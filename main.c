@@ -1,6 +1,7 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 static const double d = 0.0625;
+static const int code[] = {1, 3, 5, 7};
 double Reynolds = 1100.;
 int maxlevel = 14;
 const double pos[][2] = {{0, 0}, {2.5, 5.0/6}, {5.0, 10.0/6}, {7.5, 15.0/6}};
@@ -63,13 +64,13 @@ event movies (i += 50; t <= 100)
   vorticity (u, omega);
   foreach()
     m[] = cs[] - 0.5;
-  sprintf(path, "%d.0.mp4", icase);
+  sprintf(path, "%d.0.mp4", code[icase - 1]);
   output_ppm (omega, file = path, box = {{-d, -d}, {d, d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.1.mp4", icase);
+  sprintf(path, "%d.1.mp4", code[icase - 1]);
   output_ppm (omega, file = path, box = {{-d, -3.5 * d}, {10 * d, 3.5 * d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.2.mp4", icase);
+  sprintf(path, "%d.2.mp4", code[icase - 1]);
   output_ppm (omega, file = path, box = {{-0.5, -0.45}, {3.5, 0.45}},
 	      min = -200, max = 200, linear = false, mask = m);
 }
