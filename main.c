@@ -59,20 +59,22 @@ event logfile (i += 10)
 
 event movies (i += 50; t <= 100)
 {
+  static long iframe = 0;
   char path[FILENAME_MAX];
   scalar omega[], m[];
   vorticity (u, omega);
   foreach()
     m[] = cs[] - 0.5;
-  sprintf(path, "%d.0.mp4", code[icase - 1]);
+  sprintf(path, "%d.0.%09d.ppm", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-d, -d}, {d, d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.1.mp4", code[icase - 1]);
+  sprintf(path, "%d.1.%09d.ppm", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-d, -3.5 * d}, {10 * d, 3.5 * d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.2.mp4", code[icase - 1]);
+  sprintf(path, "%d.2.%09d.ppm", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-0.5, -0.45}, {3.5, 0.45}},
 	      min = -200, max = 200, linear = false, mask = m);
+  iframe++;
 }
 event adapt (i++) {
   adapt_wavelet ({cs,u}, (double[]){1e-2, 3e-3, 3e-3, 3e-3}, maxlevel, 4);
