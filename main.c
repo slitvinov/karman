@@ -2,10 +2,10 @@
 #include "navier-stokes/centered.h"
 static const double d = 0.0625;
 static const int code[] = {1, 3, 5, 7};
-double Reynolds = 1100.;
-int maxlevel = 14;
-const double pos[][2] = {{0, 0}, {2.5, 5.0/6}, {5.0, 10.0/6}, {7.5, 15.0/6}};
-int icase;
+static const double pos[][2] = {{0, 0}, {2.5, 5.0/6}, {5.0, 10.0/6}, {7.5, 15.0/6}};
+static double Reynolds = 1100.;
+static int maxlevel = 14;
+static int icase;
 
 face vector muv[];
 int main(int argc, char **argv) {
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   icase = atoi(argv[1]);
   L0 = 4;
   origin (-0.5, -L0/2.);
-  N = 2048;
+  N = 1024;
   mu = muv;
   run();
 }
