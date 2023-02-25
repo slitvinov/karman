@@ -2,9 +2,10 @@
 .SUFFIX:
 .SUFFIX: .c
 
-MPICC = mpicc -std=c99
-QCC =  qcc
-QCCFLAGS = -O2 -g
-all: main
-.c:; CC99='$(MPICC)' $(QCC) $(QCCFLAGS) -D_MPI=1 -o $@ $< -lm
-clean:; rm -f main
+MPICC = mpicc
+MPICCFLAGS = -O2 -g
+QCC = qcc
+all: _main
+_main.c: main.c; $(QCC) $(QCCFLAGS) -D_MPI=1 main.c -source
+.c:; $(MPICC) -o $@ $(MPICCFLAGS) $< -lm
+clean:; rm -f _main _main.c

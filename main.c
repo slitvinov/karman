@@ -7,7 +7,16 @@ static double Reynolds = 1100.;
 static int maxlevel = 14;
 static int icase;
 
+u.n[left]  = dirichlet(1.);
+p[left]    = neumann(0.);
+pf[left]   = neumann(0.);
+u.n[right] = neumann(0.);
+p[right]   = dirichlet(0.);
+pf[right]  = dirichlet(0.);
+u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
+u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 face vector muv[];
+
 int main(int argc, char **argv) {
   if (!argv[1]) {
     fprintf(stderr, "main: needs an case number\n");
@@ -25,15 +34,6 @@ event properties (i++)
   foreach_face()
     muv.x[] = fm.x[]*d/Reynolds;
 }
-
-u.n[left]  = dirichlet(1.);
-p[left]    = neumann(0.);
-pf[left]   = neumann(0.);
-u.n[right] = neumann(0.);
-p[right]   = dirichlet(0.);
-pf[right]  = dirichlet(0.);
-u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
-u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 
 event init (t = 0)
 {
