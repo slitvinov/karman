@@ -9,15 +9,15 @@ int icase;
 
 face vector muv[];
 int main(int argc, char **argv) {
+  if (!argv[1]) {
+    fprintf(stderr, "main: needs an case number\n");
+    exit(1);
+  }
+  icase = atoi(argv[1]);
   L0 = 4;
   origin (-0.5, -L0/2.);
   N = 2048;
   mu = muv;
-  if (!argv[1]) {
-    fprintf(stderr, "karman1: needs an argument\n");
-    exit(1);
-  }
-  icase = atoi(argv[1]);
   run();
 }
 event properties (i++)
@@ -50,12 +50,11 @@ event init (t = 0)
     phi[] = p0;
   }
   fractions(phi, cs, fs);
-  foreach()
-    u.x[] = cs[] ? 1. : 0.;
 }
 
-event logfile (i += 10)
+event logfile (i += 10) {
   fprintf (stderr, "%d %g %d %d\n", i, t, mgp.i, mgu.i);
+}
 
 event movies (i += 50; t <= 100)
 {
@@ -65,17 +64,17 @@ event movies (i += 50; t <= 100)
   vorticity (u, omega);
   foreach()
     m[] = cs[] - 0.5;
-  sprintf(path, "%d.0.%09d.ppm", code[icase - 1], iframe);
+  sprintf(path, "%d.0.%09ld.png", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-d, -d}, {d, d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.1.%09d.ppm", code[icase - 1], iframe);
+  sprintf(path, "%d.1.%09ld.png", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-d, -3.5 * d}, {10 * d, 3.5 * d}},
 	      min = -200, max = 200, linear = false, mask = m);
-  sprintf(path, "%d.2.%09d.ppm", code[icase - 1], iframe);
+  sprintf(path, "%d.2.%09ld.png", code[icase - 1], iframe);
   output_ppm (omega, file = path, box = {{-0.5, -0.45}, {3.5, 0.45}},
 	      min = -200, max = 200, linear = false, mask = m);
   iframe++;
 }
 event adapt (i++) {
-  adapt_wavelet ({cs,u}, (double[]){1e-2, 3e-3, 3e-3, 3e-3}, maxlevel, 4);
+  adapt_wavelet ({cs,u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel, 4);
 }
