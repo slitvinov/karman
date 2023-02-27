@@ -1,10 +1,11 @@
+#include "grid/octree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
 static const double d = 0.0625;
 static const int code[] = {1, 3, 5, 7};
 static const double pos[][2] = {{0, 0}, {2.5, 5.0/6}, {5.0, 10.0/6}, {7.5, 15.0/6}};
 static double Reynolds = 1100.;
-static int maxlevel = 14;
+static int maxlevel = 12;
 static int icase;
 
 u.n[left]  = dirichlet(1.);
