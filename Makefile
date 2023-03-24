@@ -19,4 +19,7 @@ _cylinder.c: cylinder.c; $(QCC) $(QCCFLAGS) cylinder.c -source
 sphere: _sphere.c; $(MPICC) -o sphere $(MPICCFLAGS) _sphere.c $(BASILISK)/gl/libglutils.a $(BASILISK)/gl/libfb_osmesa.a  `pkg-config --libs osmesa glu` -lm
 cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) _cylinder.c -lm
 
+deploy/cylinder.c: cylinder.c
+	$(QCC) -nolineno -source $(QCCFLAGS) cylinder.c && mv _cylinder.c deploy/cylinder.c
+
 clean:; rm -f _2.c _3.c _cylinder.c 2 3 cylinder

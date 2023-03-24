@@ -1,9 +1,8 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 static const double diameter = 0.125;
-static int level;
 static double reynolds;
-
+static int level, period, Image;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
@@ -18,12 +17,17 @@ int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag;
   int LevelFlag;
+  int PeriodFlag;
   ReynoldsFlag = 0;
   LevelFlag = 0;
+  PeriodFlag = 0;
+  Image = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(stderr, "usage: cylinder -r Reynolds\n");
+      fprintf(stderr,
+              "usage: cylinder [-i] -r <Reynolds number> -l <resolution "
+              "level> -p <dump period>\n");
       exit(1);
     case 'r':
       argv++;
@@ -46,10 +50,27 @@ int main(int argc, char **argv) {
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
-        fprintf(stderr, "cylinder '%s' is not an integer\n", *argv);
+        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
         exit(1);
       }
       LevelFlag = 1;
+      break;
+    case 'p':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: -p needs an argument\n");
+        exit(1);
+      }
+      period = strtol(*argv, &end, 10);
+      if (*end != '\0' || period <= 0) {
+        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
+      }
+      PeriodFlag = 1;
+      break;
+    case 'i':
+      argv++;
+      Image = 1;
       break;
     default:
       fprintf(stderr, "cylinder: unknown option '%s'\n", *argv);
@@ -61,6 +82,10 @@ int main(int argc, char **argv) {
   }
   if (!LevelFlag) {
     fprintf(stderr, "cylinder: -l is not set\n");
+    exit(1);
+  }
+  if (!PeriodFlag) {
+    fprintf(stderr, "cylinder: -p is not set\n");
     exit(1);
   }
   L0 = 4;
@@ -81,52 +106,56 @@ event init(t = 0) {
     phi[] = p0;
   }
   fractions(phi, cs, fs);
+  foreach() {
+    u.x[] = 0;
+    u.y[] = 0;
+  }
 }
 
-event logfile(i += 10) { fprintf(stderr, "step, time: %d %g\n", i, t); }
-
-event movies(i += 50; t <= 100) {
+event dump(i++; t <= 100) {
   static long iframe = 0;
   char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
   double sx, sy, xp, yp, ox, oy;
   float v;
-  long i, j, nx, ny;
+  long k, j, nx, ny;
 
-  vorticity(u, omega);
-  sprintf(raw, "%09ld.raw", iframe);
-  if ((fp = fopen(raw, "w")) == NULL) {
-    fprintf(stderr, "cylinder: fail to write to '%s'\n", raw);
-    exit(1);
-  }
-  ox = X0;
-  oy = -0.5;
-  nx = N;
-  sx = L0 / nx;
-  ny = 1.0 / sx;
-  sy = 1.0 / ny;
-  for (j = 0; j < ny; j++) {
-    yp = oy + sy * j + sy / 2.;
-    for (i = 0; i < nx; i++) {
-      xp = ox + sx * i + sx / 2;
-      v = interpolate(u.x, xp, yp);
-      fwrite(&v, sizeof v, 1, fp);
-      v = interpolate(u.y, xp, yp);
-      fwrite(&v, sizeof v, 1, fp);      
+  if (iframe % period == 0) {
+    fprintf(stderr, "cylinder: %09d %.3e\n", i, t);
+    vorticity(u, omega);
+    sprintf(raw, "%09ld.raw", iframe);
+    if ((fp = fopen(raw, "w")) == NULL) {
+      fprintf(stderr, "cylinder: fail to write to '%s'\n", raw);
+      exit(1);
     }
-  }
-  if (fclose(fp) != 0) {
-    fprintf(stderr, "cylinder: fail to close '%s'\n", raw);
-    exit(1);
-  }
+    ox = X0;
+    oy = -0.5;
+    nx = N;
+    sx = L0 / nx;
+    ny = 1.0 / sx;
+    sy = 1.0 / ny;
+    for (k = 0; k < ny; k++) {
+      yp = oy + sy * k + sy / 2.;
+      for (j = 0; j < nx; j++) {
+        xp = ox + sx * j + sx / 2;
+        v = interpolate(u.x, xp, yp);
+        fwrite(&v, sizeof v, 1, fp);
+        v = interpolate(u.y, xp, yp);
+        fwrite(&v, sizeof v, 1, fp);
+      }
+    }
+    if (fclose(fp) != 0) {
+      fprintf(stderr, "cylinder: fail to close '%s'\n", raw);
+      exit(1);
+    }
 
-  sprintf(xdmf, "a.%09ld.xdmf2", iframe);
-  if ((fp = fopen(xdmf, "w")) == NULL) {
-    fprintf(stderr, "cylinder: fail to write to '%s'\n", xdmf);
-    exit(1);
-  }
-  fprintf(fp, "\
+    sprintf(xdmf, "a.%09ld.xdmf2", iframe);
+    if ((fp = fopen(xdmf, "w")) == NULL) {
+      fprintf(stderr, "cylinder: fail to write to '%s'\n", xdmf);
+      exit(1);
+    }
+    fprintf(fp, "\
 <?xml version=\"1.0\" ?>\n\
 <!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n\
 <Xdmf Version=\"2.0\">\n\
@@ -138,34 +167,37 @@ event movies(i += 50; t <= 100) {
        <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
      </Geometry>\n\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
-        <DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-          <DataItem Dimensions=\"3 2\">0 0 1 2 %ld %ld</DataItem>\n\
+	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
+	  <DataItem Dimensions=\"3 2\">0 0 1 2 %ld %ld</DataItem>\n\
 	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
-        </DataItem>\n\
+	</DataItem>\n\
      </Attribute>\n\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
-        <DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-          <DataItem Dimensions=\"3 2\">0 1 1 2 %ld %ld</DataItem>\n\
+	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
+	  <DataItem Dimensions=\"3 2\">0 1 1 2 %ld %ld</DataItem>\n\
 	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
-        </DataItem>\n\
+	</DataItem>\n\
      </Attribute>\n\
    </Grid>\n\
  </Domain>\n\
 </Xdmf>\n\
 ",
-          ny + 1, nx + 1, oy, ox, sy, sx,
-	  "ux", ny, nx, ny, nx, ny, 2 * nx, raw,
-	  "uy", ny, nx, ny, nx, ny, 2 * nx, raw);
+            ny + 1, nx + 1, oy, ox, sy, sx, "ux", ny, nx, ny, nx, ny, 2 * nx,
+            raw, "uy", ny, nx, ny, nx, ny, 2 * nx, raw);
 
-  if (fclose(fp) != 0) {
-    fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
-    exit(1);
+    if (fclose(fp) != 0) {
+      fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
+      exit(1);
+    }
+    if (Image) {
+      foreach ()
+	m[] = cs[] - 0.5;
+      sprintf(png, "%09ld.ppm", iframe);
+      output_ppm(omega, file = png, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
+		 min = -5 / diameter, max = 5 / diameter, linear = false,
+		 mask = m);
+    }
   }
-  foreach ()
-    m[] = cs[] - 0.5;
-  sprintf(png, "%09ld.png", iframe);
-  output_ppm(omega, file = png, box = {{-0.5, -0.45}, {L0 - 0.5, 0.45}},
-             min = -20, max = 20, linear = false, mask = m);
   iframe++;
 }
 event adapt(i++) {
