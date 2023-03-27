@@ -1,7 +1,7 @@
 Compile
 
 ```
-$ c99 cylinder.c -O2 -o cylinder -lm
+$ c99 cylinder.c -fopenmp -O2 -o cylinder -lm
 ```
 
 Run
