@@ -1,7 +1,8 @@
 Compile
 
 ```
-$ c99 cylinder.c -fopenmp -O2 -o cylinder -lm
+$ make
+c99 -g -O2 -fopenmp -o cylinder cylinder.c  -lm
 ```
 
 Run

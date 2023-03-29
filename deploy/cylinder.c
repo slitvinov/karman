@@ -15130,7 +15130,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 #line 173 "cylinder.c"
             ny + 1, nx + 1, oy, ox, sy, sx);
     for (j = 0; j < sizeof names / sizeof *names; j++)
-      fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 2 %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
+      fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
 
 
 
@@ -15138,7 +15138,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
 
 
-       names[j], ny, nx, j, ny, nx, ny, 3 * nx, raw);
+       names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny, 3 * nx, raw);
     fprintf(fp,"   </Grid>\n </Domain>\n</Xdmf>\n");
 
 

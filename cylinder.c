@@ -175,12 +175,12 @@ event dump(i++; t <= 100) {
       fprintf(fp, "\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
 	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-	  <DataItem Dimensions=\"3 2\">0 %ld 1 2 %ld %ld</DataItem>\n\
+	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n\
 	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
 	</DataItem>\n\
      </Attribute>\n\
 ",
-	      names[j], ny, nx, j, ny, nx, ny, 3 * nx, raw);
+	      names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny, 3 * nx, raw);
     fprintf(fp,"\
    </Grid>\n\
  </Domain>\n\
