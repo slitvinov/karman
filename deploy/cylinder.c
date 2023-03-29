@@ -15068,13 +15068,13 @@ foreach_vertex() {
     val(phi,0,0,0) = p0;
   }end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
-  foreach_stencil() {
+  foreach_stencil () {
     _stencil_val_a(u.x,0,0,0);  
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
 #line 109
-foreach() {
+foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
   }end_foreach();}delete((scalar*)((scalar[]){phi,{-1}}));
@@ -15088,6 +15088,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   double sx, sy, xp, yp, ox, oy;
   float v;
   long k, j, nx, ny;
+  char *names[] = {"ux", "uy", "p"};
 
   if (iframe % period == 0) {
     fprintf(ferr, "cylinder: %09d %.3e\n", i, t);
@@ -15111,6 +15112,8 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
         fwrite(&v, sizeof v, 1, fp);
         v = interpolate((struct _interpolate){u.y, xp, yp});
         fwrite(&v, sizeof v, 1, fp);
+        v = interpolate((struct _interpolate){p, xp, yp});
+        fwrite(&v, sizeof v, 1, fp);
       }
     }
     if (fclose(fp) != 0) {
@@ -15123,10 +15126,24 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
       exit(1);
     }
-    fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 0 1 2 %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 1 1 2 %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n   </Grid>\n </Domain>\n</Xdmf>\n",
-#line 185 "cylinder.c"
-            ny + 1, nx + 1, oy, ox, sy, sx, "ux", ny, nx, ny, nx, ny, 2 * nx,
-            raw, "uy", ny, nx, ny, nx, ny, 2 * nx, raw);
+    fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
+#line 173 "cylinder.c"
+            ny + 1, nx + 1, oy, ox, sy, sx);
+    for (j = 0; j < sizeof names / sizeof *names; j++)
+      fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 2 %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
+
+
+
+
+
+
+
+       names[j], ny, nx, j, ny, nx, ny, 3 * nx, raw);
+    fprintf(fp,"   </Grid>\n </Domain>\n</Xdmf>\n");
+
+
+
+
 
     if (fclose(fp) != 0) {
       fprintf(ferr, "cylinder: fail to close '%s'\n", xdmf);
@@ -15134,15 +15151,15 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     }
     if (Image) {
       foreach_stencil ()
- {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
+        {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 193
+#line 195
 foreach ()
- val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
+        val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
       output_ppm((struct OutputPPM){omega, .file = png, .box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
-   .min = -5 / diameter, .max = 5 / diameter, .linear = false,
-   .mask = m});
+                 .min = -5 / diameter, .max = 5 / diameter, .linear = false,
+                 .mask = m});
     }
   }
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));

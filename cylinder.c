@@ -106,7 +106,7 @@ event init(t = 0) {
     phi[] = p0;
   }
   fractions(phi, cs, fs);
-  foreach() {
+  foreach () {
     u.x[] = 0;
     u.y[] = 0;
   }
@@ -120,6 +120,7 @@ event dump(i++; t <= 100) {
   double sx, sy, xp, yp, ox, oy;
   float v;
   long k, j, nx, ny;
+  char *names[] = {"ux", "uy", "p"};
 
   if (iframe % period == 0) {
     fprintf(stderr, "cylinder: %09d %.3e\n", i, t);
@@ -142,6 +143,8 @@ event dump(i++; t <= 100) {
         v = interpolate(u.x, xp, yp);
         fwrite(&v, sizeof v, 1, fp);
         v = interpolate(u.y, xp, yp);
+        fwrite(&v, sizeof v, 1, fp);
+        v = interpolate(p, xp, yp);
         fwrite(&v, sizeof v, 1, fp);
       }
     }
@@ -166,24 +169,23 @@ event dump(i++; t <= 100) {
        <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
        <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
      </Geometry>\n\
+",
+            ny + 1, nx + 1, oy, ox, sy, sx);
+    for (j = 0; j < sizeof names / sizeof *names; j++)
+      fprintf(fp, "\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
 	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-	  <DataItem Dimensions=\"3 2\">0 0 1 2 %ld %ld</DataItem>\n\
+	  <DataItem Dimensions=\"3 2\">0 %ld 1 2 %ld %ld</DataItem>\n\
 	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
 	</DataItem>\n\
      </Attribute>\n\
-     <Attribute Name=\"%s\" Center=\"Cell\">\n\
-	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-	  <DataItem Dimensions=\"3 2\">0 1 1 2 %ld %ld</DataItem>\n\
-	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
-	</DataItem>\n\
-     </Attribute>\n\
+",
+	      names[j], ny, nx, j, ny, nx, ny, 3 * nx, raw);
+    fprintf(fp,"\
    </Grid>\n\
  </Domain>\n\
 </Xdmf>\n\
-",
-            ny + 1, nx + 1, oy, ox, sy, sx, "ux", ny, nx, ny, nx, ny, 2 * nx,
-            raw, "uy", ny, nx, ny, nx, ny, 2 * nx, raw);
+");
 
     if (fclose(fp) != 0) {
       fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
@@ -191,11 +193,11 @@ event dump(i++; t <= 100) {
     }
     if (Image) {
       foreach ()
-	m[] = cs[] - 0.5;
+        m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
       output_ppm(omega, file = png, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
-		 min = -5 / diameter, max = 5 / diameter, linear = false,
-		 mask = m);
+                 min = -5 / diameter, max = 5 / diameter, linear = false,
+                 mask = m);
     }
   }
   iframe++;

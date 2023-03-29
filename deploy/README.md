@@ -18,7 +18,7 @@ cylinder: 000000300 6.143e-01
 Plot
 
 ```
-$ python plot.py
+$ python plot.py a.000000300.xdmf2
 ```
 
-open `ux.png` and `uy.png`.
+open `ux.png`, `uy.png`, or `p.png`.
