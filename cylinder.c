@@ -26,45 +26,45 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-              "usage: cylinder [-i] -r <Reynolds number> -l <resolution "
-              "level> -p <dump period>\n");
+	      "usage: cylinder [-i] -r <Reynolds number> -l <resolution "
+	      "level> -p <dump period>\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: -r needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: -r needs an argument\n");
+	exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "cylinder '%s' is not a number\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder '%s' is not a number\n", *argv);
+	exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: -l needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: -l needs an argument\n");
+	exit(1);
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
-        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
+	exit(1);
       }
       LevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: -p needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: -p needs an argument\n");
+	exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
+	exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -114,13 +114,15 @@ event init(t = 0) {
 
 event dump(i++; t <= 100) {
   static long iframe = 0;
-  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX];
+  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX], surface[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
   double sx, sy, xp, yp, ox, oy;
   float v;
   long k, j, nx, ny;
   char *names[] = {"ux", "uy", "p"};
+  coord n, b, Fp, Fmu;
+  double omega_surface, theta;
 
   if (iframe % period == 0) {
     fprintf(stderr, "cylinder: %09d %.3e\n", i, t);
@@ -139,13 +141,13 @@ event dump(i++; t <= 100) {
     for (k = 0; k < ny; k++) {
       yp = oy + sy * k + sy / 2.;
       for (j = 0; j < nx; j++) {
-        xp = ox + sx * j + sx / 2;
-        v = interpolate(u.x, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate(u.y, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate(p, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
+	xp = ox + sx * j + sx / 2;
+	v = interpolate(u.x, xp, yp);
+	fwrite(&v, sizeof v, 1, fp);
+	v = interpolate(u.y, xp, yp);
+	fwrite(&v, sizeof v, 1, fp);
+	v = interpolate(p, xp, yp);
+	fwrite(&v, sizeof v, 1, fp);
       }
     }
     if (fclose(fp) != 0) {
@@ -170,7 +172,7 @@ event dump(i++; t <= 100) {
        <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
      </Geometry>\n\
 ",
-            ny + 1, nx + 1, oy, ox, sy, sx);
+	    ny + 1, nx + 1, oy, ox, sy, sx);
     for (j = 0; j < sizeof names / sizeof *names; j++)
       fprintf(fp, "\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
@@ -186,18 +188,41 @@ event dump(i++; t <= 100) {
  </Domain>\n\
 </Xdmf>\n\
 ");
-
     if (fclose(fp) != 0) {
       fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
       exit(1);
     }
+
+    sprintf(surface, "surface.%09ld.raw", iframe);
+    if ((fp = fopen(surface, "w")) == NULL) {
+      fprintf(stderr, "cylinder: fail to write to '%s'\n", surface);
+      exit(1);
+    }
+    foreach(serial)
+      if (cs[] > 0. && cs[] < 1.) {
+	embed_geometry(point, &b, &n);
+	embed_force(p, u, mu, &Fp, &Fmu);
+	omega_surface = embed_vorticity(point, u, b, n);
+	x += b.x*Delta, y += b.y*Delta;
+	theta = atan2(y, x);
+	fwrite(&theta, sizeof theta, 1, fp);
+	fwrite(&omega_surface, sizeof omega_surface, 1, fp);
+	fwrite(&Fp.x, sizeof Fp.x, 1, fp);
+	fwrite(&Fp.y, sizeof Fp.y, 1, fp);
+	fwrite(&Fmu.x, sizeof Fmu.x, 1, fp);
+	fwrite(&Fmu.y, sizeof Fmu.y, 1, fp);
+      }
+    if (fclose(fp) != 0) {
+      fprintf(stderr, "cylinder: fail to close '%s'\n", surface);
+      exit(1);
+    }
     if (Image) {
       foreach ()
-        m[] = cs[] - 0.5;
+	m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
       output_ppm(omega, file = png, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
-                 min = -5 / diameter, max = 5 / diameter, linear = false,
-                 mask = m);
+		 min = -5 / diameter, max = 5 / diameter, linear = false,
+		 mask = m);
     }
   }
   iframe++;
