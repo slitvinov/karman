@@ -3,6 +3,10 @@ Compile
 ```
 $ make
 c99 -g -O2 -fopenmp -o cylinder cylinder.c  -lm
+$ ./cylinder -h
+usage: cylinder [-i] [-s] [-z <number of cells>] -r <Reynolds number> -l <resolution level> -p <dump period>
+  -s     dump surface file
+  -i     dump PPM images
 ```
 
 Run
