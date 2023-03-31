@@ -14966,7 +14966,7 @@ is_face_y(){
 #line 3 "cylinder.c"
 static const double diameter = 0.125;
 static double reynolds;
-static int level, period, Image, Surface;
+static int level, period, Image, Surface, Zoom, nzoom;
 static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(1.);}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
 static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
 static double _boundary6(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary6_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
@@ -14976,6 +14976,66 @@ static double _boundary9(Point point,Point neighbor,scalar _s,void *data){int ig
 static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary10_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
 static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
 vector  muv={{11},{12}};
+
+int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
+                double ex, double ey, long nx) {
+  long k, j, ny;
+  double sx, sy, xp, yp;
+  float v;
+  FILE *fp;
+  char *names[] = {"ux", "uy", "p"};
+  sx = ex / nx;
+  ny = ey / sx;
+  sy = ey / ny;
+  if ((fp = fopen(raw, "w")) == NULL) {
+    fprintf(ferr, "cylinder: fail to write to '%s'\n", raw);
+    exit(1);
+  }
+  for (k = 0; k < ny; k++) {
+    yp = oy + sy * k + sy / 2.;
+    for (j = 0; j < nx; j++) {
+      xp = ox + sx * j + sx / 2;
+      v = interpolate((struct _interpolate){u.x, xp, yp});
+      fwrite(&v, sizeof v, 1, fp);
+      v = interpolate((struct _interpolate){u.y, xp, yp});
+      fwrite(&v, sizeof v, 1, fp);
+      v = interpolate((struct _interpolate){p, xp, yp});
+      fwrite(&v, sizeof v, 1, fp);
+    }
+  }
+  if (fclose(fp) != 0) {
+    fprintf(ferr, "cylinder: fail to close '%s'\n", raw);
+    return 1;
+  }
+  if ((fp = fopen(xdmf, "w")) == NULL) {
+    fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
+    return 1;
+  }
+  fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
+#line 62 "cylinder.c"
+          ny + 1, nx + 1, oy, ox, sy, sx);
+  for (j = 0; j < sizeof names / sizeof *names; j++)
+    fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
+
+
+
+
+
+
+
+            names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
+            3 * nx, raw);
+  fprintf(fp, "   </Grid>\n </Domain>\n</Xdmf>\n");
+
+
+
+
+  if (fclose(fp) != 0) {
+    fprintf(ferr, "cylinder: fail to close '%s'\n", xdmf);
+    return 1;
+  }
+  return 0;
+}
 
 int main(int argc, char **argv) {_init_solver();
   char *end;
@@ -14987,14 +15047,15 @@ int main(int argc, char **argv) {_init_solver();
   PeriodFlag = 0;
   Image = 0;
   Surface = 0;
+  Zoom = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(ferr,
-              "usage: cylinder [-i] [-s] -r <Reynolds number> -l <resolution "
-              "level> -p <dump period>\n"
-       "  -s     dump surface file\n"
-       "  -i     dump PPM images\n");
+      fprintf(ferr, "usage: cylinder [-i] [-s] [-z <number of cells>] -r "
+                      "<Reynolds number> -l <resolution "
+                      "level> -p <dump period>\n"
+                      "  -s     dump surface file\n"
+                      "  -i     dump PPM images\n");
       exit(1);
     case 'r':
       argv++;
@@ -15043,6 +15104,19 @@ int main(int argc, char **argv) {_init_solver();
       argv++;
       Surface = 1;
       break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(ferr, "cylinder: -z needs an argument\n");
+        exit(1);
+      }
+      nzoom = strtol(*argv, &end, 10);
+      if (*end != '\0' || level <= 0) {
+        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
+      }
+      Zoom = 1;
+      break;
     default:
       fprintf(ferr, "cylinder: unknown option '%s'\n", *argv);
       exit(1);
@@ -15077,7 +15151,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 108
+#line 192
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15091,7 +15165,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 116
+#line 200
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15104,71 +15178,24 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       surface[FILENAME_MAX];
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
   FILE *fp;
-  double sx, sy, xp, yp, ox, oy, ex, ey;
-  float v;
-  long k, j, nx, ny;
-  char *names[] = {"ux", "uy", "p"};
+  long nx, ny;
   coord n, b;
   double omega_surface, theta;
 
   if (iframe % period == 0) {
     fprintf(ferr, "cylinder: %09d %.3e\n", i, t);
+
     sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
-    if ((fp = fopen(raw, "w")) == NULL) {
-      fprintf(ferr, "cylinder: fail to write to '%s'\n", raw);
+    if (dump_fields(raw, xdmf, X0, -0.5, L0, 1.0, N) != 0)
       exit(1);
-    }
-    ex = L0;
-    ey = 1.0;
-    ox = X0;
-    oy = -0.5;
-    nx = N;
-    sx = ex / nx;
-    ny = ey / sx;
-    sy = ey / ny;
-    for (k = 0; k < ny; k++) {
-      yp = oy + sy * k + sy / 2.;
-      for (j = 0; j < nx; j++) {
-        xp = ox + sx * j + sx / 2;
-        v = interpolate((struct _interpolate){u.x, xp, yp});
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate((struct _interpolate){u.y, xp, yp});
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate((struct _interpolate){p, xp, yp});
-        fwrite(&v, sizeof v, 1, fp);
-      }
-    }
-    if (fclose(fp) != 0) {
-      fprintf(ferr, "cylinder: fail to close '%s'\n", raw);
-      exit(1);
-    }
-    if ((fp = fopen(xdmf, "w")) == NULL) {
-      fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
-      exit(1);
-    }
-    fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
-#line 183 "cylinder.c"
-            ny + 1, nx + 1, oy, ox, sy, sx);
-    for (j = 0; j < sizeof names / sizeof *names; j++)
-      fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
 
-
-
-
-
-
-
-              names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
-              3 * nx, raw);
-    fprintf(fp, "   </Grid>\n </Domain>\n</Xdmf>\n");
-
-
-
-
-    if (fclose(fp) != 0) {
-      fprintf(ferr, "cylinder: fail to close '%s'\n", xdmf);
-      exit(1);
+    if (Zoom) {
+      sprintf(xdmf, "z.%09ld.xdmf2", iframe);
+      sprintf(raw, "z.%09ld.raw", iframe);
+      if (dump_fields(raw, xdmf, -1.25 * diameter, -1.25 * diameter,
+                      2.5 * diameter, 2.5 * diameter, nzoom) != 0)
+        exit(1);
     }
 
     if (Surface) {
@@ -15187,7 +15214,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
           
           
         
-#line 219
+#line 246
 }      }end_foreach_stencil();
       
 #if _OPENMP
@@ -15195,7 +15222,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
   #define OMP(x)
 #endif
 {
-#line 211
+#line 238
 foreach ()
         if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
           embed_geometry(point, &b, &n);
@@ -15211,7 +15238,7 @@ foreach ()
 #endif
 
       
-#line 220
+#line 247
 if (fclose(fp) != 0) {
         fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
         exit(1);
@@ -15221,7 +15248,7 @@ if (fclose(fp) != 0) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 226
+#line 253
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);

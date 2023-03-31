@@ -2,7 +2,7 @@
 #include "navier-stokes/centered.h"
 static const double diameter = 0.125;
 static double reynolds;
-static int level, period, Image, Surface;
+static int level, period, Image, Surface, Zoom, nzoom;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
@@ -12,6 +12,76 @@ pf[right] = dirichlet(0.);
 u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 face vector muv[];
+
+int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
+                double ex, double ey, long nx) {
+  long k, j, ny;
+  double sx, sy, xp, yp;
+  float v;
+  FILE *fp;
+  char *names[] = {"ux", "uy", "p"};
+  sx = ex / nx;
+  ny = ey / sx;
+  sy = ey / ny;
+  if ((fp = fopen(raw, "w")) == NULL) {
+    fprintf(stderr, "cylinder: fail to write to '%s'\n", raw);
+    exit(1);
+  }
+  for (k = 0; k < ny; k++) {
+    yp = oy + sy * k + sy / 2.;
+    for (j = 0; j < nx; j++) {
+      xp = ox + sx * j + sx / 2;
+      v = interpolate(u.x, xp, yp);
+      fwrite(&v, sizeof v, 1, fp);
+      v = interpolate(u.y, xp, yp);
+      fwrite(&v, sizeof v, 1, fp);
+      v = interpolate(p, xp, yp);
+      fwrite(&v, sizeof v, 1, fp);
+    }
+  }
+  if (fclose(fp) != 0) {
+    fprintf(stderr, "cylinder: fail to close '%s'\n", raw);
+    return 1;
+  }
+  if ((fp = fopen(xdmf, "w")) == NULL) {
+    fprintf(stderr, "cylinder: fail to write to '%s'\n", xdmf);
+    return 1;
+  }
+  fprintf(fp, "\
+<?xml version=\"1.0\" ?>\n\
+<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n\
+<Xdmf Version=\"2.0\">\n\
+ <Domain>\n\
+   <Grid Name=\"Grid\">\n\
+     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n\
+     <Geometry GeometryType=\"ORIGIN_DXDY\">\n\
+       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
+       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
+     </Geometry>\n\
+",
+          ny + 1, nx + 1, oy, ox, sy, sx);
+  for (j = 0; j < sizeof names / sizeof *names; j++)
+    fprintf(fp, "\
+     <Attribute Name=\"%s\" Center=\"Cell\">\n\
+	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
+	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n\
+	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
+	</DataItem>\n\
+     </Attribute>\n\
+",
+            names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
+            3 * nx, raw);
+  fprintf(fp, "\
+   </Grid>\n\
+ </Domain>\n\
+</Xdmf>\n\
+");
+  if (fclose(fp) != 0) {
+    fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
+    return 1;
+  }
+  return 0;
+}
 
 int main(int argc, char **argv) {
   char *end;
@@ -23,14 +93,15 @@ int main(int argc, char **argv) {
   PeriodFlag = 0;
   Image = 0;
   Surface = 0;
+  Zoom = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(stderr,
-              "usage: cylinder [-i] [-s] -r <Reynolds number> -l <resolution "
-              "level> -p <dump period>\n"
-              "  -s     dump surface file\n"
-              "  -i     dump PPM images\n");
+      fprintf(stderr, "usage: cylinder [-i] [-s] [-z <number of cells>] -r "
+                      "<Reynolds number> -l <resolution "
+                      "level> -p <dump period>\n"
+                      "  -s     dump surface file\n"
+                      "  -i     dump PPM images\n");
       exit(1);
     case 'r':
       argv++;
@@ -79,6 +150,19 @@ int main(int argc, char **argv) {
       argv++;
       Surface = 1;
       break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: -z needs an argument\n");
+        exit(1);
+      }
+      nzoom = strtol(*argv, &end, 10);
+      if (*end != '\0' || level <= 0) {
+        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
+      }
+      Zoom = 1;
+      break;
     default:
       fprintf(stderr, "cylinder: unknown option '%s'\n", *argv);
       exit(1);
@@ -125,81 +209,24 @@ event dump(i++; t <= 100) {
       surface[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
-  double sx, sy, xp, yp, ox, oy, ex, ey;
-  float v;
-  long k, j, nx, ny;
-  char *names[] = {"ux", "uy", "p"};
+  long nx, ny;
   coord n, b;
   double omega_surface, theta;
 
   if (iframe % period == 0) {
-    fprintf(stderr, "cylinder: %09d %.3e\n", i, t);
+    fprintf(stderr, "cylinder: %09d %.16e\n", i, t);
+
     sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
-    if ((fp = fopen(raw, "w")) == NULL) {
-      fprintf(stderr, "cylinder: fail to write to '%s'\n", raw);
+    if (dump_fields(raw, xdmf, X0, -0.5, L0, 1.0, N) != 0)
       exit(1);
-    }
-    ex = L0;
-    ey = 1.0;
-    ox = X0;
-    oy = -0.5;
-    nx = N;
-    sx = ex / nx;
-    ny = ey / sx;
-    sy = ey / ny;
-    for (k = 0; k < ny; k++) {
-      yp = oy + sy * k + sy / 2.;
-      for (j = 0; j < nx; j++) {
-        xp = ox + sx * j + sx / 2;
-        v = interpolate(u.x, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate(u.y, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
-        v = interpolate(p, xp, yp);
-        fwrite(&v, sizeof v, 1, fp);
-      }
-    }
-    if (fclose(fp) != 0) {
-      fprintf(stderr, "cylinder: fail to close '%s'\n", raw);
-      exit(1);
-    }
-    if ((fp = fopen(xdmf, "w")) == NULL) {
-      fprintf(stderr, "cylinder: fail to write to '%s'\n", xdmf);
-      exit(1);
-    }
-    fprintf(fp, "\
-<?xml version=\"1.0\" ?>\n\
-<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n\
-<Xdmf Version=\"2.0\">\n\
- <Domain>\n\
-   <Grid Name=\"Grid\">\n\
-     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n\
-     <Geometry GeometryType=\"ORIGIN_DXDY\">\n\
-       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
-       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
-     </Geometry>\n\
-",
-            ny + 1, nx + 1, oy, ox, sy, sx);
-    for (j = 0; j < sizeof names / sizeof *names; j++)
-      fprintf(fp, "\
-     <Attribute Name=\"%s\" Center=\"Cell\">\n\
-	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n\
-	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
-	</DataItem>\n\
-     </Attribute>\n\
-",
-              names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
-              3 * nx, raw);
-    fprintf(fp, "\
-   </Grid>\n\
- </Domain>\n\
-</Xdmf>\n\
-");
-    if (fclose(fp) != 0) {
-      fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
-      exit(1);
+
+    if (Zoom) {
+      sprintf(xdmf, "z.%09ld.xdmf2", iframe);
+      sprintf(raw, "z.%09ld.raw", iframe);
+      if (dump_fields(raw, xdmf, -1.25 * diameter, -1.25 * diameter,
+                      2.5 * diameter, 2.5 * diameter, nzoom) != 0)
+        exit(1);
     }
 
     if (Surface) {
