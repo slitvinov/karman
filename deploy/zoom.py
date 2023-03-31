@@ -28,7 +28,7 @@ def read(path):
 
 
 time, (ux, uy, p) = read(sys.argv[1])
-print(np.shape(ux))
+print(time, np.shape(ux))
 for name, field in zip(("ux.png", "uy.png", "p.png"), (ux, uy, p)):
     plt.title("time: %.8e" % time)
     plt.imshow(field.T)
