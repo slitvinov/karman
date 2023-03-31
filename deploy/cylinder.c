@@ -14977,8 +14977,8 @@ static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
 vector  muv={{11},{12}};
 
-int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
-                double ex, double ey, long nx) {
+int dump_fields(const char *raw, const char *xdmf, double t, double ox,
+                double oy, double ex, double ey, long nx) {
   long k, j, ny;
   double sx, sy, xp, yp;
   float v;
@@ -15011,9 +15011,9 @@ int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
     fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
     return 1;
   }
-  fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
-#line 62 "cylinder.c"
-          ny + 1, nx + 1, oy, ox, sy, sx);
+  fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Time Value=\"%.16e\"/>\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
+#line 63 "cylinder.c"
+          t, ny + 1, nx + 1, oy, ox, sy, sx);
   for (j = 0; j < sizeof names / sizeof *names; j++)
     fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
 
@@ -15083,6 +15083,19 @@ int main(int argc, char **argv) {_init_solver();
       }
       LevelFlag = 1;
       break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(ferr, "cylinder: -z needs an argument\n");
+        exit(1);
+      }
+      nzoom = strtol(*argv, &end, 10);
+      if (*end != '\0' || nzoom <= 0) {
+        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
+      }
+      Zoom = 1;
+      break;
     case 'p':
       argv++;
       if (*argv == NULL) {
@@ -15103,19 +15116,6 @@ int main(int argc, char **argv) {_init_solver();
     case 's':
       argv++;
       Surface = 1;
-      break;
-    case 'z':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(ferr, "cylinder: -z needs an argument\n");
-        exit(1);
-      }
-      nzoom = strtol(*argv, &end, 10);
-      if (*end != '\0' || level <= 0) {
-        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
-        exit(1);
-      }
-      Zoom = 1;
       break;
     default:
       fprintf(ferr, "cylinder: unknown option '%s'\n", *argv);
@@ -15151,7 +15151,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 192
+#line 193
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15165,7 +15165,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 200
+#line 201
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15183,17 +15183,17 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   double omega_surface, theta;
 
   if (iframe % period == 0) {
-    fprintf(ferr, "cylinder: %09d %.3e\n", i, t);
+    fprintf(ferr, "cylinder: %09d %.16e\n", i, t);
 
     sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
-    if (dump_fields(raw, xdmf, X0, -0.5, L0, 1.0, N) != 0)
+    if (dump_fields(raw, xdmf, t, X0, -0.5, L0, 1.0, N) != 0)
       exit(1);
 
     if (Zoom) {
       sprintf(xdmf, "z.%09ld.xdmf2", iframe);
       sprintf(raw, "z.%09ld.raw", iframe);
-      if (dump_fields(raw, xdmf, -1.25 * diameter, -1.25 * diameter,
+      if (dump_fields(raw, xdmf, t, -1.25 * diameter, -1.25 * diameter,
                       2.5 * diameter, 2.5 * diameter, nzoom) != 0)
         exit(1);
     }
@@ -15214,7 +15214,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
           
           
         
-#line 246
+#line 247
 }      }end_foreach_stencil();
       
 #if _OPENMP
@@ -15222,7 +15222,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
   #define OMP(x)
 #endif
 {
-#line 238
+#line 239
 foreach ()
         if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
           embed_geometry(point, &b, &n);
@@ -15238,7 +15238,7 @@ foreach ()
 #endif
 
       
-#line 247
+#line 248
 if (fclose(fp) != 0) {
         fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
         exit(1);
@@ -15248,7 +15248,7 @@ if (fclose(fp) != 0) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 253
+#line 254
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);

@@ -13,8 +13,8 @@ u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 face vector muv[];
 
-int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
-                double ex, double ey, long nx) {
+int dump_fields(const char *raw, const char *xdmf, double t, double ox,
+                double oy, double ex, double ey, long nx) {
   long k, j, ny;
   double sx, sy, xp, yp;
   float v;
@@ -53,13 +53,14 @@ int dump_fields(const char *raw, const char *xdmf, double ox, double oy,
 <Xdmf Version=\"2.0\">\n\
  <Domain>\n\
    <Grid Name=\"Grid\">\n\
+     <Time Value=\"%.16e\"/>\n\
      <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n\
      <Geometry GeometryType=\"ORIGIN_DXDY\">\n\
        <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
        <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
      </Geometry>\n\
 ",
-          ny + 1, nx + 1, oy, ox, sy, sx);
+          t, ny + 1, nx + 1, oy, ox, sy, sx);
   for (j = 0; j < sizeof names / sizeof *names; j++)
     fprintf(fp, "\
      <Attribute Name=\"%s\" Center=\"Cell\">\n\
@@ -129,6 +130,19 @@ int main(int argc, char **argv) {
       }
       LevelFlag = 1;
       break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: -z needs an argument\n");
+        exit(1);
+      }
+      nzoom = strtol(*argv, &end, 10);
+      if (*end != '\0' || nzoom <= 0) {
+        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
+      }
+      Zoom = 1;
+      break;
     case 'p':
       argv++;
       if (*argv == NULL) {
@@ -149,19 +163,6 @@ int main(int argc, char **argv) {
     case 's':
       argv++;
       Surface = 1;
-      break;
-    case 'z':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(stderr, "cylinder: -z needs an argument\n");
-        exit(1);
-      }
-      nzoom = strtol(*argv, &end, 10);
-      if (*end != '\0' || level <= 0) {
-        fprintf(stderr, "cylinder: '%s' is not a positive integer\n", *argv);
-        exit(1);
-      }
-      Zoom = 1;
       break;
     default:
       fprintf(stderr, "cylinder: unknown option '%s'\n", *argv);
@@ -218,13 +219,13 @@ event dump(i++; t <= 100) {
 
     sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
-    if (dump_fields(raw, xdmf, X0, -0.5, L0, 1.0, N) != 0)
+    if (dump_fields(raw, xdmf, t, X0, -0.5, L0, 1.0, N) != 0)
       exit(1);
 
     if (Zoom) {
       sprintf(xdmf, "z.%09ld.xdmf2", iframe);
       sprintf(raw, "z.%09ld.raw", iframe);
-      if (dump_fields(raw, xdmf, -1.25 * diameter, -1.25 * diameter,
+      if (dump_fields(raw, xdmf, t, -1.25 * diameter, -1.25 * diameter,
                       2.5 * diameter, 2.5 * diameter, nzoom) != 0)
         exit(1);
     }

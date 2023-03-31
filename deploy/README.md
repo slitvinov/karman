@@ -31,3 +31,15 @@ $ python surface.py surface.000000400.raw
 ```
 
 open `omega.png`
+
+Run and dump zoomed grid
+
+```
+$ ./cylinder -z 1024 -r 100 -l 10 -p 100
+```
+
+```
+$ python zoom.py z.000000300.xdmf2
+```
+
+open `ux.png`, `uy.png`, or `p.png`.
