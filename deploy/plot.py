@@ -24,3 +24,4 @@ ux, uy, p = read(sys.argv[1])
 for name, field in zip(("ux.png", "uy.png", "p.png"), (ux, uy, p)):
     plt.imshow(field.T)
     plt.savefig(name, bbox_inches='tight')
+    plt.close()

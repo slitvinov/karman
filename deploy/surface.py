@@ -1,13 +1,19 @@
 import matplotlib.pylab as plt
 import numpy as np
-import os
-import re
 import sys
 
 
 def read(path):
-    with open(path) as file:
-        return np.ndarray((4, -1), 'float64', file.read(), order='F')
+    nitems = 2
+    dtype = np.dtype('float64')
+    with open(path, 'rb') as file:
+        buffer = file.read()
+        n = len(buffer) // (dtype.itemsize * nitems)
+        return np.ndarray((nitems, n), dtype, buffer, order='F')
 
 
-read(sys.argv[0])
+theta, omega = read(sys.argv[1])
+plt.plot(theta, omega, 'o')
+plt.xlabel("theta, radians")
+plt.ylabel("vorticity, 1 / second")
+plt.savefig("omega.png")

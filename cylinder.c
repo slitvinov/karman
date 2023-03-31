@@ -2,7 +2,7 @@
 #include "navier-stokes/centered.h"
 static const double diameter = 0.125;
 static double reynolds;
-static int level, period, Image;
+static int level, period, Image, Surface;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
@@ -22,11 +22,12 @@ int main(int argc, char **argv) {
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
+  Surface = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-	      "usage: cylinder [-i] -r <Reynolds number> -l <resolution "
+	      "usage: cylinder [-i] [-s] -r <Reynolds number> -l <resolution "
 	      "level> -p <dump period>\n");
       exit(1);
     case 'r':
@@ -71,6 +72,10 @@ int main(int argc, char **argv) {
     case 'i':
       argv++;
       Image = 1;
+      break;
+    case 's':
+      argv++;
+      Surface = 1;
       break;
     default:
       fprintf(stderr, "cylinder: unknown option '%s'\n", *argv);
@@ -121,7 +126,7 @@ event dump(i++; t <= 100) {
   float v;
   long k, j, nx, ny;
   char *names[] = {"ux", "uy", "p"};
-  coord n, b, Fp, Fmu;
+  coord n, b;
   double omega_surface, theta;
 
   if (iframe % period == 0) {
@@ -193,28 +198,25 @@ event dump(i++; t <= 100) {
       exit(1);
     }
 
-    sprintf(surface, "surface.%09ld.raw", iframe);
-    if ((fp = fopen(surface, "w")) == NULL) {
-      fprintf(stderr, "cylinder: fail to write to '%s'\n", surface);
-      exit(1);
-    }
-    foreach(serial)
-      if (cs[] > 0. && cs[] < 1.) {
-	embed_geometry(point, &b, &n);
-	embed_force(p, u, mu, &Fp, &Fmu);
-	omega_surface = embed_vorticity(point, u, b, n);
-	x += b.x*Delta, y += b.y*Delta;
-	theta = atan2(y, x);
-	fwrite(&theta, sizeof theta, 1, fp);
-	fwrite(&omega_surface, sizeof omega_surface, 1, fp);
-	fwrite(&Fp.x, sizeof Fp.x, 1, fp);
-	fwrite(&Fp.y, sizeof Fp.y, 1, fp);
-	fwrite(&Fmu.x, sizeof Fmu.x, 1, fp);
-	fwrite(&Fmu.y, sizeof Fmu.y, 1, fp);
+    if (Surface) {
+      sprintf(surface, "surface.%09ld.raw", iframe);
+      if ((fp = fopen(surface, "w")) == NULL) {
+	fprintf(stderr, "cylinder: fail to write to '%s'\n", surface);
+	exit(1);
       }
-    if (fclose(fp) != 0) {
-      fprintf(stderr, "cylinder: fail to close '%s'\n", surface);
-      exit(1);
+      foreach(serial)
+	if (cs[] > 0. && cs[] < 1.) {
+	  embed_geometry(point, &b, &n);
+	  omega_surface = embed_vorticity(point, u, b, n);
+	  x += b.x*Delta, y += b.y*Delta;
+	  theta = atan2(y, x);
+	  fwrite(&theta, sizeof theta, 1, fp);
+	  fwrite(&omega_surface, sizeof omega_surface, 1, fp);
+	}
+      if (fclose(fp) != 0) {
+	fprintf(stderr, "cylinder: fail to close '%s'\n", surface);
+	exit(1);
+      }
     }
     if (Image) {
       foreach ()
