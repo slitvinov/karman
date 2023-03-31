@@ -14991,45 +14991,47 @@ int main(int argc, char **argv) {_init_solver();
     switch (argv[0][1]) {
     case 'h':
       fprintf(ferr,
-       "usage: cylinder [-i] [-s] -r <Reynolds number> -l <resolution "
-       "level> -p <dump period>\n");
+              "usage: cylinder [-i] [-s] -r <Reynolds number> -l <resolution "
+              "level> -p <dump period>\n"
+       "  -s     dump surface file\n"
+       "  -i     dump PPM images\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
- fprintf(ferr, "cylinder: -r needs an argument\n");
- exit(1);
+        fprintf(ferr, "cylinder: -r needs an argument\n");
+        exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
- fprintf(ferr, "cylinder '%s' is not a number\n", *argv);
- exit(1);
+        fprintf(ferr, "cylinder '%s' is not a number\n", *argv);
+        exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
- fprintf(ferr, "cylinder: -l needs an argument\n");
- exit(1);
+        fprintf(ferr, "cylinder: -l needs an argument\n");
+        exit(1);
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
- fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
- exit(1);
+        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
       }
       LevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
- fprintf(ferr, "cylinder: -p needs an argument\n");
- exit(1);
+        fprintf(ferr, "cylinder: -p needs an argument\n");
+        exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
- fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
- exit(1);
+        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -15075,7 +15077,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 106
+#line 108
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15089,7 +15091,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 114
+#line 116
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15098,10 +15100,11 @@ foreach () {
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= 100);*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   static long iframe = 0;
-  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX], surface[FILENAME_MAX];
+  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX],
+      surface[FILENAME_MAX];
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
   FILE *fp;
-  double sx, sy, xp, yp, ox, oy;
+  double sx, sy, xp, yp, ox, oy, ex, ey;
   float v;
   long k, j, nx, ny;
   char *names[] = {"ux", "uy", "p"};
@@ -15110,43 +15113,43 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
   if (iframe % period == 0) {
     fprintf(ferr, "cylinder: %09d %.3e\n", i, t);
-    vorticity(u, omega);
+    sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
     if ((fp = fopen(raw, "w")) == NULL) {
       fprintf(ferr, "cylinder: fail to write to '%s'\n", raw);
       exit(1);
     }
+    ex = L0;
+    ey = 1.0;
     ox = X0;
     oy = -0.5;
     nx = N;
-    sx = L0 / nx;
-    ny = 1.0 / sx;
-    sy = 1.0 / ny;
+    sx = ex / nx;
+    ny = ey / sx;
+    sy = ey / ny;
     for (k = 0; k < ny; k++) {
       yp = oy + sy * k + sy / 2.;
       for (j = 0; j < nx; j++) {
- xp = ox + sx * j + sx / 2;
- v = interpolate((struct _interpolate){u.x, xp, yp});
- fwrite(&v, sizeof v, 1, fp);
- v = interpolate((struct _interpolate){u.y, xp, yp});
- fwrite(&v, sizeof v, 1, fp);
- v = interpolate((struct _interpolate){p, xp, yp});
- fwrite(&v, sizeof v, 1, fp);
+        xp = ox + sx * j + sx / 2;
+        v = interpolate((struct _interpolate){u.x, xp, yp});
+        fwrite(&v, sizeof v, 1, fp);
+        v = interpolate((struct _interpolate){u.y, xp, yp});
+        fwrite(&v, sizeof v, 1, fp);
+        v = interpolate((struct _interpolate){p, xp, yp});
+        fwrite(&v, sizeof v, 1, fp);
       }
     }
     if (fclose(fp) != 0) {
       fprintf(ferr, "cylinder: fail to close '%s'\n", raw);
       exit(1);
     }
-
-    sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     if ((fp = fopen(xdmf, "w")) == NULL) {
       fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
       exit(1);
     }
     fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
-#line 180 "cylinder.c"
-     ny + 1, nx + 1, oy, ox, sy, sx);
+#line 183 "cylinder.c"
+            ny + 1, nx + 1, oy, ox, sy, sx);
     for (j = 0; j < sizeof names / sizeof *names; j++)
       fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
 
@@ -15156,8 +15159,9 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
 
 
-       names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny, 3 * nx, raw);
-    fprintf(fp,"   </Grid>\n </Domain>\n</Xdmf>\n");
+              names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
+              3 * nx, raw);
+    fprintf(fp, "   </Grid>\n </Domain>\n</Xdmf>\n");
 
 
 
@@ -15170,20 +15174,20 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (Surface) {
       sprintf(surface, "surface.%09ld.raw", iframe);
       if ((fp = fopen(surface, "w")) == NULL) {
- fprintf(ferr, "cylinder: fail to write to '%s'\n", surface);
- exit(1);
+        fprintf(ferr, "cylinder: fail to write to '%s'\n", surface);
+        exit(1);
       }
-      foreach_stencil()
- {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {
-   _stencil_embed_geometry(point,NULL ,NULL ); 
+      foreach_stencil ()
+        {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {
+          _stencil_embed_geometry(point,NULL ,NULL ); 
 _stencil_embed_vorticity(point, u,NULL ,NULL );  
-   
+          
+                   
+                    
+          
+          
         
-             
-   
-   
- 
-#line 215
+#line 219
 }      }end_foreach_stencil();
       
 #if _OPENMP
@@ -15191,39 +15195,40 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
   #define OMP(x)
 #endif
 {
-#line 207
-foreach()
- if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-   embed_geometry(point, &b, &n);
-   omega_surface = embed_vorticity(point, u, b, n);
-   x += b.x*Delta, y += b.y*Delta;
-   theta = atan2(y, x);
-   fwrite(&theta, sizeof theta, 1, fp);
-   fwrite(&omega_surface, sizeof omega_surface, 1, fp);
- }end_foreach();}
+#line 211
+foreach ()
+        if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
+          embed_geometry(point, &b, &n);
+          omega_surface = embed_vorticity(point, u, b, n);
+          x += b.x * Delta, y += b.y * Delta;
+          theta = atan2(y, x);
+          fwrite(&theta, sizeof theta, 1, fp);
+          fwrite(&omega_surface, sizeof omega_surface, 1, fp);
+        }end_foreach();}
 #if _OPENMP
   #undef OMP
   #define OMP(x) _Pragma(#x)
 #endif
 
       
-#line 216
+#line 220
 if (fclose(fp) != 0) {
- fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
- exit(1);
+        fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
+        exit(1);
       }
     }
     if (Image) {
       foreach_stencil ()
- {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
+        {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 222
+#line 226
 foreach ()
- val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
+        val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
+      vorticity(u, omega);
       output_ppm((struct OutputPPM){omega, .file = png, .box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
-   .min = -5 / diameter, .max = 5 / diameter, .linear = false,
-   .mask = m});
+                 .min = -5 / diameter, .max = 5 / diameter, .linear = false,
+                 .mask = m});
     }
   }
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
