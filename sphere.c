@@ -1,38 +1,11 @@
-/**
-# Vortex shedding behind a sphere at Reynolds = 300
-
-![Animation of the $\lambda_2$ vortices coloured with the vorticity
- component aligned with the flow.](sphere/movie.mp4)(loop)
-
-We solve the Navier--Stokes equations on an adaptive octree and use
-embedded boundaries to define the sphere. */
-
-#include "embed.h"
 #include "grid/octree.h"
+#include "embed.h"
 #include "navier-stokes/centered.h"
 #include "navier-stokes/perfs.h"
 #include "view.h"
-
-/**
-We will use the $\lambda_2$ criterion of [Jeong and Hussain,
-1995](/src/references.bib#jeong1995) for vortex detection. */
-
 #include "lambda2.h"
-
-/**
-This is the maximum level of refinement i.e. an equivalent maximum
-resolution of $256^3$. */
-
 int maxlevel = 8;
-/**
-We need a new field to define the viscosity. */
-
 face vector muv[];
-
-/**
-The domain size is $16^3$. We move the origin so that the center of
-the unit sphere is not too close to boundaries. */
-
 int main() {
   init_grid(64);
   size(16.);
@@ -40,17 +13,7 @@ int main() {
   mu = muv;
   run();
 }
-
-/**
-The viscosity is just $1/Re$, because we chose a sphere of diameter
-unity and an unit inflow velocity. */
-
 event properties(i++) { foreach_face() muv.x[] = fm.x[] / 300.; }
-
-/**
-The boundary conditions are inflow with unit velocity on the
-left-hand-side and outflow on the right-hand-side. */
-
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
