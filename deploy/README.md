@@ -44,6 +44,7 @@ $ ./cylinder -z 1024 -r 100 -l 10 -p 100
 
 ```
 $ python zoom.py z.000000300.xdmf2
+0.6139892145202194 (1024, 1024)
 ```
 
 open `ux.png`, `uy.png`, or `p.png`.
