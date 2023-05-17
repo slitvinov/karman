@@ -28,10 +28,12 @@ $ python plot.py a.000000300.xdmf2
 
 open `ux.png`, `uy.png`, or `p.png`.
 
+<p align="center"><img src="img/ux.png"/></p>
+
 Plot vorticity on the surface of the cylinder
 
 ```
-$ python surface.py surface.000000400.raw
+$ python surface.py surface.000000300.raw
 ```
 
 open `omega.png`
@@ -48,3 +50,6 @@ $ python zoom.py z.000000300.xdmf2
 ```
 
 open `ux.png`, `uy.png`, or `p.png`.
+
+<p align="center"><img src="img/z.ux.png"/></p>
+
