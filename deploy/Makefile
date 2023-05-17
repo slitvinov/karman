@@ -8,5 +8,5 @@ M = \
 cylinder\
 
 all: $M
-.c:; $(CC) $(CFLAGS) $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS) -lm
+.c:; $(CC) $< -o $@ $(CFLAGS) $(CFLAGS_OPENMP) $(LDFLAGS) -lm
 clean:; rm -f -- $M
