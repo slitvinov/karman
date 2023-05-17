@@ -19,7 +19,8 @@ cylinder: 000000300 6.1425090121064396e-01
 ...
 ```
 
-Plot velocity and pressure fields
+To plot the velocity and pressure fields.
+
 
 ```
 $ python plot.py a.000000300.xdmf2
