@@ -24,6 +24,7 @@ Plot velocity and pressure fields
 
 ```
 $ python plot.py a.000000300.xdmf2
+0.6142641127864911 (1024, 256)
 ```
 
 open `ux.png`, `uy.png`, or `p.png`.
@@ -45,11 +46,10 @@ $ ./cylinder -z 1024 -r 100 -l 10 -p 100
 ```
 
 ```
-$ python zoom.py z.000000300.xdmf2
-0.6139892145202194 (1024, 1024)
+$ python plot.py z.000000300.xdmf2
+0.6142641127864911 (1024, 1024)
 ```
 
 open `ux.png`, `uy.png`, or `p.png`.
 
 <p align="center"><img src="img/z.ux.png"/></p>
-
