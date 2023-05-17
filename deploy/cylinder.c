@@ -15011,7 +15011,7 @@ int dump_fields(const char *raw, const char *xdmf, double t, double ox,
     fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
     return 1;
   }
-  fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid Name=\"Grid\">\n     <Time Value=\"%.16e\"/>\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
+  fprintf(fp, "<?xml version=\"1.0\" ?>\n<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid>\n     <Time Value=\"%.16e\"/>\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
 #line 63 "cylinder.c"
           t, ny + 1, nx + 1, oy, ox, sy, sx);
   for (j = 0; j < sizeof names / sizeof *names; j++)
@@ -15110,11 +15110,9 @@ int main(int argc, char **argv) {_init_solver();
       PeriodFlag = 1;
       break;
     case 'i':
-      argv++;
       Image = 1;
       break;
     case 's':
-      argv++;
       Surface = 1;
       break;
     default:
@@ -15151,7 +15149,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 193
+#line 191
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15165,7 +15163,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 201
+#line 199
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15214,7 +15212,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
           
           
         
-#line 247
+#line 245
 }      }end_foreach_stencil();
       
 #if _OPENMP
@@ -15222,7 +15220,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
   #define OMP(x)
 #endif
 {
-#line 239
+#line 237
 foreach ()
         if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
           embed_geometry(point, &b, &n);
@@ -15238,7 +15236,7 @@ foreach ()
 #endif
 
       
-#line 248
+#line 246
 if (fclose(fp) != 0) {
         fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
         exit(1);
@@ -15248,7 +15246,7 @@ if (fclose(fp) != 0) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 254
+#line 252
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);

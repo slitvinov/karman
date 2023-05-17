@@ -52,7 +52,7 @@ int dump_fields(const char *raw, const char *xdmf, double t, double ox,
 <!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n\
 <Xdmf Version=\"2.0\">\n\
  <Domain>\n\
-   <Grid Name=\"Grid\">\n\
+   <Grid>\n\
      <Time Value=\"%.16e\"/>\n\
      <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n\
      <Geometry GeometryType=\"ORIGIN_DXDY\">\n\
@@ -157,11 +157,9 @@ int main(int argc, char **argv) {
       PeriodFlag = 1;
       break;
     case 'i':
-      argv++;
       Image = 1;
       break;
     case 's':
-      argv++;
       Surface = 1;
       break;
     default:

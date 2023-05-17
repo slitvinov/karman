@@ -3,7 +3,6 @@ Compile
 ```
 $ make
 c99 -g -O2 -fopenmp -o cylinder cylinder.c  -lm
-$ ./cylinder -h
 usage: cylinder [-i] [-s] [-z <number of cells>] -r <Reynolds number> -l <resolution level> -p <dump period>
   -s     dump surface file
   -i     dump PPM images
@@ -38,6 +37,8 @@ $ python surface.py surface.000000300.raw
 ```
 
 open `omega.png`
+
+<p align="center"><img src="img/omega.png"/></p>
 
 Run and dump zoomed grid
 

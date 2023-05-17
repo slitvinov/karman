@@ -2,7 +2,7 @@
 .SUFFIXES:
 .SUFFIXES: .c
 
-CFLAGS = -g -O2
+CFLAGS = -O2
 CFLAGS_OPENMP = -fopenmp
 M = \
 cylinder\

@@ -6,6 +6,8 @@ import sys
 
 
 def read(path):
+    nitems = 2
+    dtype = np.dtype('float64')
     with open(path) as file:
         for line in file:
             if re.match('^[ \t]*<Time Value="', line):
@@ -21,7 +23,7 @@ def read(path):
                 break
     dirname = os.path.dirname(path)
     with open(os.path.join(dirname, raw), "rb") as file:
-        return time, np.ndarray((3, nx // 3, ny),
+        return time, np.ndarray((nitems, nx // nitems, ny),
                                 'float32',
                                 file.read(),
                                 order='F')
