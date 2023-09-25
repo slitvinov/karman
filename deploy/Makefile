@@ -5,7 +5,7 @@ CC = gcc
 MPICC = mpicc
 MPICCFLAGS = -O2 -g
 CFLAGS = -O2
-BASILISK = $(HOME)/basilisk
+BASILISK = $(HOME)/basilisk/src
 M = \
 cylinder\
 cylinder_mpi \
