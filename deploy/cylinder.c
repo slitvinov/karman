@@ -15269,7 +15269,7 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
 }
 #line 6 "cylinder.c"
 static const double diameter = 0.125;
-static const int minlevel = 5;
+static const int minlevel = 9;
 static double reynolds, tend;
 static int level, period, Image, Surface;
 static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(1.);}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
@@ -15309,8 +15309,7 @@ int main(int argc, char **argv) {_init_solver();
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -i -r 100 -l 10 -p 100\n"
-          "  ./cylinder -r 100 -l 10 -p 100\n");
+          "  ./cylinder -i -r 100 -l 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
@@ -15407,7 +15406,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 137
+#line 136
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15421,7 +15420,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 145
+#line 144
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15446,7 +15445,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 166
+#line 165
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
