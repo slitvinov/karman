@@ -5,15 +5,16 @@ CC = gcc
 MPICC = mpicc
 MPICCFLAGS = -O2 -g
 CFLAGS = -O2
+BASILISK = $(HOME)/basilisk
 M = \
 cylinder\
 cylinder_mpi \
 
 all: $M
 cylinder_mpi: cylinder_mpi.c
-	$(MPICC) $< -o $@ $(MPICCFLAGS) $(LDFLAGS) -lm
+	$(MPICC) $< -o $@ $(MPICCFLAGS) $(LDFLAGS) -I$(BASILISK) -lm
 cylinder: cylinder.c
-	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) -lm
+	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) -I$(BASILISK) -lm
 
 clean:; rm -f -- $M
 install: $B
