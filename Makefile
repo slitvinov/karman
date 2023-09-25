@@ -8,12 +8,12 @@ QCC = qcc
 MPICC = mpicc
 CFLAGS_OPENMP = -fopenmp
 cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) $(CFLAGS_OPENMP) _cylinder.c -lm
-_cylinder.c: cylinder.c; $(QCC) $(QCCFLAGS) cylinder.c -source
+_cylinder.c: cylinder.c; $(QCC) -disable-dimensions $(QCCFLAGS) cylinder.c -source
 deploy/cylinder.c: cylinder.c
-	$(QCC) -nolineno -source $(QCCFLAGS) cylinder.c && \
+	$(QCC) -disable-dimensions  -nolineno -source $(QCCFLAGS) cylinder.c && \
 	mv _cylinder.c deploy/cylinder.c
 deploy/cylinder_mpi.c: cylinder.c
-	CC99=$(MPICC) $(QCC) -nolineno -source $(QCCFLAGS) -D_MPI=1 cylinder.c && \
+	CC99=$(MPICC) $(QCC) -disable-dimensions  -nolineno -source $(QCCFLAGS) -D_MPI=1 cylinder.c && \
 	mv _cylinder.c deploy/cylinder_mpi.c
 dep: deploy/cylinder.c deploy/cylinder_mpi.c
 clean:
