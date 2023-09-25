@@ -5,7 +5,7 @@
 #include "output_htg.h"
 static const double diameter = 0.125;
 static const int minlevel = 5;
-static double reynolds;
+static double reynolds, tend;
 static int level, period, Image, Surface;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
@@ -21,24 +21,31 @@ int main(int argc, char **argv) {
   int ReynoldsFlag;
   int LevelFlag;
   int PeriodFlag;
+  int TendFlag;
   ReynoldsFlag = 0;
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
+  TendFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(stderr, "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds number> -l <resolution level> -p <dump period>\n"
-	      "Options:\n"
-	      "  -h     Display this help message\n"
-	      "  -i     Enable PPM image dumping\n"
-	      "  -r <Reynolds number>     Set the Reynolds number (a decimal number)\n"
-	      "  -l <resolution level>    Set the resolution level (positive integer)\n"
-	      "  -p <dump period>         Set the dump period (positive integer)\n"
-	      "\n"
-	      "Example usage:\n"
-	      "  ./cylinder -i -s -r 100 -l 10 -p 100\n"
-	      "  ./cylinder -z 1024 -r 100 -l 10 -p 100\n");
+      fprintf(
+          stderr,
+          "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds "
+          "number> -l <resolution level> -p <dump period>\n"
+          "Options:\n"
+          "  -h     Display this help message\n"
+          "  -i     Enable PPM image dumping\n"
+          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -p <dump period>         the dump period (positive integer)\n"
+          "  -e <end time>            end time of the simulation (decimal "
+          "number)\n"
+          "\n"
+          "Example usage:\n"
+          "  ./cylinder -i -r 100 -l 10 -p 100\n"
+          "  ./cylinder -r 100 -l 10 -p 100\n");
       exit(1);
     case 'r':
       argv++;
@@ -61,7 +68,8 @@ int main(int argc, char **argv) {
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n", *argv);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
         exit(1);
       }
       LevelFlag = 1;
@@ -74,13 +82,27 @@ int main(int argc, char **argv) {
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n", *argv);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
         exit(1);
       }
       PeriodFlag = 1;
       break;
     case 'i':
       Image = 1;
+      break;
+    case 'e':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -e needs an argument\n");
+        exit(1);
+      }
+      tend = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      TendFlag = 1;
       break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -96,6 +118,10 @@ int main(int argc, char **argv) {
   }
   if (!PeriodFlag) {
     fprintf(stderr, "cylinder: error: -p is not set\n");
+    exit(1);
+  }
+  if (!TendFlag) {
+    fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
   L0 = 4;
@@ -122,7 +148,7 @@ event init(t = 0) {
   }
 }
 
-event dump(i++; t <= 100) {
+event dump(i++; t <= tend) {
   static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar omega[], m[];
@@ -134,8 +160,8 @@ event dump(i++; t <= 100) {
     if (pid() == 0)
       fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     sprintf(htg, "h.%09ld.htg", iframe);
-    vorticity(u, omega);    
-    output_htg({p, omega}, {u}, htg);    
+    vorticity(u, omega);
+    output_htg({p, omega}, {u}, htg);
     if (Image) {
       foreach ()
         m[] = cs[] - 0.5;
@@ -148,5 +174,6 @@ event dump(i++; t <= 100) {
   iframe++;
 }
 event adapt(i++) {
-  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = level, minlevel = minlevel);
+  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = level,
+                minlevel = minlevel);
 }

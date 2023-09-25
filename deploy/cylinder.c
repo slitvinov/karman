@@ -15269,8 +15269,8 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
 }
 #line 6 "cylinder.c"
 static const double diameter = 0.125;
-static const int minlevel = 6;
-static double reynolds;
+static const int minlevel = 5;
+static double reynolds, tend;
 static int level, period, Image, Surface;
 static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(1.);}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
 static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
@@ -15286,24 +15286,31 @@ int main(int argc, char **argv) {_init_solver();
   int ReynoldsFlag;
   int LevelFlag;
   int PeriodFlag;
+  int TendFlag;
   ReynoldsFlag = 0;
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
+  TendFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(ferr, "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds number> -l <resolution level> -p <dump period>\n"
-       "Options:\n"
-       "  -h     Display this help message\n"
-       "  -i     Enable PPM image dumping\n"
-       "  -r <Reynolds number>     Set the Reynolds number (a decimal number)\n"
-       "  -l <resolution level>    Set the resolution level (positive integer)\n"
-       "  -p <dump period>         Set the dump period (positive integer)\n"
-       "\n"
-       "Example usage:\n"
-       "  ./cylinder -i -s -r 100 -l 10 -p 100\n"
-       "  ./cylinder -z 1024 -r 100 -l 10 -p 100\n");
+      fprintf(
+          ferr,
+          "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds "
+          "number> -l <resolution level> -p <dump period>\n"
+          "Options:\n"
+          "  -h     Display this help message\n"
+          "  -i     Enable PPM image dumping\n"
+          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -p <dump period>         the dump period (positive integer)\n"
+          "  -e <end time>            end time of the simulation (decimal "
+          "number)\n"
+          "\n"
+          "Example usage:\n"
+          "  ./cylinder -i -r 100 -l 10 -p 100\n"
+          "  ./cylinder -r 100 -l 10 -p 100\n");
       exit(1);
     case 'r':
       argv++;
@@ -15326,7 +15333,8 @@ int main(int argc, char **argv) {_init_solver();
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
         exit(1);
       }
       LevelFlag = 1;
@@ -15339,13 +15347,27 @@ int main(int argc, char **argv) {_init_solver();
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
         exit(1);
       }
       PeriodFlag = 1;
       break;
     case 'i':
       Image = 1;
+      break;
+    case 'e':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(ferr, "cylinder: error: -e needs an argument\n");
+        exit(1);
+      }
+      tend = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      TendFlag = 1;
       break;
     default:
       fprintf(ferr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -15361,6 +15383,10 @@ int main(int argc, char **argv) {_init_solver();
   }
   if (!PeriodFlag) {
     fprintf(ferr, "cylinder: error: -p is not set\n");
+    exit(1);
+  }
+  if (!TendFlag) {
+    fprintf(ferr, "cylinder: error: -e must be set\n");
     exit(1);
   }
   L0 = 4;
@@ -15381,7 +15407,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 111
+#line 137
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15395,14 +15421,14 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 119
+#line 145
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
   }end_foreach();}delete((scalar*)((scalar[]){phi,{-1}}));
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 
-static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= 100);*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
+static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend);*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
@@ -15420,7 +15446,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 140
+#line 166
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
@@ -15432,7 +15458,8 @@ foreach ()
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("dump_0","cylinder.c",0);return 0;}end_tracing("dump_0","cylinder.c",0);}
 static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
-  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x,u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = level, .minlevel = minlevel});
+  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x,u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = level,
+                .minlevel = minlevel});
 }{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
 
