@@ -4,7 +4,7 @@
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
 static const double diameter = 0.125;
-static const int minlevel = 6;
+static const int minlevel = 5;
 static double reynolds;
 static int level, period, Image, Surface;
 u.n[left] = dirichlet(1.);
