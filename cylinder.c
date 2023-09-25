@@ -4,7 +4,7 @@
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
 static const double diameter = 0.125;
-static const int minlevel = 5;
+static const int minlevel = 9;
 static double reynolds, tend;
 static int level, period, Image, Surface;
 u.n[left] = dirichlet(1.);
@@ -44,8 +44,7 @@ int main(int argc, char **argv) {
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -i -r 100 -l 10 -p 100\n"
-          "  ./cylinder -r 100 -l 10 -p 100\n");
+          "  ./cylinder -i -r 100 -l 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
