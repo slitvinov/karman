@@ -6,9 +6,8 @@ CC = gcc
 CFLAGS = -O2 -g
 QCC = qcc
 MPICC = mpicc
-CFLAGS_OPENMP = -fopenmp
 BASILISK = $(HOME)/basilisk/src
-cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) $(CFLAGS_OPENMP) -I$(BASILISK) _cylinder.c -lm
+cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) -I$(BASILISK) _cylinder.c -lm
 _cylinder.c: cylinder.c; $(QCC) -disable-dimensions $(QCCFLAGS) cylinder.c -source
 deploy/cylinder.c: cylinder.c
 	$(QCC) -disable-dimensions  -nolineno -source $(QCCFLAGS) cylinder.c && \
