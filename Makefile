@@ -6,7 +6,8 @@ CC = gcc
 CFLAGS = -O2 -g
 QCC = qcc
 MPICC = mpicc
-cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) _cylinder.c -lm
+CFLAGS_OPENMP = -fopenmp
+cylinder: _cylinder.c; $(CC) -o cylinder $(CFLAGS) $(CFLAGS_OPENMP) _cylinder.c -lm
 _cylinder.c: cylinder.c; $(QCC) $(QCCFLAGS) cylinder.c -source
 deploy/cylinder.c: cylinder.c
 	$(QCC) -nolineno -source $(QCCFLAGS) cylinder.c && \
