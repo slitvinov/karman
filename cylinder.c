@@ -4,9 +4,9 @@
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
 static const double diameter = 0.125;
-static const int minlevel = 5;
+static const int minlevel = 7;
 static double reynolds, tend;
-static int level, period, Image, Surface;
+static int maxlevel, period, Image, Surface;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "cylinder: error: -l needs an argument\n");
         exit(1);
       }
-      level = strtol(*argv, &end, 10);
-      if (*end != '\0' || level <= 0) {
+      maxlevel = strtol(*argv, &end, 10);
+      if (*end != '\0' || maxlevel <= 0) {
         fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
                 *argv);
         exit(1);
@@ -156,6 +156,7 @@ event dump(i++; t <= tend) {
   coord n, b;
 
   if (iframe % period == 0) {
+    fields_stats();
     if (pid() == 0)
       fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     sprintf(htg, "h.%09ld.htg", iframe);
@@ -165,7 +166,7 @@ event dump(i++; t <= tend) {
       foreach ()
         m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
-      output_ppm(omega, file = png, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
+      output_ppm(omega, file = png, n = 512, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
                  min = -5 / diameter, max = 5 / diameter, linear = false,
                  mask = m);
     }
@@ -173,6 +174,6 @@ event dump(i++; t <= tend) {
   iframe++;
 }
 event adapt(i++) {
-  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = level,
+  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = maxlevel,
                 minlevel = minlevel);
 }
