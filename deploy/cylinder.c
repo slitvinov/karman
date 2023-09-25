@@ -15051,21 +15051,29 @@ int main(int argc, char **argv) {_init_solver();
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(ferr, "usage: cylinder [-i] [-s] [-z <number of cells>] -r "
-                      "<Reynolds number> -l <resolution "
-                      "level> -p <dump period>\n"
-                      "  -s     dump surface file\n"
-                      "  -i     dump PPM images\n");
+      fprintf(ferr, "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds number> -l <resolution level> -p <dump period>\n"
+       "Options:\n"
+       "  -h     Display this help message\n"
+       "  -i     Enable PPM image dumping\n"
+       "  -s     Enable surface file dumping\n"
+       "  -z <number of cells>     Set the zoom level (positive integer)\n"
+       "  -r <Reynolds number>     Set the Reynolds number (a decimal number)\n"
+       "  -l <resolution level>    Set the resolution level (positive integer)\n"
+       "  -p <dump period>         Set the dump period (positive integer)\n"
+       "\n"
+       "Example usage:\n"
+       "  ./cylinder -i -s -r 100 -l 10 -p 100\n"
+       "  ./cylinder -z 1024 -r 100 -l 10 -p 100\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: -r needs an argument\n");
+        fprintf(ferr, "cylinder: error:  -r needs an argument\n");
         exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(ferr, "cylinder '%s' is not a number\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
         exit(1);
       }
       ReynoldsFlag = 1;
@@ -15073,12 +15081,12 @@ int main(int argc, char **argv) {_init_solver();
     case 'l':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: -l needs an argument\n");
+        fprintf(ferr, "cylinder: error: -l needs an argument\n");
         exit(1);
       }
       level = strtol(*argv, &end, 10);
       if (*end != '\0' || level <= 0) {
-        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
         exit(1);
       }
       LevelFlag = 1;
@@ -15086,12 +15094,12 @@ int main(int argc, char **argv) {_init_solver();
     case 'z':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: -z needs an argument\n");
+        fprintf(ferr, "cylinder: error: -z needs an argument\n");
         exit(1);
       }
       nzoom = strtol(*argv, &end, 10);
       if (*end != '\0' || nzoom <= 0) {
-        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
         exit(1);
       }
       Zoom = 1;
@@ -15099,12 +15107,12 @@ int main(int argc, char **argv) {_init_solver();
     case 'p':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: -p needs an argument\n");
+        fprintf(ferr, "cylinder: error: -p needs an argument\n");
         exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(ferr, "cylinder: '%s' is not a positive integer\n", *argv);
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
         exit(1);
       }
       PeriodFlag = 1;
@@ -15116,19 +15124,19 @@ int main(int argc, char **argv) {_init_solver();
       Surface = 1;
       break;
     default:
-      fprintf(ferr, "cylinder: unknown option '%s'\n", *argv);
+      fprintf(ferr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
     }
   if (!ReynoldsFlag) {
-    fprintf(ferr, "cylinder: -r is not set\n");
+    fprintf(ferr, "cylinder: error: -r is not set\n");
     exit(1);
   }
   if (!LevelFlag) {
-    fprintf(ferr, "cylinder: -l is not set\n");
+    fprintf(ferr, "cylinder: error: -l is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
-    fprintf(ferr, "cylinder: -p is not set\n");
+    fprintf(ferr, "cylinder: error: -p is not set\n");
     exit(1);
   }
   L0 = 4;
@@ -15149,7 +15157,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 191
+#line 199
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15163,7 +15171,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 199
+#line 207
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15199,7 +15207,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (Surface) {
       sprintf(surface, "surface.%09ld.raw", iframe);
       if ((fp = fopen(surface, "w")) == NULL) {
-        fprintf(ferr, "cylinder: fail to write to '%s'\n", surface);
+        fprintf(ferr, "cylinder: error: fail to write to '%s'\n", surface);
         exit(1);
       }
       foreach_stencil ()
@@ -15212,7 +15220,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
           
           
         
-#line 245
+#line 253
 }      }end_foreach_stencil();
       
 #if _OPENMP
@@ -15220,7 +15228,7 @@ _stencil_embed_vorticity(point, u,NULL ,NULL );
   #define OMP(x)
 #endif
 {
-#line 237
+#line 245
 foreach ()
         if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
           embed_geometry(point, &b, &n);
@@ -15236,9 +15244,9 @@ foreach ()
 #endif
 
       
-#line 246
+#line 254
 if (fclose(fp) != 0) {
-        fprintf(ferr, "cylinder: fail to close '%s'\n", surface);
+        fprintf(ferr, "cylinder: error: fail to close '%s'\n", surface);
         exit(1);
       }
     }
@@ -15246,7 +15254,7 @@ if (fclose(fp) != 0) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 252
+#line 260
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
