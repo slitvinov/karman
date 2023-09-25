@@ -1,8 +1,12 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include "embed.h"
 #include "navier-stokes/centered.h"
+#include "output_htg.h"
 static const double diameter = 0.125;
+static const int minlevel = 6;
 static double reynolds;
-static int level, period, Image, Surface, Zoom, nzoom;
+static int level, period, Image, Surface;
 u.n[left] = dirichlet(1.);
 p[left] = neumann(0.);
 pf[left] = neumann(0.);
@@ -12,76 +16,6 @@ pf[right] = dirichlet(0.);
 u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
 face vector muv[];
-
-int dump_fields(const char *raw, const char *xdmf, double t, double ox,
-                double oy, double ex, double ey, long nx) {
-  long k, j, ny;
-  double sx, sy, xp, yp;
-  float v;
-  FILE *fp;
-  char *names[] = {"ux", "uy", "p"};
-  sx = ex / nx;
-  ny = ey / sx;
-  sy = ey / ny;
-  if ((fp = fopen(raw, "w")) == NULL) {
-    fprintf(stderr, "cylinder: fail to write to '%s'\n", raw);
-    exit(1);
-  }
-  for (k = 0; k < ny; k++) {
-    yp = oy + sy * k + sy / 2.;
-    for (j = 0; j < nx; j++) {
-      xp = ox + sx * j + sx / 2;
-      v = interpolate(u.x, xp, yp);
-      fwrite(&v, sizeof v, 1, fp);
-      v = interpolate(u.y, xp, yp);
-      fwrite(&v, sizeof v, 1, fp);
-      v = interpolate(p, xp, yp);
-      fwrite(&v, sizeof v, 1, fp);
-    }
-  }
-  if (fclose(fp) != 0) {
-    fprintf(stderr, "cylinder: fail to close '%s'\n", raw);
-    return 1;
-  }
-  if ((fp = fopen(xdmf, "w")) == NULL) {
-    fprintf(stderr, "cylinder: fail to write to '%s'\n", xdmf);
-    return 1;
-  }
-  fprintf(fp, "\
-<Xdmf Version=\"2.0\">\n\
- <Domain>\n\
-   <Grid>\n\
-     <Time Value=\"%.16e\"/>\n\
-     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n\
-     <Geometry GeometryType=\"ORIGIN_DXDY\">\n\
-       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
-       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n\
-     </Geometry>\n\
-",
-          t, ny + 1, nx + 1, oy, ox, sy, sx);
-  for (j = 0; j < sizeof names / sizeof *names; j++)
-    fprintf(fp, "\
-     <Attribute Name=\"%s\" Center=\"Cell\">\n\
-	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n\
-	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n\
-	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n\
-	</DataItem>\n\
-     </Attribute>\n\
-",
-            names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
-            3 * nx, raw);
-  fprintf(fp, "\
-   </Grid>\n\
- </Domain>\n\
-</Xdmf>\n\
-");
-  if (fclose(fp) != 0) {
-    fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
-    return 1;
-  }
-  return 0;
-}
-
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag;
@@ -91,8 +25,6 @@ int main(int argc, char **argv) {
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
-  Surface = 0;
-  Zoom = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -100,8 +32,6 @@ int main(int argc, char **argv) {
 	      "Options:\n"
 	      "  -h     Display this help message\n"
 	      "  -i     Enable PPM image dumping\n"
-	      "  -s     Enable surface file dumping\n"
-	      "  -z <number of cells>     Set the zoom level (positive integer)\n"
 	      "  -r <Reynolds number>     Set the Reynolds number (a decimal number)\n"
 	      "  -l <resolution level>    Set the resolution level (positive integer)\n"
 	      "  -p <dump period>         Set the dump period (positive integer)\n"
@@ -136,19 +66,6 @@ int main(int argc, char **argv) {
       }
       LevelFlag = 1;
       break;
-    case 'z':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -z needs an argument\n");
-        exit(1);
-      }
-      nzoom = strtol(*argv, &end, 10);
-      if (*end != '\0' || nzoom <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n", *argv);
-        exit(1);
-      }
-      Zoom = 1;
-      break;
     case 'p':
       argv++;
       if (*argv == NULL) {
@@ -164,9 +81,6 @@ int main(int argc, char **argv) {
       break;
     case 'i':
       Image = 1;
-      break;
-    case 's':
-      Surface = 1;
       break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -186,7 +100,7 @@ int main(int argc, char **argv) {
   }
   L0 = 4;
   origin(-0.5, -L0 / 2.);
-  N = 1024;
+  init_grid(1 << minlevel);
   mu = muv;
   run();
 }
@@ -210,56 +124,22 @@ event init(t = 0) {
 
 event dump(i++; t <= 100) {
   static long iframe = 0;
-  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX],
-      surface[FILENAME_MAX];
+  char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
   long nx, ny;
   coord n, b;
-  double omega_surface, theta;
 
   if (iframe % period == 0) {
     if (pid() == 0)
       fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
-
-    sprintf(xdmf, "a.%09ld.xdmf2", iframe);
-    sprintf(raw, "%09ld.raw", iframe);
-    if (dump_fields(raw, xdmf, t, X0, -0.5, L0, 1.0, N) != 0)
-      exit(1);
-
-    if (Zoom) {
-      sprintf(xdmf, "z.%09ld.xdmf2", iframe);
-      sprintf(raw, "z.%09ld.raw", iframe);
-      if (dump_fields(raw, xdmf, t, -1.25 * diameter, -1.25 * diameter,
-                      2.5 * diameter, 2.5 * diameter, nzoom) != 0)
-        exit(1);
-    }
-
-    if (Surface) {
-      sprintf(surface, "surface.%09ld.raw", iframe);
-      if ((fp = fopen(surface, "w")) == NULL) {
-        fprintf(stderr, "cylinder: error: fail to write to '%s'\n", surface);
-        exit(1);
-      }
-      foreach (serial)
-        if (cs[] > 0. && cs[] < 1.) {
-          embed_geometry(point, &b, &n);
-          omega_surface = embed_vorticity(point, u, b, n);
-          x += b.x * Delta, y += b.y * Delta;
-          theta = atan2(y, x);
-          fwrite(&theta, sizeof theta, 1, fp);
-          fwrite(&omega_surface, sizeof omega_surface, 1, fp);
-        }
-      if (fclose(fp) != 0) {
-        fprintf(stderr, "cylinder: error: fail to close '%s'\n", surface);
-        exit(1);
-      }
-    }
+    sprintf(htg, "h.%09ld.htg", iframe);
+    vorticity(u, omega);    
+    output_htg({p, omega}, {u}, htg);    
     if (Image) {
       foreach ()
         m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
-      vorticity(u, omega);
       output_ppm(omega, file = png, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
                  min = -5 / diameter, max = 5 / diameter, linear = false,
                  mask = m);
@@ -268,5 +148,5 @@ event dump(i++; t <= 100) {
   iframe++;
 }
 event adapt(i++) {
-  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, level, 4);
+  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = level, minlevel = minlevel);
 }

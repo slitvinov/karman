@@ -2,7 +2,7 @@
 .SUFFIX:
 .SUFFIX: .c
 
-CC = c99
+CC = gcc
 CFLAGS = -O2 -g
 QCC = qcc
 MPICC = mpicc

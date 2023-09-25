@@ -8252,6 +8252,12 @@ void quadtree_methods() {
 }
 #line 15 "cylinder-cpp.c"
 #line 1 "cylinder.c"
+#line 1 "/u/basilisk/src/ast/std/stdbool.h"
+#include <stdbool.h>
+#line 2 "cylinder.c"
+#line 1 "/u/basilisk/src/ast/std/stdint.h"
+#include <stdint.h>
+#line 3 "cylinder.c"
 #line 1 "embed.h"
 #line 1 "/u/basilisk/src/embed.h"
 #line 12 "/u/basilisk/src/embed.h"
@@ -10582,17 +10588,6 @@ double embed_vorticity (Point point, vector u, coord p, coord n)
 #line 632 "/u/basilisk/src/embed.h"
   return dudn.y*n.x - dudn.x*n.y;
 }
-#line 615 "/u/basilisk/src/embed.h"
-static void _stencil_embed_vorticity (Point point, vector u,_stencil_undefined * p,_stencil_undefined * n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;  
-
-
-
-
-   _stencil_embed_gradient (point, u,NULL ,NULL );
-#line 632 "/u/basilisk/src/embed.h"
-  return   ;
-}
 #line 654 "/u/basilisk/src/embed.h"
 double embed_flux (Point point, scalar s, vector mu, double * val)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
@@ -10960,7 +10955,7 @@ static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
     "fc = {0.5,0.5,0.5}, order = 2);"});
 }{end_tracing("defaults","/u/basilisk/src/embed.h",0);return 0;}end_tracing("defaults","/u/basilisk/src/embed.h",0);}
-#line 2 "cylinder.c"
+#line 4 "cylinder.c"
 #line 1 "navier-stokes/centered.h"
 #line 1 "/u/basilisk/src/navier-stokes/centered.h"
 #line 27 "/u/basilisk/src/navier-stokes/centered.h"
@@ -14963,10 +14958,320 @@ is_face_y(){
 
   event ("properties");
 }{end_tracing("adapt","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("adapt","/u/basilisk/src/navier-stokes/centered.h",0);}
-#line 3 "cylinder.c"
+#line 5 "cylinder.c"
+#line 1 "output_htg.h"
+#line 1 "./output_htg.h"
+void output_htg(scalar *list, vector *vlist, const char *path);
+
+
+
+
+void output_htg_data(scalar *list, vector *vlist, FILE *fp);
+#line 38 "./output_htg.h"
+void output_htg(scalar *list, vector *vlist, const char *path) {
+  FILE *fp;
+  fp = fopen(path, "w");
+  if (!fp) {
+    printf("output_htg.h : %s could not be opened\n Does the Folder exist?\n",
+           path);
+    exit(1);
+  }
+
+  output_htg_data((scalar *)list, (vector *)vlist, fp);
+  fclose(fp);
+}
+#line 592 "./output_htg.h"
+void output_htg_data(scalar *list, vector *vlist, FILE *fp) {
+  unsigned int vertices_local = 0;
+  unsigned int descBits_local = 0;
+  unsigned int vertices_local_pL[grid->maxdepth + 1];
+
+  for (int lvl = 0; lvl < grid->maxdepth + 1; ++lvl) {
+    vertices_local_pL[lvl] = 0;
+    
+#if _OPENMP
+  #undef OMP
+  #define OMP(x)
+#endif
+{
+#line 599
+foreach_level(lvl) if (is_local(cell)) vertices_local_pL[lvl]++;end_foreach_level();}
+#if _OPENMP
+  #undef OMP
+  #define OMP(x) _Pragma(#x)
+#endif
+
+
+    
+#line 601
+vertices_local += vertices_local_pL[lvl];
+  }
+
+  descBits_local = vertices_local - vertices_local_pL[grid->maxdepth];
+
+  double min_val[list_len(list)];
+  double max_val[list_len(list)];
+  {
+    int i = 0;
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+      stats stat = statsf(s);
+      min_val[i] = stat.min;
+      max_val[i] = stat.max;
+      i++;
+    }}}
+  }
+  double min_val_v[vectors_len(vlist)];
+  double max_val_v[vectors_len(vlist)];
+  {
+    int i = 0;
+    {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
+      min_val_v[i] = HUGE;
+      max_val_v[i] = -HUGE;
+       {
+        stats stat = statsf(v.x);
+        min_val_v[i] = min(stat.min, min_val_v[i]);
+        max_val_v[i] = max(stat.max, max_val_v[i]);
+      } 
+#line 624
+{
+        stats stat = statsf(v.y);
+        min_val_v[i] = min(stat.min, min_val_v[i]);
+        max_val_v[i] = max(stat.max, max_val_v[i]);
+      }
+      i++;
+    }}}
+  }
+  int maj_v = 1, min_v = 0;
+
+  fprintf(fp, "<VTKFile %s version=\"%i.%i\" %s %s>\n",
+          "type=\"HyperTreeGrid\"", maj_v, min_v,
+          "byte_order=\"LittleEndian\" ", "header_type=\"UInt32\"");
+
+
+  fprintf(fp,
+          "\t<HyperTreeGrid BranchFactor=\"2\" TransposedRootIndexing=\"0\" "
+          "Dimensions=\"%d %d %d\">\n",
+          2, 2, 1);
+
+
+
+
+
+
+  fprintf(fp, "\t\t<Grid>\n");
+
+  fprintf(fp,
+          "\t\t\t<DataArray type=\"Float64\" Name=\"XCoordinates\" "
+          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
+          "RangeMax=\"%g\">\n",
+          Y0, Y0 + L0);
+  fprintf(fp, "\t\t\t\t%g %g", Y0, Y0 + L0);
+  fprintf(fp, "\n\t\t\t</DataArray>\n");
+  fprintf(fp,
+          "\t\t\t<DataArray type=\"Float64\" Name=\"YCoordinates\" "
+          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
+          "RangeMax=\"%g\">\n",
+          X0, X0 + L0);
+  fprintf(fp, "\t\t\t\t%g %g", X0, X0 + L0);
+  fprintf(fp, "\n\t\t\t</DataArray>\n");
+  fprintf(fp,
+          "\t\t\t<DataArray type=\"Float64\" Name=\"ZCoordinates\" "
+          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
+          "RangeMax=\"%g\">\n",
+          Z0, Z0 + L0);
+  fprintf(fp, "\t\t\t\t%g %g", 0., 0.);
+#line 693 "./output_htg.h"
+  fprintf(fp, "\n\t\t\t</DataArray>\n");
+  fprintf(fp, "\t\t</Grid>\n");
+  fprintf(fp, "\t\t<Trees>\n");
+
+  unsigned int byte_offset = 0;
+  fprintf(fp,
+          "\t\t\t<Tree Index=\"0\" NumberOfLevels=\"%d\" "
+          "NumberOfVertices=\"%u\">\n",
+          grid->maxdepth + 1, vertices_local);
+
+  fprintf(fp,
+          "\t\t\t\t<DataArray type=\"Bit\" Name=\"Descriptor\" "
+          "NumberOfTuples=\"%u\" format=\"appended\" RangeMin=\"0\" "
+          "RangeMax=\"1\" offset=\"%u\"/>\n",
+          descBits_local, byte_offset);
+  byte_offset += (descBits_local / 8 + 1) * sizeof(uint8_t) + sizeof(uint32_t);
+
+  fprintf(fp,
+          "\t\t\t\t<DataArray type=\"Int64\" Name=\"NbVerticesByLevel\" "
+          "NumberOfTuples=\"%d\" format=\"ascii\" RangeMin=\"1\" "
+          "RangeMax=\"%u\" >\n\t\t\t\t\t",
+          grid->maxdepth + 1, vertices_local_pL[grid->maxdepth]);
+
+  for (int lvl = 0; lvl <= grid->maxdepth; lvl++) {
+    fprintf(fp, "%u ", vertices_local_pL[lvl]);
+  }
+  fprintf(fp, "\n\t\t\t\t</DataArray>\n");
+  fprintf(fp, "\t\t\t\t<CellData>\n");
+  {
+    int i = 0;
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+      fprintf(fp,
+              "\t\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" "
+              "NumberOfTuples=\"%u\" format=\"appended\" RangeMin=\"%g\" "
+              "RangeMax=\"%g\" offset=\"%u\"/>\n",
+              _attribute[s.i].name, vertices_local, min_val[i], max_val[i], byte_offset);
+      byte_offset += vertices_local * sizeof(float) + sizeof(uint32_t);
+      i++;
+    }}}
+  }
+  {
+    int i = 0;
+    {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
+      char *vname = strtok(_attribute[v.x.i].name, ".");
+      fprintf(fp,
+              "\t\t\t\t\t<DataArray type=\"Float32\" NumberOfComponents=\"%i\" "
+              "Name=\"%s\" NumberOfTuples=\"%u\" format=\"appended\"  "
+              "RangeMin=\"%g\" RangeMax=\"%g\" offset=\"%u\"/>\n",
+              3, vname, vertices_local, min_val_v[i], max_val_v[i],
+              byte_offset);
+      byte_offset += vertices_local * 3 * sizeof(float) + sizeof(uint32_t);
+      i++;
+    }}}
+  }
+  fprintf(fp, "\t\t\t\t</CellData>\n");
+  fprintf(fp, "\t\t\t</Tree>\n\t\t</Trees>\n");
+  fprintf(fp, "\t</HyperTreeGrid>\n\t<AppendedData encoding=\"raw\">\n_");
+
+  int cell_size;
+
+  cell_size = sizeof(uint8_t);
+
+  int vertices_local_corr = ((descBits_local / 8) + 1) * 8;
+
+  uint32_t prepend_size = vertices_local_corr;
+  fwrite(&prepend_size, sizeof(uint32_t), 1, fp);
+  uint8_t *write_cache = (uint8_t *)calloc(vertices_local_corr, cell_size);
+  long index = 1;
+  for (int lvl = 0; lvl < grid->maxdepth; ++lvl) {
+    
+#if _OPENMP
+  #undef OMP
+  #define OMP(x)
+#endif
+{
+#line 762
+foreach_level(lvl) if (is_local(cell)) {
+      if (is_leaf(cell)) {
+        write_cache[index++] = 0;
+      } else {
+        write_cache[index++] = 1;
+      }
+    }end_foreach_level();}
+#if _OPENMP
+  #undef OMP
+  #define OMP(x) _Pragma(#x)
+#endif
+
+  
+#line 769
+}
+
+  for (int i = 0; i < vertices_local_corr / 8; ++i) {
+    for (int j = 0; j < 8; ++j) {
+      write_cache[i] |= write_cache[(8 * i + j) + 1] << (7 - j);
+      if ((j + 1) == 8) {
+        write_cache[i + 1] = 0;
+      }
+    }
+  }
+
+  fwrite(&write_cache[0], cell_size, vertices_local_corr / 8, fp);
+  pfree(write_cache,__func__,__FILE__,0);
+  write_cache = NULL;
+  {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+    cell_size = sizeof(float);
+
+    uint32_t prepend_size = vertices_local * cell_size;
+    fwrite(&prepend_size, sizeof(uint32_t), 1, fp);
+
+    for (int lvl = 0; lvl < grid->maxdepth + 1; ++lvl) {
+
+      float *write_cache = pmalloc(vertices_local_pL[lvl] * cell_size,__func__,__FILE__,0);
+      long index = 0;
+
+      
+#if _OPENMP
+  #undef OMP
+  #define OMP(x)
+#endif
+{
+#line 794
+foreach_level(lvl) if (is_local(cell)) write_cache[index++] =
+          val(s,0,0,0);end_foreach_level();}
+#if _OPENMP
+  #undef OMP
+  #define OMP(x) _Pragma(#x)
+#endif
+
+
+      
+#line 797
+fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
+      pfree(write_cache,__func__,__FILE__,0);
+      write_cache = NULL;
+    }
+  }}}
+
+  {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
+    cell_size = 3 * sizeof(float);
+
+    uint32_t prepend_size = vertices_local * cell_size;
+    fwrite(&prepend_size, sizeof(uint32_t), 1, fp);
+
+    for (int lvl = 0; lvl <= grid->maxdepth; ++lvl) {
+
+      float *write_cache = pmalloc(vertices_local_pL[lvl] * cell_size,__func__,__FILE__,0);
+      long index = 0;
+      
+#if _OPENMP
+  #undef OMP
+  #define OMP(x)
+#endif
+{
+#line 813
+foreach_level(lvl) if (is_local(cell)) {
+
+
+        write_cache[index] = val(v.y,0,0,0);
+        write_cache[index + 1] = val(v.x,0,0,0);
+        write_cache[index + 2] = 0.;
+        index += 3;
+
+
+
+
+
+
+
+      }end_foreach_level();}
+#if _OPENMP
+  #undef OMP
+  #define OMP(x) _Pragma(#x)
+#endif
+
+      
+#line 828
+fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
+      pfree(write_cache,__func__,__FILE__,0);
+      write_cache = NULL;
+    }
+  }}}
+
+  fprintf(fp, "ENDBINARY\n\t</AppendedData>\n</VTKFile>\n");
+  fflush(fp);
+}
+#line 6 "cylinder.c"
 static const double diameter = 0.125;
+static const int minlevel = 6;
 static double reynolds;
-static int level, period, Image, Surface, Zoom, nzoom;
+static int level, period, Image, Surface;
 static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(1.);}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
 static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
 static double _boundary6(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary6_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
@@ -14976,66 +15281,6 @@ static double _boundary9(Point point,Point neighbor,scalar _s,void *data){int ig
 static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary10_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
 static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
 vector  muv={{11},{12}};
-
-int dump_fields(const char *raw, const char *xdmf, double t, double ox,
-                double oy, double ex, double ey, long nx) {
-  long k, j, ny;
-  double sx, sy, xp, yp;
-  float v;
-  FILE *fp;
-  char *names[] = {"ux", "uy", "p"};
-  sx = ex / nx;
-  ny = ey / sx;
-  sy = ey / ny;
-  if ((fp = fopen(raw, "w")) == NULL) {
-    fprintf(ferr, "cylinder: fail to write to '%s'\n", raw);
-    exit(1);
-  }
-  for (k = 0; k < ny; k++) {
-    yp = oy + sy * k + sy / 2.;
-    for (j = 0; j < nx; j++) {
-      xp = ox + sx * j + sx / 2;
-      v = interpolate((struct _interpolate){u.x, xp, yp});
-      fwrite(&v, sizeof v, 1, fp);
-      v = interpolate((struct _interpolate){u.y, xp, yp});
-      fwrite(&v, sizeof v, 1, fp);
-      v = interpolate((struct _interpolate){p, xp, yp});
-      fwrite(&v, sizeof v, 1, fp);
-    }
-  }
-  if (fclose(fp) != 0) {
-    fprintf(ferr, "cylinder: fail to close '%s'\n", raw);
-    return 1;
-  }
-  if ((fp = fopen(xdmf, "w")) == NULL) {
-    fprintf(ferr, "cylinder: fail to write to '%s'\n", xdmf);
-    return 1;
-  }
-  fprintf(fp, "<Xdmf Version=\"2.0\">\n <Domain>\n   <Grid>\n     <Time Value=\"%.16e\"/>\n     <Topology TopologyType=\"2DCORECTMesh\" Dimensions=\"%ld %ld\"/>\n     <Geometry GeometryType=\"ORIGIN_DXDY\">\n       <DataItem Name=\"Origin\" Dimensions=\"2\">%.16e %.16e</DataItem>\n       <DataItem Name=\"Spacing\" Dimensions=\"2\">%.16e %.16e</DataItem>\n     </Geometry>\n",
-#line 61 "cylinder.c"
-          t, ny + 1, nx + 1, oy, ox, sy, sx);
-  for (j = 0; j < sizeof names / sizeof *names; j++)
-    fprintf(fp, "     <Attribute Name=\"%s\" Center=\"Cell\">\n	<DataItem ItemType=\"HyperSlab\" Dimensions=\"%ld %ld\">\n	  <DataItem Dimensions=\"3 2\">0 %ld 1 %ld %ld %ld</DataItem>\n	  <DataItem Dimensions=\"%ld %ld\" Format=\"Binary\">%s</DataItem>\n	</DataItem>\n     </Attribute>\n",
-
-
-
-
-
-
-
-            names[j], ny, nx, j, sizeof names / sizeof *names, ny, nx, ny,
-            3 * nx, raw);
-  fprintf(fp, "   </Grid>\n </Domain>\n");
-
-
-
-  if (fclose(fp) != 0) {
-    fprintf(ferr, "cylinder: fail to close '%s'\n", xdmf);
-    return 1;
-  }
-  return 0;
-}
-
 int main(int argc, char **argv) {_init_solver();
   char *end;
   int ReynoldsFlag;
@@ -15045,8 +15290,6 @@ int main(int argc, char **argv) {_init_solver();
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
-  Surface = 0;
-  Zoom = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -15054,8 +15297,6 @@ int main(int argc, char **argv) {_init_solver();
        "Options:\n"
        "  -h     Display this help message\n"
        "  -i     Enable PPM image dumping\n"
-       "  -s     Enable surface file dumping\n"
-       "  -z <number of cells>     Set the zoom level (positive integer)\n"
        "  -r <Reynolds number>     Set the Reynolds number (a decimal number)\n"
        "  -l <resolution level>    Set the resolution level (positive integer)\n"
        "  -p <dump period>         Set the dump period (positive integer)\n"
@@ -15090,19 +15331,6 @@ int main(int argc, char **argv) {_init_solver();
       }
       LevelFlag = 1;
       break;
-    case 'z':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -z needs an argument\n");
-        exit(1);
-      }
-      nzoom = strtol(*argv, &end, 10);
-      if (*end != '\0' || nzoom <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n", *argv);
-        exit(1);
-      }
-      Zoom = 1;
-      break;
     case 'p':
       argv++;
       if (*argv == NULL) {
@@ -15118,9 +15346,6 @@ int main(int argc, char **argv) {_init_solver();
       break;
     case 'i':
       Image = 1;
-      break;
-    case 's':
-      Surface = 1;
       break;
     default:
       fprintf(ferr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -15140,7 +15365,7 @@ int main(int argc, char **argv) {_init_solver();
   }
   L0 = 4;
   origin((struct _origin){-0.5, -L0 / 2.});
-  N = 1024;
+  init_grid(1 << minlevel);
   mu = muv;
   run();
 free_solver();}
@@ -15156,7 +15381,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 196
+#line 111
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15170,7 +15395,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 204
+#line 119
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15179,86 +15404,26 @@ foreach () {
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= 100);*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   static long iframe = 0;
-  char png[FILENAME_MAX], raw[FILENAME_MAX], xdmf[FILENAME_MAX],
-      surface[FILENAME_MAX];
+  char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
   FILE *fp;
   long nx, ny;
   coord n, b;
-  double omega_surface, theta;
 
   if (iframe % period == 0) {
     if (pid() == 0)
       fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
-
-    sprintf(xdmf, "a.%09ld.xdmf2", iframe);
-    sprintf(raw, "%09ld.raw", iframe);
-    if (dump_fields(raw, xdmf, t, X0, -0.5, L0, 1.0, N) != 0)
-      exit(1);
-
-    if (Zoom) {
-      sprintf(xdmf, "z.%09ld.xdmf2", iframe);
-      sprintf(raw, "z.%09ld.raw", iframe);
-      if (dump_fields(raw, xdmf, t, -1.25 * diameter, -1.25 * diameter,
-                      2.5 * diameter, 2.5 * diameter, nzoom) != 0)
-        exit(1);
-    }
-
-    if (Surface) {
-      sprintf(surface, "surface.%09ld.raw", iframe);
-      if ((fp = fopen(surface, "w")) == NULL) {
-        fprintf(ferr, "cylinder: error: fail to write to '%s'\n", surface);
-        exit(1);
-      }
-      foreach_stencil ()
-        {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {
-          _stencil_embed_geometry(point,NULL ,NULL ); 
-_stencil_embed_vorticity(point, u,NULL ,NULL );  
-          
-                   
-                    
-          
-          
-        
-#line 251
-}      }end_foreach_stencil();
-      
-#if _OPENMP
-  #undef OMP
-  #define OMP(x)
-#endif
-{
-#line 243
-foreach ()
-        if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-          embed_geometry(point, &b, &n);
-          omega_surface = embed_vorticity(point, u, b, n);
-          x += b.x * Delta, y += b.y * Delta;
-          theta = atan2(y, x);
-          fwrite(&theta, sizeof theta, 1, fp);
-          fwrite(&omega_surface, sizeof omega_surface, 1, fp);
-        }end_foreach();}
-#if _OPENMP
-  #undef OMP
-  #define OMP(x) _Pragma(#x)
-#endif
-
-      
-#line 252
-if (fclose(fp) != 0) {
-        fprintf(ferr, "cylinder: error: fail to close '%s'\n", surface);
-        exit(1);
-      }
-    }
+    sprintf(htg, "h.%09ld.htg", iframe);
+    vorticity(u, omega);
+    output_htg(((scalar[]){p, omega,{-1}}), ((vector[]){u,{{-1},{-1}}}), htg);
     if (Image) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 258
+#line 140
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
-      vorticity(u, omega);
       output_ppm((struct OutputPPM){omega, .file = png, .box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
                  .min = -5 / diameter, .max = 5 / diameter, .linear = false,
                  .mask = m});
@@ -15267,7 +15432,7 @@ foreach ()
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("dump_0","cylinder.c",0);return 0;}end_tracing("dump_0","cylinder.c",0);}
 static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
-  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x,u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, level, 4});
+  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x,u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = level, .minlevel = minlevel});
 }{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
 
