@@ -48,8 +48,6 @@ int dump_fields(const char *raw, const char *xdmf, double t, double ox,
     return 1;
   }
   fprintf(fp, "\
-<?xml version=\"1.0\" ?>\n\
-<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n\
 <Xdmf Version=\"2.0\">\n\
  <Domain>\n\
    <Grid>\n\
@@ -75,7 +73,6 @@ int dump_fields(const char *raw, const char *xdmf, double t, double ox,
   fprintf(fp, "\
    </Grid>\n\
  </Domain>\n\
-</Xdmf>\n\
 ");
   if (fclose(fp) != 0) {
     fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
