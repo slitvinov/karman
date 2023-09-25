@@ -16,43 +16,43 @@
 
 
 
-#line 1 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/stdlib.h"
+#line 1 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdlib.h"
 #include <stdlib.h>
-#line 2 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/stdio.h"
+#line 2 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdio.h"
 #include <stdio.h>
-#line 3 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/stddef.h"
+#line 3 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stddef.h"
 #include <stddef.h>
-#line 4 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/stdbool.h"
+#line 4 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdbool.h"
 #include <stdbool.h>
-#line 5 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/stdarg.h"
+#line 5 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdarg.h"
 #include <stdarg.h>
-#line 6 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/string.h"
+#line 6 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/string.h"
 #include <string.h>
-#line 7 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/float.h"
+#line 7 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/float.h"
 #include <float.h>
-#line 8 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/limits.h"
+#line 8 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/limits.h"
 #include <limits.h>
-#line 9 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/math.h"
+#line 9 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/math.h"
 #include <math.h>
-#line 10 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/time.h"
+#line 10 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/time.h"
 #include <time.h>
-#line 11 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/sys/time.h"
+#line 11 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/sys/time.h"
 #include <sys/time.h>
-#line 12 "/u/basilisk/src/common.h"
-#line 1 "/u/basilisk/src/ast/std/sys/resource.h"
+#line 12 "/home/lisergey/basilisk/src/common.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/sys/resource.h"
 #include <sys/resource.h>
-#line 13 "/u/basilisk/src/common.h"
+#line 13 "/home/lisergey/basilisk/src/common.h"
 
 #if _OPENMP
 # include <omp.h>
@@ -72,13 +72,10 @@ static int mpi_rank, mpi_npe;
 # define OMP(x)
 
 #endif
-#line 46 "/u/basilisk/src/common.h"
-#undef HUGE
-#define HUGE ((double)1e30)
-
+#line 49 "/home/lisergey/basilisk/src/common.h"
 #define _NVARMAX 65536
 #define is_constant(v) ((v).i >= _NVARMAX)
-#define constant(v) (is_constant(v) ? _constant[(v).i - _NVARMAX] : HUGE)
+#define constant(v) (is_constant(v) ? _constant[(v).i - _NVARMAX] : 1e30)
 
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
@@ -125,7 +122,7 @@ static inline void qassert (const char * file, int line, const char * cond) {
   fprintf (ferr, "%s:%d: Assertion `%s' failed.\n", file, line, cond);
   abort();
 }
-#line 104 "/u/basilisk/src/common.h"
+#line 104 "/home/lisergey/basilisk/src/common.h"
 #define sysmalloc malloc
 #define syscalloc calloc
 #define sysrealloc realloc
@@ -201,7 +198,7 @@ static void * pmfunc_alloc (pmdata * d, size_t size,
        const char * func, const char * file, int line,
        char c)
 {
-  if (!(d != NULL)) qassert ("/u/basilisk/src/common.h", 0, "d != NULL");
+  if (!(d != NULL)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "d != NULL");
   OMP (omp critical)
   {
     d->id = pmfunc_index(func, file, line);
@@ -473,7 +470,7 @@ static void trace_push (Trace * t, const char * func)
 
 static void trace_pop (Trace * t, const char * func)
 {
-  if (!(t->stack.len > 0)) qassert ("/u/basilisk/src/common.h", 0, "t->stack.len > 0");
+  if (!(t->stack.len > 0)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "t->stack.len > 0");
   t->stack.len -= sizeof(int);
   int value = t->stack.len > 0 ?
     ((int *)t->stack.p)[t->stack.len/sizeof(int) - 1] : 0;
@@ -577,7 +574,7 @@ static void end_tracing (const char * func, const char * file, int line)
   gettimeofday (&tv, NULL);
   double te = (tv.tv_sec - Trace.t0) + tv.tv_usec/1e6;
   double * t = (double *) Trace.stack.p;
-  if (!(Trace.stack.len >= 2*sizeof(double))) qassert ("/u/basilisk/src/common.h", 0, "Trace.stack.len >= 2*sizeof(double)");
+  if (!(Trace.stack.len >= 2*sizeof(double))) qassert ("/home/lisergey/basilisk/src/common.h", 0, "Trace.stack.len >= 2*sizeof(double)");
   t += Trace.stack.len/sizeof(double) - 2;
   Trace.stack.len -= 2*sizeof(double);
   double dt = te - t[0];
@@ -687,13 +684,13 @@ static void trace_off()
 static bool in_prof = false;
 static double prof_start, _prof;
 #define prof_start(name)\
-  if (!(!in_prof)) qassert ("/u/basilisk/src/common.h", 0, "!in_prof"); in_prof = true;\
+  if (!(!in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "!in_prof"); in_prof = true;\
   prof_start = MPI_Wtime();\
 
 #line 667
 
 #define prof_stop()\
-  if (!(in_prof)) qassert ("/u/basilisk/src/common.h", 0, "in_prof"); in_prof = false;\
+  if (!(in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "in_prof"); in_prof = false;\
   _prof = MPI_Wtime();\
   mpi_time += _prof - prof_start;\
 
@@ -707,9 +704,9 @@ static double prof_start, _prof;
      
 int mpi_all_reduce0 (void *sendbuf, void *recvbuf, int count,
        MPI_Datatype datatype, MPI_Op op, MPI_Comm comm)
-{tracing("mpi_all_reduce0","/u/basilisk/src/common.h",0);
-  { int _ret= MPI_Allreduce (sendbuf, recvbuf, count, datatype, op, comm);end_tracing("mpi_all_reduce0","/u/basilisk/src/common.h",0);return _ret;}
-end_tracing("mpi_all_reduce0","/u/basilisk/src/common.h",0);}
+{tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",0);
+  { int _ret= MPI_Allreduce (sendbuf, recvbuf, count, datatype, op, comm);end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",0);return _ret;}
+end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",0);}
 #define mpi_all_reduce(v,type,op) {\
   prof_start ("mpi_all_reduce");\
   union { int a; float b; double c;} global;\
@@ -845,7 +842,7 @@ void mpi_init()
 #define val(a,k,l,m) data(k,l,m)[_index(a,m)]
 
 double _val_higher_dimension = 0.;
-#line 823 "/u/basilisk/src/common.h"
+#line 823 "/home/lisergey/basilisk/src/common.h"
 #if (_GNU_SOURCE || __APPLE__) && !_OPENMP && !_CADNA
 double undefined;
 # if __APPLE__
@@ -856,7 +853,7 @@ double undefined;
 # define disable_fpe(flags) fedisableexcept (flags)
 static void set_fpe (void) {
   int64_t lnan = 0x7ff0000000000001;
-  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/u/basilisk/src/common.h", 0, "sizeof (int64_t) == sizeof (double)");
+  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/home/lisergey/basilisk/src/common.h", 0, "sizeof (int64_t) == sizeof (double)");
   memcpy (&undefined, &lnan, sizeof (double));
   enable_fpe (FE_DIVBYZERO|FE_INVALID);
 }
@@ -928,7 +925,7 @@ OMP(omp declare reduction (+ : coord :
       omp_out.x += omp_in.x,
       omp_out.y += omp_in.y,
       omp_out.z += omp_in.z))
-#line 917 "/u/basilisk/src/common.h"
+#line 917 "/home/lisergey/basilisk/src/common.h"
 void normalize (coord * n)
 {
   double norm = 0.;
@@ -970,18 +967,18 @@ int nboundary = 2*2;
 
 
 
-#define dirichlet(expr) (2.*(expr) - val(_s,0,0,0))
-#define dirichlet_homogeneous() (- val(_s,0,0,0))
-#define dirichlet_face(expr) (expr)
-#define dirichlet_face_homogeneous() (0.)
-#define neumann(expr) (Delta*(expr) + val(_s,0,0,0))
-#define neumann_homogeneous() (val(_s,0,0,0))
+#define _dirichlet(expr, ...) (2.*(expr) - val(_s,0,0,0))
+#define _dirichlet_homogeneous(...) (- val(_s,0,0,0))
+#define _dirichlet_face(expr,...) (expr)
+#define _dirichlet_face_homogeneous(...) (0.)
+#define _neumann(expr,...) (Delta*(expr) + val(_s,0,0,0))
+#define _neumann_homogeneous(...) (val(_s,0,0,0))
 
 double * _constant = NULL;
 size_t datasize = 0;
 typedef struct _Point Point;
 
-#line 1 "/u/basilisk/src/grid/boundaries.h"
+#line 1 "/home/lisergey/basilisk/src/grid/boundaries.h"
 
 
 typedef struct _Boundary Boundary;
@@ -1018,12 +1015,12 @@ void free_boundaries() {
   pfree (boundaries,__func__,__FILE__,0);
   boundaries = NULL;
 }
-#line 47 "/u/basilisk/src/grid/boundaries.h"
+#line 47 "/home/lisergey/basilisk/src/grid/boundaries.h"
 typedef struct {
   Boundary parent;
   int d;
 } BoxBoundary;
-#line 964 "/u/basilisk/src/common.h"
+#line 964 "/home/lisergey/basilisk/src/common.h"
 
 
 
@@ -1049,31 +1046,31 @@ typedef struct {
   scalar * depends;
 
   
-#line 19 "/u/basilisk/src/grid/stencils.h"
+#line 19 "/home/lisergey/basilisk/src/grid/stencils.h"
 bool input, output;
   int width;
   int dirty;
   
-#line 18 "/u/basilisk/src/grid/multigrid-common.h"
+#line 18 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
 void (* prolongation) (Point, scalar);
   void (* restriction) (Point, scalar);
   
-#line 9 "/u/basilisk/src/grid/tree-common.h"
+#line 9 "/home/lisergey/basilisk/src/grid/tree-common.h"
 void (* refine) (Point, scalar);
   
 #line 97
 void (* coarsen) (Point, scalar);
   
-#line 82 "/u/basilisk/src/fractions.h"
+#line 82 "/home/lisergey/basilisk/src/fractions.h"
 vector n;
   
-#line 207 "/u/basilisk/src/embed-tree.h"
+#line 207 "/home/lisergey/basilisk/src/embed-tree.h"
 void (* embed_gradient) (Point, scalar, coord *);
   
-#line 176 "/u/basilisk/src/embed.h"
+#line 178 "/home/lisergey/basilisk/src/embed.h"
 bool third;
 
-#line 987 "/u/basilisk/src/common.h"
+#line 987 "/home/lisergey/basilisk/src/common.h"
 } _Attributes;
 
 static _Attributes * _attribute = NULL;
@@ -1202,12 +1199,12 @@ vector * vectors_from_scalars (scalar * s)
   while (s->i >= 0) {
     vector v;
      {
-      if (!(s->i >= 0)) qassert ("/u/basilisk/src/common.h", 0, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "s->i >= 0");
       v.x = *s++;
     } 
 #line 1110
 {
-      if (!(s->i >= 0)) qassert ("/u/basilisk/src/common.h", 0, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "s->i >= 0");
       v.y = *s++;
     }
     list = vectors_append (list, v);
@@ -1238,17 +1235,29 @@ tensor * tensors_from_vectors (vector * v)
   while (v->x.i >= 0) {
     tensor t;
      {
-      if (!(v->x.i >= 0)) qassert ("/u/basilisk/src/common.h", 0, "v->x.i >= 0");
+      if (!(v->x.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "v->x.i >= 0");
       t.x = *v++;
     } 
 #line 1141
 {
-      if (!(v->y.i >= 0)) qassert ("/u/basilisk/src/common.h", 0, "v->x.i >= 0");
+      if (!(v->y.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 0, "v->x.i >= 0");
       t.y = *v++;
     }
     list = tensors_append (list, t);
   }
   return list;
+}
+
+static inline bool is_vertex_scalar (scalar s)
+{
+  
+    if (_attribute[s.i].d.x != -1)
+      return false;
+    
+#line 1153
+if (_attribute[s.i].d.y != -1)
+      return false;
+  return true;
 }
 
 scalar * all = NULL;
@@ -1355,9 +1364,11 @@ const scalar zeroc = {_NVARMAX+5};
 
 
 
-        vector fm = {{_NVARMAX+2},{_NVARMAX+3}};
-        scalar cm = {_NVARMAX+4};
-#line 1269 "/u/basilisk/src/common.h"
+const vector unityf0 = {{_NVARMAX+6},{_NVARMAX+7}};
+const scalar unity0 = {_NVARMAX+8};
+        vector fm = {{_NVARMAX+6},{_NVARMAX+7}};
+        scalar cm = {_NVARMAX+8};
+#line 1279 "/home/lisergey/basilisk/src/common.h"
 static FILE ** qpopen_pipes = NULL;
 
 FILE * qpopen (const char * command, const char * type)
@@ -1428,7 +1439,7 @@ double matrix_inverse (double ** m, int n, double pivmin)
 {
   int indxc[n], indxr[n], ipiv[n];
   int i, icol = 0, irow = 0, j, k, l, ll;
-  double big, dum, pivinv, minpiv = HUGE;
+  double big, dum, pivinv, minpiv = 1e30;
 
   for (j = 0; j < n; j++)
     ipiv[j] = -1;
@@ -1533,8 +1544,8 @@ void display (struct _display p)
 
 
 
-#line 1 "/u/basilisk/src/grid/stencils.h"
-#line 17 "/u/basilisk/src/grid/stencils.h"
+#line 1 "/home/lisergey/basilisk/src/grid/stencils.h"
+#line 17 "/home/lisergey/basilisk/src/grid/stencils.h"
 
 
 
@@ -1897,7 +1908,7 @@ _attribute[s.i].v.y.i = -1;
 
 
   if (flux) {
-#line 335 "/u/basilisk/src/grid/stencils.h"
+#line 335 "/home/lisergey/basilisk/src/grid/stencils.h"
     boundary_face (listf);
     
       pfree (listf.x,__func__,__FILE__,0);
@@ -1936,16 +1947,16 @@ pfree (listf.y,__func__,__FILE__,0);
     pfree (dirty,__func__,__FILE__,0);
   }
 }
-#line 1445 "/u/basilisk/src/common.h"
+#line 1455 "/home/lisergey/basilisk/src/common.h"
 #line 14 "cylinder-cpp.c"
 #line 1 "grid/quadtree.h"
-#line 1 "/u/basilisk/src/grid/quadtree.h"
+#line 1 "/home/lisergey/basilisk/src/grid/quadtree.h"
 
 
 #line 1 "grid/tree.h"
-#line 1 "/u/basilisk/src/grid/tree.h"
+#line 1 "/home/lisergey/basilisk/src/grid/tree.h"
 #line 1 "grid/mempool.h"
-#line 1 "/u/basilisk/src/grid/mempool.h"
+#line 1 "/home/lisergey/basilisk/src/grid/mempool.h"
 
 
 
@@ -1971,8 +1982,8 @@ typedef struct {
 Mempool * mempool_new (size_t poolsize, size_t size)
 {
 
-  if (!(poolsize % 8 == 0)) qassert ("/u/basilisk/src/grid/mempool.h", 0, "poolsize % 8 == 0");
-  if (!(size >= sizeof(FreeBlock))) qassert ("/u/basilisk/src/grid/mempool.h", 0, "size >= sizeof(FreeBlock)");
+  if (!(poolsize % 8 == 0)) qassert ("/home/lisergey/basilisk/src/grid/mempool.h", 0, "poolsize % 8 == 0");
+  if (!(size >= sizeof(FreeBlock))) qassert ("/home/lisergey/basilisk/src/grid/mempool.h", 0, "size >= sizeof(FreeBlock)");
 
 
   poolsize = min(1 << 20, poolsize + sizeof(Pool));
@@ -2048,14 +2059,14 @@ void mempool_free (Mempool * m, void * p)
   b->next = m->first;
   m->first = (char *) p;
 }
-#line 2 "/u/basilisk/src/grid/tree.h"
+#line 2 "/home/lisergey/basilisk/src/grid/tree.h"
 
 
 
 
 #line 1 "grid/memindex/range.h"
-#line 1 "/u/basilisk/src/grid/memindex/range.h"
-#line 15 "/u/basilisk/src/grid/memindex/range.h"
+#line 1 "/home/lisergey/basilisk/src/grid/memindex/range.h"
+#line 15 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 typedef struct {
   void ** p;
   int size;
@@ -2064,7 +2075,7 @@ typedef struct {
 typedef struct {
   int start, end;
 } Memrange;
-#line 34 "/u/basilisk/src/grid/memindex/range.h"
+#line 34 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 void memrange_alloc (Memrange * r, Memalloc * mem, int i)
 {
   if (r->start == r->end) {
@@ -2095,7 +2106,7 @@ void memrange_alloc (Memrange * r, Memalloc * mem, int i)
     r->start = i;
   }
 }
-#line 73 "/u/basilisk/src/grid/memindex/range.h"
+#line 73 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 bool memrange_free (Memrange * r, Memalloc * mem, int i)
 {
   if (i == r->start) {
@@ -2131,7 +2142,7 @@ bool memrange_free (Memrange * r, Memalloc * mem, int i)
     }
   }
   else {
-    if (!(i > r->start && i < r->end)) qassert ("/u/basilisk/src/grid/memindex/range.h", 0, "i > r->start && i < r->end");
+    if (!(i > r->start && i < r->end)) qassert ("/home/lisergey/basilisk/src/grid/memindex/range.h", 0, "i > r->start && i < r->end");
     for (Memalloc * m = mem; m->p; m++)
       memset ((char *)(*m->p) + i*m->size, 0, m->size);
   }
@@ -2160,7 +2171,7 @@ struct _Memindex {
 
 
 };
-#line 171 "/u/basilisk/src/grid/memindex/range.h"
+#line 171 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 struct _Memindex * mem_new (int len)
 {
   struct _Memindex * m = pcalloc (1, sizeof (struct _Memindex),__func__,__FILE__,0);
@@ -2195,7 +2206,7 @@ void mem_destroy (struct _Memindex * m, int len)
     pfree (m->b + m->r1.start,__func__,__FILE__,0);
   pfree (m,__func__,__FILE__,0);
 }
-#line 218 "/u/basilisk/src/grid/memindex/range.h"
+#line 218 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 void mem_assign (struct _Memindex * m, int i, int j, int len, void * b)
 {
   Memalloc mem[] = {{(void **)&m->b, sizeof(char **)},
@@ -2207,7 +2218,7 @@ void mem_assign (struct _Memindex * m, int i, int j, int len, void * b)
   memrange_alloc (&m->r2[i], mem1, j);
   ((m)->b[i][j]) = b;
 }
-#line 259 "/u/basilisk/src/grid/memindex/range.h"
+#line 259 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 void mem_free (struct _Memindex * m, int i, int j, int len)
 {
   Memalloc mem[] = {{(void **)&m->b[i], sizeof(char *)},
@@ -2219,7 +2230,7 @@ void mem_free (struct _Memindex * m, int i, int j, int len)
     memrange_free (&m->r1, mem, i);
   }
 }
-#line 305 "/u/basilisk/src/grid/memindex/range.h"
+#line 305 "/home/lisergey/basilisk/src/grid/memindex/range.h"
 #define foreach_mem(_m, _len, _i) {\
   Point point = {0};\
   for (point.i = max(Period.x*2, (_m)->r1.start);\
@@ -2234,8 +2245,8 @@ void mem_free (struct _Memindex * m, int i, int j, int len)
 #line 315
 
 #define end_foreach_mem() }}
-#line 7 "/u/basilisk/src/grid/tree.h"
-#line 24 "/u/basilisk/src/grid/tree.h"
+#line 7 "/home/lisergey/basilisk/src/grid/tree.h"
+#line 24 "/home/lisergey/basilisk/src/grid/tree.h"
 typedef struct {
   unsigned short flags;
 
@@ -2412,7 +2423,7 @@ static void cache_level_shrink (CacheLevel * c)
 {
   if (c->nm > (c->n/128 + 1)*128) {
     c->nm = (c->n/128 + 1)*128;
-    if (!(c->nm > c->n)) qassert ("/u/basilisk/src/grid/tree.h", 0, "c->nm > c->n");
+    if (!(c->nm > c->n)) qassert ("/home/lisergey/basilisk/src/grid/tree.h", 0, "c->nm > c->n");
     c->p = (IndexLevel *) prealloc (c->p, sizeof (Index)*c->nm,__func__,__FILE__,0);
   }
 }
@@ -2439,7 +2450,7 @@ void cache_shrink (Cache * c)
 {
   cache_level_shrink ((CacheLevel *)c);
 }
-#line 243 "/u/basilisk/src/grid/tree.h"
+#line 243 "/home/lisergey/basilisk/src/grid/tree.h"
 #define allocated(k,l,n) (((point.i+k) >= (((Tree *)grid)->L[point.level]->m)->r1.start && (point.i+k) < (((Tree *)grid)->L[point.level]->m->r1.end) && (((Tree *)grid)->L[point.level]->m)->b[point.i+k] && (point.j+l) >= (((Tree *)grid)->L[point.level]->m)->r2[point.i+k].start && (point.j+l) < (((Tree *)grid)->L[point.level]->m)->r2[point.i+k].end && (((Tree *)grid)->L[point.level]->m)->b[point.i+k][point.j+l])\
                                )\
 
@@ -2467,7 +2478,7 @@ void cache_shrink (Cache * c)
 
 #line 259
 
-#line 284 "/u/basilisk/src/grid/tree.h"
+#line 284 "/home/lisergey/basilisk/src/grid/tree.h"
 #define CELL(m) (*((Cell *)(m)))
 
 
@@ -2524,8 +2535,8 @@ void cache_shrink (Cache * c)
 
 
 #line 1 "grid/foreach_cell.h"
-#line 1 "/u/basilisk/src/grid/foreach_cell.h"
-#line 66 "/u/basilisk/src/grid/foreach_cell.h"
+#line 1 "/home/lisergey/basilisk/src/grid/foreach_cell.h"
+#line 66 "/home/lisergey/basilisk/src/grid/foreach_cell.h"
 #define foreach_cell_root(root)\
   {\
     int ig = 0, jg = 0; NOT_UNUSED(ig); NOT_UNUSED(jg);\
@@ -2711,8 +2722,8 @@ void cache_shrink (Cache * c)
 #line 281
 
 #define end_foreach_leaf() } continue; } end_foreach_cell()
-#line 344 "/u/basilisk/src/grid/tree.h"
-#line 361 "/u/basilisk/src/grid/tree.h"
+#line 344 "/home/lisergey/basilisk/src/grid/tree.h"
+#line 361 "/home/lisergey/basilisk/src/grid/tree.h"
 #define foreach_child() {\
   int _i = 2*point.i - 2, _j = 2*point.j - 2;\
   point.level++;\
@@ -2734,7 +2745,7 @@ void cache_shrink (Cache * c)
 #line 376
 
 #define foreach_child_break() _k = _l = 2
-#line 407 "/u/basilisk/src/grid/tree.h"
+#line 407 "/home/lisergey/basilisk/src/grid/tree.h"
 #define is_refined_check() ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0) &&\
     point.i > 0 && point.i < (1 << level) + 2*2 - 1\
 \
@@ -2866,8 +2877,8 @@ void cache_shrink (Cache * c)
 #define end_foreach_halo() end_foreach_cache_level(); }}
 
 #line 1 "grid/neighbors.h"
-#line 1 "/u/basilisk/src/grid/neighbors.h"
-#line 17 "/u/basilisk/src/grid/neighbors.h"
+#line 1 "/home/lisergey/basilisk/src/grid/neighbors.h"
+#line 17 "/home/lisergey/basilisk/src/grid/neighbors.h"
 #define foreach_neighbor(_s) {\
   int _nn = _s + 0 ? _s + 0 : 2;\
   int _i = point.i, _j = point.j;\
@@ -2888,7 +2899,7 @@ void cache_shrink (Cache * c)
 #line 31
 
 #define foreach_neighbor_break() _k = _l = _nn + 1
-#line 524 "/u/basilisk/src/grid/tree.h"
+#line 524 "/home/lisergey/basilisk/src/grid/tree.h"
 
 static inline bool has_local_children (Point point)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
@@ -2918,7 +2929,7 @@ if ((flags & face_x) && !is_vertex(neighbor(0,1,0))) {
       cache_append (&q->vertices, neighborp(0,1,0), 0);
       neighbor(0,1,0).flags |= vertex;
     }
-#line 557 "/u/basilisk/src/grid/tree.h"
+#line 557 "/home/lisergey/basilisk/src/grid/tree.h"
 }
 
 
@@ -2947,7 +2958,7 @@ static void update_cache_f (void)
 
       cache_level_append (&q->active[level], point);
     }
-#line 601 "/u/basilisk/src/grid/tree.h"
+#line 601 "/home/lisergey/basilisk/src/grid/tree.h"
     if (!(cell.pid < 0)) {
 
       {foreach_neighbor (2)
@@ -3095,7 +3106,7 @@ if (allocated(0,1,0) && is_local(neighbor(0,1,0)) &&
 #line 742
 
 #define end_foreach_vertex() } end_foreach_cache()
-#line 734 "/u/basilisk/src/grid/tree.h"
+#line 734 "/home/lisergey/basilisk/src/grid/tree.h"
 #define foreach_level(l) {\
   if (l <= depth()) {\
     { if (((Tree *)grid)->dirty) update_cache_f(); };\
@@ -3163,7 +3174,7 @@ static void update_depth (int inc)
   q->boundary = cache_level_resize (q->boundary, inc);
   q->restriction = cache_level_resize (q->restriction, inc);
 }
-#line 823 "/u/basilisk/src/grid/tree.h"
+#line 823 "/home/lisergey/basilisk/src/grid/tree.h"
 typedef void (* PeriodicFunction) (struct _Memindex *, int, int, int, void *);
 
 static void periodic_function (struct _Memindex * m, int i, int j, int len, void * b,
@@ -3201,7 +3212,7 @@ static void free_periodic (struct _Memindex * m, int i, int j, int len)
 {
   periodic_function (m, i, j, len, NULL, (PeriodicFunction) mem_free);
 }
-#line 938 "/u/basilisk/src/grid/tree.h"
+#line 938 "/home/lisergey/basilisk/src/grid/tree.h"
 static void alloc_children (Point point)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   if (point.level == grid->depth)
@@ -3225,7 +3236,7 @@ static void alloc_children (Point point)
       assign_periodic (L->m, i, j, L->len, b);
       b += len;
     }
-#line 971 "/u/basilisk/src/grid/tree.h"
+#line 971 "/home/lisergey/basilisk/src/grid/tree.h"
   }
 
   int pid = cell.pid;
@@ -3237,24 +3248,24 @@ static void alloc_children (Point point)
 #endif
   }end_foreach_child()}
 }
-#line 1000 "/u/basilisk/src/grid/tree.h"
+#line 1000 "/home/lisergey/basilisk/src/grid/tree.h"
 static void free_children (Point point)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
 
   Layer * L = ((Tree *)grid)->L[point.level + 1];
   int i = 2*point.i - 2, j = 2*point.j - 2;
-  if (!(((L->m)->b[i][j]))) qassert ("/u/basilisk/src/grid/tree.h", 0, "mem_data (L->m,i,j)");
+  if (!(((L->m)->b[i][j]))) qassert ("/home/lisergey/basilisk/src/grid/tree.h", 0, "mem_data (L->m,i,j)");
   mempool_free (L->pool, ((L->m)->b[i][j]));
   for (int k = 0; k < 2; k++)
     for (int l = 0; l < 2; l++)
       free_periodic (L->m, i + k, j + l, L->len);
   if (--L->nc == 0) {
     destroy_layer (L);
-    if (!(point.level + 1 == grid->depth)) qassert ("/u/basilisk/src/grid/tree.h", 0, "point.level + 1 == grid->depth");
+    if (!(point.level + 1 == grid->depth)) qassert ("/home/lisergey/basilisk/src/grid/tree.h", 0, "point.level + 1 == grid->depth");
     update_depth (-1);
   }
 }
-#line 1041 "/u/basilisk/src/grid/tree.h"
+#line 1041 "/home/lisergey/basilisk/src/grid/tree.h"
 void increment_neighbors (Point point)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   ((Tree *)grid)->dirty = true;
@@ -3327,7 +3338,7 @@ void realloc_scalar (int size)
    assign_periodic (L->m, point.i + k, point.j + o, L->len, new);
    new += newlen;
  }
-#line 1124 "/u/basilisk/src/grid/tree.h"
+#line 1124 "/home/lisergey/basilisk/src/grid/tree.h"
     }end_foreach_mem();}
     mempool_destroy (oldpool);
   }
@@ -3451,7 +3462,7 @@ static bool diagonal_neighbor_2D (Point point,
 static bool diagonal_neighbor_3D (Point point,
       scalar * scalars, vector * vectors)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
-#line 1266 "/u/basilisk/src/grid/tree.h"
+#line 1266 "/home/lisergey/basilisk/src/grid/tree.h"
   return false;
 }
 
@@ -3633,9 +3644,9 @@ static double masked_average (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   double sum = 0., n = 0.;
   {foreach_child()
-    if (!(cell.pid < 0) && val(s,0,0,0) != HUGE)
+    if (!(cell.pid < 0) && val(s,0,0,0) != 1e30)
       sum += val(s,0,0,0), n++;end_foreach_child()}
-  return n ? sum/n : HUGE;
+  return n ? sum/n : 1e30;
 }
 
 
@@ -3644,9 +3655,9 @@ static double masked_average_x (Point point, scalar s)
   double sum = 0., n = 0.;
   {foreach_child()
     if (child.x < 0 && (!(cell.pid < 0) || !(neighbor(1,0,0).pid < 0)) &&
- val(s,1,0,0) != HUGE)
+ val(s,1,0,0) != 1e30)
       sum += val(s,1,0,0), n++;end_foreach_child()}
-  return n ? sum/n : HUGE;
+  return n ? sum/n : 1e30;
 }
 
 #line 1391
@@ -3655,9 +3666,9 @@ static double masked_average_y (Point point, scalar s)
   double sum = 0., n = 0.;
   {foreach_child()
     if (child.y < 0 && (!(cell.pid < 0) || !(neighbor(0,1,0).pid < 0)) &&
- val(s,0,1,0) != HUGE)
+ val(s,0,1,0) != 1e30)
       sum += val(s,0,1,0), n++;end_foreach_child()}
-  return n ? sum/n : HUGE;
+  return n ? sum/n : 1e30;
 }
 
 static void masked_boundary_restriction (const Boundary * b,
@@ -3697,7 +3708,7 @@ static void masked_boundary_restriction (const Boundary * b,
   pfree (scalars,__func__,__FILE__,0);
   pfree (faces,__func__,__FILE__,0);
 }
-#line 1454 "/u/basilisk/src/grid/tree.h"
+#line 1454 "/home/lisergey/basilisk/src/grid/tree.h"
 static void free_cache (CacheLevel * c)
 {
   for (int l = 0; l <= depth(); l++)
@@ -3743,9 +3754,9 @@ static void refine_level (int depth);
 
      
 void init_grid (int n)
-{tracing("init_grid","/u/basilisk/src/grid/tree.h",0);
+{tracing("init_grid","/home/lisergey/basilisk/src/grid/tree.h",0);
 
-  if (!(sizeof(Cell) % 8 == 0)) qassert ("/u/basilisk/src/grid/tree.h", 0, "sizeof(Cell) % 8 == 0");
+  if (!(sizeof(Cell) % 8 == 0)) qassert ("/home/lisergey/basilisk/src/grid/tree.h", 0, "sizeof(Cell) % 8 == 0");
 
   free_grid();
   int depth = 0;
@@ -3768,7 +3779,7 @@ void init_grid (int n)
 
   Layer * L = new_layer (0);
   q->L[0] = L;
-#line 1537 "/u/basilisk/src/grid/tree.h"
+#line 1537 "/home/lisergey/basilisk/src/grid/tree.h"
   for (int i = Period.x*2; i < L->len - Period.x*2; i++)
     for (int j = Period.y*2; j < L->len - Period.y*2; j++)
       assign_periodic (L->m, i, j, L->len,
@@ -3785,7 +3796,7 @@ void init_grid (int n)
   l < 0 ? -1 - bottom :
   0);
   CELL(((L->m)->b[2][2])).pid = 0;
-#line 1575 "/u/basilisk/src/grid/tree.h"
+#line 1575 "/home/lisergey/basilisk/src/grid/tree.h"
   q->active = ((CacheLevel *) pcalloc (1, sizeof(CacheLevel),__func__,__FILE__,0));
   q->prolongation = ((CacheLevel *) pcalloc (1, sizeof(CacheLevel),__func__,__FILE__,0));
   q->boundary = ((CacheLevel *) pcalloc (1, sizeof(CacheLevel),__func__,__FILE__,0));
@@ -3804,7 +3815,7 @@ void init_grid (int n)
   refine_level (depth);
   reset (all, 0.);
   { if (((Tree *)grid)->dirty) update_cache_f(); };
-end_tracing("init_grid","/u/basilisk/src/grid/tree.h",0);}
+end_tracing("init_grid","/home/lisergey/basilisk/src/grid/tree.h",0);}
 
 
 void check_two_one (void)
@@ -3834,7 +3845,7 @@ void check_two_one (void)
 
 
 
-     if (!(false)) qassert ("/u/basilisk/src/grid/tree.h", 0, "false");
+     if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/tree.h", 0, "false");
    }
  }end_foreach_leaf();}
 }
@@ -3883,24 +3894,25 @@ bool tree_is_full()
 }
 
 #line 1 "grid/tree-common.h"
-#line 1 "/u/basilisk/src/grid/tree-common.h"
+#line 1 "/home/lisergey/basilisk/src/grid/tree-common.h"
 
 
 
 #line 1 "grid/multigrid-common.h"
-#line 1 "/u/basilisk/src/grid/multigrid-common.h"
+#line 1 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
 
 
 #line 1 "grid/cartesian-common.h"
-#line 1 "/u/basilisk/src/grid/cartesian-common.h"
+#line 1 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 #line 1 "grid/events.h"
-#line 1 "/u/basilisk/src/grid/events.h"
+#line 1 "/home/lisergey/basilisk/src/grid/events.h"
 
 
 
 
-
-
+static int END_EVENT = 1234567890;
+static double TEND_EVENT = 1234567890;
+static double TEPS = 1e-9;
 
 static void event_error (Event * ev, const char * s)
 {
@@ -3911,7 +3923,7 @@ static void event_error (Event * ev, const char * s)
 static void init_event (Event * ev)
 {
   if (ev->arrayi || ev->arrayt) {
-    ev->i = ev->t = -1;
+    ev->i = -1; ev->t = - TEND_EVENT;
     if (ev->arrayi)
       ev->i = ev->arrayi[0];
     else
@@ -3923,9 +3935,9 @@ static void init_event (Event * ev)
     if (ev->nexpr > 0) {
       Expr init = NULL, cond = NULL, inc = NULL;
       for (int j = 0; j < ev->nexpr; j++) {
- int i = -123456; double t = i;
+ int i = -123456; double t = - TEND_EVENT;
  (* ev->expr[j]) (&i, &t, ev);
- if (i == -123456 && t == -123456) {
+ if (i == -123456 && t == - TEND_EVENT) {
 
    if (cond)
      event_error (ev, "events can only use a single condition");
@@ -3955,18 +3967,18 @@ static void init_event (Event * ev)
       ev->expr[2] = inc;
       ev->nexpr = 0;
     }
-    ev->i = ev->t = -1;
+    ev->i = -1; ev->t = - TEND_EVENT;
     if (ev->expr[0]) {
       (* ev->expr[0]) (&ev->i, &ev->t, ev);
-      if (ev->i == 1234567890 || ev->t == 1234567890) {
- ev->i = 1234567890; ev->t = -1;
+      if (ev->i == END_EVENT || ev->t == TEND_EVENT) {
+ ev->i = END_EVENT; ev->t = - TEND_EVENT;
       }
     }
     else if (ev->expr[2]) {
       (* ev->expr[2]) (&ev->i, &ev->t, ev);
       if (ev->i != -1)
  ev->i = 0;
-      if (ev->t != -1)
+      if (ev->t != - TEND_EVENT)
  ev->t = 0;
     }
   }
@@ -3976,17 +3988,17 @@ enum { event_done, event_alive, event_stop };
 
 static int event_finished (Event * ev)
 {
-  ev->t = ev->i = -1;
+  ev->i = -1; ev->t = - TEND_EVENT;
   return event_done;
 }
 
 void event_register (Event event) {
-  if (!(Events)) qassert ("/u/basilisk/src/grid/events.h", 0, "Events");
-  if (!(!event.last)) qassert ("/u/basilisk/src/grid/events.h", 0, "!event.last");
+  if (!(Events)) qassert ("/home/lisergey/basilisk/src/grid/events.h", 0, "Events");
+  if (!(!event.last)) qassert ("/home/lisergey/basilisk/src/grid/events.h", 0, "!event.last");
   int n = 0, parent = -1;
   for (Event * ev = Events; !ev->last; ev++) {
     if (!strcmp (event.name, ev->name)) {
-      if (!(parent < 0)) qassert ("/u/basilisk/src/grid/events.h", 0, "parent < 0");
+      if (!(parent < 0)) qassert ("/home/lisergey/basilisk/src/grid/events.h", 0, "parent < 0");
       parent = n;
     }
     n++;
@@ -4013,12 +4025,14 @@ static int event_cond (Event * ev, int i, double t)
     return true;
   return (* ev->expr[1]) (&i, &t, ev);
 }
-#line 131 "/u/basilisk/src/grid/events.h"
+#line 136 "/home/lisergey/basilisk/src/grid/events.h"
+static bool overload_event() { return true; }
+
 static int event_do (Event * ev, bool action)
 {
   if ((iter > ev->i && t > ev->t) || !event_cond (ev, iter, t))
     return event_finished (ev);
-  if (iter == ev->i || fabs (t - ev->t) <= 1e-9) {
+  if (!overload_event() || iter == ev->i || fabs (t - ev->t) <= TEPS*t) {
     if (action) {
       bool finished = false;
       for (Event * e = ev; e; e = e->next) {
@@ -4064,7 +4078,7 @@ static void end_event_do (bool action)
 
 
   for (Event * ev = Events; !ev->last; ev++)
-    if (ev->i == 1234567890 && action)
+    if (ev->i == END_EVENT && action)
       for (Event * e = ev; e; e = e->next) {
 
 
@@ -4085,9 +4099,9 @@ int events (bool action)
       init_event (ev);
 
   int cond = 0, cond1 = 0;
-  inext = 1234567890; tnext = HUGE;
+  inext = END_EVENT; tnext = 1e30;
   for (Event * ev = Events; !ev->last && !cond; ev++)
-    if (ev->i != 1234567890 &&
+    if (ev->i != END_EVENT &&
  (ev->expr[1] || (ev->expr[0] && !ev->expr[1] && !ev->expr[2]) || ev->arrayi || ev->arrayt))
       cond = 1;
   for (Event * ev = Events; !ev->last; ev++) {
@@ -4096,7 +4110,7 @@ int events (bool action)
       end_event_do (action);
       return 0;
     }
-    if (status == event_alive && ev->i != 1234567890 &&
+    if (status == event_alive && ev->i != END_EVENT &&
  (ev->expr[1] || (ev->expr[0] && !ev->expr[1] && !ev->expr[2]) || ev->arrayi || ev->arrayt))
       cond1 = 1;
     if (ev->t > t && ev->t < tnext)
@@ -4104,7 +4118,7 @@ int events (bool action)
     if (ev->i > iter && ev->i < inext)
       inext = ev->i;
   }
-  if ((!cond || cond1) && (tnext != HUGE || inext != 1234567890)) {
+  if (overload_event() && (!cond || cond1) && (tnext != 1e30 || inext != END_EVENT)) {
     inext = iter + 1;
     return 1;
   }
@@ -4126,14 +4140,14 @@ void event (const char * name)
 
 double dtnext (double dt)
 {
-  if (tnext != HUGE && tnext > t) {
+  if (tnext != 1e30 && tnext > t) {
     unsigned int n = (tnext - t)/dt;
-    if (!(n < INT_MAX)) qassert ("/u/basilisk/src/grid/events.h", 0, "n < INT_MAX");
+    if (!(n < INT_MAX)) qassert ("/home/lisergey/basilisk/src/grid/events.h", 0, "n < INT_MAX");
     if (n == 0)
       dt = tnext - t;
     else {
       double dt1 = (tnext - t)/n;
-      if (dt1 > dt + 1e-9)
+      if (dt1 > dt*(1. + TEPS))
  dt = (tnext - t)/(n + 1);
       else if (dt1 < dt)
  dt = dt1;
@@ -4144,7 +4158,7 @@ double dtnext (double dt)
     tnext = t + dt;
   return dt;
 }
-#line 2 "/u/basilisk/src/grid/cartesian-common.h"
+#line 2 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 
 void (* debug) (Point);
 
@@ -4192,7 +4206,7 @@ void (* debug) (Point);
 
 
 #line 1 "grid/fpe.h"
-#line 1 "/u/basilisk/src/grid/fpe.h"
+#line 1 "/home/lisergey/basilisk/src/grid/fpe.h"
 
 
 #include <signal.h>
@@ -4245,7 +4259,7 @@ void catch_fpe (void)
   act.sa_flags = SA_RESETHAND;
   sigaction (6, &act, NULL);
 }
-#line 47 "/u/basilisk/src/grid/cartesian-common.h"
+#line 47 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 
 #define end_foreach_face()
 
@@ -4256,7 +4270,7 @@ static void init_block_scalar (scalar sb, const char * name, const char * ext,
 {
   char bname[strlen(name) + strlen(ext) + 10];
   if (n == 0) {
-    sprintf (bname, "%s%s", name, ext);
+    strcat (strcpy (bname, name), ext);
     _attribute[sb.i].block = block;
     init_scalar (sb, bname);
     baseblock = list_append (baseblock, sb);
@@ -4269,8 +4283,11 @@ static void init_block_scalar (scalar sb, const char * name, const char * ext,
   all = list_append (all, sb);
 }
 
+#define interpreter_set_int(...)
+
 scalar new_block_scalar (const char * name, const char * ext, int block)
 {
+  interpreter_set_int (&block);
   int nvar = datasize/sizeof(double);
 
   scalar s = {0};
@@ -4290,16 +4307,16 @@ scalar new_block_scalar (const char * name, const char * ext, int block)
 
 
   s = (scalar){nvar};
-  if (!(nvar + block <= _NVARMAX)) qassert ("/u/basilisk/src/grid/cartesian-common.h", 0, "nvar + block <= _NVARMAX");
+  if (!(nvar + block <= _NVARMAX)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 0, "nvar + block <= _NVARMAX");
   _attribute = (_Attributes *) prealloc (_attribute, (nvar + block)*sizeof(_Attributes),__func__,__FILE__,0);
   memset (&_attribute[nvar], 0, block*sizeof (_Attributes));
+
+  realloc_scalar (block*sizeof(double));
+  trash (((scalar []){s, {-1}}));
   for (int n = 0; n < block; n++, nvar++) {
     scalar sb = (scalar){nvar};
     init_block_scalar (sb, name, ext, n, block);
   }
-
-  realloc_scalar (block*sizeof(double));
-  trash (((scalar []){s, {-1}}));
   return s;
 }
 
@@ -4332,7 +4349,7 @@ static vector alloc_block_vector (const char * name, int block)
   
     v.x = new_block_scalar (name, ext.x, block);
     
-#line 131
+#line 134
 v.y = new_block_scalar (name, ext.y, block);
   return v;
 }
@@ -4359,19 +4376,19 @@ vector new_block_vector (const char * name, int block)
     
       vb.x.i = v.x.i + i;
       
-#line 155
+#line 158
 vb.y.i = v.y.i + i;
     init_vector (vb, NULL);
     
       _attribute[vb.x.i].block = - i;
       
-#line 158
+#line 161
 _attribute[vb.y.i].block = - i;
   }
   
     _attribute[v.x.i].block = block;
     
-#line 161
+#line 164
 _attribute[v.y.i].block = block;
   return v;
 }
@@ -4384,19 +4401,19 @@ vector new_block_face_vector (const char * name, int block)
     
       vb.x.i = v.x.i + i;
       
-#line 171
+#line 174
 vb.y.i = v.y.i + i;
     init_face_vector (vb, NULL);
     
       _attribute[vb.x.i].block = - i;
       
-#line 174
+#line 177
 _attribute[vb.y.i].block = - i;
   }
   
     _attribute[v.x.i].block = block;
     
-#line 177
+#line 180
 _attribute[v.y.i].block = block;
   return v;
 }
@@ -4404,15 +4421,15 @@ _attribute[v.y.i].block = block;
 tensor new_tensor (const char * name)
 {
   char cname[strlen(name) + 3];
-  struct { char * x, * y, * z; } ext = {"%s.x", "%s.y", "%s.z"};
+  struct { char * x, * y, * z; } ext = {".x", ".y", ".z"};
   tensor t;
    {
-    sprintf (cname, ext.x, name);
+    strcat (strcpy (cname, name), ext.x);
     t.x = new_vector (cname);
   } 
-#line 186
+#line 189
 {
-    sprintf (cname, ext.y, name);
+    strcat (strcpy (cname, name), ext.y);
     t.y = new_vector (cname);
   }
   init_tensor (t, NULL);
@@ -4422,22 +4439,22 @@ tensor new_tensor (const char * name)
 tensor new_symmetric_tensor (const char * name)
 {
   char cname[strlen(name) + 5];
-  struct { char * x, * y, * z; } ext = {"%s.x.x", "%s.y.y", "%s.z.z"};
+  struct { char * x, * y, * z; } ext = {".x.x", ".y.y", ".z.z"};
   tensor t;
    {
-    sprintf (cname, ext.x, name);
+    strcat (strcpy (cname, name), ext.x);
     t.x.x = new_scalar(cname);
   } 
-#line 199
+#line 202
 {
-    sprintf (cname, ext.y, name);
+    strcat (strcpy (cname, name), ext.y);
     t.y.y = new_scalar(cname);
   }
 
-    sprintf (cname, "%s.x.y", name);
+    strcat (strcpy (cname, name), "x.y");
     t.x.y = new_scalar(cname);
     t.y.x = t.x.y;
-#line 219 "/u/basilisk/src/grid/cartesian-common.h"
+#line 222 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
   init_tensor (t, NULL);
   return t;
 }
@@ -4465,7 +4482,7 @@ void init_const_vector (vector v, const char * name, double * val)
   
     init_const_scalar (v.x, name, *val++);
     
-#line 244
+#line 247
 init_const_scalar (v.y, name, *val++);
 }
 
@@ -4475,7 +4492,7 @@ vector new_const_vector (const char * name, int i, double * val)
   
     v.x.i = _NVARMAX + i++;
     
-#line 251
+#line 254
 v.y.i = _NVARMAX + i++;
   init_const_vector (v, name, val);
   return v;
@@ -4487,7 +4504,7 @@ void scalar_clone (scalar a, scalar b)
   double (** boundary) (Point, Point, scalar, void *) = _attribute[a.i].boundary;
   double (** boundary_homogeneous) (Point, Point, scalar, void *) =
     _attribute[a.i].boundary_homogeneous;
-  if (!(_attribute[b.i].block > 0 && _attribute[a.i].block == _attribute[b.i].block)) qassert ("/u/basilisk/src/grid/cartesian-common.h", 0, "b.block > 0 && a.block == b.block");
+  if (!(_attribute[b.i].block > 0 && _attribute[a.i].block == _attribute[b.i].block)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 0, "b.block > 0 && a.block == b.block");
   pfree (_attribute[a.i].depends,__func__,__FILE__,0);
   _attribute[a.i] = _attribute[b.i];
   _attribute[a.i].name = name;
@@ -4518,7 +4535,7 @@ scalar * list_clone (scalar * l)
       if (_attribute[s.i].v.x.i >= 0 && map[_attribute[s.i].v.x.i] >= 0)
  _attribute[s.i].v.x.i = map[_attribute[s.i].v.x.i];
       
-#line 290
+#line 293
 if (_attribute[s.i].v.y.i >= 0 && map[_attribute[s.i].v.y.i] >= 0)
  _attribute[s.i].v.y.i = map[_attribute[s.i].v.y.i];}}}
   return list;
@@ -4570,7 +4587,7 @@ void delete (scalar * list)
 
 void free_solver()
 {
-  if (!(_val_higher_dimension == 0.)) qassert ("/u/basilisk/src/grid/cartesian-common.h", 0, "_val_higher_dimension == 0.");
+  if (!(_val_higher_dimension == 0.)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 0, "_val_higher_dimension == 0.");
 
   if (free_solver_funcs) {
     free_solver_func * a = (free_solver_func *) free_solver_funcs->p;
@@ -4624,13 +4641,13 @@ void boundary_flux (vector * list)
     {
       list1.x = list_append (list1.x, v.x);
       
-#line 393
+#line 396
 list1.y = list_append (list1.y, v.y);}}}
   boundary_face (list1);
   
     pfree (list1.x,__func__,__FILE__,0);
     
-#line 396
+#line 399
 pfree (list1.y,__func__,__FILE__,0);
 }
 
@@ -4648,9 +4665,9 @@ static scalar * list_add_depends (scalar * list, scalar s)
 
      
 void boundary_internal (scalar * list, const char * fname, int line)
-{tracing("boundary_internal","/u/basilisk/src/grid/cartesian-common.h",0);
+{tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);
   if (list == NULL)
-    {end_tracing("boundary_internal","/u/basilisk/src/grid/cartesian-common.h",0);return;}
+    {end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);return;}
   scalar * listc = NULL;
   vectorl listf = {NULL};
   bool flux = false;
@@ -4662,7 +4679,7 @@ void boundary_internal (scalar * list, const char * fname, int line)
      if (_attribute[s.i].v.x.i == s.i)
        listf.x = list_add (listf.x, s), flux = true;
      
-#line 424
+#line 427
 if (_attribute[s.i].v.y.i == s.i)
        listf.y = list_add (listf.y, s), flux = true;}
  if (!is_constant(cm) && _attribute[cm.i].dirty)
@@ -4680,7 +4697,7 @@ if (_attribute[s.i].v.y.i == s.i)
     
       pfree (listf.x,__func__,__FILE__,0);
       
-#line 439
+#line 442
 pfree (listf.y,__func__,__FILE__,0);
   }
   if (listc) {
@@ -4689,7 +4706,7 @@ pfree (listf.y,__func__,__FILE__,0);
       _attribute[s.i].dirty = false;}}
     pfree (listc,__func__,__FILE__,0);
   }
-end_tracing("boundary_internal","/u/basilisk/src/grid/cartesian-common.h",0);}
+end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);}
 
 void cartesian_boundary_level (scalar * list, int l)
 {
@@ -4702,7 +4719,7 @@ void cartesian_boundary_face (vectorl list)
     {scalar*_i=(scalar*)( list.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
     
-#line 457
+#line 460
 {scalar*_i=(scalar*)( list.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
 }
@@ -4754,7 +4771,7 @@ scalar cartesian_init_scalar (scalar s, const char * name)
     _attribute[s.i].d.x = 0;
     _attribute[s.i].v.x.i = -1;
   } 
-#line 504
+#line 507
 {
     _attribute[s.i].d.y = 0;
     _attribute[s.i].v.y.i = -1;
@@ -4769,7 +4786,7 @@ scalar cartesian_init_vertex_scalar (scalar s, const char * name)
   
     _attribute[s.i].d.x = -1;
     
-#line 516
+#line 519
 _attribute[s.i].d.y = -1;
   for (int d = 0; d < nboundary; d++)
     _attribute[s.i].boundary[d] = _attribute[s.i].boundary_homogeneous[d] = NULL;
@@ -4788,18 +4805,18 @@ vector cartesian_init_vector (vector v, const char * name)
    {
     if (name) {
       char cname[strlen(name) + 3];
-      sprintf (cname, "%s%s", name, ext.x);
+      strcat (strcpy (cname, name), ext.x);
       init_scalar (v.x, cname);
     }
     else
       init_scalar (v.x, NULL);
     _attribute[v.x.i].v = v;
   } 
-#line 531
+#line 534
 {
     if (name) {
       char cname[strlen(name) + 3];
-      sprintf (cname, "%s%s", name, ext.y);
+      strcat (strcpy (cname, name), ext.y);
       init_scalar (v.y, cname);
     }
     else
@@ -4820,7 +4837,7 @@ vector cartesian_init_face_vector (vector v, const char * name)
     _attribute[v.x.i].d.x = -1;
     _attribute[v.x.i].face = true;
   } 
-#line 551
+#line 554
 {
     _attribute[v.y.i].d.y = -1;
     _attribute[v.y.i].face = true;
@@ -4836,17 +4853,17 @@ tensor cartesian_init_tensor (tensor t, const char * name)
    {
     if (name) {
       char cname[strlen(name) + 3];
-      sprintf (cname, "%s%s", name, ext.x);
+      strcat (strcpy (cname, name), ext.x);
       init_vector (t.x, cname);
     }
     else
       init_vector (t.x, NULL);
   } 
-#line 563
+#line 566
 {
     if (name) {
       char cname[strlen(name) + 3];
-      sprintf (cname, "%s%s", name, ext.y);
+      strcat (strcpy (cname, name), ext.y);
       init_vector (t.y, cname);
     }
     else
@@ -4889,7 +4906,7 @@ void output_cells (struct OutputCells p)
    (o.x > p.c.x + p.size || o.x < p.c.x - p.size))
  inside = false;
       
-#line 605
+#line 608
 if (inside && p.size > 0. &&
    (o.y > p.c.y + p.size || o.y < p.c.y - p.size))
  inside = false;
@@ -4904,7 +4921,7 @@ if (inside && p.size > 0. &&
         x + Delta, y + Delta,
         x + Delta, y - Delta,
         x - Delta, y - Delta);
-#line 633 "/u/basilisk/src/grid/cartesian-common.h"
+#line 636 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
     }
   }end_foreach();}
   fflush (p.fp);
@@ -4972,7 +4989,7 @@ void cartesian_debug (Point point)
 
 
   fputc ('\n', fp);
-#line 712 "/u/basilisk/src/grid/cartesian-common.h"
+#line 715 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
     for (int k = -2; k <= 2; k++)
       for (int l = -2; l <= 2; l++) {
  {scalar*_i=(scalar*)( all);if(_i)for(scalar v=*_i;(&v)->i>=0;v=*++_i){ {
@@ -4986,7 +5003,7 @@ void cartesian_debug (Point point)
  }}}
  fputc ('\n', fp);
       }
-#line 742 "/u/basilisk/src/grid/cartesian-common.h"
+#line 745 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
   fclose (fp);
 
   fp = fopen ("debug.plot", "w");
@@ -5049,24 +5066,24 @@ static double interpolate_linear (Point point, struct _interpolate p)
 
   return ((val(v,0,0,0)*(1. - x) + val(v,i,0,0)*x)*(1. - y) +
    (val(v,0,j,0)*(1. - x) + val(v,i,j,0)*x)*y);
-#line 816 "/u/basilisk/src/grid/cartesian-common.h"
+#line 819 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 }
 
      
 double interpolate (struct _interpolate p)
-{tracing("interpolate","/u/basilisk/src/grid/cartesian-common.h",0);
+{tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);
   scalar v = p.v;
-  boundary_internal ((scalar *)((scalar[]){v,{-1}}), "/u/basilisk/src/grid/cartesian-common.h", 0);
+  boundary_internal ((scalar *)((scalar[]){v,{-1}}), "/home/lisergey/basilisk/src/grid/cartesian-common.h", 0);
   Point point = locate ((struct _locate){p.x, p.y, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   if (point.level < 0)
-    {end_tracing("interpolate","/u/basilisk/src/grid/cartesian-common.h",0);return HUGE;}
-  { double _ret= interpolate_linear (point, p);end_tracing("interpolate","/u/basilisk/src/grid/cartesian-common.h",0);return _ret;}
-end_tracing("interpolate","/u/basilisk/src/grid/cartesian-common.h",0);}
+    {end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);return 1e30;}
+  { double _ret= interpolate_linear (point, p);end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);return _ret;}
+end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);}
 
      
 void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear)
-{tracing("interpolate_array","/u/basilisk/src/grid/cartesian-common.h",0);
-  boundary_internal ((scalar *)list, "/u/basilisk/src/grid/cartesian-common.h", 0);
+{tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/cartesian-common.h", 0);
   int j = 0;
   for (int i = 0; i < n; i++) {
     Point point = locate ((struct _locate){a[i].x, a[i].y, a[i].z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
@@ -5078,7 +5095,7 @@ void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear
     }
     else
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
- v[j++] = HUGE;}}
+ v[j++] = 1e30;}}
   }
 #if 1
   if (pid() == 0)
@@ -5088,7 +5105,7 @@ void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear
     MPI_Reduce (v, v, n*list_len(list), MPI_DOUBLE,
   MPI_MIN, 0, MPI_COMM_WORLD);
 #endif
-end_tracing("interpolate_array","/u/basilisk/src/grid/cartesian-common.h",0);}
+end_tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",0);}
 
 
 
@@ -5111,7 +5128,7 @@ bid new_bid()
       
  _attribute[v.y.i].boundary[b] = _attribute[v.y.i].boundary_homogeneous[b] = symmetry;
  
-#line 875
+#line 878
 _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] = symmetry;
       _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] =
  _attribute[v.x.i].face ? NULL : antisymmetry;
@@ -5124,14 +5141,17 @@ _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] = symm
 
 static double periodic_bc (Point point, Point neighbor, scalar s, void * data)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
-  return HUGE;
+  return 1e30;
 }
 
 static void periodic_boundary (int d)
 {
 
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-    _attribute[s.i].boundary[d] = _attribute[s.i].boundary_homogeneous[d] = periodic_bc;}}
+    if (is_vertex_scalar (s))
+      _attribute[s.i].boundary[d] = _attribute[s.i].boundary_homogeneous[d] = NULL;
+    else
+      _attribute[s.i].boundary[d] = _attribute[s.i].boundary_homogeneous[d] = periodic_bc;}}
 
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     if (_attribute[s.i].face) {
@@ -5148,7 +5168,7 @@ void periodic (int dir)
 
 
 
-    if (!(dir <= bottom)) qassert ("/u/basilisk/src/grid/cartesian-common.h", 0, "dir <= bottom");
+    if (!(dir <= bottom)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 0, "dir <= bottom");
 
 
 
@@ -5215,7 +5235,7 @@ void stencil_val (Point p, scalar s, int i, int j, int k,
  _attribute[s.i].width = abs(index[d]);
       d++;
     } 
-#line 973
+#line 979
 {
       if ((!_attribute[s.i].face || _attribute[s.i].v.y.i != s.i) && abs(index[d]) > _attribute[s.i].width)
  _attribute[s.i].width = abs(index[d]);
@@ -5245,7 +5265,16 @@ void stencil_val_a (Point p, scalar s, int i, int j, int k, bool input,
     _attribute[s.i].input = true;
   _attribute[s.i].output = true;
 }
-#line 4 "/u/basilisk/src/grid/multigrid-common.h"
+
+
+
+
+#define dimensional(...)
+
+#define show_dimension_internal(...)
+#define display_value(...)
+#define interpreter_verbosity(...)
+#line 4 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
 
 #ifndef foreach_level_or_leaf
 # define foreach_level_or_leaf foreach_level
@@ -5354,7 +5383,7 @@ static inline void no_restriction (Point point, scalar s) {int ig=0;NOT_UNUSED(i
 
 static inline void no_data (Point point, scalar s) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   {foreach_child()
-    val(s,0,0,0) = HUGE;end_foreach_child()}
+    val(s,0,0,0) = 1e30;end_foreach_child()}
 }
 
 void wavelet (scalar s, scalar w)
@@ -5403,7 +5432,7 @@ static inline double bilinear (Point point, scalar s)
     return (9.*coarse(s,0,0,0) +
      3.*(coarse(s,child.x,0,0) + coarse(s,0,child.y,0)) +
      coarse(s,child.x,child.y,0))/16.;
-#line 140 "/u/basilisk/src/grid/multigrid-common.h"
+#line 140 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
 }
 
 static inline void refine_bilinear (Point point, scalar s)
@@ -5486,7 +5515,7 @@ g.y = (val(s,0,1,0) - val(s,0,-1,0))/2.;}
 val(s,0,0,0) += child.y*g.y*val(cm,0,-child.y,0)/cmc;
     sum -= val(cm,0,0,0);
   }end_foreach_child()}
-  if (!(fabs(sum) < 1e-10)) qassert ("/u/basilisk/src/grid/multigrid-common.h", 0, "fabs(sum) < 1e-10");
+  if (!(fabs(sum) < 1e-10)) qassert ("/home/lisergey/basilisk/src/grid/multigrid-common.h", 0, "fabs(sum) < 1e-10");
 }}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
 
 #line 194
@@ -5515,7 +5544,7 @@ g.y = (val(s,0,1,0) - val(s,0,-1,0))/2.;}
 val(s,0,0,0) += child.y*g.y*_const_cm/cmc;
     sum -= _const_cm;
   }end_foreach_child()}
-  if (!(fabs(sum) < 1e-10)) qassert ("/u/basilisk/src/grid/multigrid-common.h", 0, "fabs(sum) < 1e-10");
+  if (!(fabs(sum) < 1e-10)) qassert ("/home/lisergey/basilisk/src/grid/multigrid-common.h", 0, "fabs(sum) < 1e-10");
 }}
 
 #line 211
@@ -5571,7 +5600,7 @@ void multigrid_debug (Point point)
     if (pid() > 0)
       sprintf (name, "coarse-%d", pid());
     FILE * fp = fopen (name, "w");
-#line 271 "/u/basilisk/src/grid/multigrid-common.h"
+#line 271 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
       double xc = x - child.x*Delta/2., yc = y - child.y*Delta/2.;
       for (int k = 0; k <= 1; k++)
  for (int l = 0; l <= 1; l++) {
@@ -5584,7 +5613,7 @@ void multigrid_debug (Point point)
  }
       fprintf (ferr, ", '%s' u 1+3*v:2+3*v:3+3*v w labels tc lt 3 t ''", name);
       fprintf (plot, ", '%s' u 1+3*v:2+3*v:3+3*v w labels tc lt 3 t ''", name);
-#line 302 "/u/basilisk/src/grid/multigrid-common.h"
+#line 302 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
     fclose (fp);
   }
 
@@ -5593,7 +5622,7 @@ void multigrid_debug (Point point)
     if (pid() > 0)
       sprintf (name, "fine-%d", pid());
     FILE * fp = fopen (name, "w");
-#line 324 "/u/basilisk/src/grid/multigrid-common.h"
+#line 324 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
       double xf = x - Delta/4., yf = y - Delta/4.;
       for (int k = -2; k <= 3; k++)
  for (int l = -2; l <= 3; l++) {
@@ -5610,7 +5639,7 @@ void multigrid_debug (Point point)
  }
       fprintf (ferr, ", '%s' u 1+3*v:2+3*v:3+3*v w labels tc lt 2 t ''", name);
       fprintf (plot, ", '%s' u 1+3*v:2+3*v:3+3*v w labels tc lt 2 t ''", name);
-#line 362 "/u/basilisk/src/grid/multigrid-common.h"
+#line 362 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
     fclose (fp);
   }
   fflush (ferr);
@@ -5695,7 +5724,7 @@ foreach()
 
 
 
-  { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b, ((scalar[]){size,{-1}}), depth()); };
+  { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b,((scalar[]) {size,{-1}}), depth()); };
   for (int l = depth() - 1; l >= 0; l--) {
     {foreach_coarse_level(l) {
       double sum = !leaves;
@@ -5703,15 +5732,15 @@ foreach()
  sum += val(size,0,0,0);end_foreach_child()}
       val(size,0,0,0) = sum;
     }end_foreach_coarse_level();}
-    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b, ((scalar[]){size,{-1}}), l); };
+    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b,((scalar[]) {size,{-1}}), l); };
   }
 }
-#line 5 "/u/basilisk/src/grid/tree-common.h"
+#line 5 "/home/lisergey/basilisk/src/grid/tree-common.h"
 
 
 
 
-#line 21 "/u/basilisk/src/grid/tree-common.h"
+#line 21 "/home/lisergey/basilisk/src/grid/tree-common.h"
 int refine_cell (Point point, scalar * list, int flag, Cache * refined)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   int nr = 0;
@@ -5839,7 +5868,7 @@ void coarsen_cell_recursive (Point point, scalar * list)
  if ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
    coarsen_cell_recursive (point, list);end_foreach_neighbor()}end_foreach_child()}
 
-  if (!(coarsen_cell (point, list))) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "coarsen_cell (point, list)");
+  if (!(coarsen_cell (point, list))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "coarsen_cell (point, list)");
 }
 
 void mpi_boundary_refine (scalar *);
@@ -5860,23 +5889,23 @@ struct Adapt {
 
      
 astats adapt_wavelet (struct Adapt p)
-{tracing("adapt_wavelet","/u/basilisk/src/grid/tree-common.h",0);
+{tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",0);
   scalar * list = p.list;
 
   if (is_constant(cm)) {
     if (list == NULL || list == all)
       list = list_copy (all);
-    boundary_internal ((scalar *)list, "/u/basilisk/src/grid/tree-common.h", 0);
+    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 0);
     restriction (p.slist);
   }
   else {
     if (list == NULL || list == all) {
-      list = list_copy (((scalar[]){cm, fm.x,fm.y,{-1}}));
+      list = list_copy (((scalar[]){cm, fm.x, fm.y,{-1}}));
       {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  list = list_add (list, s);}}
     }
-    boundary_internal ((scalar *)list, "/u/basilisk/src/grid/tree-common.h", 0);
-    scalar * listr = list_concat (p.slist, ((scalar[]){cm,{-1}}));
+    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 0);
+    scalar * listr = list_concat (p.slist,((scalar[]) {cm,{-1}}));
     restriction (listr);
     pfree (listr,__func__,__FILE__,0);
   }
@@ -5999,9 +6028,9 @@ astats adapt_wavelet (struct Adapt p)
   if (list != p.list)
     pfree (list,__func__,__FILE__,0);
 
-  {end_tracing("adapt_wavelet","/u/basilisk/src/grid/tree-common.h",0);return st;}
-end_tracing("adapt_wavelet","/u/basilisk/src/grid/tree-common.h",0);}
-#line 331 "/u/basilisk/src/grid/tree-common.h"
+  {end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",0);return st;}
+end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",0);}
+#line 331 "/home/lisergey/basilisk/src/grid/tree-common.h"
 static void refine_level (int depth)
 {
   int refined;
@@ -6021,10 +6050,10 @@ static void refine_level (int depth)
     }
   } while (refined);
 }
-#line 376 "/u/basilisk/src/grid/tree-common.h"
+#line 376 "/home/lisergey/basilisk/src/grid/tree-common.h"
      
 static void halo_face (vectorl vl)
-{tracing("halo_face","/u/basilisk/src/grid/tree-common.h",0);
+{tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",0);
   
     {scalar*_i=(scalar*)( vl.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
@@ -6037,28 +6066,28 @@ static void halo_face (vectorl vl)
     {foreach_halo (prolongation, l)
       {
         if (vl.x) {
-#line 395 "/u/basilisk/src/grid/tree-common.h"
+#line 395 "/home/lisergey/basilisk/src/grid/tree-common.h"
    if ((!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = (fine(s,0,0,0) + fine(s,0,1,0))/2.;}}
    if ((!is_leaf (neighbor(1,0,0)) && neighbor(1,0,0).neighbors && neighbor(1,0,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,1,0,0) = (fine(s,2,0,0) + fine(s,2,1,0))/2.;}}
-#line 411 "/u/basilisk/src/grid/tree-common.h"
+#line 411 "/home/lisergey/basilisk/src/grid/tree-common.h"
  }
         
 #line 386
 if (vl.y) {
-#line 395 "/u/basilisk/src/grid/tree-common.h"
+#line 395 "/home/lisergey/basilisk/src/grid/tree-common.h"
    if ((!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = (fine(s,0,0,0) + fine(s,1,0,0))/2.;}}
    if ((!is_leaf (neighbor(0,1,0)) && neighbor(0,1,0).neighbors && neighbor(0,1,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,1,0) = (fine(s,0,2,0) + fine(s,1,2,0))/2.;}}
-#line 411 "/u/basilisk/src/grid/tree-common.h"
+#line 411 "/home/lisergey/basilisk/src/grid/tree-common.h"
  }}end_foreach_halo();}
-end_tracing("halo_face","/u/basilisk/src/grid/tree-common.h",0);}
+end_tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",0);}
 
 
 
@@ -6093,14 +6122,14 @@ static void prolongation_vertex (Point point, scalar s)
       if (neighbor(i,0,0).neighbors) {
 
  fine(s,2*i,1,0) = (val(s,i,0,0) + val(s,i,1,0))/2.;
-#line 456 "/u/basilisk/src/grid/tree-common.h"
+#line 456 "/home/lisergey/basilisk/src/grid/tree-common.h"
       }
       
 #line 444
 if (neighbor(0,i,0).neighbors) {
 
  fine(s,1,2*i,0) = (val(s,0,i,0) + val(s,1,i,0))/2.;
-#line 456 "/u/basilisk/src/grid/tree-common.h"
+#line 456 "/home/lisergey/basilisk/src/grid/tree-common.h"
       }
   }
 }
@@ -6134,7 +6163,7 @@ static void refine_face_x (Point point, scalar s)
     for (int j = 0; j <= 1; j++)
       fine(v.x,1,j,0) = (val(v.x,0,0,0) + val(v.x,1,0,0))/2. + (2*j - 1)*g1;
   }
-#line 514 "/u/basilisk/src/grid/tree-common.h"
+#line 514 "/home/lisergey/basilisk/src/grid/tree-common.h"
 }
 
 #line 468
@@ -6159,7 +6188,7 @@ static void refine_face_y (Point point, scalar s)
     for (int j = 0; j <= 1; j++)
       fine(v.y,j,1,0) = (val(v.y,0,0,0) + val(v.y,0,1,0))/2. + (2*j - 1)*g1;
   }
-#line 514 "/u/basilisk/src/grid/tree-common.h"
+#line 514 "/home/lisergey/basilisk/src/grid/tree-common.h"
 }
 
 void refine_face (Point point, scalar s)
@@ -6199,7 +6228,7 @@ d[i] += val(v.y,0,1,0) - val(v.y,0,0,0);
     fine(v.x,1,0,0) += p[3] - p[2];
     fine(v.y,0,1,0) += p[0] - p[2];
     fine(v.y,1,1,0) += p[1] - p[3];
-#line 574 "/u/basilisk/src/grid/tree-common.h"
+#line 574 "/home/lisergey/basilisk/src/grid/tree-common.h"
   }
 
 }
@@ -6224,12 +6253,12 @@ _attribute[v.y.i].prolongation = refine_face_y;
 
      
 static void tree_boundary_level (scalar * list, int l)
-{tracing("tree_boundary_level","/u/basilisk/src/grid/tree-common.h",0);
+{tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",0);
   int depth = l < 0 ? depth() : l;
 
   if (tree_is_full()) {
     { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, list, depth); };
-    {end_tracing("tree_boundary_level","/u/basilisk/src/grid/tree-common.h",0);return;}
+    {end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",0);return;}
   }
 
   scalar * listdef = NULL, * listc = NULL, * list2 = NULL, * vlist = NULL;
@@ -6267,7 +6296,7 @@ list2 = list_add (list2, _attribute[s.i].v.y);}
    (!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) || (!is_leaf (neighbor(-1,-1,0)) && neighbor(-1,-1,0).neighbors && neighbor(-1,-1,0).pid >= 0)) {
 
  {scalar*_i=(scalar*)( vlist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   val(s,0,0,0) = is_vertex (child(0,0,0)) ? fine(s,0,0,0) : HUGE;}}
+   val(s,0,0,0) = is_vertex (child(0,0,0)) ? fine(s,0,0,0) : 1e30;}}
       }
       else
  {
@@ -6276,7 +6305,7 @@ list2 = list_add (list2, _attribute[s.i].v.y);}
 
      {scalar*_i=(scalar*)( vlist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = is_vertex(neighbor(0,-1,0)) && is_vertex(neighbor(0,1,0)) ?
-  (val(s,0,-1,0) + val(s,0,1,0))/2. : HUGE;}}
+  (val(s,0,-1,0) + val(s,0,1,0))/2. : 1e30;}}
    }
    
 #line 636
@@ -6285,10 +6314,10 @@ if (child.x == 1 &&
 
      {scalar*_i=(scalar*)( vlist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = is_vertex(neighbor(-1,0,0)) && is_vertex(neighbor(1,0,0)) ?
-  (val(s,-1,0,0) + val(s,1,0,0))/2. : HUGE;}}
+  (val(s,-1,0,0) + val(s,1,0,0))/2. : 1e30;}}
    }}
     }end_foreach_vertex();}
-#line 676 "/u/basilisk/src/grid/tree-common.h"
+#line 676 "/home/lisergey/basilisk/src/grid/tree-common.h"
   pfree (vlist,__func__,__FILE__,0);
 
   if (listdef || listc) {
@@ -6335,7 +6364,7 @@ _attribute[v.y.i].prolongation (point, v.y);}}}
     pfree (listr,__func__,__FILE__,0);
     pfree (listf,__func__,__FILE__,0);
   }
-end_tracing("tree_boundary_level","/u/basilisk/src/grid/tree-common.h",0);}
+end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",0);}
 
 double treex (Point point) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   if (level == 0)
@@ -6368,17 +6397,17 @@ void output_tree (FILE * fp)
 
      
 void tree_check()
-{tracing("tree_check","/u/basilisk/src/grid/tree-common.h",0);
+{tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",0);
 
 
   long nleaves = 0, nactive = 0;
   {foreach_cell_all() {
     if (is_leaf(cell)) {
-      if (!(cell.pid >= 0)) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "cell.pid >= 0");
+      if (!(cell.pid >= 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "cell.pid >= 0");
       nleaves++;
     }
     if (is_local(cell))
-      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "is_active(cell) || is_prolongation(cell)");
+      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "is_active(cell) || is_prolongation(cell)");
     if (is_active(cell))
       nactive++;
 
@@ -6386,11 +6415,11 @@ void tree_check()
     {foreach_neighbor(1)
       if (allocated(0,0,0) && (!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
  neighbors++;end_foreach_neighbor()}
-    if (!(cell.neighbors == neighbors)) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "cell.neighbors == neighbors");
+    if (!(cell.neighbors == neighbors)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "cell.neighbors == neighbors");
 
 
     if (!cell.neighbors)
-      if (!(!allocated_child(0,0,0))) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "!allocated_child(0)");
+      if (!(!allocated_child(0,0,0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "!allocated_child(0)");
   }end_foreach_cell_all();}
 
 
@@ -6401,7 +6430,7 @@ void tree_check()
     else
       continue;
   }end_foreach_cell();}
-  if (!(nactive == reachable)) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "nactive == reachable");
+  if (!(nactive == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "nactive == reachable");
 
 
   reachable = 0;
@@ -6410,15 +6439,15 @@ void tree_check()
       reachable++;
       continue;
     }end_foreach_cell();}
-  if (!(nleaves == reachable)) qassert ("/u/basilisk/src/grid/tree-common.h", 0, "nleaves == reachable");
-end_tracing("tree_check","/u/basilisk/src/grid/tree-common.h",0);}
+  if (!(nleaves == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 0, "nleaves == reachable");
+end_tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",0);}
 
      
-static void tree_restriction (scalar * list) {tracing("tree_restriction","/u/basilisk/src/grid/tree-common.h",0);
-  boundary_internal ((scalar *)list, "/u/basilisk/src/grid/tree-common.h", 0);
+static void tree_restriction (scalar * list) {tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",0);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 0);
   if (tree_is_full())
     multigrid_restriction (list);
-end_tracing("tree_restriction","/u/basilisk/src/grid/tree-common.h",0);}
+end_tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",0);}
 
 void tree_methods()
 {
@@ -6430,7 +6459,7 @@ void tree_methods()
   boundary_face = halo_face;
   restriction = tree_restriction;
 }
-#line 1672 "/u/basilisk/src/grid/tree.h"
+#line 1672 "/home/lisergey/basilisk/src/grid/tree.h"
 
 
 void tree_periodic (int dir)
@@ -6446,7 +6475,7 @@ void tree_periodic (int dir)
 
 #if 1
 #line 1 "grid/tree-mpi.h"
-#line 1 "/u/basilisk/src/grid/tree-mpi.h"
+#line 1 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
 
 int debug_iteration = -1;
 
@@ -6534,7 +6563,7 @@ static RcvPid * rcv_pid_new (const char * name)
 
 static Rcv * rcv_pid_pointer (RcvPid * p, int pid)
 {
-  if (!(pid >= 0 && pid < npe())) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "pid >= 0 && pid < npe()");
+  if (!(pid >= 0 && pid < npe())) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "pid >= 0 && pid < npe()");
 
   int i;
   for (i = 0; i < p->npid; i++)
@@ -6620,7 +6649,7 @@ static void apply_bc (Rcv * rcv, scalar * list, scalar * listv,
       { {
  memcpy (&val(v.x,0,0,0), b, sizeof(double)*_attribute[v.x.i].block);
  b += _attribute[v.x.i].block;
- if (*b != HUGE && allocated(1,0,0))
+ if (*b != 1e30 && allocated(1,0,0))
    memcpy (&val(v.x,1,0,0), b, sizeof(double)*_attribute[v.x.i].block);
  b += _attribute[v.x.i].block;
       } 
@@ -6628,7 +6657,7 @@ static void apply_bc (Rcv * rcv, scalar * list, scalar * listv,
 {
  memcpy (&val(v.y,0,0,0), b, sizeof(double)*_attribute[v.y.i].block);
  b += _attribute[v.y.i].block;
- if (*b != HUGE && allocated(0,1,0))
+ if (*b != 1e30 && allocated(0,1,0))
    memcpy (&val(v.y,0,1,0), b, sizeof(double)*_attribute[v.y.i].block);
  b += _attribute[v.y.i].block;
       }}}}
@@ -6643,7 +6672,7 @@ static void apply_bc (Rcv * rcv, scalar * list, scalar * listv,
 
 
           {
-     if (*b != HUGE && allocated(i,j,0))
+     if (*b != 1e30 && allocated(i,j,0))
        memcpy (&val(s,i,j,0), b, sizeof(double)*_attribute[s.i].block);
      b += _attribute[s.i].block;
           }
@@ -6667,13 +6696,13 @@ static void apply_bc (Rcv * rcv, scalar * list, scalar * listv,
     MPI_Abort (MPI_COMM_WORLD, -2);
   }
 }
-#line 234 "/u/basilisk/src/grid/tree-mpi.h"
+#line 234 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
 static void mpi_recv_check (void * buf, int count, MPI_Datatype datatype,
        int source, int tag,
        MPI_Comm comm, MPI_Status * status,
        const char * name)
 {
-#line 269 "/u/basilisk/src/grid/tree-mpi.h"
+#line 269 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
   int errorcode = MPI_Recv (buf, count, datatype, source, tag, comm, status);
   if (errorcode != MPI_SUCCESS) {
     char string[MPI_MAX_ERROR_STRING];
@@ -6698,9 +6727,9 @@ static void mpi_recv_check (void * buf, int count, MPI_Datatype datatype,
      
 static int mpi_waitany (int count, MPI_Request array_of_requests[], int *indx,
    MPI_Status *status)
-{tracing("mpi_waitany","/u/basilisk/src/grid/tree-mpi.h",0);
-  { int _ret= MPI_Waitany (count, array_of_requests, indx, status);end_tracing("mpi_waitany","/u/basilisk/src/grid/tree-mpi.h",0);return _ret;}
-end_tracing("mpi_waitany","/u/basilisk/src/grid/tree-mpi.h",0);}
+{tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
+  { int _ret= MPI_Waitany (count, array_of_requests, indx, status);end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);return _ret;}
+end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 static int list_lenb (scalar * list) {
   int len = 0;
@@ -6733,7 +6762,7 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
   for (int i = 0; i < m->npid; i++) {
     Rcv * rcv = &m->rcv[i];
     if (l <= rcv->depth && rcv->halo[l].n > 0) {
-      if (!(!rcv->buf)) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "!rcv->buf");
+      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "!rcv->buf");
       rcv->buf = pmalloc (sizeof (double)*rcv->halo[l].n*len,__func__,__FILE__,0);
 
 
@@ -6760,8 +6789,8 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
     mpi_waitany (nr, r, &i, &s);
     while (i != MPI_UNDEFINED) {
       Rcv * rcv = rrcv[i];
-      if (!(l <= rcv->depth && rcv->halo[l].n > 0)) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "l <= rcv->depth && rcv->halo[l].n > 0");
-      if (!(rcv->buf)) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "rcv->buf");
+      if (!(l <= rcv->depth && rcv->halo[l].n > 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "l <= rcv->depth && rcv->halo[l].n > 0");
+      if (!(rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "rcv->buf");
       apply_bc (rcv, list, listv, listf, l, s);
       mpi_waitany (nr, r, &i, &s);
     }
@@ -6772,11 +6801,11 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
 
      
 static void rcv_pid_wait (RcvPid * m)
-{tracing("rcv_pid_wait","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
 
   for (int i = 0; i < m->npid; i++)
     rcv_free_buf (&m->rcv[i]);
-end_tracing("rcv_pid_wait","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
      vector * listf, int l)
@@ -6793,7 +6822,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
   for (int i = 0; i < m->npid; i++) {
     Rcv * rcv = &m->rcv[i];
     if (l <= rcv->depth && rcv->halo[l].n > 0) {
-      if (!(!rcv->buf)) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "!rcv->buf");
+      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "!rcv->buf");
       rcv->buf = pmalloc (sizeof (double)*rcv->halo[l].n*len,__func__,__FILE__,0);
       double * b = rcv->buf;
       {foreach_cache_level(rcv->halo[l], l) {
@@ -6808,7 +6837,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
      if (allocated(1,0,0))
        memcpy (b, &val(v.x,1,0,0), sizeof(double)*_attribute[v.x.i].block);
      else
-       *b = HUGE;
+       *b = 1e30;
      b += _attribute[v.x.i].block;
    } 
 #line 397
@@ -6818,18 +6847,18 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
      if (allocated(0,1,0))
        memcpy (b, &val(v.y,0,1,0), sizeof(double)*_attribute[v.y.i].block);
      else
-       *b = HUGE;
+       *b = 1e30;
      b += _attribute[v.y.i].block;
    }}}}
  {scalar*_i=(scalar*)( listv);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
    for (int i = 0; i <= 1; i++)
      for (int j = 0; j <= 1; j++)
-#line 418 "/u/basilisk/src/grid/tree-mpi.h"
+#line 418 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
        {
   if (allocated(i,j,0))
     memcpy (b, &val(s,i,j,0), sizeof(double)*_attribute[s.i].block);
   else
-    *b = HUGE;
+    *b = 1e30;
   b += _attribute[s.i].block;
        }
 
@@ -6900,18 +6929,18 @@ static void mpi_boundary_destroy (Boundary * b)
 
      
 static void mpi_boundary_level (const Boundary * b, scalar * list, int l)
-{tracing("mpi_boundary_level","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   MpiBoundary * m = (MpiBoundary *) b;
   rcv_pid_sync (&m->mpi_level, list, l);
   rcv_pid_sync (&m->mpi_level_root, list, l);
-end_tracing("mpi_boundary_level","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
      
 static void mpi_boundary_restriction (const Boundary * b, scalar * list, int l)
-{tracing("mpi_boundary_restriction","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   MpiBoundary * m = (MpiBoundary *) b;
   rcv_pid_sync (&m->restriction, list, l);
-end_tracing("mpi_boundary_restriction","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 void mpi_boundary_new()
 {
@@ -7009,7 +7038,7 @@ is_face_y(){
       if ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
  n++;end_foreach_neighbor()}
     fprintf (fp, "%s%g %g %g %d\n", prefix, x, y, z, cell.neighbors);
-    if (!(cell.neighbors == n)) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "cell.neighbors == n");
+    if (!(cell.neighbors == n)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "cell.neighbors == n");
   }end_foreach();}
   if (!fp1)
     fclose (fp);
@@ -7276,9 +7305,9 @@ static bool has_local_child (Point point)
 
      
 void mpi_boundary_update_buffers()
-{tracing("mpi_boundary_update_buffers","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   if (npe() == 1)
-    {end_tracing("mpi_boundary_update_buffers","/u/basilisk/src/grid/tree-mpi.h",0);return;}
+    {end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);return;}
 
   prof_start ("mpi_boundary_update_buffers");
 
@@ -7418,12 +7447,12 @@ void mpi_boundary_update_buffers()
   rcv_pid_append_pids (mpi_level_root->rcv, m->receive);
 
   prof_stop();
-#line 1015 "/u/basilisk/src/grid/tree-mpi.h"
-end_tracing("mpi_boundary_update_buffers","/u/basilisk/src/grid/tree-mpi.h",0);}
+#line 1015 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
+end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
      
 void mpi_boundary_refine (scalar * list)
-{tracing("mpi_boundary_refine","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   prof_start ("mpi_boundary_refine");
 
   MpiBoundary * mpi = (MpiBoundary *) mpi_boundary;
@@ -7490,11 +7519,11 @@ void mpi_boundary_refine (scalar * list)
     mpi_boundary_refine (list);
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].dirty = true;}}
-end_tracing("mpi_boundary_refine","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 static void check_depth()
 {
-#line 1121 "/u/basilisk/src/grid/tree-mpi.h"
+#line 1121 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
 }
 
 typedef struct {
@@ -7505,13 +7534,13 @@ typedef struct {
 
      
 void mpi_boundary_coarsen (int l, int too_fine)
-{tracing("mpi_boundary_coarsen","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   if (npe() == 1)
-    {end_tracing("mpi_boundary_coarsen","/u/basilisk/src/grid/tree-mpi.h",0);return;}
+    {end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);return;}
 
   check_depth();
 
-  if (!(sizeof(Remote) == sizeof(double))) qassert ("/u/basilisk/src/grid/tree-mpi.h", 0, "sizeof(Remote) == sizeof(double)");
+  if (!(sizeof(Remote) == sizeof(double))) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 0, "sizeof(Remote) == sizeof(double)");
 
   scalar  remote=new_scalar("remote");
   {foreach_cell() {
@@ -7529,7 +7558,7 @@ void mpi_boundary_coarsen (int l, int too_fine)
     if (is_leaf(cell))
       continue;
   }end_foreach_cell();}
-  mpi_boundary_level (mpi_boundary, ((scalar[]){remote,{-1}}), l);
+  mpi_boundary_level (mpi_boundary,((scalar[]) {remote,{-1}}), l);
 
   {foreach_cell() {
     if (level == l) {
@@ -7559,7 +7588,7 @@ void mpi_boundary_coarsen (int l, int too_fine)
       if (is_leaf(cell))
  continue;
     }end_foreach_cell();}
-    mpi_boundary_level (mpi_boundary, ((scalar[]){remote,{-1}}), l);
+    mpi_boundary_level (mpi_boundary,((scalar[]) {remote,{-1}}), l);
     {foreach_cell() {
       if (level == l)
  if (!is_local(cell) && is_local(aparent(0,0,0)) && val(remote,0,0,0)) {
@@ -7570,7 +7599,7 @@ void mpi_boundary_coarsen (int l, int too_fine)
  continue;
     }end_foreach_cell();}
   }delete((scalar*)((scalar[]){remote,{-1}}));
-end_tracing("mpi_boundary_coarsen","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 static void flag_border_cells()
 {
@@ -7628,7 +7657,7 @@ static int balanced_pid (long index, long nt, int nproc)
 
      
 void mpi_partitioning()
-{tracing("mpi_partitioning","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
   prof_start ("mpi_partitioning");
 
   long nt = 0;
@@ -7681,7 +7710,7 @@ long i = 0;
   prof_stop();
 
   mpi_boundary_update_buffers();
-end_tracing("mpi_partitioning","/u/basilisk/src/grid/tree-mpi.h",0);}
+end_tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
 
 void restore_mpi (FILE * fp, scalar * list1)
 {
@@ -7802,10 +7831,10 @@ void restore_mpi (FILE * fp, scalar * list1)
   mpi_boundary_update (list);
   pfree (list,__func__,__FILE__,0);delete((scalar*)((scalar[]){size,{-1}}));
 }
-#line 1435 "/u/basilisk/src/grid/tree-mpi.h"
+#line 1435 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
      
 double z_indexing (scalar index, bool leaves)
-{tracing("z_indexing","/u/basilisk/src/grid/tree-mpi.h",0);
+{tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);
 
 
 
@@ -7828,7 +7857,7 @@ double z_indexing (scalar index, bool leaves)
   {foreach_level(0)
     val(index,0,0,0) = 0;end_foreach_level();}
   for (int l = 0; l < depth(); l++) {
-    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b, ((scalar[]){index,{-1}}), l); };
+    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b,((scalar[]) {index,{-1}}), l); };
     {foreach_cell() {
       if (level == l) {
  if (is_leaf(cell)) {
@@ -7859,13 +7888,13 @@ double z_indexing (scalar index, bool leaves)
  continue;
     }end_foreach_cell();}
   }
-  { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b, ((scalar[]){index,{-1}}), depth()); };
+  { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b,((scalar[]) {index,{-1}}), depth()); };
 
-  {delete((scalar*)((scalar[]){size,{-1}}));{end_tracing("z_indexing","/u/basilisk/src/grid/tree-mpi.h",0);return maxi;}}delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("z_indexing","/u/basilisk/src/grid/tree-mpi.h",0);}
-#line 1687 "/u/basilisk/src/grid/tree.h"
+  {delete((scalar*)((scalar[]){size,{-1}}));{end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);return maxi;}}delete((scalar*)((scalar[]){size,{-1}}));
+end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",0);}
+#line 1687 "/home/lisergey/basilisk/src/grid/tree.h"
 #line 1 "grid/balance.h"
-#line 1 "/u/basilisk/src/grid/balance.h"
+#line 1 "/home/lisergey/basilisk/src/grid/balance.h"
 
 
 typedef struct {
@@ -7899,7 +7928,7 @@ Array * linear_tree (size_t size, scalar newpid)
     }
     else {
       if (cell.pid >= 0 && ((NewPid *)&val(newpid,0,0,0))->leaf)
- if (!(is_leaf(cell))) qassert ("/u/basilisk/src/grid/balance.h", 0, "is_leaf(cell)");
+ if (!(is_leaf(cell))) qassert ("/home/lisergey/basilisk/src/grid/balance.h", 0, "is_leaf(cell)");
       if (is_refined_check()) {
 
 
@@ -7948,7 +7977,7 @@ Array * linear_tree (size_t size, scalar newpid)
     else\
       _i += sizeof(Cell);\
     if (c->flags & _next) {\
-      if (!(c->neighbors)) qassert ("/u/basilisk/src/grid/balance.h", 0, "c->neighbors");\
+      if (!(c->neighbors)) qassert ("/home/lisergey/basilisk/src/grid/balance.h", 0, "c->neighbors");\
       if (!(c->flags & leaf) && is_leaf(cell) &&\
    (!is_newpid() || !((NewPid *)&val(newpid,0,0,0))->leaf))\
 \
@@ -8029,7 +8058,7 @@ static void receive_tree (int from, scalar newpid, FILE * fp)
     {foreach_tree (&a, sizeof(Cell) + datasize, NULL) {
       memcpy (((char *)&cell) + sizeof(Cell), ((char *)c) + sizeof(Cell),
        datasize);
-      if (!(((NewPid *)&val(newpid,0,0,0))->pid > 0)) qassert ("/u/basilisk/src/grid/balance.h", 0, "NEWPID()->pid > 0");
+      if (!(((NewPid *)&val(newpid,0,0,0))->pid > 0)) qassert ("/home/lisergey/basilisk/src/grid/balance.h", 0, "NEWPID()->pid > 0");
       if (fp)
  fprintf (fp, "%g %g %g %d %d %d %d %d %d recv\n",
    x, y, z, ((NewPid *)&val(newpid,0,0,0))->pid - 1, cell.pid,
@@ -8071,11 +8100,11 @@ struct {
 
      
 bool balance()
-{tracing("balance","/u/basilisk/src/grid/balance.h",0);
+{tracing("balance","/home/lisergey/basilisk/src/grid/balance.h",0);
   if (npe() == 1)
-    {end_tracing("balance","/u/basilisk/src/grid/balance.h",0);return false;}
+    {end_tracing("balance","/home/lisergey/basilisk/src/grid/balance.h",0);return false;}
 
-  if (!(sizeof(NewPid) == sizeof(double))) qassert ("/u/basilisk/src/grid/balance.h", 0, "sizeof(NewPid) == sizeof(double)");
+  if (!(sizeof(NewPid) == sizeof(double))) qassert ("/home/lisergey/basilisk/src/grid/balance.h", 0, "sizeof(NewPid) == sizeof(double)");
 
   check_flags();
 
@@ -8113,15 +8142,15 @@ bool balance()
     mpi.npe = npe();
 
   if (nmax - nmin <= 1)
-    {end_tracing("balance","/u/basilisk/src/grid/balance.h",0);return false;}
+    {end_tracing("balance","/home/lisergey/basilisk/src/grid/balance.h",0);return false;}
 
   scalar  newpid=new_scalar("newpid");
   double zn = z_indexing (newpid, mpi.leaves);
   if (pid() == 0)
-    if (!(zn + 1 == nt)) qassert ("/u/basilisk/src/grid/balance.h", 0, "zn + 1 == nt");
+    if (!(zn + 1 == nt)) qassert ("/home/lisergey/basilisk/src/grid/balance.h", 0, "zn + 1 == nt");
 
   FILE * fp = NULL;
-#line 261 "/u/basilisk/src/grid/balance.h"
+#line 261 "/home/lisergey/basilisk/src/grid/balance.h"
   bool next = false, prev = false;
   {foreach_cell_all() {
     if (is_local(cell)) {
@@ -8141,8 +8170,8 @@ bool balance()
       val(newpid,0,0,0) = 0;
   }end_foreach_cell_all();}
   for (int l = 0; l <= depth(); l++)
-    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, ((scalar[]){newpid,{-1}}), l); };
-#line 305 "/u/basilisk/src/grid/balance.h"
+    { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b,((scalar[]) {newpid,{-1}}), l); };
+#line 305 "/home/lisergey/basilisk/src/grid/balance.h"
   Array * anext = next ? neighborhood (newpid, pid() + 1, fp) : array_new();
   Array * aprev = prev ? neighborhood (newpid, pid() - 1, fp) : array_new();
 
@@ -8230,8 +8259,8 @@ bool balance()
   if (pid_changed)
     mpi_boundary_update_buffers();
 
-  {delete((scalar*)((scalar[]){newpid,{-1}}));{end_tracing("balance","/u/basilisk/src/grid/balance.h",0);return pid_changed;}}delete((scalar*)((scalar[]){newpid,{-1}}));
-end_tracing("balance","/u/basilisk/src/grid/balance.h",0);}
+  {delete((scalar*)((scalar[]){newpid,{-1}}));{end_tracing("balance","/home/lisergey/basilisk/src/grid/balance.h",0);return pid_changed;}}delete((scalar*)((scalar[]){newpid,{-1}}));
+end_tracing("balance","/home/lisergey/basilisk/src/grid/balance.h",0);}
 
 void mpi_boundary_update (scalar * list)
 {
@@ -8239,41 +8268,41 @@ void mpi_boundary_update (scalar * list)
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].dirty = true;}}
   grid->tn = 0;
-  boundary_internal ((scalar *)list, "/u/basilisk/src/grid/balance.h", 0);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/balance.h", 0);
   while (balance());
 }
-#line 1688 "/u/basilisk/src/grid/tree.h"
+#line 1688 "/home/lisergey/basilisk/src/grid/tree.h"
 #else
 void mpi_boundary_refine (scalar * list){}
 void mpi_boundary_coarsen (int a, int b){}
 void mpi_boundary_update (scalar * list) {
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].dirty = true;}}
-  boundary_internal ((scalar *)list, "/u/basilisk/src/grid/tree.h", 0);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree.h", 0);
 }
 #endif
-#line 4 "/u/basilisk/src/grid/quadtree.h"
+#line 4 "/home/lisergey/basilisk/src/grid/quadtree.h"
 
 void quadtree_methods() {
   tree_methods();
 }
 #line 15 "cylinder-cpp.c"
 #line 1 "cylinder.c"
-#line 1 "/u/basilisk/src/ast/std/stdbool.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdbool.h"
 #include <stdbool.h>
 #line 2 "cylinder.c"
-#line 1 "/u/basilisk/src/ast/std/stdint.h"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdint.h"
 #include <stdint.h>
 #line 3 "cylinder.c"
 #line 1 "embed.h"
-#line 1 "/u/basilisk/src/embed.h"
-#line 12 "/u/basilisk/src/embed.h"
+#line 1 "/home/lisergey/basilisk/src/embed.h"
+#line 12 "/home/lisergey/basilisk/src/embed.h"
 #line 1 "fractions.h"
-#line 1 "/u/basilisk/src/fractions.h"
-#line 12 "/u/basilisk/src/fractions.h"
+#line 1 "/home/lisergey/basilisk/src/fractions.h"
+#line 12 "/home/lisergey/basilisk/src/fractions.h"
 #line 1 "geometry.h"
-#line 1 "/u/basilisk/src/geometry.h"
-#line 28 "/u/basilisk/src/geometry.h"
+#line 1 "/home/lisergey/basilisk/src/geometry.h"
+#line 28 "/home/lisergey/basilisk/src/geometry.h"
 double line_alpha (double c, coord n)
 {
   double alpha, n1, n2;
@@ -8298,7 +8327,7 @@ double line_alpha (double c, coord n)
 
   return alpha - (n.x + n.y)/2.;
 }
-#line 133 "/u/basilisk/src/geometry.h"
+#line 133 "/home/lisergey/basilisk/src/geometry.h"
 double line_area (double nx, double ny, double alpha)
 {
   double a, v, area;
@@ -8339,7 +8368,7 @@ double line_area (double nx, double ny, double alpha)
 
   return clamp (area, 0., 1.);
 }
-#line 237 "/u/basilisk/src/geometry.h"
+#line 237 "/home/lisergey/basilisk/src/geometry.h"
 double rectangle_fraction (coord n, double alpha, coord a, coord b)
 {
   coord n1;
@@ -8354,7 +8383,7 @@ double rectangle_fraction (coord n, double alpha, coord a, coord b)
   }
   return line_area(n1.x, n1.y, alpha);
 }
-#line 262 "/u/basilisk/src/geometry.h"
+#line 262 "/home/lisergey/basilisk/src/geometry.h"
 int facets (coord n, double alpha, coord p[2])
 {
   int i = 0;
@@ -8378,7 +8407,7 @@ if (fabs (n.x) > 1e-4 && i < 2) {
       }}
   return i;
 }
-#line 352 "/u/basilisk/src/geometry.h"
+#line 352 "/home/lisergey/basilisk/src/geometry.h"
 double line_length_center (coord m, double alpha, coord * p)
 {
   alpha += (m.x + m.y)/2.;
@@ -8452,7 +8481,7 @@ if (n.y < 1e-4) {
 
   return sqrt (ax*ax + ay*ay);
 }
-#line 482 "/u/basilisk/src/geometry.h"
+#line 482 "/home/lisergey/basilisk/src/geometry.h"
 void line_center (coord m, double alpha, double a, coord * p)
 {
   alpha += (m.x + m.y)/2.;
@@ -8523,7 +8552,7 @@ if (n.y < 1e-4) {
     p->y = sign(m.y)*(p->y - 0.5);
   }
 }
-#line 13 "/u/basilisk/src/fractions.h"
+#line 13 "/home/lisergey/basilisk/src/fractions.h"
 
 
 
@@ -8531,7 +8560,7 @@ if (n.y < 1e-4) {
 
 
 #line 1 "myc2d.h"
-#line 1 "/u/basilisk/src/myc2d.h"
+#line 1 "/home/lisergey/basilisk/src/myc2d.h"
 
 
 
@@ -8551,8 +8580,8 @@ coord mycs (Point point, scalar c)
 
 
 
-  mx0 = 0.5*(c_l-c_r);
-  my0 = 0.5*(c_b-c_t);
+  mx0 = 0.5*(c_l - c_r);
+  my0 = 0.5*(c_b - c_t);
 
 
   if (fabs(mx0) <= fabs(my0)) {
@@ -8567,10 +8596,10 @@ coord mycs (Point point, scalar c)
 
   mm1 = val(c,-1,-1,0) + 2.0*val(c,-1,0,0) + val(c,-1,1,0);
   mm2 = val(c,1,-1,0) + 2.0*val(c,1,0,0) + val(c,1,1,0);
-  mx1 = mm1 - mm2 + 1.e-30;
+  mx1 = mm1 - mm2 + 1e-30;
   mm1 = val(c,-1,-1,0) + 2.0*val(c,0,-1,0) + val(c,1,-1,0);
   mm2 = val(c,-1,1,0) + 2.0*val(c,0,1,0) + val(c,1,1,0);
-  my1 = mm1 - mm2 + 1.e-30;
+  my1 = mm1 - mm2 + 1e-30;
 
 
   if (ix) {
@@ -8597,7 +8626,7 @@ coord mycs (Point point, scalar c)
 
   return n;
 }
-#line 13 "/u/basilisk/src/fractions.h"
+#line 13 "/home/lisergey/basilisk/src/fractions.h"
 
 
 
@@ -8605,7 +8634,7 @@ coord mycs (Point point, scalar c)
 
 
 #line 1 "myc2d.h"
-#line 1 "/u/basilisk/src/myc2d.h"
+#line 1 "/home/lisergey/basilisk/src/myc2d.h"
 
 
 
@@ -8636,8 +8665,8 @@ _stencil_val(c,-1,-1,0); _stencil_val(c,0,-1,0); _stencil_val(c,1,-1,0);
 
 
 
-   
-    
+     
+      
 
 
 
@@ -8686,8 +8715,8 @@ _stencil_val(c,1,-1,0);_stencil_val(c,1,0,0); _stencil_val(c,1,1,0);
 #line 64
 return ;
 }
-#line 20 "/u/basilisk/src/fractions.h"
-#line 41 "/u/basilisk/src/fractions.h"
+#line 20 "/home/lisergey/basilisk/src/fractions.h"
+#line 41 "/home/lisergey/basilisk/src/fractions.h"
 void fraction_refine (Point point, scalar c)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
 
@@ -8754,7 +8783,7 @@ m.y = val(n.y,0,0,0);
 val(alpha,0,0,0) -= child.y*m.y/2.;
   }end_foreach_child()}
 }
-#line 121 "/u/basilisk/src/fractions.h"
+#line 121 "/home/lisergey/basilisk/src/fractions.h"
 struct Fractions {
   scalar Phi;
   scalar c;
@@ -8764,15 +8793,15 @@ struct Fractions {
 
      
 void fractions (struct Fractions a)
-{tracing("fractions","/u/basilisk/src/fractions.h",0);
+{tracing("fractions","/home/lisergey/basilisk/src/fractions.h",0);
   scalar Phi = a.Phi;
   scalar c = a.c;
   vector   s=(a.s).x.i?(a.s):new_face_vector("s");
   double val = a.val;
-#line 145 "/u/basilisk/src/fractions.h"
+#line 145 "/home/lisergey/basilisk/src/fractions.h"
   vector p;
   p.x = s.y; p.y = s.x;
-#line 155 "/u/basilisk/src/fractions.h"
+#line 155 "/home/lisergey/basilisk/src/fractions.h"
   foreach_face_stencil(){_stencil_is_face_y(){ {
 
 
@@ -8809,7 +8838,7 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 180 "/u/basilisk/src/fractions.h"
+#line 180 "/home/lisergey/basilisk/src/fractions.h"
     
   
 }}end__stencil_is_face_y()
@@ -8850,11 +8879,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 180 "/u/basilisk/src/fractions.h"
+#line 180 "/home/lisergey/basilisk/src/fractions.h"
     
   
 }}end__stencil_is_face_x()}end_foreach_face_stencil();
-#line 155 "/u/basilisk/src/fractions.h"
+#line 155 "/home/lisergey/basilisk/src/fractions.h"
   {foreach_face_generic(){is_face_y(){ {
 
 
@@ -8872,7 +8901,7 @@ _stencil_val(Phi,0,0,0);
       if (val(Phi,0,0,0) < val)
  val(p.x,0,0,0) = 1. - val(p.x,0,0,0);
     }
-#line 180 "/u/basilisk/src/fractions.h"
+#line 180 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.x,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,1,0,0) > val);
   }}end_is_face_y()
@@ -8894,16 +8923,16 @@ is_face_x(){ {
       if (val(Phi,0,0,0) < val)
  val(p.y,0,0,0) = 1. - val(p.y,0,0,0);
     }
-#line 180 "/u/basilisk/src/fractions.h"
+#line 180 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.y,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,1,0) > val);
   }}end_is_face_x()}end_foreach_face_generic();}
-#line 205 "/u/basilisk/src/fractions.h"
+#line 205 "/home/lisergey/basilisk/src/fractions.h"
   scalar s_z = c;
   foreach_stencil()
 
   {    
-#line 240 "/u/basilisk/src/fractions.h"
+#line 240 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -8976,7 +9005,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
  _stencil_val_a(s_z,0,0,0);  
 
       }}}
-#line 283 "/u/basilisk/src/fractions.h"
+#line 283 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -9004,7 +9033,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
 foreach()
 
   {
-#line 240 "/u/basilisk/src/fractions.h"
+#line 240 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
@@ -9055,7 +9084,7 @@ if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
      alpha += n.y*a + n.x*(i - 0.5);
      ni++;
    }}
-#line 283 "/u/basilisk/src/fractions.h"
+#line 283 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_z,0,0,0) = max (val(p.x,0,0,0), val(p.y,0,0,0));
       else if (ni != 4)
@@ -9068,15 +9097,15 @@ if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
 
       }
     }
-  }end_foreach();}{if(!(a.s).x.i)delete((scalar*)((vector[]){s,{{-1},{-1}}}));}
-#line 347 "/u/basilisk/src/fractions.h"
-end_tracing("fractions","/u/basilisk/src/fractions.h",0);}
-#line 391 "/u/basilisk/src/fractions.h"
+  }end_foreach();}if(!(a.s).x.i)delete((scalar*)((vector[]){s,{{-1},{-1}}}));
+#line 347 "/home/lisergey/basilisk/src/fractions.h"
+end_tracing("fractions","/home/lisergey/basilisk/src/fractions.h",0);}
+#line 391 "/home/lisergey/basilisk/src/fractions.h"
 coord youngs_normal (Point point, scalar c)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   coord n;
   double nn = 0.;
-  if (!(2 == 2)) qassert ("/u/basilisk/src/fractions.h", 0, "dimension == 2");
+  if (!(2 == 2)) qassert ("/home/lisergey/basilisk/src/fractions.h", 0, "dimension == 2");
    {
     n.x = (val(c,-1,1,0) + 2.*val(c,-1,0,0) + val(c,-1,-1,0) -
     val(c,+1,1,0) - 2.*val(c,+1,0,0) - val(c,+1,-1,0));
@@ -9174,10 +9203,10 @@ _stencil_mycs (point, c);
 #line 431
 return;
 }
-#line 441 "/u/basilisk/src/fractions.h"
+#line 441 "/home/lisergey/basilisk/src/fractions.h"
      
 void reconstruction (const scalar c, vector n, scalar alpha)
-{tracing("reconstruction","/u/basilisk/src/fractions.h",0);
+{tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",0);
   foreach_stencil() {
 
 
@@ -9249,7 +9278,7 @@ val(n.y,0,0,0) = m.y;
       val(alpha,0,0,0) = line_alpha (val(c,0,0,0), m);
     }
   }end_foreach();}
-#line 476 "/u/basilisk/src/fractions.h"
+#line 476 "/home/lisergey/basilisk/src/fractions.h"
   
     _attribute[n.x.i].refine = _attribute[n.x.i].prolongation = refine_injection;
     
@@ -9262,8 +9291,8 @@ _attribute[n.y.i].refine = _attribute[n.y.i].prolongation = refine_injection;
   _attribute[alpha.i].n = n;
   _attribute[alpha.i].refine = _attribute[alpha.i].prolongation = alpha_refine;
 
-end_tracing("reconstruction","/u/basilisk/src/fractions.h",0);}
-#line 505 "/u/basilisk/src/fractions.h"
+end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",0);}
+#line 505 "/home/lisergey/basilisk/src/fractions.h"
 struct OutputFacets {
   scalar c;
   FILE * fp;
@@ -9272,7 +9301,7 @@ struct OutputFacets {
 
      
 void output_facets (struct OutputFacets p)
-{tracing("output_facets","/u/basilisk/src/fractions.h",0);
+{tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",0);
   scalar c = p.c;
   vector s = p.s;
   if (!p.fp) p.fp = fout;
@@ -9288,7 +9317,7 @@ void output_facets (struct OutputFacets p)
         
      
  
-#line 538 "/u/basilisk/src/fractions.h"
+#line 538 "/home/lisergey/basilisk/src/fractions.h"
     }        }end_foreach_stencil();
 
   {
@@ -9303,11 +9332,11 @@ foreach()
  fprintf (p.fp, "%g %g\n%g %g\n\n",
    x + segment[0].x*Delta, y + segment[0].y*Delta,
    x + segment[1].x*Delta, y + segment[1].y*Delta);
-#line 538 "/u/basilisk/src/fractions.h"
+#line 538 "/home/lisergey/basilisk/src/fractions.h"
     }end_foreach();}
 
   fflush (p.fp);
-end_tracing("output_facets","/u/basilisk/src/fractions.h",0);}
+end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",0);}
 
 
 
@@ -9317,7 +9346,7 @@ end_tracing("output_facets","/u/basilisk/src/fractions.h",0);}
 
      
 double interface_area (scalar c)
-{tracing("interface_area","/u/basilisk/src/fractions.h",0);
+{tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);
   double area = 0.;
   foreach_stencil ()
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {   
@@ -9341,9 +9370,9 @@ foreach ()
 }
   
 #line 559
-{end_tracing("interface_area","/u/basilisk/src/fractions.h",0);return area;}
-end_tracing("interface_area","/u/basilisk/src/fractions.h",0);}
-#line 13 "/u/basilisk/src/embed.h"
+{end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);return area;}
+end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);}
+#line 13 "/home/lisergey/basilisk/src/embed.h"
 
 
 
@@ -9353,14 +9382,16 @@ end_tracing("interface_area","/u/basilisk/src/fractions.h",0);}
 scalar  cs={0};
 vector  fs={{1},{2}};
 
+double (* metric_embed_factor) (Point, coord) = NULL;
+
 
 
 
 
 
 #line 1 "embed-tree.h"
-#line 1 "/u/basilisk/src/embed-tree.h"
-#line 14 "/u/basilisk/src/embed-tree.h"
+#line 1 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 14 "/home/lisergey/basilisk/src/embed-tree.h"
 static void embed_fraction_refine (Point point, scalar cs)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   double cc = val(cs,0,0,0);
@@ -9436,7 +9467,7 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
 
     coord n = facet_normal (point, cs, fs);
     double alpha = line_alpha (val(cs,0,0,0), n);
-#line 100 "/u/basilisk/src/embed-tree.h"
+#line 100 "/home/lisergey/basilisk/src/embed-tree.h"
     if (2.*fabs(alpha) < fabs(n.y)) {
       double yc = alpha/n.y;
       int i = yc > 0.;
@@ -9445,7 +9476,7 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
     }
     else
       fine(fs.x,1,0,0) = fine(fs.x,1,1,0) = alpha > 0.;
-#line 132 "/u/basilisk/src/embed-tree.h"
+#line 132 "/home/lisergey/basilisk/src/embed-tree.h"
     for (int i = 0; i <= 1; i++)
       if (neighbor(2*i-1,0,0).neighbors &&
    (is_local(cell) || is_local(neighbor(2*i-1,0,0)))) {
@@ -9471,7 +9502,7 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
        fine(fs.x,2*i,0,0) = 2.*val(fs.x,i,0,0) + a - 1.;
        fine(fs.x,2*i,1,0) = 1. - a;
      }
-#line 174 "/u/basilisk/src/embed-tree.h"
+#line 174 "/home/lisergey/basilisk/src/embed-tree.h"
    }
  }
 
@@ -9522,7 +9553,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
 
     coord n = facet_normal (point, cs, fs);
     double alpha = line_alpha (val(cs,0,0,0), n);
-#line 100 "/u/basilisk/src/embed-tree.h"
+#line 100 "/home/lisergey/basilisk/src/embed-tree.h"
     if (2.*fabs(alpha) < fabs(n.x)) {
       double yc = alpha/n.x;
       int i = yc > 0.;
@@ -9531,7 +9562,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
     }
     else
       fine(fs.y,0,1,0) = fine(fs.y,1,1,0) = alpha > 0.;
-#line 132 "/u/basilisk/src/embed-tree.h"
+#line 132 "/home/lisergey/basilisk/src/embed-tree.h"
     for (int i = 0; i <= 1; i++)
       if (neighbor(0,2*i-1,0).neighbors &&
    (is_local(cell) || is_local(neighbor(0,2*i-1,0)))) {
@@ -9557,7 +9588,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
        fine(fs.y,0,2*i,0) = 2.*val(fs.y,0,i,0) + a - 1.;
        fine(fs.y,1,2*i,0) = 1. - a;
      }
-#line 174 "/u/basilisk/src/embed-tree.h"
+#line 174 "/home/lisergey/basilisk/src/embed-tree.h"
    }
  }
 
@@ -9573,7 +9604,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
       }
   }
 }
-#line 206 "/u/basilisk/src/embed-tree.h"
+#line 206 "/home/lisergey/basilisk/src/embed-tree.h"
 
 
 
@@ -9611,7 +9642,7 @@ static inline void restriction_embed_linear (Point point, scalar s)
   {foreach_child()
     if (val(cs,0,0,0))
       p.x += x, p.y += y, p.z += z, val += val(s,0,0,0), nv++;end_foreach_child()}
-  if (!(nv > 0.)) qassert ("/u/basilisk/src/embed-tree.h", 0, "nv > 0.");
+  if (!(nv > 0.)) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "nv > 0.");
   val(s,0,0,0) = val/nv;
 
 
@@ -9629,23 +9660,23 @@ static inline void restriction_embed_linear (Point point, scalar s)
 val(s,0,0,0) += (o.y - p.y/nv)*g.y;
   }
 }
-#line 268 "/u/basilisk/src/embed-tree.h"
+#line 268 "/home/lisergey/basilisk/src/embed-tree.h"
 static inline void refine_embed_linear (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   {foreach_child() {
     if (!val(cs,0,0,0))
       val(s,0,0,0) = 0.;
     else {
-      if (!(coarse(cs,0,0,0))) qassert ("/u/basilisk/src/embed-tree.h", 0, "coarse(cs)");
+      if (!(coarse(cs,0,0,0))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs)");
       int i = (child.x + 1)/2, j = (child.y + 1)/2;
 
       if (coarse(fs.x,i,0,0) && coarse(fs.y,0,j,0) &&
    (coarse(cs,0,0,0) == 1. || coarse(cs,child.x,0,0) == 1. ||
     coarse(cs,0,child.y,0) == 1. || coarse(cs,child.x,child.y,0) == 1.)) {
- if (!(coarse(cs,child.x,0,0) && coarse(cs,0,child.y,0))) qassert ("/u/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x) && coarse(cs,0,child.y)");
+ if (!(coarse(cs,child.x,0,0) && coarse(cs,0,child.y,0))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x) && coarse(cs,0,child.y)");
  if (coarse(fs.x,i,child.y,0) && coarse(fs.y,child.x,j,0)) {
 
-   if (!(coarse(cs,child.x,child.y,0))) qassert ("/u/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x,child.y)");
+   if (!(coarse(cs,child.x,child.y,0))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x,child.y)");
    val(s,0,0,0) = (9.*coarse(s,0,0,0) +
    3.*(coarse(s,child.x,0,0) + coarse(s,0,child.y,0)) +
    coarse(s,child.x,child.y,0))/16.;
@@ -9660,7 +9691,7 @@ static inline void refine_embed_linear (Point point, scalar s)
 
  val(s,0,0,0) = (3.*coarse(s,0,0,0) + coarse(s,child.x,child.y,0))/4.;
       }
-#line 346 "/u/basilisk/src/embed-tree.h"
+#line 346 "/home/lisergey/basilisk/src/embed-tree.h"
       else {
 
  val(s,0,0,0) = coarse(s,0,0,0);
@@ -9681,7 +9712,7 @@ static inline void refine_embed_linear (Point point, scalar s)
     }
   }end_foreach_child()}
 }
-#line 369 "/u/basilisk/src/embed-tree.h"
+#line 369 "/home/lisergey/basilisk/src/embed-tree.h"
 
 void refine_embed_face_x (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
@@ -9745,31 +9776,31 @@ void refine_embed_face_y (Point point, scalar s)
        (2*j - 1)*g1 + (2*k - 1)*g2) : 0.;
   }
 }
-#line 28 "/u/basilisk/src/embed.h"
-#line 68 "/u/basilisk/src/embed.h"
+#line 30 "/home/lisergey/basilisk/src/embed.h"
+#line 70 "/home/lisergey/basilisk/src/embed.h"
 
 static inline double embed_face_gradient_x (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   int j = sign(val(fs.x,i,1,0) - val(fs.x,i,-1,0));
-  if (!(val(cs,i,0,0) && val(cs,i-1,0,0))) qassert ("/u/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
+  if (!(val(cs,i,0,0) && val(cs,i-1,0,0))) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
   if ((val(fs.x,i,j,0) > 0.5 && val(fs.y,i,j + (j < 0),0) && val(fs.y,i-1,j + (j < 0),0) && val(cs,i,j,0) && val(cs,i-1,j,0)))
     return ((1. + val(fs.x,i,0,0))*(val(a,i,0,0) - val(a,i-1,0,0)) +
      (1. - val(fs.x,i,0,0))*(val(a,i,j,0) - val(a,i-1,j,0)))/(2.*Delta);
   return (val(a,i,0,0) - val(a,i-1,0,0))/Delta;
 }
 
-#line 69
+#line 71
 static inline double embed_face_gradient_y (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   int j = sign(val(fs.y,1,i,0) - val(fs.y,-1,i,0));
-  if (!(val(cs,0,i,0) && val(cs,0,i-1,0))) qassert ("/u/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
+  if (!(val(cs,0,i,0) && val(cs,0,i-1,0))) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
   if ((val(fs.y,j,i,0) > 0.5 && val(fs.x,j + (j < 0),i,0) && val(fs.x,j + (j < 0),i-1,0) && val(cs,j,i,0) && val(cs,j,i-1,0)))
     return ((1. + val(fs.y,0,i,0))*(val(a,0,i,0) - val(a,0,i-1,0)) +
      (1. - val(fs.y,0,i,0))*(val(a,j,i,0) - val(a,j,i-1,0)))/(2.*Delta);
   return (val(a,0,i,0) - val(a,0,i-1,0))/Delta;
 }
-#line 28 "/u/basilisk/src/embed.h"
-#line 68 "/u/basilisk/src/embed.h"
+#line 30 "/home/lisergey/basilisk/src/embed.h"
+#line 70 "/home/lisergey/basilisk/src/embed.h"
 
 static void _stencil_embed_face_gradient_x (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;    
@@ -9779,17 +9810,17 @@ _stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.y,i,o_stencil,0    ); _stencil
     { _stencil_val(fs.x,i,0,0);_stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0); 
 _stencil_val(fs.x,i,0,0);_stencil_val(a,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0);    
        
-#line 75
+#line 77
 }
 _stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0);  
       
          
   
-#line 76
+#line 78
 return  ;
 }
 
-#line 69
+#line 71
 static void _stencil_embed_face_gradient_y (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;    
    _stencil_val(fs.y,-1,i,0);_stencil_val(fs.y,1,i,0);
@@ -9798,13 +9829,13 @@ _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.x,o_stencil,i,0    ); _stencil
     { _stencil_val(fs.y,0,i,0);_stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0); 
 _stencil_val(fs.y,0,i,0);_stencil_val(a,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0);    
        
-#line 75
+#line 77
 }
 _stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0);  
       
          
   
-#line 76
+#line 78
 return  ;
 }
 
@@ -9817,7 +9848,7 @@ static inline double embed_face_value_x (Point point, scalar a, int i)
     ((val(a,i,0,0)*(1.5 + val(cs,i,0,0)) + val(a,i-1,0,0)*(1.5 + val(cs,i-1,0,0)))/ (val(cs,i,0,0) + val(cs,i-1,0,0) + 3.));
 }
 
-#line 80
+#line 82
 static inline double embed_face_value_y (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   int j = sign(val(fs.y,1,i,0) - val(fs.y,-1,i,0));
@@ -9828,7 +9859,7 @@ static inline double embed_face_value_y (Point point, scalar a, int i)
 
 
 
-#line 80
+#line 82
 static void _stencil_embed_face_value_x (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;    
    _stencil_val(fs.x,i,-1,0);_stencil_val(fs.x,i,1,0);
@@ -9836,13 +9867,13 @@ _stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.y,i,o_stencil,0    ); _stencil
 _stencil_val(fs.x,i,0,0);_stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0); _stencil_val(fs.x,i,0,0);_stencil_val(a,i,o_stencil,0); _stencil_val(cs,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);_stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);
 _stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);
   
-#line 83
+#line 85
 return                  
                     
     ;
 }
 
-#line 80
+#line 82
 static void _stencil_embed_face_value_y (Point point, scalar a, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;    
    _stencil_val(fs.y,-1,i,0);_stencil_val(fs.y,1,i,0);
@@ -9850,14 +9881,14 @@ _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.x,o_stencil,i,0    ); _stencil
 _stencil_val(fs.y,0,i,0);_stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0); _stencil_val(fs.y,0,i,0);_stencil_val(a,o_stencil,i,0); _stencil_val(cs,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,0);_stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i-1,0);
 _stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);
   
-#line 83
+#line 85
 return                  
                     
     ;
 }
-#line 175 "/u/basilisk/src/embed.h"
+#line 177 "/home/lisergey/basilisk/src/embed.h"
 
-#line 220 "/u/basilisk/src/embed.h"
+#line 222 "/home/lisergey/basilisk/src/embed.h"
 static inline
 double embed_geometry (Point point, coord * p, coord * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
@@ -9867,14 +9898,14 @@ double embed_geometry (Point point, coord * p, coord * n)
   normalize (n);
   return area;
 }
-#line 220 "/u/basilisk/src/embed.h"
+#line 222 "/home/lisergey/basilisk/src/embed.h"
 static void 
 _stencil_embed_geometry (Point point,_stencil_undefined  * p,_stencil_undefined  * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES; 
 _stencil_facet_normal (point, cs, fs);     
    
   
-#line 224
+#line 226
 _stencil_val(cs,0,0,0);   
    
   
@@ -9896,10 +9927,10 @@ double embed_area_center (Point point, double * x1, double * y1, double * z1)
   }
   return area;
 }
-#line 253 "/u/basilisk/src/embed.h"
+#line 255 "/home/lisergey/basilisk/src/embed.h"
 double embed_interpolate (Point point, scalar s, coord p)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
-  if (!(2 == 2)) qassert ("/u/basilisk/src/embed.h", 0, "dimension == 2");
+  if (!(2 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
   int i = sign(p.x), j = sign(p.y);
   if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0))
 
@@ -9916,7 +9947,7 @@ double embed_interpolate (Point point, scalar s, coord p)
       else if (val(cs,-i,0,0))
  val += fabs(p.x)*(val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 265
+#line 267
 {
       int i = sign(p.y);
       if (val(cs,0,i,0))
@@ -9927,7 +9958,7 @@ double embed_interpolate (Point point, scalar s, coord p)
     return val;
   }
 }
-#line 253 "/u/basilisk/src/embed.h"
+#line 255 "/home/lisergey/basilisk/src/embed.h"
 static void _stencil_embed_interpolate (Point point, scalar s,_stencil_undefined * p)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;         
       
@@ -9937,7 +9968,7 @@ _stencil_val(cs,o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,
     {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);
 _stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0);         
       
-#line 260
+#line 262
 } 
 {  
 
@@ -9952,9 +9983,9 @@ _stencil_val(cs,o_stencil,0,0);{
        
       
     
-#line 271
+#line 273
 } 
-#line 265
+#line 267
 {   
       
 _stencil_val(cs,0,o_stencil,0);{
@@ -9964,16 +9995,16 @@ _stencil_val(cs,0,o_stencil,0);{
        
       
     
-#line 271
+#line 273
 } 
     
   }}
      
   
 
-#line 274
+#line 276
 }
-#line 283 "/u/basilisk/src/embed.h"
+#line 285 "/home/lisergey/basilisk/src/embed.h"
 struct Cleanup {
   scalar c;
   vector s;
@@ -9983,7 +10014,7 @@ struct Cleanup {
 
      
 int fractions_cleanup (struct Cleanup p)
-{tracing("fractions_cleanup","/u/basilisk/src/embed.h",0);
+{tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);
   scalar c = p.c;
   vector s = p.s;
 
@@ -10002,7 +10033,7 @@ int fractions_cleanup (struct Cleanup p)
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val(s.x,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,-1,0,0); _stencil_val(s.x,0,0,0);
  {_stencil_val_a(s.x,0,0,0);  }        }}end__stencil_is_face_x()
-#line 308
+#line 310
 _stencil_is_face_y(){
       {_stencil_val(s.y,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,0,-1,0); _stencil_val(s.y,0,0,0);
  {_stencil_val_a(s.y,0,0,0);  }        }}end__stencil_is_face_y()}end_foreach_face_stencil();
@@ -10011,11 +10042,11 @@ _stencil_is_face_y(){
 
 
     {
-#line 308
+#line 310
 foreach_face_generic(){is_face_x(){
       if (val(s.x,0,0,0) && ((!val(c,0,0,0) || !val(c,-1,0,0)) || val(s.x,0,0,0) < p.smin))
  val(s.x,0,0,0) = 0.;}end_is_face_x()
-#line 308
+#line 310
 is_face_y(){
       if (val(s.y,0,0,0) && ((!val(c,0,0,0) || !val(c,0,-1,0)) || val(s.y,0,0,0) < p.smin))
  val(s.y,0,0,0) = 0.;}end_is_face_y()}end_foreach_face_generic();}
@@ -10039,11 +10070,11 @@ is_face_y(){
 
 _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 329 "/u/basilisk/src/embed.h"
+#line 331 "/home/lisergey/basilisk/src/embed.h"
           
  
 } 
-#line 316
+#line 318
 {
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.y,0,i,0);
@@ -10059,7 +10090,7 @@ _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
 
 _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 329 "/u/basilisk/src/embed.h"
+#line 331 "/home/lisergey/basilisk/src/embed.h"
           
  
 }
@@ -10081,13 +10112,13 @@ _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);
 
     
       
-#line 341
+#line 343
 }      }end_foreach_stencil();
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:changed)){
-#line 313
+#line 315
 foreach()
       if (val(c,0,0,0) > 0. && val(c,0,0,0) < 1.) {
  int n = 0;
@@ -10095,16 +10126,16 @@ foreach()
    for (int i = 0; i <= 1; i++)
      if (val(s.x,i,0,0) > 0.)
        n++;
-#line 329 "/u/basilisk/src/embed.h"
+#line 331 "/home/lisergey/basilisk/src/embed.h"
    if (p.opposite && val(s.x,0,0,0) == 0. && val(s.x,1,0,0) == 0.)
      val(c,0,0,0) = 0., changed++;
  } 
-#line 316
+#line 318
 {
    for (int i = 0; i <= 1; i++)
      if (val(s.y,0,i,0) > 0.)
        n++;
-#line 329 "/u/basilisk/src/embed.h"
+#line 331 "/home/lisergey/basilisk/src/embed.h"
    if (p.opposite && val(s.y,0,0,0) == 0. && val(s.y,0,1,0) == 0.)
      val(c,0,0,0) = 0., changed++;
  }
@@ -10123,15 +10154,15 @@ foreach()
 }
 
     
-#line 343
+#line 345
 schanged += changed;
   }
   if (changed)
     fprintf (ferr, "WARNING: fractions_cleanup() did not converge after "
       "%d iterations\n", i);
-  {end_tracing("fractions_cleanup","/u/basilisk/src/embed.h",0);return schanged;}
-end_tracing("fractions_cleanup","/u/basilisk/src/embed.h",0);}
-#line 373 "/u/basilisk/src/embed.h"
+  {end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);return schanged;}
+end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);}
+#line 375 "/home/lisergey/basilisk/src/embed.h"
 
 static inline double dirichlet_gradient_x (Point point, scalar s, scalar cs,
         coord n, coord p, double bc,
@@ -10140,15 +10171,15 @@ static inline double dirichlet_gradient_x (Point point, scalar s, scalar cs,
   
     n.x = - n.x;
     
-#line 379
+#line 381
 n.y = - n.y;
-  double d[2], v[2] = {HUGE,HUGE};
+  double d[2], v[2] = {1e30,1e30};
   bool defined = true;
   
     if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
     
-#line 383
+#line 385
 if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
   if (defined)
@@ -10162,11 +10193,11 @@ if (defined && !val(fs.y,0,(n.y > 0.),0))
       if (val(fs.x,i + (i < 0),j,0) && val(fs.y,i,j,0) && val(fs.y,i,j+1,0) &&
    val(cs,i,j-1,0) && val(cs,i,j,0) && val(cs,i,j+1,0))
  v[l] = ((((val(s,i,j-1,0)))*((y1) - 1.) + ((val(s,i,j+1,0)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,0)))*((y1) - 1.)*((y1) + 1.));
-#line 417 "/u/basilisk/src/embed.h"
+#line 419 "/home/lisergey/basilisk/src/embed.h"
       else
  break;
     }
-  if (v[0] == HUGE) {
+  if (v[0] == 1e30) {
 
 
 
@@ -10182,12 +10213,12 @@ if (defined && !val(fs.y,0,(n.y > 0.),0))
 
 
   *coef = 0.;
-  if (v[1] != HUGE)
+  if (v[1] != 1e30)
     return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
   return (bc - v[0])/(d[0]*Delta);
 }
 
-#line 374
+#line 376
 static inline double dirichlet_gradient_y (Point point, scalar s, scalar cs,
         coord n, coord p, double bc,
         double * coef)
@@ -10195,15 +10226,15 @@ static inline double dirichlet_gradient_y (Point point, scalar s, scalar cs,
   
     n.y = - n.y;
     
-#line 379
+#line 381
 n.x = - n.x;
-  double d[2], v[2] = {HUGE,HUGE};
+  double d[2], v[2] = {1e30,1e30};
   bool defined = true;
   
     if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
     
-#line 383
+#line 385
 if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
   if (defined)
@@ -10217,11 +10248,11 @@ if (defined && !val(fs.x,(n.x > 0.),0,0))
       if (val(fs.y,j,i + (i < 0),0) && val(fs.x,j,i,0) && val(fs.x,j+1,i,0) &&
    val(cs,j-1,i,0) && val(cs,j,i,0) && val(cs,j+1,i,0))
  v[l] = ((((val(s,j-1,i,0)))*((y1) - 1.) + ((val(s,j+1,i,0)))*((y1) + 1.))*(y1)/2. - ((val(s,j,i,0)))*((y1) - 1.)*((y1) + 1.));
-#line 417 "/u/basilisk/src/embed.h"
+#line 419 "/home/lisergey/basilisk/src/embed.h"
       else
  break;
     }
-  if (v[0] == HUGE) {
+  if (v[0] == 1e30) {
 
 
 
@@ -10237,20 +10268,20 @@ if (defined && !val(fs.x,(n.x > 0.),0,0))
 
 
   *coef = 0.;
-  if (v[1] != HUGE)
+  if (v[1] != 1e30)
     return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
   return (bc - v[0])/(d[0]*Delta);
 }
-#line 373 "/u/basilisk/src/embed.h"
+#line 375 "/home/lisergey/basilisk/src/embed.h"
 
 static void _stencil_dirichlet_gradient_x (Point point, scalar s, scalar cs,
 _stencil_undefined *
         
-#line 375
+#line 377
 n,_stencil_undefined * p,_stencil_undefined * bc,
 _stencil_undefined 
         
-#line 376
+#line 378
 * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;       
   
@@ -10261,7 +10292,7 @@ _stencil_undefined
     {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
-#line 383
+#line 385
 {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
@@ -10274,16 +10305,16 @@ for (int l = 0; l <= 1; l++) {
 
 _stencil_val(fs.x,    o_stencil,o_stencil,0); _stencil_val(fs.y,o_stencil,o_stencil,0); _stencil_val(fs.y,o_stencil,o_stencil,0);
    _stencil_val(cs,o_stencil,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);
-#line 393
+#line 395
 {
  
 {_stencil_val(s,o_stencil,o_stencil,0);_stencil_val(s,o_stencil,o_stencil,0);_stencil_val(s,o_stencil,o_stencil,0);              }
  
-#line 418
+#line 420
 }
 
             
-#line 417 "/u/basilisk/src/embed.h"
+#line 419 "/home/lisergey/basilisk/src/embed.h"
       
     
 }         
@@ -10308,15 +10339,15 @@ _stencil_val(fs.x,    o_stencil,o_stencil,0); _stencil_val(fs.y,o_stencil,o_sten
 return   ;
 }
 
-#line 374
+#line 376
 static void _stencil_dirichlet_gradient_y (Point point, scalar s, scalar cs,
 _stencil_undefined *
         
-#line 375
+#line 377
 n,_stencil_undefined * p,_stencil_undefined * bc,
 _stencil_undefined 
         
-#line 376
+#line 378
 * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;       
   
@@ -10327,7 +10358,7 @@ _stencil_undefined
     {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
-#line 383
+#line 385
 {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
@@ -10340,16 +10371,16 @@ for (int l = 0; l <= 1; l++) {
 
 _stencil_val(fs.y,o_stencil,    o_stencil,0); _stencil_val(fs.x,o_stencil,o_stencil,0); _stencil_val(fs.x,o_stencil,o_stencil,0);
    _stencil_val(cs,o_stencil,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);
-#line 393
+#line 395
 {
  
 {_stencil_val(s,o_stencil,o_stencil,0);_stencil_val(s,o_stencil,o_stencil,0);_stencil_val(s,o_stencil,o_stencil,0);              }
  
-#line 418
+#line 420
 }
 
             
-#line 417 "/u/basilisk/src/embed.h"
+#line 419 "/home/lisergey/basilisk/src/embed.h"
       
     
 }         
@@ -10382,19 +10413,19 @@ double dirichlet_gradient (Point point, scalar s, scalar cs,
     if (fabs(n.x) >= fabs(n.y))
       return dirichlet_gradient_x (point, s, cs, n, p, bc, coef);
     
-#line 446
+#line 448
 if (fabs(n.y) >= fabs(n.x))
       return dirichlet_gradient_y (point, s, cs, n, p, bc, coef);
-#line 457 "/u/basilisk/src/embed.h"
-  return HUGE;
+#line 459 "/home/lisergey/basilisk/src/embed.h"
+  return 1e30;
 }
 
 
-#line 441
+#line 443
 static void _stencil_dirichlet_gradient (Point point, scalar s, scalar cs,
 _stencil_undefined *
       
-#line 442
+#line 444
 n,_stencil_undefined * p,_stencil_undefined * bc,_stencil_undefined  * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
 
@@ -10402,21 +10433,21 @@ n,_stencil_undefined * p,_stencil_undefined * bc,_stencil_undefined  * coef)
       
 { _stencil_dirichlet_gradient_x (point, s, cs,NULL ,NULL ,NULL ,NULL );}
       
-#line 447
+#line 449
 { _stencil_dirichlet_gradient_y (point, s, cs,NULL ,NULL ,NULL ,NULL );}
        
-#line 457 "/u/basilisk/src/embed.h"
+#line 459 "/home/lisergey/basilisk/src/embed.h"
   return ;
 }
 
 bid embed;
-#line 469 "/u/basilisk/src/embed.h"
+#line 471 "/home/lisergey/basilisk/src/embed.h"
 static inline
 coord embed_gradient (Point point, vector u, coord p, coord n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   coord dudn;
    {
-    bool dirichlet;
+    bool dirichlet = false;
     double vb = _attribute[u.x.i].boundary[embed] (point, point, u.x, &dirichlet);
     if (dirichlet) {
       double val;
@@ -10424,12 +10455,12 @@ coord embed_gradient (Point point, vector u, coord p, coord n)
     }
     else
       dudn.x = vb;
-    if (dudn.x == HUGE)
+    if (dudn.x == 1e30)
       dudn.x = 0.;
   } 
-#line 473
+#line 475
 {
-    bool dirichlet;
+    bool dirichlet = false;
     double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
     if (dirichlet) {
       double val;
@@ -10437,17 +10468,17 @@ coord embed_gradient (Point point, vector u, coord p, coord n)
     }
     else
       dudn.y = vb;
-    if (dudn.y == HUGE)
+    if (dudn.y == 1e30)
       dudn.y = 0.;
   }
   return dudn;
 }
-#line 469 "/u/basilisk/src/embed.h"
+#line 471 "/home/lisergey/basilisk/src/embed.h"
 static void 
 _stencil_embed_gradient (Point point, vector u,_stencil_undefined * p,_stencil_undefined * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES; 
   
-   {   
+   {     
     
     default_stencil ( point,((scalar[]){ u.x,{-1}}) ); 
 { 
@@ -10455,7 +10486,7 @@ _stencil_embed_gradient (Point point, vector u,_stencil_undefined * p,_stencil_u
 _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
       
     
-#line 479
+#line 481
 }   
      
     
@@ -10463,10 +10494,10 @@ _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL );
      
        
   
-#line 484
+#line 486
 } 
-#line 473
-{   
+#line 475
+{     
     
     default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
 { 
@@ -10474,7 +10505,7 @@ _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL );
 _stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
       
     
-#line 479
+#line 481
 }   
      
     
@@ -10482,14 +10513,14 @@ _stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL );
      
        
   
-#line 484
+#line 486
 }
   return ;
 }
-#line 507 "/u/basilisk/src/embed.h"
+#line 509 "/home/lisergey/basilisk/src/embed.h"
      
 void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
-{tracing("embed_force","/u/basilisk/src/embed.h",0);
+{tracing("embed_force","/home/lisergey/basilisk/src/embed.h",0);
   coord Fps = {0}, Fmus = {0};
   foreach_stencil ()
     {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
@@ -10505,26 +10536,26 @@ void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
       _stencil_embed_interpolate (point, p,NULL );
        
   
-#line 533 "/u/basilisk/src/embed.h"
+#line 535 "/home/lisergey/basilisk/src/embed.h"
       if (constant(mu.x) != 0.) {      
  
   { 
 _stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
-     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
+     _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); 
     
  
-#line 538
+#line 540
 } 
-#line 535
+#line 537
 { 
 _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
-     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
+     _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0); 
     
  
-#line 538
+#line 540
 }  
       
-#line 598 "/u/basilisk/src/embed.h"
+#line 600 "/home/lisergey/basilisk/src/embed.h"
      
   _stencil_embed_gradient (point, u,NULL ,NULL );
   
@@ -10532,10 +10563,12 @@ _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0);
       }
     }      }end_foreach_stencil();
   
+#line 513
+if(!is_constant(fm.x)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 511
+#line 513
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
 
@@ -10551,40 +10584,90 @@ foreach ()
       
  Fps.x += Fn*n.x;
  
-#line 524
+#line 526
 Fps.y += Fn*n.y;
-#line 533 "/u/basilisk/src/embed.h"
+#line 535 "/home/lisergey/basilisk/src/embed.h"
       if (constant(mu.x) != 0.) {
  double mua = 0., fa = 0.;
   {
    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+   fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
  } 
-#line 535
+#line 537
 {
    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+   fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
  }
  mua /= fa;
-#line 598 "/u/basilisk/src/embed.h"
- if (!(2 == 2)) qassert ("/u/basilisk/src/embed.h", 0, "dimension == 2");
+#line 600 "/home/lisergey/basilisk/src/embed.h"
+ if (!(2 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
  coord dudn = embed_gradient (point, u, b, n);
  
    Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
    
-#line 601
+#line 603
 Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.x*n.y*n.x);
       }
     }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,2);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,2);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-
-  
 #line 605
-*Fp = Fps; *Fmu = Fmus;
-end_tracing("embed_force","/u/basilisk/src/embed.h",0);}
-#line 615 "/u/basilisk/src/embed.h"
+}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
+#line 513
+foreach ()
+    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
+
+
+
+
+
+
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, 2 - 1);
+      double Fn = area*embed_interpolate (point, p, b);
+      
+ Fps.x += Fn*n.x;
+ 
+#line 526
+Fps.y += Fn*n.y;
+#line 535 "/home/lisergey/basilisk/src/embed.h"
+      if (constant(mu.x) != 0.) {
+ double mua = 0., fa = 0.;
+  {
+   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+   fa += _const_fm.x + _const_fm.x;
+ } 
+#line 537
+{
+   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+   fa += _const_fm.y + _const_fm.y;
+ }
+ mua /= fa;
+#line 600 "/home/lisergey/basilisk/src/embed.h"
+ if (!(2 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
+ coord dudn = embed_gradient (point, u, b, n);
+ 
+   Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
+   
+#line 603
+Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.x*n.y*n.x);
+      }
+    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,2);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,2);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+#line 605
+}
+
+  *Fp = Fps; *Fmu = Fmus;
+end_tracing("embed_force","/home/lisergey/basilisk/src/embed.h",0);}
+#line 617 "/home/lisergey/basilisk/src/embed.h"
 double embed_vorticity (Point point, vector u, coord p, coord n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
 
@@ -10592,12 +10675,15 @@ double embed_vorticity (Point point, vector u, coord p, coord n)
 
 
   coord dudn = embed_gradient (point, u, p, n);
-#line 632 "/u/basilisk/src/embed.h"
+#line 634 "/home/lisergey/basilisk/src/embed.h"
   return dudn.y*n.x - dudn.x*n.y;
 }
-#line 654 "/u/basilisk/src/embed.h"
+#line 656 "/home/lisergey/basilisk/src/embed.h"
 double embed_flux (Point point, scalar s, vector mu, double * val)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
+
+#line 657
+if(!is_constant(fm.x)){{
 
 
 
@@ -10611,7 +10697,7 @@ double embed_flux (Point point, scalar s, vector mu, double * val)
 
 
 
-  bool dirichlet;
+  bool dirichlet = false;
   double grad = _attribute[s.i].boundary[embed] (point, point, s, &dirichlet);
   if (!grad && !dirichlet)
     return 0.;
@@ -10623,6 +10709,8 @@ double embed_flux (Point point, scalar s, vector mu, double * val)
   coord n = facet_normal (point, cs, fs), p;
   double alpha = line_alpha (val(cs,0,0,0), n);
   double area = line_length_center(n,alpha,&p);
+  if (metric_embed_factor)
+    area *= metric_embed_factor (point, p);
 
 
 
@@ -10640,44 +10728,104 @@ double embed_flux (Point point, scalar s, vector mu, double * val)
   double mua = 0., fa = 0.;
    {
     mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-    fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+    fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
   } 
-#line 696
+#line 700
 {
     mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-    fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+    fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
   }
   *val = - mua/(fa + 1e-30)*grad*area/Delta;
-  return - mua/(fa + 1e-30)*coef*area/Delta;;
+  return - mua/(fa + 1e-30)*coef*area/Delta;
+}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+
+#line 657
+{
+
+
+
+
+
+  *val = 0.;
+  if (val(cs,0,0,0) >= 1. || val(cs,0,0,0) <= 0.)
+    return 0.;
+
+
+
+
+
+  bool dirichlet = false;
+  double grad = _attribute[s.i].boundary[embed] (point, point, s, &dirichlet);
+  if (!grad && !dirichlet)
+    return 0.;
+
+
+
+
+
+  coord n = facet_normal (point, cs, fs), p;
+  double alpha = line_alpha (val(cs,0,0,0), n);
+  double area = line_length_center(n,alpha,&p);
+  if (metric_embed_factor)
+    area *= metric_embed_factor (point, p);
+
+
+
+
+
+  double coef = 0.;
+  if (dirichlet) {
+    normalize (&n);
+    grad = dirichlet_gradient (point, s, cs, n, p, grad, &coef);
+  }
+
+
+
+
+  double mua = 0., fa = 0.;
+   {
+    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+    fa += _const_fm.x + _const_fm.x;
+  } 
+#line 700
+{
+    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+    fa += _const_fm.y + _const_fm.y;
+  }
+  *val = - mua/(fa + 1e-30)*grad*area/Delta;
+  return - mua/(fa + 1e-30)*coef*area/Delta;
+}}
+
+#line 706
 }
-#line 711 "/u/basilisk/src/embed.h"
-#undef neumann
-#define neumann(expr) (data ? embed_area_center (point, &x, &y, &z),\
-        *((bool *)data) = false, (expr) :\
-        Delta*(expr) + val(_s,0,0,0))\
-
-#line 715
-
-#undef neumann_homogeneous
-#define neumann_homogeneous() (data ? *((bool *)data) = false, (0) :\
-       val(_s,0,0,0))\
+#line 715 "/home/lisergey/basilisk/src/embed.h"
+#undef _neumann
+#define _neumann(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
+       *((bool *)data) = false, (expr) :\
+       Delta*(expr) + val(_s,0,0,0))\
 
 #line 719
 
-#undef dirichlet
-#define dirichlet(expr) (data ? embed_area_center (point, &x, &y, &z),\
-        *((bool *)data) = true, (expr) :\
-        2.*(expr) - val(_s,0,0,0))\
+#undef _neumann_homogeneous
+#define _neumann_homogeneous(...) (data ? *((bool *)data) = false, (0) :\
+    val(_s,0,0,0))\
 
-#line 724
+#line 723
 
-#undef dirichlet_homogeneous
-#define dirichlet_homogeneous() (data ? *((bool *)data) = true, (0) :\
-         - val(_s,0,0,0))\
+#undef _dirichlet
+#define _dirichlet(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
+       *((bool *)data) = true, (expr) :\
+       2.*(expr) - val(_s,0,0,0))\
 
 #line 728
 
-#line 739 "/u/basilisk/src/embed.h"
+#undef _dirichlet_homogeneous
+#define _dirichlet_homogeneous(...) (data ? *((bool *)data) = true, (0) :\
+      - val(_s,0,0,0))\
+
+#line 732
+
+#line 743 "/home/lisergey/basilisk/src/embed.h"
 static inline double bilinear_embed (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
   if (!coarse(cs,0,0,0) || !coarse(cs,child.x,0,0))
@@ -10694,11 +10842,11 @@ static inline double bilinear_embed (Point point, scalar s)
 
   return bilinear (point, s);
 }
-#line 786 "/u/basilisk/src/embed.h"
+#line 790 "/home/lisergey/basilisk/src/embed.h"
      
 void update_tracer (scalar f, vector uf, vector flux, double dt)
-{tracing("update_tracer","/u/basilisk/src/embed.h",0);
-#line 798 "/u/basilisk/src/embed.h"
+{tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",0);
+#line 802 "/home/lisergey/basilisk/src/embed.h"
   scalar  e=new_scalar("e");
   foreach_stencil() {
 
@@ -10717,11 +10865,11 @@ _stencil_val(cs,0,0,0);{
       
  {_stencil_val_r(f,0,0,0);_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);   }
  
-#line 814
+#line 818
 {_stencil_val_r(f,0,0,0);_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);   }
       _stencil_val_a(e,0,0,0);  
     } 
-#line 827
+#line 831
 {   
       
       for (int i = 0; i <= 1; i++)
@@ -10729,10 +10877,10 @@ _stencil_val(cs,0,0,0);{
    {_stencil_val(uf.x,i,0,0);
      {_stencil_val(uf.x,i,0,0);  }   }
    
-#line 831
+#line 835
 {_stencil_val(uf.y,0,i,0);
      {_stencil_val(uf.y,0,i,0);  }   }}     
-      _stencil_val(cs,0,0,0);   
+      _stencil_val(cm,0,0,0);   
 
 
 
@@ -10741,9 +10889,9 @@ _stencil_val(cs,0,0,0);{
       
  { _stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);  }
  
-#line 840
+#line 844
 { _stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);  }
-_stencil_val(cs,0,0,0);
+_stencil_val(cm,0,0,0);
 
 
 
@@ -10765,8 +10913,8 @@ _stencil_val(cs,0,0,0);
  _stencil_val_r(f,0,0,0);     
  
  {foreach_neighbor(1)
-   {_stencil_val(cs,0,0,0);  }end_foreach_neighbor()}
- _stencil_val_a(e,0,0,0);_stencil_val(cs,0,0,0);    
+   {_stencil_val(cm,0,0,0);  }end_foreach_neighbor()}
+ _stencil_val_a(e,0,0,0);_stencil_val(cm,0,0,0);    
       }}
         
 
@@ -10785,11 +10933,11 @@ _stencil_val(cs,0,0,0);
 
       
     
-#line 866
+#line 870
 }}   
-#line 827 "/u/basilisk/src/embed.h"
+#line 831 "/home/lisergey/basilisk/src/embed.h"
     
-#line 866
+#line 870
 }}
 
 
@@ -10804,11 +10952,11 @@ _stencil_val(cs,0,0,0);
 
     
   
-#line 867
+#line 871
 }end_foreach_stencil();
-  {
-#line 799
-foreach() {
+  
+#line 803
+if(!is_constant(cm)){{foreach() {
 
 
 
@@ -10825,11 +10973,11 @@ foreach() {
       
  val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
  
-#line 814
+#line 818
 val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
       val(e,0,0,0) = 0.;
     }
-#line 827 "/u/basilisk/src/embed.h"
+#line 831 "/home/lisergey/basilisk/src/embed.h"
     else {
       double umax = 0.;
       for (int i = 0; i <= 1; i++)
@@ -10837,10 +10985,10 @@ val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
    if (fabs(val(uf.x,i,0,0)) > umax)
      umax = fabs(val(uf.x,i,0,0));
    
-#line 831
+#line 835
 if (fabs(val(uf.y,0,i,0)) > umax)
      umax = fabs(val(uf.y,0,i,0));}
-      double dtmax = Delta*val(cs,0,0,0)/(umax + 1e-30);
+      double dtmax = Delta*val(cm,0,0,0)/(umax + 1e-30);
 
 
 
@@ -10849,9 +10997,9 @@ if (fabs(val(uf.y,0,i,0)) > umax)
       
  F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
  
-#line 840
+#line 844
 F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
-      F /= Delta*val(cs,0,0,0);
+      F /= Delta*val(cm,0,0,0);
 
 
 
@@ -10873,11 +11021,83 @@ F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
  val(f,0,0,0) += dtmax*F;
  double scs = 0.;
  {foreach_neighbor(1)
-   scs += sq(val(cs,0,0,0));end_foreach_neighbor()}
- val(e,0,0,0) = (dt - dtmax)*F*val(cs,0,0,0)/scs;
+   scs += sq(val(cm,0,0,0));end_foreach_neighbor()}
+ val(e,0,0,0) = (dt - dtmax)*F*val(cm,0,0,0)/scs;
       }
     }
-  }end_foreach();}
+  }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  {
+#line 803
+foreach() {
+
+
+
+
+    if (val(cs,0,0,0) <= 0.)
+      val(e,0,0,0) = 0.;
+
+
+
+
+
+
+    else if (val(cs,0,0,0) >= 1.) {
+      
+ val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
+ 
+#line 818
+val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
+      val(e,0,0,0) = 0.;
+    }
+#line 831 "/home/lisergey/basilisk/src/embed.h"
+    else {
+      double umax = 0.;
+      for (int i = 0; i <= 1; i++)
+ {
+   if (fabs(val(uf.x,i,0,0)) > umax)
+     umax = fabs(val(uf.x,i,0,0));
+   
+#line 835
+if (fabs(val(uf.y,0,i,0)) > umax)
+     umax = fabs(val(uf.y,0,i,0));}
+      double dtmax = Delta*_const_cm/(umax + 1e-30);
+
+
+
+
+      double F = 0.;
+      
+ F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
+ 
+#line 844
+F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
+      F /= Delta*_const_cm;
+
+
+
+
+
+
+      if (dt <= dtmax) {
+ val(f,0,0,0) += dt*F;
+ val(e,0,0,0) = 0.;
+      }
+
+
+
+
+
+
+
+      else {
+ val(f,0,0,0) += dtmax*F;
+ double scs = 0.;
+ {foreach_neighbor(1)
+   scs += sq(_const_cm);end_foreach_neighbor()}
+ val(e,0,0,0) = (dt - dtmax)*F*_const_cm/scs;
+      }
+    }
+  }end_foreach();}}
 
 
 
@@ -10895,49 +11115,58 @@ F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
 
 
   {
-#line 873
+#line 877
 foreach() {
     double se = 0.;
     {foreach_neighbor(1)
       se += val(e,0,0,0);end_foreach_neighbor()}
     val(f,0,0,0) += val(cs,0,0,0)*se;
   }end_foreach();}delete((scalar*)((scalar[]){e,{-1}}));
-end_tracing("update_tracer","/u/basilisk/src/embed.h",0);}
-
-
-
-
-
-
-
-static int metric_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int metric(const int i,const double t,Event *_ev){tracing("metric","/u/basilisk/src/embed.h",0);
+end_tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",0);}
+#line 896
+static int metric_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+#line 896 "/home/lisergey/basilisk/src/embed.h"
+      static int metric(const int i,const double t,Event *_ev){tracing("metric","/home/lisergey/basilisk/src/embed.h",0);
 {
-  foreach_stencil()
-    {_stencil_val_a(cs,0,0,0);  }end_foreach_stencil();
-  {
-#line 889
-foreach()
-    val(cs,0,0,0) = 1.;end_foreach();}
+  if (is_constant (fm.x)) {
+    
+      if (!(constant (fm.x) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (fm.x) == 1.");
+      
+#line 900
+if (!(constant (fm.y) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (fm.x) == 1.");
+    fm = fs;
+  }
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
-#line 891
+#line 903
 _stencil_is_face_y(){
     {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()}end_foreach_face_stencil();
   {
-#line 891
+#line 903
 foreach_face_generic(){is_face_x(){
     val(fs.x,0,0,0) = 1.;}end_is_face_x()
-#line 891
+#line 903
 is_face_y(){
     val(fs.y,0,0,0) = 1.;}end_is_face_y()}end_foreach_face_generic();}
+  if (is_constant (cm)) {
+    if (!(constant (cm) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (cm) == 1.");
+    cm = cs;
+  }
+  foreach_stencil()
+    {_stencil_val_a(cs,0,0,0);  }end_foreach_stencil();
+  {
+#line 909
+foreach()
+    val(cs,0,0,0) = 1.;end_foreach();}
+
 
   _attribute[cs.i].refine = embed_fraction_refine;
-#line 904 "/u/basilisk/src/embed.h"
+#line 923 "/home/lisergey/basilisk/src/embed.h"
   _attribute[cs.i].prolongation = fraction_refine;
   
     _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
     
-#line 906
+#line 925
 _attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
 
 
@@ -10946,33 +11175,34 @@ _attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
 
 
 
-  restriction (((scalar[]){cs, fs.x,fs.y,{-1}}));
-
-
-  if (!(is_constant (cm) || cm.i == cs.i)) qassert ("/u/basilisk/src/embed.h", 0, "is_constant (cm) || cm.i == cs.i");
-
-  cm = cs;
-  fm = fs;
-}{end_tracing("metric","/u/basilisk/src/embed.h",0);return 0;}end_tracing("metric","/u/basilisk/src/embed.h",0);}
+  restriction (((scalar[]){cs, fs.x, fs.y,{-1}}));
+}{end_tracing("metric","/home/lisergey/basilisk/src/embed.h",0);return 0;}end_tracing("metric","/home/lisergey/basilisk/src/embed.h",0);}
 
 
 
 
-static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/u/basilisk/src/embed.h",0); {
+static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+#line 939
+      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/home/lisergey/basilisk/src/embed.h",0); {
   display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
     "fc = {0.5,0.5,0.5}, order = 2);"});
-}{end_tracing("defaults","/u/basilisk/src/embed.h",0);return 0;}end_tracing("defaults","/u/basilisk/src/embed.h",0);}
+}{end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);return 0;}end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);}
 #line 4 "cylinder.c"
 #line 1 "navier-stokes/centered.h"
-#line 1 "/u/basilisk/src/navier-stokes/centered.h"
-#line 27 "/u/basilisk/src/navier-stokes/centered.h"
+#line 1 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+#line 27 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 1 "./run.h"
-#line 1 "/u/basilisk/src/run.h"
-#line 9 "/u/basilisk/src/run.h"
+#line 1 "/home/lisergey/basilisk/src/run.h"
+#line 9 "/home/lisergey/basilisk/src/run.h"
 double dt = 1.;
 
 #line 1 "./utils.h"
-#line 1 "/u/basilisk/src/utils.h"
+#line 1 "/home/lisergey/basilisk/src/utils.h"
 
 
 
@@ -10980,7 +11210,7 @@ double dt = 1.;
 
 
 
-double DT = 1e10, CFL = 0.5;
+double DT = 1e30, CFL = 0.5;
 
 
 
@@ -10996,7 +11226,7 @@ struct {
   double speed;
 
   timer gt;
-} perf;
+} perf = {0};
 
 
 
@@ -11139,7 +11369,7 @@ OMP(omp parallel  reduction(+:volume)
 #line 135
 foreach(
 )
-    if (val(f,0,0,0) != HUGE && (sq(Delta)*val(cm,0,0,0)) > 0.) {
+    if (val(f,0,0,0) != 1e30 && (sq(Delta)*val(cm,0,0,0)) > 0.) {
       double v = fabs(val(f,0,0,0));
       if (v > max) max = v;
       volume += (sq(Delta)*val(cm,0,0,0));
@@ -11159,7 +11389,7 @@ OMP(omp parallel  reduction(+:volume)
 #line 135
 foreach(
 )
-    if (val(f,0,0,0) != HUGE && (sq(Delta)*_const_cm) > 0.) {
+    if (val(f,0,0,0) != 1e30 && (sq(Delta)*_const_cm) > 0.) {
       double v = fabs(val(f,0,0,0));
       if (v > max) max = v;
       volume += (sq(Delta)*_const_cm);
@@ -11213,7 +11443,7 @@ OMP(omp parallel  reduction(min:min)
 #line 163
 foreach(
 )
-    if ((sq(Delta)*val(cm,0,0,0)) > 0. && val(f,0,0,0) != HUGE) {
+    if ((sq(Delta)*val(cm,0,0,0)) > 0. && val(f,0,0,0) != 1e30) {
       volume += (sq(Delta)*val(cm,0,0,0));
       sum += (sq(Delta)*val(cm,0,0,0))*val(f,0,0,0);
       sum2 += (sq(Delta)*val(cm,0,0,0))*sq(val(f,0,0,0));
@@ -11233,7 +11463,7 @@ OMP(omp parallel  reduction(min:min)
 #line 163
 foreach(
 )
-    if ((sq(Delta)*_const_cm) > 0. && val(f,0,0,0) != HUGE) {
+    if ((sq(Delta)*_const_cm) > 0. && val(f,0,0,0) != 1e30) {
       volume += (sq(Delta)*_const_cm);
       sum += (sq(Delta)*_const_cm)*val(f,0,0,0);
       sum2 += (sq(Delta)*_const_cm)*sq(val(f,0,0,0));
@@ -11252,7 +11482,7 @@ foreach(
   s.stddev = sum2 > 0. ? sqrt(sum2/volume) : 0.;
   return s;
 }
-#line 187 "/u/basilisk/src/utils.h"
+#line 187 "/home/lisergey/basilisk/src/utils.h"
 static double generic_limiter (double r, double beta)
 {
   double v1 = min (r, beta), v2 = min (beta*r, 1.);
@@ -11271,7 +11501,7 @@ double superbee (double s0, double s1, double s2) {
 double sweby (double s0, double s1, double s2) {
   return s1 == s0 ? 0. : generic_limiter ((s2 - s1)/(s1 - s0), 1.5)*(s1 - s0);
 }
-#line 213 "/u/basilisk/src/utils.h"
+#line 213 "/home/lisergey/basilisk/src/utils.h"
 double theta = 1.3;
 
 double minmod2 (double s0, double s1, double s2)
@@ -11288,10 +11518,10 @@ double minmod2 (double s0, double s1, double s2)
   }
   return 0.;
 }
-#line 237 "/u/basilisk/src/utils.h"
+#line 237 "/home/lisergey/basilisk/src/utils.h"
 void gradients (scalar * f, vector * g)
 {
-  if (!(list_len(f) == vectors_len(g))) qassert ("/u/basilisk/src/utils.h", 0, "list_len(f) == vectors_len(g)");
+  if (!(list_len(f) == vectors_len(g))) qassert ("/home/lisergey/basilisk/src/utils.h", 0, "list_len(f) == vectors_len(g)");
   foreach_stencil() {
     scalar s; vector v;
     {vector*_i0=g;scalar*_i1= f;if(_i0)for(v=*_i0,s=*_i1;_i0->x.i>= 0;v=*++_i0,s=*++_i1){ {
@@ -11397,7 +11627,7 @@ foreach() {
     }}}
   }end_foreach();}
 }
-#line 280 "/u/basilisk/src/utils.h"
+#line 280 "/home/lisergey/basilisk/src/utils.h"
 void vorticity (const vector u, scalar omega)
 {
   foreach_stencil()
@@ -11414,28 +11644,28 @@ if(!is_constant(fm.x) && !is_constant(cm)){{foreach()
     val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +
         val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -
         (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +
-        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*val(cm,0,0,0)*Delta + 1e-30);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 1e-30)*Delta);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
 #line 282
 foreach()
     val(omega,0,0,0) = ((_const_fm.x - _const_fm.x)*val(u.y,0,0,0) +
         _const_fm.x*val(u.y,1,0,0) - _const_fm.x*val(u.y,-1,0,0) -
         (_const_fm.y - _const_fm.y)*val(u.x,0,0,0) +
-        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*val(cm,0,0,0)*Delta + 1e-30);end_foreach();}}else if(!is_constant(fm.x) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 1e-30)*Delta);end_foreach();}}else if(!is_constant(fm.x) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
   {
 #line 282
 foreach()
     val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +
         val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -
         (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +
-        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*_const_cm*Delta + 1e-30);end_foreach();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(_const_cm + 1e-30)*Delta);end_foreach();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
   {
 #line 282
 foreach()
     val(omega,0,0,0) = ((_const_fm.x - _const_fm.x)*val(u.y,0,0,0) +
         _const_fm.x*val(u.y,1,0,0) - _const_fm.x*val(u.y,-1,0,0) -
         (_const_fm.y - _const_fm.y)*val(u.x,0,0,0) +
-        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*_const_cm*Delta + 1e-30);end_foreach();}}
+        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*(_const_cm + 1e-30)*Delta);end_foreach();}}
 }
 
 
@@ -11522,11 +11752,11 @@ vector lookup_vector (const char * name)
   }
   return (vector){{-1}};
 }
-#line 340 "/u/basilisk/src/utils.h"
+#line 340 "/home/lisergey/basilisk/src/utils.h"
 #define foreach_segment(_S,_p) {\
   coord t = {(_S)[1].x - (_S)[0].x, (_S)[1].y - (_S)[0].y};\
   double norm = sqrt(sq(t.x) + sq(t.y));\
-  if (!(norm > 0.)) qassert ("/u/basilisk/src/utils.h", 0, "norm > 0.");\
+  if (!(norm > 0.)) qassert ("/home/lisergey/basilisk/src/utils.h", 0, "norm > 0.");\
   t.x = t.x/norm + 1e-6, t.y = t.y/norm - 1.5e-6;\
   double alpha = ((_S)[0].x*((_S)[1].y - (_S)[0].y) -\
     (_S)[0].y*((_S)[1].x - (_S)[0].x))/norm;\
@@ -11566,7 +11796,7 @@ vector lookup_vector (const char * name)
 
 #line 380
 
-#line 410 "/u/basilisk/src/utils.h"
+#line 410 "/home/lisergey/basilisk/src/utils.h"
 #define end_foreach_segment() } } end_foreach(); }
 
 
@@ -11588,8 +11818,8 @@ void fields_stats()
 }
 
 #line 1 "./output.h"
-#line 1 "/u/basilisk/src/output.h"
-#line 37 "/u/basilisk/src/output.h"
+#line 1 "/home/lisergey/basilisk/src/output.h"
+#line 37 "/home/lisergey/basilisk/src/output.h"
 struct OutputField {
   scalar * list;
   FILE * fp;
@@ -11600,7 +11830,7 @@ struct OutputField {
 
      
 void output_field (struct OutputField p)
-{tracing("output_field","/u/basilisk/src/output.h",0);
+{tracing("output_field","/home/lisergey/basilisk/src/output.h",0);
   if (!p.list) p.list = all;
   if (p.n == 0) p.n = N;
   if (!p.fp) p.fp = fout;
@@ -11611,7 +11841,7 @@ void output_field (struct OutputField p)
     p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
   }
 
-  boundary_internal ((scalar *)p.list, "/u/basilisk/src/output.h", 0);
+  boundary_internal ((scalar *)p.list, "/home/lisergey/basilisk/src/output.h", 0);
   int len = list_len(p.list);
   double Delta = 0.999999*(p.box[1][0] - p.box[0][0])/(p.n - 1);
   int ny = (p.box[1][1] - p.box[0][1])/Delta + 1;
@@ -11629,7 +11859,7 @@ void output_field (struct OutputField p)
  Point point = locate ((struct _locate){x, y});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
  int k = 0;
  {scalar*_i=(scalar*)( p.list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   field[i][len*j + k++] = point.level >= 0 ? val(s,0,0,0) : HUGE;}}
+   field[i][len*j + k++] = point.level >= 0 ? val(s,0,0,0) : 1e30;}}
       }
     }
   }
@@ -11666,8 +11896,8 @@ void output_field (struct OutputField p)
 #endif
 
   matrix_free (field);
-end_tracing("output_field","/u/basilisk/src/output.h",0);}
-#line 141 "/u/basilisk/src/output.h"
+end_tracing("output_field","/home/lisergey/basilisk/src/output.h",0);}
+#line 141 "/home/lisergey/basilisk/src/output.h"
 struct OutputMatrix {
   scalar f;
   FILE * fp;
@@ -11677,12 +11907,12 @@ struct OutputMatrix {
 
      
 void output_matrix (struct OutputMatrix p)
-{tracing("output_matrix","/u/basilisk/src/output.h",0);
+{tracing("output_matrix","/home/lisergey/basilisk/src/output.h",0);
   if (p.n == 0) p.n = N;
   if (!p.fp) p.fp = fout;
   if (p.linear) {
     scalar f = p.f;
-    boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/u/basilisk/src/output.h", 0);
+    boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 0);
   }
   float fn = p.n;
   float Delta = (float) L0/fn;
@@ -11700,15 +11930,15 @@ void output_matrix (struct OutputMatrix p)
  v = interpolate ((struct _interpolate){p.f, xp, yp});
       else {
  Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
- if (!(point.level >= 0)) qassert ("/u/basilisk/src/output.h", 0, "point.level >= 0");
+ if (!(point.level >= 0)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "point.level >= 0");
  v = val(p.f,0,0,0);
       }
       fwrite (&v, sizeof(float), 1, p.fp);
     }
   }
   fflush (p.fp);
-end_tracing("output_matrix","/u/basilisk/src/output.h",0);}
-#line 189 "/u/basilisk/src/output.h"
+end_tracing("output_matrix","/home/lisergey/basilisk/src/output.h",0);}
+#line 189 "/home/lisergey/basilisk/src/output.h"
 typedef void (* colormap) (double cmap[127][3]);
 
 void jet (double cmap[127][3])
@@ -11825,7 +12055,7 @@ color colormap_color (double cmap[127][3],
         double val, double min, double max)
 {
   color c;
-  if (val == HUGE) {
+  if (val == 1e30) {
     c.r = c.g = c.b = 0;
     return c;
   }
@@ -11841,13 +12071,13 @@ color colormap_color (double cmap[127][3],
     i = val*(127 - 1);
     coef = val*(127 - 1) - i;
   }
-  if (!(i < 127 - 1)) qassert ("/u/basilisk/src/output.h", 0, "i < NCMAP - 1");
+  if (!(i < 127 - 1)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "i < NCMAP - 1");
   unsigned char * c1 = (unsigned char *) &c;
   for (int j = 0; j < 3; j++)
     c1[j] = 255*(cmap[i][j]*(1. - coef) + cmap[i + 1][j]*coef);
   return c;
 }
-#line 340 "/u/basilisk/src/output.h"
+#line 340 "/home/lisergey/basilisk/src/output.h"
 static const char * extension (const char * file, const char * ext) {
   int len = strlen(file);
   return len > 4 && !strcmp (file + len - 4, ext) ? file + len - 4 : NULL;
@@ -11930,7 +12160,7 @@ static FILE * ppm_fallback (const char * file, const char * mode)
 
 FILE * open_image (const char * file, const char * options)
 {
-  if (!(pid() == 0)) qassert ("/u/basilisk/src/output.h", 0, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "pid() == 0");
   const char * ext;
   if ((ext = is_animation (file))) {
     FILE * fp = open_image_lookup (file);
@@ -12004,7 +12234,7 @@ FILE * open_image (const char * file, const char * options)
 
 void close_image (const char * file, FILE * fp)
 {
-  if (!(pid() == 0)) qassert ("/u/basilisk/src/output.h", 0, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "pid() == 0");
   if (is_animation (file)) {
     if (!open_image_lookup (file))
       fclose (fp);
@@ -12014,7 +12244,7 @@ void close_image (const char * file, FILE * fp)
   else
     fclose (fp);
 }
-#line 571 "/u/basilisk/src/output.h"
+#line 571 "/home/lisergey/basilisk/src/output.h"
 struct OutputPPM {
   scalar f;
   FILE * fp;
@@ -12030,10 +12260,10 @@ struct OutputPPM {
 
      
 void output_ppm (struct OutputPPM p)
-{tracing("output_ppm","/u/basilisk/src/output.h",0);
+{tracing("output_ppm","/home/lisergey/basilisk/src/output.h",0);
 
-  if (p.n == 0) p.n = N;
-  if (p.min == 0 && p.max == 0) {
+  if (!p.n) p.n = N;
+  if (!p.min && !p.max) {
     stats s = statsf (p.f);
     if (p.spread < 0.)
       p.min = s.min, p.max = s.max;
@@ -12042,8 +12272,8 @@ void output_ppm (struct OutputPPM p)
       p.min = avg - spread; p.max = avg + spread;
     }
   }
-  if (p.box[0][0] == 0. && p.box[0][1] == 0. &&
-      p.box[1][0] == 0. && p.box[1][1] == 0.) {
+  if (!p.box[0][0] && !p.box[0][1] &&
+      !p.box[1][0] && !p.box[1][1]) {
     p.box[0][0] = X0; p.box[0][1] = Y0;
     p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
   }
@@ -12052,9 +12282,9 @@ void output_ppm (struct OutputPPM p)
   if (p.linear) {
     scalar f = p.f, mask = p.mask;
     if (mask.i)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/u/basilisk/src/output.h", 0);
+      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 0);
     else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/u/basilisk/src/output.h", 0);
+      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 0);
   }
 
   double fn = p.n;
@@ -12075,14 +12305,14 @@ void output_ppm (struct OutputPPM p)
      if (p.linear) {
        double m = interpolate ((struct _interpolate){p.mask, xp, yp, p.z});
        if (m < 0.)
-  v = HUGE;
+  v = 1e30;
        else
   v = interpolate ((struct _interpolate){p.f, xp, yp, p.z});
      }
      else {
        Point point = locate ((struct _locate){xp, yp, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
        if (point.level < 0 || val(p.mask,0,0,0) < 0.)
-  v = HUGE;
+  v = 1e30;
        else
   v = val(p.f,0,0,0);
      }
@@ -12091,7 +12321,7 @@ void output_ppm (struct OutputPPM p)
      v = interpolate ((struct _interpolate){p.f, xp, yp, p.z});
    else {
      Point point = locate ((struct _locate){xp, yp, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
-     v = point.level >= 0 ? val(p.f,0,0,0) : HUGE;
+     v = point.level >= 0 ? val(p.f,0,0,0) : 1e30;
    }
    ppm[ny - 1 - j][i] = colormap_color (cmap, v, p.min, p.max);
  }
@@ -12122,8 +12352,8 @@ void output_ppm (struct OutputPPM p)
 #endif
 
   matrix_free (ppm);
-end_tracing("output_ppm","/u/basilisk/src/output.h",0);}
-#line 710 "/u/basilisk/src/output.h"
+end_tracing("output_ppm","/home/lisergey/basilisk/src/output.h",0);}
+#line 710 "/home/lisergey/basilisk/src/output.h"
 struct OutputGRD {
   scalar f;
   FILE * fp;
@@ -12135,7 +12365,7 @@ struct OutputGRD {
 
      
 void output_grd (struct OutputGRD p)
-{tracing("output_grd","/u/basilisk/src/output.h",0);
+{tracing("output_grd","/home/lisergey/basilisk/src/output.h",0);
 
   if (!p.fp) p.fp = fout;
   if (p.box[0][0] == 0. && p.box[0][1] == 0. &&
@@ -12147,9 +12377,9 @@ void output_grd (struct OutputGRD p)
   if (p.linear) {
     scalar f = p.f, mask = p.mask;
     if (mask.i)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/u/basilisk/src/output.h", 0);
+      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 0);
     else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/u/basilisk/src/output.h", 0);
+      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 0);
   }
 
   double Delta = p.Delta;
@@ -12173,14 +12403,14 @@ void output_grd (struct OutputGRD p)
  if (p.linear) {
    double m = interpolate ((struct _interpolate){p.mask, xp, yp});
    if (m < 0.)
-     v = HUGE;
+     v = 1e30;
    else
      v = interpolate ((struct _interpolate){p.f, xp, yp});
  }
  else {
    Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
    if (point.level < 0 || val(p.mask,0,0,0) < 0.)
-     v = HUGE;
+     v = 1e30;
    else
      v = val(p.f,0,0,0);
  }
@@ -12189,9 +12419,9 @@ void output_grd (struct OutputGRD p)
  v = interpolate ((struct _interpolate){p.f, xp, yp});
       else {
  Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
- v = point.level >= 0 ? val(p.f,0,0,0) : HUGE;
+ v = point.level >= 0 ? val(p.f,0,0,0) : 1e30;
       }
-      if (v == HUGE)
+      if (v == 1e30)
  fprintf (p.fp, "-9999 ");
       else
  fprintf (p.fp, "%f ", v);
@@ -12200,8 +12430,8 @@ void output_grd (struct OutputGRD p)
   }
 
   fflush (p.fp);
-end_tracing("output_grd","/u/basilisk/src/output.h",0);}
-#line 813 "/u/basilisk/src/output.h"
+end_tracing("output_grd","/home/lisergey/basilisk/src/output.h",0);}
+#line 813 "/home/lisergey/basilisk/src/output.h"
 struct OutputGfs {
   FILE * fp;
   scalar * list;
@@ -12232,7 +12462,7 @@ static char * replace (const char * input, int target, int with,
 
      
 void output_gfs (struct OutputGfs p)
-{tracing("output_gfs","/u/basilisk/src/output.h",0);
+{tracing("output_gfs","/home/lisergey/basilisk/src/output.h",0);
   char * fname = p.file;
 
 #if 1
@@ -12330,7 +12560,7 @@ void output_gfs (struct OutputGfs p)
  child.x == -1 && child.y == 1 ? 1 :
  child.x == 1 && child.y == -1 ? 2 :
  3;
-#line 951 "/u/basilisk/src/output.h"
+#line 951 "/home/lisergey/basilisk/src/output.h"
       if (is_leaf(cell))
  flags |= (1 << 4);
       fwrite (&flags, sizeof (unsigned), 1, p.fp);
@@ -12345,11 +12575,11 @@ void output_gfs (struct OutputGfs p)
 
      if (_attribute[s.i].v.x.i == s.i) {
        s = _attribute[s.i].v.y;
-       a = is_local(cell) && val(s,0,0,0) != HUGE ? val(s,0,0,0) : (double) DBL_MAX;
+       a = is_local(cell) && val(s,0,0,0) != 1e30 ? val(s,0,0,0) : (double) DBL_MAX;
      }
      else if (_attribute[s.i].v.y.i == s.i) {
        s = _attribute[s.i].v.x;
-       a = is_local(cell) && val(s,0,0,0) != HUGE ? - val(s,0,0,0) : (double) DBL_MAX;
+       a = is_local(cell) && val(s,0,0,0) != 1e30 ? - val(s,0,0,0) : (double) DBL_MAX;
      }
 
 
@@ -12358,7 +12588,7 @@ void output_gfs (struct OutputGfs p)
 
    }
    else
-     a = is_local(cell) && val(s,0,0,0) != HUGE ? val(s,0,0,0) : (double) DBL_MAX;
+     a = is_local(cell) && val(s,0,0,0) != 1e30 ? val(s,0,0,0) : (double) DBL_MAX;
    fwrite (&a, sizeof (double), 1, p.fp);
  }}}
     }
@@ -12399,8 +12629,8 @@ void output_gfs (struct OutputGfs p)
     pfree (fname,__func__,__FILE__,0);
   }
 #endif
-end_tracing("output_gfs","/u/basilisk/src/output.h",0);}
-#line 1043 "/u/basilisk/src/output.h"
+end_tracing("output_gfs","/home/lisergey/basilisk/src/output.h",0);}
+#line 1043 "/home/lisergey/basilisk/src/output.h"
 struct Dump {
   char * file;
   scalar * list;
@@ -12455,7 +12685,7 @@ static void dump_header (FILE * fp, struct DumpHeader * header, scalar * list)
 #if !1
      
 void dump (struct Dump p)
-{tracing("dump","/u/basilisk/src/output.h",0);
+{tracing("dump","/home/lisergey/basilisk/src/output.h",0);
   FILE * fp = p.fp;
   char def[] = "dump", * file = p.file ? p.file : p.fp ? NULL : def;
 
@@ -12470,7 +12700,7 @@ void dump (struct Dump p)
       exit (1);
     }
   }
-  if (!(fp)) qassert ("/u/basilisk/src/output.h", 0, "fp");
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "fp");
 
   scalar * dlist = dump_list (p.list ? p.list : all);
   scalar  size=new_scalar("size");
@@ -12503,11 +12733,11 @@ void dump (struct Dump p)
       rename (name, file);
     pfree (name,__func__,__FILE__,0);
   }delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/u/basilisk/src/output.h",0);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",0);}
 #else
      
 void dump (struct Dump p)
-{tracing("dump","/u/basilisk/src/output.h",0);
+{tracing("dump","/home/lisergey/basilisk/src/output.h",0);
   FILE * fp = p.fp;
   char def[] = "dump", * file = p.file ? p.file : p.fp ? NULL : def;
 
@@ -12577,19 +12807,19 @@ void dump (struct Dump p)
   fclose (fh);
   if (!p.unbuffered && pid() == 0)
     rename (name, file);delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/u/basilisk/src/output.h",0);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",0);}
 #endif
 
      
 bool restore (struct Dump p)
-{tracing("restore","/u/basilisk/src/output.h",0);
+{tracing("restore","/home/lisergey/basilisk/src/output.h",0);
   FILE * fp = p.fp;
   char * file = p.file;
   if (file && (fp = fopen (file, "r")) == NULL)
-    {end_tracing("restore","/u/basilisk/src/output.h",0);return false;}
-  if (!(fp)) qassert ("/u/basilisk/src/output.h", 0, "fp");
+    {end_tracing("restore","/home/lisergey/basilisk/src/output.h",0);return false;}
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 0, "fp");
 
-  struct DumpHeader header;
+  struct DumpHeader header = {0};
   if (fread (&header, sizeof(header), 1, fp) < 1) {
     fprintf (ferr, "restore(): error: expecting header\n");
     exit (1);
@@ -12602,7 +12832,7 @@ bool restore (struct Dump p)
     cell.flags |= active;
   }end_foreach_cell();}
   ((Tree *)grid)->dirty = true;
-#line 1264 "/u/basilisk/src/output.h"
+#line 1264 "/home/lisergey/basilisk/src/output.h"
   bool restore_all = (p.list == all);
   scalar * list = dump_list (p.list ? p.list : all);
   if (header.version == 161020) {
@@ -12667,11 +12897,11 @@ bool restore (struct Dump p)
     origin ((struct _origin){o[0], o[1], o[2]});
     size (o[3]);
   }
-#line 1339 "/u/basilisk/src/output.h"
+#line 1339 "/home/lisergey/basilisk/src/output.h"
   scalar * listm = is_constant(cm) ? NULL : (scalar *)((vector[]){fm,{{-1},{-1}}});
 
   restore_mpi (fp, list);
-#line 1369 "/u/basilisk/src/output.h"
+#line 1369 "/home/lisergey/basilisk/src/output.h"
   scalar * other = NULL;
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     if (!list_lookup (list, s) && !list_lookup (listm, s))
@@ -12692,14 +12922,14 @@ bool restore (struct Dump p)
   t = header.t;
   events (false);
 
-  {end_tracing("restore","/u/basilisk/src/output.h",0);return true;}
-end_tracing("restore","/u/basilisk/src/output.h",0);}
-#line 431 "/u/basilisk/src/utils.h"
-#line 12 "/u/basilisk/src/run.h"
+  {end_tracing("restore","/home/lisergey/basilisk/src/output.h",0);return true;}
+end_tracing("restore","/home/lisergey/basilisk/src/output.h",0);}
+#line 431 "/home/lisergey/basilisk/src/utils.h"
+#line 12 "/home/lisergey/basilisk/src/run.h"
 
      
 void run (void)
-{tracing("run","/u/basilisk/src/run.h",0);
+{tracing("run","/home/lisergey/basilisk/src/run.h",0);
   iter = 0, t = 0., dt = 1.;
   init_grid (N);
 
@@ -12721,25 +12951,40 @@ void run (void)
   timer_print (perf.gt, iter, perf.tnc);
 
   free_grid();
-end_tracing("run","/u/basilisk/src/run.h",0);}
+end_tracing("run","/home/lisergey/basilisk/src/run.h",0);}
 
 
 
 
-static int defaults_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int defaults_0(const int i,const double t,Event *_ev){tracing("defaults_0","/u/basilisk/src/run.h",0); {
+static int defaults_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+#line 42
+      static int defaults_0(const int i,const double t,Event *_ev){tracing("defaults_0","/home/lisergey/basilisk/src/run.h",0); {
   display ((struct _display){"box();"});
-}{end_tracing("defaults_0","/u/basilisk/src/run.h",0);return 0;}end_tracing("defaults_0","/u/basilisk/src/run.h",0);}
+}{end_tracing("defaults_0","/home/lisergey/basilisk/src/run.h",0);return 0;}end_tracing("defaults_0","/home/lisergey/basilisk/src/run.h",0);}
 
 
 
 
 
-static int cleanup_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 1234567890);*ip=i;*tp=t;return ret;}      static int cleanup(const int i,const double t,Event *_ev){tracing("cleanup","/u/basilisk/src/run.h",0); {
+static int cleanup_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = TEND_EVENT)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+#line 50
+      static int cleanup(const int i,const double t,Event *_ev){tracing("cleanup","/home/lisergey/basilisk/src/run.h",0); {
   display ((struct _display){"", true});
-}{end_tracing("cleanup","/u/basilisk/src/run.h",0);return 0;}end_tracing("cleanup","/u/basilisk/src/run.h",0);}
-#line 28 "/u/basilisk/src/navier-stokes/centered.h"
+}{end_tracing("cleanup","/home/lisergey/basilisk/src/run.h",0);return 0;}end_tracing("cleanup","/home/lisergey/basilisk/src/run.h",0);}
+#line 28 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 1 "./timestep.h"
-#line 1 "/u/basilisk/src/timestep.h"
+#line 1 "/home/lisergey/basilisk/src/timestep.h"
 
 double timestep (const vector u, double dtmax)
 {
@@ -12789,7 +13034,7 @@ foreach_face_generic(){is_face_x(){
     if (val(u.x,0,0,0) != 0.) {
       double dt = Delta/fabs(val(u.x,0,0,0));
 
-      if (!(val(fm.x,0,0,0))) qassert ("/u/basilisk/src/timestep.h", 0, "fm.x[]");
+      if (!(val(fm.x,0,0,0))) qassert ("/home/lisergey/basilisk/src/timestep.h", 0, "fm.x[]");
       dt *= val(fm.x,0,0,0);
 
 
@@ -12801,7 +13046,7 @@ is_face_y(){
     if (val(u.y,0,0,0) != 0.) {
       double dt = Delta/fabs(val(u.y,0,0,0));
 
-      if (!(val(fm.y,0,0,0))) qassert ("/u/basilisk/src/timestep.h", 0, "fm.x[]");
+      if (!(val(fm.y,0,0,0))) qassert ("/home/lisergey/basilisk/src/timestep.h", 0, "fm.x[]");
       dt *= val(fm.y,0,0,0);
 
 
@@ -12822,7 +13067,7 @@ foreach_face_generic(){is_face_x(){
     if (val(u.x,0,0,0) != 0.) {
       double dt = Delta/fabs(val(u.x,0,0,0));
 
-      if (!(_const_fm.x)) qassert ("/u/basilisk/src/timestep.h", 0, "fm.x[]");
+      if (!(_const_fm.x)) qassert ("/home/lisergey/basilisk/src/timestep.h", 0, "fm.x[]");
       dt *= _const_fm.x;
 
 
@@ -12834,7 +13079,7 @@ is_face_y(){
     if (val(u.y,0,0,0) != 0.) {
       double dt = Delta/fabs(val(u.y,0,0,0));
 
-      if (!(_const_fm.y)) qassert ("/u/basilisk/src/timestep.h", 0, "fm.x[]");
+      if (!(_const_fm.y)) qassert ("/home/lisergey/basilisk/src/timestep.h", 0, "fm.x[]");
       dt *= _const_fm.y;
 
 
@@ -12852,10 +13097,10 @@ is_face_y(){
   previous = dtmax;
   return dtmax;
 }
-#line 29 "/u/basilisk/src/navier-stokes/centered.h"
+#line 29 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 1 "./bcg.h"
-#line 1 "/u/basilisk/src/bcg.h"
-#line 11 "/u/basilisk/src/bcg.h"
+#line 1 "/home/lisergey/basilisk/src/bcg.h"
+#line 11 "/home/lisergey/basilisk/src/bcg.h"
 void tracer_fluxes (scalar f,
       vector uf,
       vector flux,
@@ -12868,7 +13113,7 @@ void tracer_fluxes (scalar f,
 
 
   vector  g=new_vector("g");
-  gradients (((scalar[]){f,{-1}}), ((vector[]){g,{{-1},{-1}}}));
+  gradients (((scalar[]){f,{-1}}),((vector[]) {g,{{-1},{-1}}}));
 
 
 
@@ -12900,7 +13145,7 @@ _stencil_val(fm.y,o_stencil,0,0); _stencil_val(fm.y,o_stencil,1,0); {
 
 
       
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     _stencil_val_a(flux.x,0,0,0);_stencil_val(uf.x,0,0,0);  
   }}end__stencil_is_face_x()
 #line 28
@@ -12931,7 +13176,7 @@ _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {
 
 
       
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     _stencil_val_a(flux.y,0,0,0);_stencil_val(uf.y,0,0,0);  
   }}end__stencil_is_face_y()}end_foreach_face_stencil();
 
@@ -12961,7 +13206,7 @@ if(!is_constant(fm.x) && !is_constant(src)){{foreach_face_generic(){is_face_x(){
       double fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.x,0,0,0) = f2*val(uf.x,0,0,0);
   }}end_is_face_x()
 #line 28
@@ -12986,7 +13231,7 @@ is_face_y(){ {
       double fyy = vn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.y,0,0,0) = f2*val(uf.y,0,0,0);
   }}end_is_face_y()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(src)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
 
@@ -13016,7 +13261,7 @@ foreach_face_generic(){is_face_x(){ {
       double fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.x,0,0,0) = f2*val(uf.x,0,0,0);
   }}end_is_face_x()
 #line 28
@@ -13041,7 +13286,7 @@ is_face_y(){ {
       double fyy = vn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.y,0,0,0) = f2*val(uf.y,0,0,0);
   }}end_is_face_y()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(src)){double _const_src=_constant[src.i-_NVARMAX];NOT_UNUSED(_const_src);
 
@@ -13071,7 +13316,7 @@ foreach_face_generic(){is_face_x(){ {
       double fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.x,0,0,0) = f2*val(uf.x,0,0,0);
   }}end_is_face_x()
 #line 28
@@ -13096,7 +13341,7 @@ is_face_y(){ {
       double fyy = vn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.y,0,0,0) = f2*val(uf.y,0,0,0);
   }}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_src=_constant[src.i-_NVARMAX];NOT_UNUSED(_const_src);
 
@@ -13126,7 +13371,7 @@ foreach_face_generic(){is_face_x(){ {
       double fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.x,0,0,0) = f2*val(uf.x,0,0,0);
   }}end_is_face_x()
 #line 28
@@ -13151,7 +13396,7 @@ is_face_y(){ {
       double fyy = vn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);
       f2 -= dt*vn*fyy/(2.*Delta);
     }
-#line 58 "/u/basilisk/src/bcg.h"
+#line 58 "/home/lisergey/basilisk/src/bcg.h"
     val(flux.y,0,0,0) = f2*val(uf.y,0,0,0);
   }}end_is_face_y()}end_foreach_face_generic();}}delete((scalar*)((vector[]){g,{{-1},{-1}}}));
 }
@@ -13176,9 +13421,11 @@ void advection (struct Advection p)
 
   scalar * lsrc = p.src;
   if (!lsrc)
-    {scalar*_i=(scalar*)( p.tracers);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-      lsrc = list_append (lsrc, zeroc);}}
-  if (!(list_len(p.tracers) == list_len(lsrc))) qassert ("/u/basilisk/src/bcg.h", 0, "list_len(p.tracers) == list_len(lsrc)");
+    {scalar*_i=(scalar*)( p.tracers);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+      const scalar zero = new_const_scalar("zero",9, 0.);
+      lsrc = list_append (lsrc, zero);
+    }}}
+  if (!(list_len(p.tracers) == list_len(lsrc))) qassert ("/home/lisergey/basilisk/src/bcg.h", 0, "list_len(p.tracers) == list_len(lsrc)");
 
   scalar f, src;
   {scalar*_i0=lsrc;scalar*_i1= p.tracers;if(_i0)for(src=*_i0,f=*_i1;_i0->i>= 0;src=*++_i0,f=*++_i1){ {
@@ -13196,13 +13443,14 @@ void advection (struct Advection p)
   if (!p.src)
     pfree (lsrc,__func__,__FILE__,0);
 }
-#line 30 "/u/basilisk/src/navier-stokes/centered.h"
+#line 30 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 
 #line 1 "./viscosity-embed.h"
-#line 1 "/u/basilisk/src/viscosity-embed.h"
+#line 1 "/home/lisergey/basilisk/src/viscosity-embed.h"
+#line 31 "/home/lisergey/basilisk/src/viscosity-embed.h"
 #line 1 "./poisson.h"
-#line 1 "/u/basilisk/src/poisson.h"
-#line 32 "/u/basilisk/src/poisson.h"
+#line 1 "/home/lisergey/basilisk/src/poisson.h"
+#line 32 "/home/lisergey/basilisk/src/poisson.h"
 void mg_cycle (scalar * a, scalar * res, scalar * da,
         void (* relax) (scalar * da, scalar * res,
           int depth, void * data),
@@ -13274,7 +13522,7 @@ foreach() {
  val(s,0,0,0) += val(ds,0,0,0);}}
   }end_foreach();}
 }
-#line 102 "/u/basilisk/src/poisson.h"
+#line 102 "/home/lisergey/basilisk/src/poisson.h"
 int NITERMAX = 100, NITERMIN = 1;
 double TOLERANCE = 1e-3;
 
@@ -13288,7 +13536,7 @@ typedef struct {
   int nrelax;
   int minlevel;
 } mgstats;
-#line 125 "/u/basilisk/src/poisson.h"
+#line 125 "/home/lisergey/basilisk/src/poisson.h"
 struct MGSolve {
   scalar * a, * b;
   double (* residual) (scalar * a, scalar * b, scalar * res,
@@ -13328,17 +13576,16 @@ mgstats mg_solve (struct MGSolve p)
 
   mgstats s = {0};
   double sum = 0.;
+  scalar rhs = p.b[0];
   foreach_stencil ()
-    {scalar*_i=(scalar*)( p.b);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-      { _stencil_val(s,0,0,0); }}}end_foreach_stencil();
+    { _stencil_val(rhs,0,0,0); }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:sum)){
-#line 164
+#line 165
 foreach ()
-    {scalar*_i=(scalar*)( p.b);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-      sum += val(s,0,0,0);}}end_foreach();mpi_all_reduce_array(&sum,double,MPI_SUM,1);
+    sum += val(rhs,0,0,0);end_foreach();mpi_all_reduce_array(&sum,double,MPI_SUM,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
@@ -13368,7 +13615,7 @@ s.sum = sum;
        p.minlevel,
        grid->maxdepth);
     s.resa = p.residual (p.a, p.b, res, p.data);
-#line 199 "/u/basilisk/src/poisson.h"
+#line 199 "/home/lisergey/basilisk/src/poisson.h"
     if (s.resa > p.tolerance) {
       if (resb/s.resa < 1.2 && s.nrelax < 100)
  s.nrelax++;
@@ -13406,7 +13653,7 @@ s.sum = sum;
 
   return s;
 }
-#line 258 "/u/basilisk/src/poisson.h"
+#line 258 "/home/lisergey/basilisk/src/poisson.h"
 struct Poisson {
   scalar a, b;
           vector alpha;
@@ -13429,7 +13676,7 @@ static void relax (scalar * al, scalar * bl, int l, void * data)
   struct Poisson * p = (struct Poisson *) data;
           vector alpha = p->alpha;
           scalar lambda = p->lambda;
-#line 296 "/u/basilisk/src/poisson.h"
+#line 296 "/home/lisergey/basilisk/src/poisson.h"
   scalar c = a;
 
 
@@ -13455,7 +13702,7 @@ static void relax (scalar * al, scalar * bl, int l, void * data)
       d += e*sq(Delta);
     }
     if (!d)
-      val(c,0,0,0) = val(b,0,0,0) = 0.;
+      val(c,0,0,0) = 0., val(b,0,0,0) = 0.;
     else
 
       val(c,0,0,0) = n/d;
@@ -13486,7 +13733,7 @@ foreach_level_or_leaf (l) {
       d += e*sq(Delta);
     }
     if (!d)
-      val(c,0,0,0) = val(b,0,0,0) = 0.;
+      val(c,0,0,0) = 0., val(b,0,0,0) = 0.;
     else
 
       val(c,0,0,0) = n/d;
@@ -13517,7 +13764,7 @@ foreach_level_or_leaf (l) {
       d += e*sq(Delta);
     }
     if (!d)
-      val(c,0,0,0) = val(b,0,0,0) = 0.;
+      val(c,0,0,0) = 0., val(b,0,0,0) = 0.;
     else
 
       val(c,0,0,0) = n/d;
@@ -13548,12 +13795,12 @@ foreach_level_or_leaf (l) {
       d += e*sq(Delta);
     }
     if (!d)
-      val(c,0,0,0) = val(b,0,0,0) = 0.;
+      val(c,0,0,0) = 0., val(b,0,0,0) = 0.;
     else
 
       val(c,0,0,0) = n/d;
   }end_foreach_level_or_leaf();}}
-#line 338 "/u/basilisk/src/poisson.h"
+#line 338 "/home/lisergey/basilisk/src/poisson.h"
 }
 
 
@@ -13599,7 +13846,7 @@ is_face_y(){
 {_stencil_val_r(res,0,0,0);_stencil_val(g.y,0,1,0); _stencil_val(g.y,0,0,0);   }
 
     if (p->embed_flux) {   
-      default_stencil ( point,((scalar[]){ alpha.x,alpha.y, a,{-1}}) );
+      default_stencil ( point,((scalar[]){alpha.x , alpha.y, a,{-1}}) );
       _stencil_val_r(res,0,0,0);_stencil_val(a,0,0,0);    
     }
 
@@ -13664,10 +13911,10 @@ val(res,0,0,0) -= (val(g.y,0,1,0) - val(g.y,0,0,0))/Delta;
 }
 #line 369
 }
-#line 387 "/u/basilisk/src/poisson.h"
+#line 387 "/home/lisergey/basilisk/src/poisson.h"
   {delete((scalar*)((vector[]){g,{{-1},{-1}}}));return maxres;}delete((scalar*)((vector[]){g,{{-1},{-1}}}));
 }
-#line 399 "/u/basilisk/src/poisson.h"
+#line 399 "/home/lisergey/basilisk/src/poisson.h"
 mgstats poisson (struct Poisson p)
 {
 
@@ -13678,8 +13925,10 @@ mgstats poisson (struct Poisson p)
 
   if (!p.alpha.x.i)
     p.alpha = unityf;
-  if (!p.lambda.i)
+  if (!p.lambda.i) {
+    const scalar zeroc = new_const_scalar("zeroc",10, 0.);
     p.lambda = zeroc;
+  }
 
 
 
@@ -13701,7 +13950,7 @@ mgstats poisson (struct Poisson p)
   if (!p.embed_flux && _attribute[a.i].boundary[embed] != symmetry)
     p.embed_flux = embed_flux;
 
-  mgstats s = mg_solve ((struct MGSolve){((scalar[]){a,{-1}}), ((scalar[]){b,{-1}}), residual, relax,
+  mgstats s = mg_solve ((struct MGSolve){((scalar[]){a,{-1}}),((scalar[]) {b,{-1}}), residual, relax,
    &p, p.nrelax, p.res, .minlevel = max(1, p.minlevel)});
 
 
@@ -13712,7 +13961,7 @@ mgstats poisson (struct Poisson p)
 
   return s;
 }
-#line 461 "/u/basilisk/src/poisson.h"
+#line 463 "/home/lisergey/basilisk/src/poisson.h"
 struct Project {
   vector uf;
   scalar p;
@@ -13723,7 +13972,7 @@ struct Project {
 
      
 mgstats project (struct Project q)
-{tracing("project","/u/basilisk/src/poisson.h",0);
+{tracing("project","/home/lisergey/basilisk/src/poisson.h",0);
   vector uf = q.uf;
   scalar p = q.p;
           vector alpha = q.alpha.x.i ? q.alpha : unityf;
@@ -13741,22 +13990,22 @@ mgstats project (struct Project q)
     
       {_stencil_val_r(div,0,0,0); _stencil_val(uf.x,1,0,0); _stencil_val(uf.x,0,0,0);  }
       
-#line 487
+#line 489
 {_stencil_val_r(div,0,0,0); _stencil_val(uf.y,0,1,0); _stencil_val(uf.y,0,0,0);  }
     _stencil_val_r(div,0,0,0);  
   }end_foreach_stencil();
   {
-#line 484
+#line 486
 foreach() {
     val(div,0,0,0) = 0.;
     
       val(div,0,0,0) += val(uf.x,1,0,0) - val(uf.x,0,0,0);
       
-#line 487
+#line 489
 val(div,0,0,0) += val(uf.y,0,1,0) - val(uf.y,0,0,0);
     val(div,0,0,0) /= dt*Delta;
   }end_foreach();}
-#line 500 "/u/basilisk/src/poisson.h"
+#line 502 "/home/lisergey/basilisk/src/poisson.h"
   mgstats mgp = poisson ((struct Poisson){p, div, alpha,
     .tolerance = TOLERANCE/sq(dt), .nrelax = nrelax});
 
@@ -13765,7 +14014,7 @@ val(div,0,0,0) += val(uf.y,0,1,0) - val(uf.y,0,0,0);
 
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_r(uf.x,0,0,0);_stencil_val(alpha.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, p, 0);_stencil_val(p,0,0,0); _stencil_val(p,0 -1,0,0);            }}end__stencil_is_face_x()
-#line 506
+#line 508
 _stencil_is_face_y(){
     {_stencil_val_r(uf.y,0,0,0);_stencil_val(alpha.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, p, 0);_stencil_val(p,0,0,0); _stencil_val(p,0,0 -1,0);            }}end__stencil_is_face_y()}end_foreach_face_stencil();
 
@@ -13773,10 +14022,10 @@ _stencil_is_face_y(){
 
 
   
-#line 506
+#line 508
 if(!is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) -= dt*val(alpha.x,0,0,0)*(_attribute[p.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, p, 0) : (val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()
-#line 506
+#line 508
 is_face_y(){
     val(uf.y,0,0,0) -= dt*val(alpha.y,0,0,0)*(_attribute[p.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, p, 0) : (val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
 
@@ -13784,16 +14033,16 @@ is_face_y(){
 
 
   {
-#line 506
+#line 508
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) -= dt*_const_alpha.x*(_attribute[p.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, p, 0) : (val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()
-#line 506
+#line 508
 is_face_y(){
     val(uf.y,0,0,0) -= dt*_const_alpha.y*(_attribute[p.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, p, 0) : (val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}
 
-  {delete((scalar*)((scalar[]){div,{-1}}));{end_tracing("project","/u/basilisk/src/poisson.h",0);return mgp;}}delete((scalar*)((scalar[]){div,{-1}}));
-end_tracing("project","/u/basilisk/src/poisson.h",0);}
-#line 2 "/u/basilisk/src/viscosity-embed.h"
+  {delete((scalar*)((scalar[]){div,{-1}}));{end_tracing("project","/home/lisergey/basilisk/src/poisson.h",0);return mgp;}}delete((scalar*)((scalar[]){div,{-1}}));
+end_tracing("project","/home/lisergey/basilisk/src/poisson.h",0);}
+#line 32 "/home/lisergey/basilisk/src/viscosity-embed.h"
 
 struct Viscosity {
   vector u;
@@ -13804,7 +14053,7 @@ struct Viscosity {
   scalar * res;
   double (* embed_flux) (Point, scalar, vector, double *);
 };
-#line 30 "/u/basilisk/src/viscosity-embed.h"
+#line 61 "/home/lisergey/basilisk/src/viscosity-embed.h"
 static void relax_diffusion (scalar * a, scalar * b, int l, void * data)
 {
   struct Viscosity * p = (struct Viscosity *) data;
@@ -13819,7 +14068,7 @@ static void relax_diffusion (scalar * a, scalar * b, int l, void * data)
     
       avgmu += val(mu.x,0,0,0) + val(mu.x,1,0,0);
       
-#line 42
+#line 73
 avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
     avgmu = dt*avgmu + 1e-30;
      {
@@ -13830,12 +14079,12 @@ avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
       
  a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 50
+#line 81
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(val(rho,0,0,0)*((coord){1.,1.}).x + dt*d) + avgmu);
+ (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.}).x + dt*d) + avgmu);
     } 
-#line 44
+#line 75
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -13844,20 +14093,20 @@ a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       
  a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 50
+#line 81
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(val(rho,0,0,0)*((coord){1.,1.}).y + dt*d) + avgmu);
+ (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.}).y + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else if(is_constant(mu.x) && !is_constant(rho)){struct{double x,y;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
   {
-#line 39
+#line 70
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += _const_mu.x + _const_mu.x;
       
-#line 42
+#line 73
 avgmu += _const_mu.y + _const_mu.y;
     avgmu = dt*avgmu + 1e-30;
      {
@@ -13868,12 +14117,12 @@ avgmu += _const_mu.y + _const_mu.y;
       
  a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 50
+#line 81
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(val(rho,0,0,0)*((coord){1.,1.}).x + dt*d) + avgmu);
+ (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.}).x + dt*d) + avgmu);
     } 
-#line 44
+#line 75
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -13882,20 +14131,20 @@ a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       
  a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 50
+#line 81
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(val(rho,0,0,0)*((coord){1.,1.}).y + dt*d) + avgmu);
+ (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.}).y + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else if(!is_constant(mu.x) && is_constant(rho)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
   {
-#line 39
+#line 70
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += val(mu.x,0,0,0) + val(mu.x,1,0,0);
       
-#line 42
+#line 73
 avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
     avgmu = dt*avgmu + 1e-30;
      {
@@ -13906,12 +14155,12 @@ avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
       
  a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 50
+#line 81
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(_const_rho*((coord){1.,1.}).x + dt*d) + avgmu);
+ (sq(Delta)*(_const_rho + ((coord){0.,0.}).x + dt*d) + avgmu);
     } 
-#line 44
+#line 75
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -13920,20 +14169,20 @@ a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       
  a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 50
+#line 81
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(_const_rho*((coord){1.,1.}).y + dt*d) + avgmu);
+ (sq(Delta)*(_const_rho + ((coord){0.,0.}).y + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else {struct{double x,y;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
   {
-#line 39
+#line 70
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += _const_mu.x + _const_mu.x;
       
-#line 42
+#line 73
 avgmu += _const_mu.y + _const_mu.y;
     avgmu = dt*avgmu + 1e-30;
      {
@@ -13944,12 +14193,12 @@ avgmu += _const_mu.y + _const_mu.y;
       
  a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 50
+#line 81
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(_const_rho*((coord){1.,1.}).x + dt*d) + avgmu);
+ (sq(Delta)*(_const_rho + ((coord){0.,0.}).x + dt*d) + avgmu);
     } 
-#line 44
+#line 75
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -13958,13 +14207,13 @@ a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       
  a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 50
+#line 81
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
- (sq(Delta)*(_const_rho*((coord){1.,1.}).y + dt*d) + avgmu);
+ (sq(Delta)*(_const_rho + ((coord){0.,0.}).y + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}
-#line 66 "/u/basilisk/src/viscosity-embed.h"
+#line 97 "/home/lisergey/basilisk/src/viscosity-embed.h"
 }
 
 static double residual_diffusion (scalar * a, scalar * b, scalar * resl,
@@ -13984,21 +14233,21 @@ static double residual_diffusion (scalar * a, scalar * b, scalar * resl,
     vector  g=new_face_vector("g");
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val_a(g.x,0,0,0); _stencil_val(mu.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0 -1,0,0);           }}end__stencil_is_face_x()
-#line 83
+#line 114
 _stencil_is_face_y(){
       {_stencil_val_a(g.y,0,0,0); _stencil_val(mu.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0 -1,0);           }}end__stencil_is_face_y()}end_foreach_face_stencil();
     
-#line 83
+#line 114
 if(!is_constant(mu.x)){{foreach_face_generic(){is_face_x(){
       val(g.x,0,0,0) = val(mu.x,0,0,0)*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 83
+#line 114
 is_face_y(){
       val(g.y,0,0,0) = val(mu.y,0,0,0)*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
     {
-#line 83
+#line 114
 foreach_face_generic(){is_face_x(){
       val(g.x,0,0,0) = _const_mu.x*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 83
+#line 114
 is_face_y(){
       val(g.y,0,0,0) = _const_mu.y*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}
     foreach_stencil () {   
@@ -14006,34 +14255,34 @@ is_face_y(){
       
  { _stencil_val(g.x,0,0,0); _stencil_val(g.x,1,0,0);  }
  
-#line 88
+#line 119
 { _stencil_val(g.y,0,0,0); _stencil_val(g.y,0,1,0);  }
-      _stencil_val_a(res.x,0,0,0); _stencil_val(r.x,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.x,0,0,0);    
+      _stencil_val_a(res.x,0,0,0); _stencil_val(r.x,0,0,0);_stencil_val(rho,0,0,0);_stencil_val(u.x,0,0,0);       
       if (embed_flux) {   
- default_stencil ( point,((scalar[]){ mu.x,mu.y, u.x,{-1}}) );
+ default_stencil ( point,((scalar[]){mu.x , mu.y, u.x,{-1}}) );
  _stencil_val_r(res.x,0,0,0);_stencil_val(u.x,0,0,0);    
       }
 _stencil_val(res.x,0,0,0);
  {_stencil_val(res.x,0,0,0);   }
           
     
-#line 96
+#line 127
 }end_foreach_stencil();
     
-#line 85
+#line 116
 if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 85
+#line 116
 foreach () {
       double a = 0.;
       
  a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 88
+#line 119
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
-      val(res.x,0,0,0) = val(r.x,0,0,0) - val(rho,0,0,0)*((coord){1.,1.}).x*val(u.x,0,0,0) - dt*a/Delta;
+      val(res.x,0,0,0) = val(r.x,0,0,0) - (val(rho,0,0,0) + ((coord){0.,0.}).x)*val(u.x,0,0,0) - dt*a/Delta;
       if (embed_flux) {
  double c, d = embed_flux (point, u.x, mu, &c);
  val(res.x,0,0,0) -= dt*(c + d*val(u.x,0,0,0));
@@ -14044,21 +14293,21 @@ a += val(g.y,0,0,0) - val(g.y,0,1,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 96
+#line 127
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 85
+#line 116
 foreach () {
       double a = 0.;
       
  a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 88
+#line 119
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
-      val(res.x,0,0,0) = val(r.x,0,0,0) - _const_rho*((coord){1.,1.}).x*val(u.x,0,0,0) - dt*a/Delta;
+      val(res.x,0,0,0) = val(r.x,0,0,0) - (_const_rho + ((coord){0.,0.}).x)*val(u.x,0,0,0) - dt*a/Delta;
       if (embed_flux) {
  double c, d = embed_flux (point, u.x, mu, &c);
  val(res.x,0,0,0) -= dt*(c + d*val(u.x,0,0,0));
@@ -14069,30 +14318,30 @@ a += val(g.y,0,0,0) - val(g.y,0,1,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 96
+#line 127
 }delete((scalar*)((vector[]){g,{{-1},{-1}}}));
   } 
-#line 80
+#line 111
 {
     scalar s = u.y;
     vector  g=new_face_vector("g");
     foreach_face_stencil(){_stencil_is_face_y(){
       {_stencil_val_a(g.y,0,0,0); _stencil_val(mu.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0 -1,0);           }}end__stencil_is_face_y()
-#line 83
+#line 114
 _stencil_is_face_x(){
       {_stencil_val_a(g.x,0,0,0); _stencil_val(mu.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0 -1,0,0);           }}end__stencil_is_face_x()}end_foreach_face_stencil();
     
-#line 83
+#line 114
 if(!is_constant(mu.y)){{foreach_face_generic(){is_face_y(){
       val(g.y,0,0,0) = val(mu.y,0,0,0)*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 83
+#line 114
 is_face_x(){
       val(g.x,0,0,0) = val(mu.x,0,0,0)*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()}end_foreach_face_generic();}}else {struct{double x,y;}_const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
     {
-#line 83
+#line 114
 foreach_face_generic(){is_face_y(){
       val(g.y,0,0,0) = _const_mu.y*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 83
+#line 114
 is_face_x(){
       val(g.x,0,0,0) = _const_mu.x*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()}end_foreach_face_generic();}}
     foreach_stencil () {   
@@ -14100,34 +14349,34 @@ is_face_x(){
       
  { _stencil_val(g.y,0,0,0); _stencil_val(g.y,0,1,0);  }
  
-#line 88
+#line 119
 { _stencil_val(g.x,0,0,0); _stencil_val(g.x,1,0,0);  }
-      _stencil_val_a(res.y,0,0,0); _stencil_val(r.y,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.y,0,0,0);    
+      _stencil_val_a(res.y,0,0,0); _stencil_val(r.y,0,0,0);_stencil_val(rho,0,0,0);_stencil_val(u.y,0,0,0);       
       if (embed_flux) {   
- default_stencil ( point,((scalar[]){ mu.x,mu.y, u.y,{-1}}) );
+ default_stencil ( point,((scalar[]){mu.x , mu.y, u.y,{-1}}) );
  _stencil_val_r(res.y,0,0,0);_stencil_val(u.y,0,0,0);    
       }
 _stencil_val(res.y,0,0,0);
  {_stencil_val(res.y,0,0,0);   }
           
     
-#line 96
+#line 127
 }end_foreach_stencil();
     
-#line 85
+#line 116
 if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 85
+#line 116
 foreach () {
       double a = 0.;
       
  a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 88
+#line 119
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
-      val(res.y,0,0,0) = val(r.y,0,0,0) - val(rho,0,0,0)*((coord){1.,1.}).y*val(u.y,0,0,0) - dt*a/Delta;
+      val(res.y,0,0,0) = val(r.y,0,0,0) - (val(rho,0,0,0) + ((coord){0.,0.}).y)*val(u.y,0,0,0) - dt*a/Delta;
       if (embed_flux) {
  double c, d = embed_flux (point, u.y, mu, &c);
  val(res.y,0,0,0) -= dt*(c + d*val(u.y,0,0,0));
@@ -14138,21 +14387,21 @@ a += val(g.x,0,0,0) - val(g.x,1,0,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 96
+#line 127
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 85
+#line 116
 foreach () {
       double a = 0.;
       
  a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 88
+#line 119
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
-      val(res.y,0,0,0) = val(r.y,0,0,0) - _const_rho*((coord){1.,1.}).y*val(u.y,0,0,0) - dt*a/Delta;
+      val(res.y,0,0,0) = val(r.y,0,0,0) - (_const_rho + ((coord){0.,0.}).y)*val(u.y,0,0,0) - dt*a/Delta;
       if (embed_flux) {
  double c, d = embed_flux (point, u.y, mu, &c);
  val(res.y,0,0,0) -= dt*(c + d*val(u.y,0,0,0));
@@ -14163,10 +14412,10 @@ a += val(g.x,0,0,0) - val(g.x,1,0,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 96
+#line 127
 }delete((scalar*)((vector[]){g,{{-1},{-1}}}));
   }
-#line 115 "/u/basilisk/src/viscosity-embed.h"
+#line 146 "/home/lisergey/basilisk/src/viscosity-embed.h"
   return maxres;
 }
 
@@ -14176,22 +14425,22 @@ double TOLERANCE_MU = 0.;
 
      
 mgstats viscosity (struct Viscosity p)
-{tracing("viscosity","/u/basilisk/src/viscosity-embed.h",0);
+{tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",0);
   vector u = p.u,  r=new_vector("r");
   scalar rho = p.rho;
   foreach_stencil()
     {
       {_stencil_val_a(r.x,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.x,0,0,0); }
       
-#line 129
+#line 160
 {_stencil_val_a(r.y,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.y,0,0,0); }}end_foreach_stencil();
   {
-#line 127
+#line 158
 foreach()
     {
       val(r.x,0,0,0) = val(rho,0,0,0)*val(u.x,0,0,0);
       
-#line 129
+#line 160
 val(r.y,0,0,0) = val(rho,0,0,0)*val(u.y,0,0,0);}end_foreach();}
 
   vector mu = p.mu;
@@ -14202,22 +14451,22 @@ val(r.y,0,0,0) = val(rho,0,0,0)*val(u.y,0,0,0);}end_foreach();}
      residual_diffusion, relax_diffusion, &p, p.nrelax, p.res,
      .minlevel = 1,
 
-     .tolerance = TOLERANCE_MU});delete((scalar*)((vector[]){r,{{-1},{-1}}}));{end_tracing("viscosity","/u/basilisk/src/viscosity-embed.h",0);return _ret;}}delete((scalar*)((vector[]){r,{{-1},{-1}}}));
-end_tracing("viscosity","/u/basilisk/src/viscosity-embed.h",0);}
-#line 32 "/u/basilisk/src/navier-stokes/centered.h"
-#line 44 "/u/basilisk/src/navier-stokes/centered.h"
+     .tolerance = TOLERANCE_MU});delete((scalar*)((vector[]){r,{{-1},{-1}}}));{end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",0);return _ret;}}delete((scalar*)((vector[]){r,{{-1},{-1}}}));
+end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",0);}
+#line 32 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+#line 44 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 scalar  p={3};
 vector  u={{4},{5}},  g={{6},{7}};
 scalar  pf={8};
 vector  uf={{9},{10}};
-#line 70 "/u/basilisk/src/navier-stokes/centered.h"
+#line 70 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
         vector mu = {{_NVARMAX+0},{_NVARMAX+1}}, a = {{_NVARMAX+0},{_NVARMAX+1}}, alpha = {{_NVARMAX+2},{_NVARMAX+3}};
         scalar rho = {_NVARMAX+4};
-mgstats mgp, mgpf, mgu;
+mgstats mgp = {0}, mgpf = {0}, mgu = {0};
 bool stokes = false;
 #line 91
-static double _boundary0(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}}static double _boundary0_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous ();}}
-static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)));}}}}static double _boundary1_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous ();}}
+static double _boundary0(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}static double _boundary0_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*val(fm.x,1,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0) : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? val(a.x,1,0,0)*_const_fm.x/_const_alpha.x : val(a.x,1,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.x,1,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,1,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}
+static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}static double _boundary1_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*val(fm.x,0,0,0)/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0) : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? val(a.x,0,0,0)*_const_fm.x/_const_alpha.x : val(a.x,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.x,0,0,0) ? _const_a.x*_const_fm.x/val(alpha.x,0,0,0) : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.x ? _const_a.x*_const_fm.x/_const_alpha.x : _const_a.x*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}
 
 
 
@@ -14226,9 +14475,9 @@ static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig
 
 
 
-static double _boundary2(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann ((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}}static double _boundary2_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous ();}}
-static double _boundary3(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)));}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann (- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)));}}}}static double _boundary3_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous ();}}
-#line 116 "/u/basilisk/src/navier-stokes/centered.h"
+static double _boundary2(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}static double _boundary2_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*val(fm.y,0,1,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0) : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? val(a.y,0,1,0)*_const_fm.y/_const_alpha.y : val(a.y,0,1,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((val(alpha.y,0,1,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,1,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}
+static double _boundary3(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}static double _boundary3_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && !is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(val(cm,0,0,0) + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && !is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*val(rho,0,0,0)/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && is_constant(a.x) && !is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*val(fm.y,0,0,0)/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0) : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(is_constant(alpha.x) && !is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? val(a.y,0,0,0)*_const_fm.y/_const_alpha.y : val(a.y,0,0,0)*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else if(!is_constant(alpha.x) && is_constant(a.x) && is_constant(fm.x) && is_constant(rho) && is_constant(cm)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(alpha.y,0,0,0) ? _const_a.y*_const_fm.y/val(alpha.y,0,0,0) : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}else {struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_alpha.y ? _const_a.y*_const_fm.y/_const_alpha.y : _const_a.y*_const_rho/(_const_cm + 1e-30)), point, neighbor, _s, data));}}}}}
+#line 116 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 void pressure_embed_gradient (Point point, scalar p, coord * g)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;
 
@@ -14311,7 +14560,15 @@ g->y = _const_rho/(_const_cm + 1e-30)*(_const_a.y + _const_a.y)/2.;
 
 
 
-static int defaults_1_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int defaults_1(const int i,const double t,Event *_ev){tracing("defaults_1","/u/basilisk/src/navier-stokes/centered.h",0);
+static int defaults_1_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+#line 126
+      static int defaults_1(const int i,const double t,Event *_ev){tracing("defaults_1","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
 
   CFL = 0.8;
@@ -14324,6 +14581,7 @@ static int defaults_1_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
 
 
 
+
   if (alpha.x.i == unityf.x.i) {
     alpha = fm;
     rho = cm;
@@ -14332,21 +14590,21 @@ static int defaults_1_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
     vector alphav = alpha;
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val_a(alphav.x,0,0,0); _stencil_val(fm.x,0,0,0); }}end__stencil_is_face_x()
-#line 145
+#line 146
 _stencil_is_face_y(){
       {_stencil_val_a(alphav.y,0,0,0); _stencil_val(fm.y,0,0,0); }}end__stencil_is_face_y()}end_foreach_face_stencil();
     
-#line 145
+#line 146
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
       val(alphav.x,0,0,0) = val(fm.x,0,0,0);}end_is_face_x()
-#line 145
+#line 146
 is_face_y(){
       val(alphav.y,0,0,0) = val(fm.y,0,0,0);}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
     {
-#line 145
+#line 146
 foreach_face_generic(){is_face_x(){
       val(alphav.x,0,0,0) = _const_fm.x;}end_is_face_x()
-#line 145
+#line 146
 is_face_y(){
       val(alphav.y,0,0,0) = _const_fm.y;}end_is_face_y()}end_foreach_face_generic();}}
   }
@@ -14367,25 +14625,57 @@ is_face_y(){
   
     _attribute[uf.x.i].prolongation = refine_embed_face_x;
     
-#line 163
+#line 164
 _attribute[uf.y.i].prolongation = refine_embed_face_y;
-  {scalar*_i=(scalar*) ((scalar[]){p, pf, u.x,u.y, g.x,g.y,{-1}});if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+  {scalar*_i=(scalar*)(((scalar[]) {p, pf, u.x, u.y, g.x, g.y,{-1}}));if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
     _attribute[s.i].restriction = restriction_embed_linear;
     _attribute[s.i].refine = _attribute[s.i].prolongation = refine_embed_linear;
     _attribute[s.i].depends = list_add (_attribute[s.i].depends, cs);
   }}}
-  {scalar*_i=(scalar*) ((scalar[]){p, pf,{-1}});if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+  {scalar*_i=(scalar*)(((scalar[]) {p, pf,{-1}}));if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].embed_gradient = pressure_embed_gradient;}}
 
 
-}{end_tracing("defaults_1","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("defaults_1","/u/basilisk/src/navier-stokes/centered.h",0);}
+
+
+
+
+  foreach_stencil()
+    {
+      {_stencil_val(u.x,0,0,0);   }
+      
+#line 180
+{_stencil_val(u.y,0,0,0);   }}end_foreach_stencil();
 
 
 
 
 
-static int default_display_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int default_display(const int i,const double t,Event *_ev){tracing("default_display","/u/basilisk/src/navier-stokes/centered.h",0);
-  display ((struct _display){"squares (color = 'u.x', spread = -1);"});{end_tracing("default_display","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("default_display","/u/basilisk/src/navier-stokes/centered.h",0);}
+
+  {
+#line 178
+foreach()
+    {
+      dimensional (val(u.x,0,0,0) == Delta/t);
+      
+#line 180
+dimensional (val(u.y,0,0,0) == Delta/t);}end_foreach();}
+}{end_tracing("defaults_1","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("defaults_1","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
+
+
+
+
+
+static int default_display_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+#line 187
+      static int default_display(const int i,const double t,Event *_ev){tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
+  display ((struct _display){"squares (color = 'u.x', spread = -1);"});{end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 
 
 
@@ -14393,26 +14683,30 @@ static int default_display_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double
 
 double dtmax;
 
-static int init_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0);*ip=i;*tp=t;return ret;}      static int init(const int i,const double t,Event *_ev){tracing("init","/u/basilisk/src/navier-stokes/centered.h",0);
+static int init_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 196
+      static int init(const int i,const double t,Event *_ev){tracing("init","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
   trash (((vector[]){uf,{{-1},{-1}}}));
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(uf.x,0,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_value_x (point, u.x, 0);_stencil_val(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0 -1,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0 -1,0,0);                 }}end__stencil_is_face_x()
-#line 191
+#line 199
 _stencil_is_face_y(){
     {_stencil_val_a(uf.y,0,0,0); _stencil_val(fm.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_value_y (point, u.y, 0);_stencil_val(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0 -1,0); _stencil_val(cs,0,0 -1,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0 -1,0);                 }}end__stencil_is_face_y()}end_foreach_face_stencil();
   
-#line 191
+#line 199
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = val(fm.x,0,0,0)*(_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.)));}end_is_face_x()
-#line 191
+#line 199
 is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*(_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.)));}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 191
+#line 199
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = _const_fm.x*(_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.)));}end_is_face_x()
-#line 191
+#line 199
 is_face_y(){
     val(uf.y,0,0,0) = _const_fm.y*(_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.)));}end_is_face_y()}end_foreach_face_generic();}}
 
@@ -14427,13 +14721,26 @@ is_face_y(){
 
   dtmax = DT;
   event ("stability");
-}{end_tracing("init","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("init","/u/basilisk/src/navier-stokes/centered.h",0);}
-#line 214 "/u/basilisk/src/navier-stokes/centered.h"
-static int set_dtmax_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int set_dtmax(const int i,const double t,Event *_ev){tracing("set_dtmax","/u/basilisk/src/navier-stokes/centered.h",0); dtmax = DT;{end_tracing("set_dtmax","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("set_dtmax","/u/basilisk/src/navier-stokes/centered.h",0);}
+}{end_tracing("init","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("init","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 
-static int stability_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int stability(const int i,const double t,Event *_ev){tracing("stability","/u/basilisk/src/navier-stokes/centered.h",0); {
+
+
+
+
+
+
+
+static int set_dtmax_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 222 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+      static int set_dtmax(const int i,const double t,Event *_ev){tracing("set_dtmax","/home/lisergey/basilisk/src/navier-stokes/centered.h",0); dtmax = DT;{end_tracing("set_dtmax","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("set_dtmax","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
+
+static int stability_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 224
+      static int stability(const int i,const double t,Event *_ev){tracing("stability","/home/lisergey/basilisk/src/navier-stokes/centered.h",0); {
   dt = dtnext (stokes ? dtmax : timestep (uf, dtmax));
-}{end_tracing("stability","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("stability","/u/basilisk/src/navier-stokes/centered.h",0);}
+}{end_tracing("stability","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("stability","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 
 
 
@@ -14441,17 +14748,42 @@ static int stability_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp
 
 
 
-static int vof_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}static int vof(const int i,const double t,Event *_ev){;return 0;}
-static int tracer_advection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}static int tracer_advection(const int i,const double t,Event *_ev){;return 0;}
-static int tracer_diffusion_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}static int tracer_diffusion(const int i,const double t,Event *_ev){;return 0;}
+static int vof_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
 
 
 
 
-static int properties_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}static int properties(const int i,const double t,Event *_ev){;return 0;}
-#line 247 "/u/basilisk/src/navier-stokes/centered.h"
+
+
+#line 234
+static int vof(const int i,const double t,Event *_ev){;return 0;}
+static int tracer_advection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+#line 235
+static int tracer_advection(const int i,const double t,Event *_ev){;return 0;}
+static int tracer_diffusion_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+#line 236
+static int tracer_diffusion(const int i,const double t,Event *_ev){;return 0;}
+
+
+
+
+
+
+static int properties_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+
+#line 243
+static int properties(const int i,const double t,Event *_ev){;return 0;}
+#line 255 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 void prediction()
 {
   vector du;
@@ -14459,7 +14791,7 @@ void prediction()
     scalar s = new_scalar("s");
     du.x = s;
   } 
-#line 250
+#line 258
 {
     scalar s = new_scalar("s");
     du.y = s;
@@ -14468,7 +14800,7 @@ void prediction()
   if (_attribute[u.x.i].gradient)
     {
     
-#line 256
+#line 264
 foreach_stencil()
       { {
 
@@ -14481,9 +14813,9 @@ _stencil_val(fs.x,0,0,0);_stencil_val(fs.x,1,0,0);{
            
  
       
-#line 264
+#line 272
 } 
-#line 257
+#line 265
 {
 
 _stencil_val(fs.y,0,0,0);_stencil_val(fs.y,0,1,0);{
@@ -14495,9 +14827,9 @@ _stencil_val(fs.y,0,0,0);_stencil_val(fs.y,0,1,0);{
            
  
       
-#line 264
+#line 272
 }}end_foreach_stencil();{
-#line 256
+#line 264
 foreach()
       { {
 
@@ -14507,7 +14839,7 @@ foreach()
 
    val(du.x,0,0,0) = _attribute[u.x.i].gradient (val(u.x,-1,0,0), val(u.x,0,0,0), val(u.x,1,0,0))/Delta;
       } 
-#line 257
+#line 265
 {
 
         if (!val(fs.y,0,0,0) || !val(fs.y,0,1,0))
@@ -14519,7 +14851,7 @@ foreach()
   else
     {
     
-#line 266
+#line 274
 foreach_stencil()
       { {
 
@@ -14532,9 +14864,9 @@ _stencil_val(fs.x,0,0,0);_stencil_val(fs.x,1,0,0);{
            
  
     
-#line 274
+#line 282
 } 
-#line 267
+#line 275
 {
 
 _stencil_val(fs.y,0,0,0);_stencil_val(fs.y,0,1,0);{
@@ -14546,9 +14878,9 @@ _stencil_val(fs.y,0,0,0);_stencil_val(fs.y,0,1,0);{
            
  
     
-#line 274
+#line 282
 }}end_foreach_stencil();{
-#line 266
+#line 274
 foreach()
       { {
 
@@ -14558,7 +14890,7 @@ foreach()
 
    val(du.x,0,0,0) = (val(u.x,1,0,0) - val(u.x,-1,0,0))/(2.*Delta);
     } 
-#line 267
+#line 275
 {
 
         if (!val(fs.y,0,0,0) || !val(fs.y,0,1,0))
@@ -14588,10 +14920,10 @@ _stencil_val(fm.y,o_stencil,0,0); _stencil_val(fm.y,o_stencil,1,0); {
 
 
     
-#line 293
+#line 301
 _stencil_val_r(uf.x,0,0,0); _stencil_val(fm.x,0,0,0); 
   }}end__stencil_is_face_x()
-#line 277
+#line 285
 _stencil_is_face_y(){ {       
      _stencil_val(u.y,0,-1,0);_stencil_val(u.y,0,0,0);     
     
@@ -14611,11 +14943,11 @@ _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {
 
 
     
-#line 293
+#line 301
 _stencil_val_r(uf.y,0,0,0); _stencil_val(fm.y,0,0,0); 
   }}end__stencil_is_face_y()}end_foreach_face_stencil();
   
-#line 277
+#line 285
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ {
     double un = dt*(val(u.x,0,0,0) + val(u.x,-1,0,0))/(2.*Delta), s = sign(un);
     int i = -(s + 1.)/2.;
@@ -14634,7 +14966,7 @@ if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ {
 
     val(uf.x,0,0,0) *= val(fm.x,0,0,0);
   }}end_is_face_x()
-#line 277
+#line 285
 is_face_y(){ {
     double un = dt*(val(u.y,0,0,0) + val(u.y,0,-1,0))/(2.*Delta), s = sign(un);
     int i = -(s + 1.)/2.;
@@ -14654,7 +14986,7 @@ is_face_y(){ {
     val(uf.y,0,0,0) *= val(fm.y,0,0,0);
   }}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 277
+#line 285
 foreach_face_generic(){is_face_x(){ {
     double un = dt*(val(u.x,0,0,0) + val(u.x,-1,0,0))/(2.*Delta), s = sign(un);
     int i = -(s + 1.)/2.;
@@ -14673,7 +15005,7 @@ foreach_face_generic(){is_face_x(){ {
 
     val(uf.x,0,0,0) *= _const_fm.x;
   }}end_is_face_x()
-#line 277
+#line 285
 is_face_y(){ {
     double un = dt*(val(u.y,0,0,0) + val(u.y,0,-1,0))/(2.*Delta), s = sign(un);
     int i = -(s + 1.)/2.;
@@ -14695,15 +15027,17 @@ is_face_y(){ {
 
   delete ((scalar *)((vector[]){du,{{-1},{-1}}}));
 }
-#line 308 "/u/basilisk/src/navier-stokes/centered.h"
-static int advection_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int advection_term(const int i,const double t,Event *_ev){tracing("advection_term","/u/basilisk/src/navier-stokes/centered.h",0);
+#line 316
+static int advection_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 316 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+      static int advection_term(const int i,const double t,Event *_ev){tracing("advection_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
   if (!stokes) {
     prediction();
     mgpf = project ((struct Project){uf, pf, alpha, dt/2., mgpf.nrelax});
     advection ((struct Advection){(scalar *)((vector[]){u,{{-1},{-1}}}), uf, dt, (scalar *)((vector[]){g,{{-1},{-1}}})});
   }
-}{end_tracing("advection_term","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("advection_term","/u/basilisk/src/navier-stokes/centered.h",0);}
+}{end_tracing("advection_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("advection_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 
 
 
@@ -14717,19 +15051,28 @@ static void correction (double dt)
     {
       {_stencil_val_r(u.x,0,0,0);_stencil_val(g.x,0,0,0);  }
       
-#line 327
+#line 335
 {_stencil_val_r(u.y,0,0,0);_stencil_val(g.y,0,0,0);  }}end_foreach_stencil();
   {
-#line 325
+#line 333
 foreach()
     {
       val(u.x,0,0,0) += dt*val(g.x,0,0,0);
       
-#line 327
+#line 335
 val(u.y,0,0,0) += dt*val(g.y,0,0,0);}end_foreach();}
 }
-#line 337 "/u/basilisk/src/navier-stokes/centered.h"
-static int viscous_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int viscous_term(const int i,const double t,Event *_ev){tracing("viscous_term","/u/basilisk/src/navier-stokes/centered.h",0);
+
+
+
+
+
+
+
+
+static int viscous_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 345 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+      static int viscous_term(const int i,const double t,Event *_ev){tracing("viscous_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
   if (constant(mu.x) != 0.) {
     correction (dt);
@@ -14745,57 +15088,59 @@ static int viscous_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
     trash (((vector[]){af,{{-1},{-1}}}));
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val_a(af.x,0,0,0);  }}end__stencil_is_face_x()
-#line 351
+#line 359
 _stencil_is_face_y(){
       {_stencil_val_a(af.y,0,0,0);  }}end__stencil_is_face_y()}end_foreach_face_stencil();
     {
-#line 351
+#line 359
 foreach_face_generic(){is_face_x(){
       val(af.x,0,0,0) = 0.;}end_is_face_x()
-#line 351
+#line 359
 is_face_y(){
       val(af.y,0,0,0) = 0.;}end_is_face_y()}end_foreach_face_generic();}
   }
-}{end_tracing("viscous_term","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("viscous_term","/u/basilisk/src/navier-stokes/centered.h",0);}
-#line 373 "/u/basilisk/src/navier-stokes/centered.h"
-static int acceleration_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int acceleration(const int i,const double t,Event *_ev){tracing("acceleration","/u/basilisk/src/navier-stokes/centered.h",0);
+}{end_tracing("viscous_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("viscous_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
+#line 381
+static int acceleration_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 381 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+      static int acceleration(const int i,const double t,Event *_ev){tracing("acceleration","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
   trash (((vector[]){uf,{{-1},{-1}}}));
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(uf.x,0,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_value_x (point, u.x, 0);_stencil_val(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0 -1,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(a.x,0,0,0);                   }}end__stencil_is_face_x()
-#line 376
+#line 384
 _stencil_is_face_y(){
     {_stencil_val_a(uf.y,0,0,0); _stencil_val(fm.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_value_y (point, u.y, 0);_stencil_val(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0 -1,0); _stencil_val(cs,0,0 -1,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0 -1,0);_stencil_val(a.y,0,0,0);                   }}end__stencil_is_face_y()}end_foreach_face_stencil();
   
-#line 376
+#line 384
 if(!is_constant(fm.x) && !is_constant(a.x)){{foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = val(fm.x,0,0,0)*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*val(a.x,0,0,0));}end_is_face_x()
-#line 376
+#line 384
 is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*val(a.y,0,0,0));}end_is_face_y()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 376
+#line 384
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = _const_fm.x*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*val(a.x,0,0,0));}end_is_face_x()
-#line 376
+#line 384
 is_face_y(){
     val(uf.y,0,0,0) = _const_fm.y*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*val(a.y,0,0,0));}end_is_face_y()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);
   {
-#line 376
+#line 384
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = val(fm.x,0,0,0)*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*_const_a.x);}end_is_face_x()
-#line 376
+#line 384
 is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*_const_a.y);}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);
   {
-#line 376
+#line 384
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = _const_fm.x*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*_const_a.x);}end_is_face_x()
-#line 376
+#line 384
 is_face_y(){
     val(uf.y,0,0,0) = _const_fm.y*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*_const_a.y);}end_is_face_y()}end_foreach_face_generic();}}
-}{end_tracing("acceleration","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("acceleration","/u/basilisk/src/navier-stokes/centered.h",0);}
-#line 387 "/u/basilisk/src/navier-stokes/centered.h"
+}{end_tracing("acceleration","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("acceleration","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
+#line 395 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 void centered_gradient (scalar p, vector g)
 {
 
@@ -14806,63 +15151,63 @@ void centered_gradient (scalar p, vector g)
   vector  gf=new_face_vector("gf");
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(gf.x,0,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(a.x,0,0,0); _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);   }}end__stencil_is_face_x()
-#line 395
+#line 403
 _stencil_is_face_y(){
     {_stencil_val_a(gf.y,0,0,0); _stencil_val(fm.y,0,0,0);_stencil_val(a.y,0,0,0); _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);   }}end__stencil_is_face_y()}end_foreach_face_stencil();
   
-#line 395
+#line 403
 if(!is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = val(fm.x,0,0,0)*val(a.x,0,0,0) - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = _const_fm.x*val(a.x,0,0,0) - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = val(fm.x,0,0,0)*_const_a.x - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = _const_fm.x*_const_a.x - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = val(fm.x,0,0,0)*val(a.x,0,0,0) - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = _const_fm.x*val(a.x,0,0,0) - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && is_constant(alpha.x)){struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = val(fm.x,0,0,0)*_const_a.x - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
   {
-#line 395
+#line 403
 foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = _const_fm.x*_const_a.x - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
-#line 395
+#line 403
 is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*_const_a.y - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()}end_foreach_face_generic();}}
 
@@ -14875,23 +15220,23 @@ is_face_y(){
     {
       {_stencil_val_a(g.x,0,0,0);_stencil_val(gf.x,0,0,0); _stencil_val(gf.x,1,0,0);_stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0);      }
       
-#line 405
+#line 413
 {_stencil_val_a(g.y,0,0,0);_stencil_val(gf.y,0,0,0); _stencil_val(gf.y,0,1,0);_stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0);      }}end_foreach_stencil();
   
-#line 403
+#line 411
 if(!is_constant(fm.x)){{foreach()
     {
       val(g.x,0,0,0) = (val(gf.x,0,0,0) + val(gf.x,1,0,0))/(val(fm.x,0,0,0) + val(fm.x,1,0,0) + 1e-30);
       
-#line 405
+#line 413
 val(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(val(fm.y,0,0,0) + val(fm.y,0,1,0) + 1e-30);}end_foreach();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 403
+#line 411
 foreach()
     {
       val(g.x,0,0,0) = (val(gf.x,0,0,0) + val(gf.x,1,0,0))/(_const_fm.x + _const_fm.x + 1e-30);
       
-#line 405
+#line 413
 val(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(_const_fm.y + _const_fm.y + 1e-30);}end_foreach();}}delete((scalar*)((vector[]){gf,{{-1},{-1}}}));
 }
 
@@ -14900,7 +15245,16 @@ val(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(_const_fm.y + _const_fm.y 
 
 
 
-static int projection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int projection(const int i,const double t,Event *_ev){tracing("projection","/u/basilisk/src/navier-stokes/centered.h",0);
+static int projection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+
+#line 421
+      static int projection(const int i,const double t,Event *_ev){tracing("projection","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);
 {
   mgp = project ((struct Project){uf, p, alpha, dt, mgp.nrelax});
   centered_gradient (p, g);
@@ -14909,36 +15263,54 @@ static int projection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
 
 
   correction (dt);
-}{end_tracing("projection","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("projection","/u/basilisk/src/navier-stokes/centered.h",0);}
+}{end_tracing("projection","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("projection","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 
 
 
 
 
-static int end_timestep_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}static int end_timestep(const int i,const double t,Event *_ev){;return 0;}
-#line 438 "/u/basilisk/src/navier-stokes/centered.h"
-static int adapt_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int adapt(const int i,const double t,Event *_ev){tracing("adapt","/u/basilisk/src/navier-stokes/centered.h",0); {
+static int end_timestep_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+#line 436
+static int end_timestep(const int i,const double t,Event *_ev){;return 0;}
+
+
+
+
+
+
+
+
+
+static int adapt_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 446 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+      static int adapt(const int i,const double t,Event *_ev){tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0); {
 
   fractions_cleanup ((struct Cleanup){cs, fs});
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val(uf.x,0,0,0);_stencil_val(fs.x,0,0,0);
       {_stencil_val_a(uf.x,0,0,0);  }   }}end__stencil_is_face_x()
-#line 441
+#line 449
 _stencil_is_face_y(){
     {_stencil_val(uf.y,0,0,0);_stencil_val(fs.y,0,0,0);
       {_stencil_val_a(uf.y,0,0,0);  }   }}end__stencil_is_face_y()}end_foreach_face_stencil();
   {
-#line 441
+#line 449
 foreach_face_generic(){is_face_x(){
     if (val(uf.x,0,0,0) && !val(fs.x,0,0,0))
       val(uf.x,0,0,0) = 0.;}end_is_face_x()
-#line 441
+#line 449
 is_face_y(){
     if (val(uf.y,0,0,0) && !val(fs.y,0,0,0))
       val(uf.y,0,0,0) = 0.;}end_is_face_y()}end_foreach_face_generic();}
 
   event ("properties");
-}{end_tracing("adapt","/u/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("adapt","/u/basilisk/src/navier-stokes/centered.h",0);}
+}{end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 #line 5 "cylinder.c"
 #line 1 "output_htg.h"
 #line 1 "./output_htg.h"
@@ -15060,8 +15432,8 @@ vertices_local += vertices_local_pL[lvl];
   {
     int i = 0;
     {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
-      min_val_v[i] = HUGE;
-      max_val_v[i] = -HUGE;
+      min_val_v[i] = 1e30;
+      max_val_v[i] = -1e30;
        {
         stats stat = statsf(v.x);
         min_val_v[i] = min(stat.min, min_val_v[i]);
@@ -15198,7 +15570,7 @@ vertices_local += vertices_local_pL[lvl];
     int vertices_local_pL_offset[grid->maxdepth + 1];
 
     long length_w_spacing = descBits_local + 7 * (grid->maxdepth + 1) + 8;
-    uint8_t *mask = (uint8_t *)calloc(length_w_spacing, cell_size);
+    uint8_t *mask = (uint8_t *)pcalloc(length_w_spacing, cell_size,__func__,__FILE__,0);
 
     long index = 8;
     for (int lvl = 0; lvl < grid->maxdepth; ++lvl) {
@@ -15551,20 +15923,24 @@ MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
 }
 #line 6 "cylinder.c"
 static const double diameter = 0.125;
-static const int minlevel = 5;
+static const int minlevel = 7;
 static double reynolds, tend;
-static int level, period, Image, Surface;
-static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(1.);}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
-static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
-static double _boundary6(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary6_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
-static double _boundary7(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann(0.);}}static double _boundary7_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return neumann_homogeneous();}}
-static double _boundary8(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(0.);}}static double _boundary8_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
-static double _boundary9(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet(0.);}}static double _boundary9_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return dirichlet_homogeneous();}}
-static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary10_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
-static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;return fabs(y) > 0.45 ? neumann_homogeneous() : dirichlet_homogeneous();}}
+static int maxlevel, period, Image, Surface;
+static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet(1., point, neighbor, _s, data));}}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet_homogeneous(1., point, neighbor, _s, data));}}}
+static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(0., point, neighbor, _s, data));}}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary6(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(0., point, neighbor, _s, data));}}}static double _boundary6_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary7(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann(0., point, neighbor, _s, data));}}}static double _boundary7_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _neumann_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary8(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet(0., point, neighbor, _s, data));}}}static double _boundary8_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary9(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet(0., point, neighbor, _s, data));}}}static double _boundary9_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann(0., point, neighbor, _s, data) : _dirichlet(0., point, neighbor, _s, data));}}}static double _boundary10_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann_homogeneous(0., point, neighbor, _s, data) : _dirichlet_homogeneous(0., point, neighbor, _s, data));}}}
+static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann(0., point, neighbor, _s, data) : _dirichlet(0., point, neighbor, _s, data));}}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann_homogeneous(0., point, neighbor, _s, data) : _dirichlet_homogeneous(0., point, neighbor, _s, data));}}}
 vector  muv={{11},{12}};
-int main(int argc, char **argv) {_init_solver();
-  char *end;
+int main(int argc, char **argv) {
+#line 131
+_init_solver();
+  
+#line 20
+char *end;
   int ReynoldsFlag;
   int LevelFlag;
   int PeriodFlag;
@@ -15612,8 +15988,8 @@ int main(int argc, char **argv) {_init_solver();
         fprintf(ferr, "cylinder: error: -l needs an argument\n");
         exit(1);
       }
-      level = strtol(*argv, &end, 10);
-      if (*end != '\0' || level <= 0) {
+      maxlevel = strtol(*argv, &end, 10);
+      if (*end != '\0' || maxlevel <= 0) {
         fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
                 *argv);
         exit(1);
@@ -15675,10 +16051,20 @@ int main(int argc, char **argv) {_init_solver();
   init_grid(1 << minlevel);
   mu = muv;
   run();
-free_solver();}
-static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
+free_solver();
 
-static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0);*ip=i;*tp=t;return ret;}      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
+#line 131
+}
+static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+#line 132
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
+
+static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 134
+      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   scalar  phi=new_vertex_scalar("phi");
   foreach_vertex_stencil() { 
      
@@ -15709,7 +16095,11 @@ foreach () {
   }end_foreach();}delete((scalar*)((scalar[]){phi,{-1}}));
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 
-static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend);*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
+static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 150
+      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
@@ -15718,28 +16108,32 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   coord n, b;
 
   if (iframe % period == 0) {
+    fields_stats();
     if (pid() == 0)
       fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
-    output_htg(((scalar[]){p, omega,{-1}}), ((vector[]){u,{{-1},{-1}}}), htg);
+    output_htg(((scalar[]){p, omega,{-1}}),((vector[]) {u,{{-1},{-1}}}), htg);
     if (Image) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 165
+#line 166
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
-      output_ppm((struct OutputPPM){omega, .file = png, .box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
+      output_ppm((struct OutputPPM){omega, .file = png, .n = 512, .box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
                  .min = -5 / diameter, .max = 5 / diameter, .linear = false,
                  .mask = m});
     }
   }
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("dump_0","cylinder.c",0);return 0;}end_tracing("dump_0","cylinder.c",0);}
-static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
-  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x,u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = level,
+static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+#line 176
+      static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
+  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = maxlevel,
                 .minlevel = minlevel});
 }{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
@@ -15747,62 +16141,118 @@ static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;i
 static void _init_solver (void)
 {
   void init_solver();
-  datasize=13*sizeof(double);init_solver();
-  embed=new_bid();quadtree_methods();{  event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"/u/basilisk/src/embed.h",0,"metric"});
-  event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"/u/basilisk/src/embed.h",0,"defaults"});
-  event_register((Event){0,1,defaults_0,{defaults_0_expr0},((int *)0),((double *)0),"/u/basilisk/src/run.h",0,"defaults"});
-  event_register((Event){0,1,defaults_1,{defaults_1_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"defaults"});
-  event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"default_display"});
-  event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"init"});
-  event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});
-  event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",0,"dump"});
-
+datasize=13*sizeof(double);
+  
+#line 6
+init_solver();
+  {
+#line 24
+quadtree_methods();
 
     
 
-    init_const_vector((vector){{_NVARMAX+0},{_NVARMAX+1}},"zerof",(double[]) {0.,0.,0.});
-  init_const_vector((vector){{_NVARMAX+2},{_NVARMAX+3}},"unityf",(double[]) {1.,1.,1.});
-  init_const_scalar((scalar){_NVARMAX+4},"unity", 1.);
-  init_const_scalar((scalar){_NVARMAX+5},"zeroc", 0.);
-  init_scalar((scalar){0},"cs");
-  init_face_vector((vector){{1},{2}},"fs");
-  event_register((Event){0,1,cleanup,{cleanup_expr0},((int *)0),((double *)0),"/u/basilisk/src/run.h",0,"cleanup"});
-  init_scalar((scalar){3},"p");
-  init_vector((vector){{4},{5}},"u");
-  init_vector((vector){{6},{7}},"g");
-  init_scalar((scalar){8},"pf");
-  init_face_vector((vector){{9},{10}},"uf");
-  event_register((Event){0,1,set_dtmax,{set_dtmax_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"set_dtmax"});
-  event_register((Event){0,1,stability,{stability_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"stability"});
-  event_register((Event){0,1,vof,{vof_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"vof"});
-  event_register((Event){0,1,tracer_advection,{tracer_advection_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"tracer_advection"});
-  event_register((Event){0,1,tracer_diffusion,{tracer_diffusion_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"tracer_diffusion"});
-  event_register((Event){0,1,properties,{properties_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"properties"});
-  event_register((Event){0,1,advection_term,{advection_term_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"advection_term"});
-  event_register((Event){0,1,viscous_term,{viscous_term_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"viscous_term"});
-  event_register((Event){0,1,acceleration,{acceleration_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"acceleration"});
-  event_register((Event){0,1,projection,{projection_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"projection"});
-  event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"end_timestep"});
-  event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/u/basilisk/src/navier-stokes/centered.h",0,"adapt"});
-  init_face_vector((vector){{11},{12}},"muv");
-  event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
-  event_register((Event){0,1,adapt_0,{adapt_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"adapt"});
+    
+#line 12
+{
+      
+      
+    
+      {  
+#line 896 "/home/lisergey/basilisk/src/embed.h"
+event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",0,"metric"});  
+#line 939
+event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",0,"defaults"});  
+#line 42 "/home/lisergey/basilisk/src/run.h"
+event_register((Event){0,1,defaults_0,{defaults_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/run.h",0,"defaults"});  
+#line 126 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+event_register((Event){0,1,defaults_1,{defaults_1_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"defaults"});  
+#line 187
+event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"default_display"});  
 
-#line 13
-}  _attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;
-  _attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary1,_attribute[p.i].boundary_homogeneous[left]=_boundary1_homogeneous;
-  _attribute[p.i].dirty=1,_attribute[p.i].boundary[top]=_boundary2,_attribute[p.i].boundary_homogeneous[top]=_boundary2_homogeneous;
-  _attribute[p.i].dirty=1,_attribute[p.i].boundary[bottom]=_boundary3,_attribute[p.i].boundary_homogeneous[bottom]=_boundary3_homogeneous;
-  _attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[left]=_boundary4,_attribute[u.x.i].boundary_homogeneous[left]=_boundary4_homogeneous;
-  _attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary5,_attribute[p.i].boundary_homogeneous[left]=_boundary5_homogeneous;
-  _attribute[pf.i].dirty=1,_attribute[pf.i].boundary[left]=_boundary6,_attribute[pf.i].boundary_homogeneous[left]=_boundary6_homogeneous;
-  _attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[right]=_boundary7,_attribute[u.x.i].boundary_homogeneous[right]=_boundary7_homogeneous;
-  _attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary8,_attribute[p.i].boundary_homogeneous[right]=_boundary8_homogeneous;
-  _attribute[pf.i].dirty=1,_attribute[pf.i].boundary[right]=_boundary9,_attribute[pf.i].boundary_homogeneous[right]=_boundary9_homogeneous;
-  _attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[embed]=_boundary10,_attribute[u.x.i].boundary_homogeneous[embed]=_boundary10_homogeneous;
-  _attribute[u.y.i].dirty=1,_attribute[u.y.i].boundary[embed]=_boundary11,_attribute[u.y.i].boundary_homogeneous[embed]=_boundary11_homogeneous;
 
+
+
+
+
+
+
+event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
+#line 134 "cylinder.c"
+event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
+#line 150
+event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",0,"dump"});
+	
+	
+	
+      
+#line 22 "ast/init_solver.h"
+}
+#line 1255 "/home/lisergey/basilisk/src/common.h"
+init_const_vector((vector){{_NVARMAX+0},{_NVARMAX+1}},"zerof",(double[]){0.,0.,0.});
+init_const_vector((vector){{_NVARMAX+2},{_NVARMAX+3}},"unityf",(double[]){1.,1.,1.});
+init_const_scalar((scalar){_NVARMAX+4},"unity", 1.);
+init_const_scalar((scalar){_NVARMAX+5},"zeroc", 0.);
+
+
+
+init_const_vector((vector){{_NVARMAX+6},{_NVARMAX+7}},"unityf0",(double[]){1.,1.,1.});
+init_const_scalar((scalar){_NVARMAX+8},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_face_vector((vector){{1},{2}},"fs"); 
+#line 462 "/home/lisergey/basilisk/src/embed.h"
+embed=new_bid();  init_scalar((scalar){3},"p");  init_vector((vector){{4},{5}},"u");  init_vector((vector){{6},{7}},"g");  init_scalar((scalar){8},"pf");  init_face_vector((vector){{9},{10}},"uf");  init_face_vector((vector){{11},{12}},"muv");
+    
+#line 23 "ast/init_solver.h"
+}_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary1,_attribute[p.i].boundary_homogeneous[left]=_boundary1_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[top]=_boundary2,_attribute[p.i].boundary_homogeneous[top]=_boundary2_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[bottom]=_boundary3,_attribute[p.i].boundary_homogeneous[bottom]=_boundary3_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[left]=_boundary4,_attribute[u.x.i].boundary_homogeneous[left]=_boundary4_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary5,_attribute[p.i].boundary_homogeneous[left]=_boundary5_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[left]=_boundary6,_attribute[pf.i].boundary_homogeneous[left]=_boundary6_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[right]=_boundary7,_attribute[u.x.i].boundary_homogeneous[right]=_boundary7_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary8,_attribute[p.i].boundary_homogeneous[right]=_boundary8_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[right]=_boundary9,_attribute[pf.i].boundary_homogeneous[right]=_boundary9_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[embed]=_boundary10,_attribute[u.x.i].boundary_homogeneous[embed]=_boundary10_homogeneous;_attribute[u.y.i].dirty=1,_attribute[u.y.i].boundary[embed]=_boundary11,_attribute[u.y.i].boundary_homogeneous[embed]=_boundary11_homogeneous;  
+#line 50 "/home/lisergey/basilisk/src/run.h"
+event_register((Event){0,1,cleanup,{cleanup_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/run.h",0,"cleanup"});  
+#line 222 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+event_register((Event){0,1,set_dtmax,{set_dtmax_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"set_dtmax"});  
+
+event_register((Event){0,1,stability,{stability_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"stability"});  
+
+
+
+
+
+
+
+
+
+event_register((Event){0,1,vof,{vof_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"vof"});  
+event_register((Event){0,1,tracer_advection,{tracer_advection_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"tracer_advection"});  
+event_register((Event){0,1,tracer_diffusion,{tracer_diffusion_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"tracer_diffusion"});  
+
+
+
+
+
+
+event_register((Event){0,1,properties,{properties_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"properties"});  
+#line 316
+event_register((Event){0,1,advection_term,{advection_term_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"advection_term"});  
+#line 345
+event_register((Event){0,1,viscous_term,{viscous_term_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"viscous_term"});  
+#line 381
+event_register((Event){0,1,acceleration,{acceleration_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"acceleration"});  
+#line 421
+event_register((Event){0,1,projection,{projection_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"projection"});  
+#line 436
+event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"end_timestep"});  
+
+
+
+
+
+
+
+
+
+event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
+#line 132 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});  
+#line 176
+event_register((Event){0,1,adapt_0,{adapt_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"adapt"});
   
-#line 14
-set_fpe();
+#line 24 "ast/init_solver.h"
+}
+  set_fpe();
 }
