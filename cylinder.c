@@ -73,6 +73,7 @@ int dump_fields(const char *raw, const char *xdmf, double t, double ox,
   fprintf(fp, "\
    </Grid>\n\
  </Domain>\n\
+</Xdmf>\n\
 ");
   if (fclose(fp) != 0) {
     fprintf(stderr, "cylinder: fail to close '%s'\n", xdmf);
