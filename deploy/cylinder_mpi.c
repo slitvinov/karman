@@ -57,7 +57,7 @@
 #if _OPENMP
 # include <omp.h>
 # define OMP(x) _Pragma(#x)
-#elif _MPI
+#elif 1
 
 # define OMP(x)
 
@@ -96,7 +96,7 @@ static int mpi_rank, mpi_npe;
 #define systderr stderr
 #define systdout stdout
 
-#if _MPI
+#if 1
 FILE * qstderr (void);
 FILE * qstdout (void);
 FILE * ferr = NULL, * fout = NULL;
@@ -528,7 +528,7 @@ typedef struct {
   char * func, * file;
   int line, calls;
   double total, self;
-#if _MPI
+#if 1
   double min, max;
 #endif
 } TraceIndex;
@@ -598,7 +598,7 @@ static int compar_self (const void * p1, const void * p2)
   return t1->self < t2->self;
 }
 
-#if _MPI
+#if 1
 static int compar_func (const void * p1, const void * p2)
 {
   const TraceIndex * t1 = p1, * t2 = p2;
@@ -616,7 +616,7 @@ void trace_print (FILE * fp, double threshold)
   Array * index = array_new();
   for (i = 0, t = (TraceIndex *) Trace.index.p; i < len; i++, t++)
     array_append (index, t, sizeof(TraceIndex)), total += t->self;
-#if _MPI
+#if 1
   qsort (index->p, len, sizeof(TraceIndex), compar_func);
   double tot[len], self[len], min[len], max[len];
   for (i = 0, t = (TraceIndex *) index->p; i < len; i++, t++)
@@ -638,7 +638,7 @@ void trace_print (FILE * fp, double threshold)
     if (t->self*100./total > threshold) {
       fprintf (fp, "%8d   %6.2f   %6.2f     %4.1f%%",
         t->calls, t->total, t->self, t->self*100./total);
-#if _MPI
+#if 1
       fprintf (fp, " (%4.1f%% - %4.1f%%)", t->min*100./total, t->max*100./total);
 #endif
       fprintf (fp, "   %s():%s:%d\n", t->func, t->file, t->line);
@@ -682,7 +682,7 @@ static void trace_off()
 #define mpi_all_reduce(v,type,op)
 #define mpi_all_reduce_array(v,type,op,elem)
 
-#elif _MPI
+#elif 1
 
 static bool in_prof = false;
 static double prof_start, _prof;
@@ -1306,7 +1306,7 @@ void init_solver()
 #if _CADNA
   cadna_init (-1);
 #endif
-#if _MPI
+#if 1
   mpi_init();
 #elif MTRACE == 1
   char * etrace = getenv ("MTRACE");
@@ -1317,7 +1317,7 @@ void init_solver()
 
 
 
-#if _MPI
+#if 1
 static double mpi_time = 0.;
 #endif
 
@@ -1332,7 +1332,7 @@ timer timer_start (void)
   timer t;
   t.c = clock();
   gettimeofday (&t.tv, NULL);
-#if _MPI
+#if 1
   t.tm = mpi_time;
 #endif
   return t;
@@ -3053,7 +3053,7 @@ if (allocated(0,1,0) && is_local(neighbor(0,1,0)) &&
 
   grid->n = q->leaves.n;
 
-#if !_MPI
+#if !1
   grid->tn = grid->n;
   grid->maxdepth = grid->depth;
 #endif
@@ -3342,7 +3342,7 @@ void realloc_scalar (int size)
 
 
 
-#if _MPI
+#if 1
 # define disable_fpe_for_mpi() disable_fpe (FE_DIVBYZERO|FE_INVALID)
 # define enable_fpe_for_mpi() enable_fpe (FE_DIVBYZERO|FE_INVALID)
 #else
@@ -3792,7 +3792,7 @@ void init_grid (int n)
   q->restriction = ((CacheLevel *) pcalloc (1, sizeof(CacheLevel),__func__,__FILE__,0));
   q->dirty = true;
   N = 1 << depth;
-#if _MPI
+#if 1
   void mpi_boundary_new();
   mpi_boundary_new();
 #endif
@@ -4909,7 +4909,14 @@ if (inside && p.size > 0. &&
   }end_foreach();}
   fflush (p.fp);
 }
-#line 645 "/u/basilisk/src/grid/cartesian-common.h"
+
+
+static void output_cells_internal (FILE * fp)
+{
+  output_cells ((struct OutputCells){fp});
+}
+
+
 static char * replace_ (const char * vname)
 {
   char * name = pstrdup (vname,__func__,__FILE__,0), * c = name;
@@ -5073,7 +5080,7 @@ void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  v[j++] = HUGE;}}
   }
-#if _MPI
+#if 1
   if (pid() == 0)
     MPI_Reduce (MPI_IN_PLACE, v, n*list_len(list), MPI_DOUBLE,
   MPI_MIN, 0, MPI_COMM_WORLD);
@@ -5753,7 +5760,7 @@ int refine_cell (Point point, scalar * list, int flag, Cache * refined)
 
   cell.flags &= ~leaf;
 
-#if _MPI
+#if 1
   if (is_border(cell)) {
     {foreach_child() {
       bool bord = false;
@@ -5808,7 +5815,7 @@ bool coarsen_cell (Point point, scalar * list)
 
   decrement_neighbors (point);
 
-#if _MPI
+#if 1
   if (!is_local(cell)) {
     cell.flags &= ~(active|border);
     {foreach_neighbor(1)
@@ -6437,7 +6444,7 @@ void tree_periodic (int dir)
 }
 
 
-#if _MPI
+#if 1
 #line 1 "grid/tree-mpi.h"
 #line 1 "/u/basilisk/src/grid/tree-mpi.h"
 
@@ -11031,7 +11038,7 @@ typedef struct {
 timing timer_timing (timer t, int i, size_t tnc, double * mpi)
 {
   timing s;
-#if _MPI
+#if 1
   s.avg = mpi_time - t.tm;
 #endif
   clock_t end = clock();
@@ -11062,7 +11069,7 @@ s.tnc = n;
 #else
   s.mem = 0;
 #endif
-#if _MPI
+#if 1
   if (mpi)
     MPI_Allgather (&s.avg, 1, MPI_DOUBLE, mpi, 1, MPI_DOUBLE, MPI_COMM_WORLD);
   s.max = s.min = s.avg;
@@ -11091,7 +11098,7 @@ void timer_print (timer t, int i, size_t tnc)
     "\n# " "Quadtree"
     ", %d steps, %g CPU, %.4g real, %.3g points.step/s, %d var\n",
     i, s.cpu, s.real, s.speed, (int) (datasize/sizeof(double)));
-#if _MPI
+#if 1
   fprintf (fout,
     "# %d procs, MPI: min %.2g (%.2g%%) "
     "avg %.2g (%.2g%%) max %.2g (%.2g%%)\n",
@@ -11633,7 +11640,7 @@ void output_field (struct OutputField p)
   }
 
   if (pid() == 0) {
-#if _MPI
+#if 1
     MPI_Reduce (MPI_IN_PLACE, field[0], len*p.n*ny, MPI_DOUBLE, MPI_MIN, 0,
   MPI_COMM_WORLD);
 #endif
@@ -11657,7 +11664,7 @@ void output_field (struct OutputField p)
     }
     fflush (p.fp);
   }
-#if _MPI
+#if 1
   else
     MPI_Reduce (field[0], NULL, len*p.n*ny, MPI_DOUBLE, MPI_MIN, 0,
   MPI_COMM_WORLD);
@@ -11919,7 +11926,7 @@ static FILE * ppm_fallback (const char * file, const char * mode)
   if (!fp) {
     perror (file);
 
-
+    MPI_Abort (MPI_COMM_WORLD, 1);
 
     exit (1);
   }
@@ -12097,7 +12104,7 @@ void output_ppm (struct OutputPPM p)
   }
 
   if (pid() == 0) {
-#if _MPI
+#if 1
     MPI_Reduce (MPI_IN_PLACE, ppm[0], 3*ny*p.n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
   MPI_COMM_WORLD);
 #endif
@@ -12113,7 +12120,7 @@ void output_ppm (struct OutputPPM p)
     else
       fflush (p.fp);
   }
-#if _MPI
+#if 1
   else
     MPI_Reduce (ppm[0], NULL, 3*ny*p.n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
   MPI_COMM_WORLD);
@@ -12233,7 +12240,7 @@ void output_gfs (struct OutputGfs p)
 {tracing("output_gfs","/u/basilisk/src/output.h",0);
   char * fname = p.file;
 
-#if _MPI
+#if 1
 
 
 
@@ -12292,7 +12299,7 @@ void output_gfs (struct OutputGfs p)
   fprintf (p.fp, "  VariableTracerVOF f\n");
   fprintf (p.fp, "}\nGfsBox { x = 0 y = 0 z = 0 } {\n");
 
-#if _MPI
+#if 1
   long header;
   if ((header = ftell (p.fp)) < 0) {
     perror ("output_gfs(): error in header");
@@ -12309,11 +12316,11 @@ void output_gfs (struct OutputGfs p)
 
 
   {foreach_cell() {
-#if _MPI
+#if 1
     if (is_local(cell))
 #endif
     {
-#if _MPI
+#if 1
       if (fseek (p.fp, header + val(index,0,0,0)*cell_size, SEEK_SET) < 0) {
  perror ("output_gfs(): error while seeking");
  exit (1);
@@ -12364,7 +12371,7 @@ void output_gfs (struct OutputGfs p)
       continue;
   }end_foreach_cell();}
 
-#if _MPI
+#if 1
   delete (((scalar[]){index,{-1}}));
   if (!pid() && fseek (p.fp, total_size, SEEK_SET) < 0) {
     perror ("output_gfs(): error while finishing");
@@ -12380,7 +12387,7 @@ void output_gfs (struct OutputGfs p)
   if (opened)
     fclose (p.fp);
 
-#if _MPI
+#if 1
   if (p.file == NULL) {
     MPI_Barrier (MPI_COMM_WORLD);
     if (pid() == 0) {
@@ -12450,7 +12457,7 @@ static void dump_header (FILE * fp, struct DumpHeader * header, scalar * list)
   }
 }
 
-#if !_MPI
+#if !1
      
 void dump (struct Dump p)
 {tracing("dump","/u/basilisk/src/output.h",0);
@@ -12668,34 +12675,8 @@ bool restore (struct Dump p)
 #line 1339 "/u/basilisk/src/output.h"
   scalar * listm = is_constant(cm) ? NULL : (scalar *)((vector[]){fm,{{-1},{-1}}});
 
-
-
-  {foreach_cell() {
-    unsigned flags;
-    if (fread (&flags, sizeof(unsigned), 1, fp) != 1) {
-      fprintf (ferr, "restore(): error: expecting 'flags'\n");
-      exit (1);
-    }
-
-    fseek (fp, sizeof(double), SEEK_CUR);
-    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
-      double val;
-      if (fread (&val, sizeof(double), 1, fp) != 1) {
- fprintf (ferr, "restore(): error: expecting a scalar\n");
- exit (1);
-      }
-      if (s.i != INT_MAX)
- val(s,0,0,0) = val;
-    }}}
-    if (!(flags & leaf) && is_leaf(cell))
-      refine_cell (point, listm, 0, NULL);
-    if (is_leaf(cell))
-      continue;
-  }end_foreach_cell();}
-  {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-    _attribute[s.i].dirty = true;}}
-
-
+  restore_mpi (fp, list);
+#line 1369 "/u/basilisk/src/output.h"
   scalar * other = NULL;
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     if (!list_lookup (list, s) && !list_lookup (listm, s))

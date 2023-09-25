@@ -1,12 +1,22 @@
 .POSIX:
 .SUFFIXES:
-.SUFFIXES: .c
 
+CC = gcc
+MPICC = mpicc
+MPICCFLAGS = -O2 -g
 CFLAGS = -O2
-CFLAGS_OPENMP = -fopenmp
 M = \
 cylinder\
+cylinder_mpi \
 
 all: $M
-.c:; $(CC) $< -o $@ $(CFLAGS) $(CFLAGS_OPENMP) $(LDFLAGS) -lm
+cylinder_mpi: cylinder_mpi.c
+	$(MPICC) $< -o $@ $(MPICCFLAGS) $(LDFLAGS) -lm
+cylinder: cylinder.c
+	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) -lm
+
 clean:; rm -f -- $M
+install: $B
+	mkdir -p $(HOME)/.local/bin && \
+	cp $B $(HOME)/.local/bin/
+

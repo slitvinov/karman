@@ -218,7 +218,8 @@ event dump(i++; t <= 100) {
   double omega_surface, theta;
 
   if (iframe % period == 0) {
-    fprintf(stderr, "cylinder: %09d %.16e\n", i, t);
+    if (pid() == 0)
+      fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
 
     sprintf(xdmf, "a.%09ld.xdmf2", iframe);
     sprintf(raw, "%09ld.raw", iframe);
