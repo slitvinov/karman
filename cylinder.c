@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -i -r 100 -l 10 -p 100 -e 2\n");
+          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
