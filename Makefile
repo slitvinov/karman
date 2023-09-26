@@ -17,4 +17,4 @@ deploy/cylinder_mpi.c: cylinder.c
 	mv _cylinder.c deploy/cylinder_mpi.c
 dep: deploy/cylinder.c deploy/cylinder_mpi.c
 clean:
-	rm -f _cylinder.c
+	rm -f _cylinder.c cylinder

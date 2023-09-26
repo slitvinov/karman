@@ -20,4 +20,3 @@ clean:; rm -f -- $M
 install: $B
 	mkdir -p $(HOME)/.local/bin && \
 	cp $B $(HOME)/.local/bin/
-
