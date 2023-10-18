@@ -166,9 +166,9 @@ event dump(i++; t <= tend) {
       foreach ()
         m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
-      output_ppm(omega, file = png, n = 512, box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}},
-                 min = - 2 / diameter, max = 2 / diameter, linear = false,
-                 mask = m);
+      output_ppm(omega, file = png, n = 512,
+                 box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
+                 max = 2 / diameter, linear = false, mask = m);
     }
   }
   iframe++;
