@@ -159,7 +159,7 @@ event init(t = 0) {
   }
   fractions(phi, vof);
   foreach () {
-    u.x[] = 1 - vof[];
+    u.x[] = vof[];
     u.y[] = 0;
     u.z[] = 0;
   }
