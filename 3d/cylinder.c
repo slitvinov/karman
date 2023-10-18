@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
-#include "grid/quadtree.h"
+#include "grid/octree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   L0 = 4;
-  origin(-0.5, -L0 / 2.);
+  origin(-0.5, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
   mu = muv;
   run();
