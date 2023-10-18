@@ -169,7 +169,7 @@ event dump(i++; t <= tend) {
   static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
   scalar omega[], m[];
-  FILE *fp;
+  static FILE *fp;
   long nx, ny;
   double fx, fy, fz;
   if (iframe % period == 0) {
@@ -217,8 +217,8 @@ event dump(i++; t <= tend) {
 event adapt(i++) {
   double uemax = 0.01;
   astats s =
-      adapt_wavelet({vof, u}, (double[]){0.01, 0.01, uemax, uemax, uemax},
+      adapt_wavelet({u}, (double[]){uemax, uemax, uemax},
                     maxlevel = maxlevel, minlevel = minlevel);
-  fprintf(stderr, "cylinder: # refined %d cells, coarsened %d cells\n", s.nf,
-          s.nc);
+  if (Verbose)
+    fprintf(stderr, "cylinder: refined, coarsened: %d %d\n", s.nf, s.nc);
 }
