@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include "grid/quadtree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
