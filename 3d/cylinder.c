@@ -9,12 +9,15 @@ static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
 static const char *force_path;
+
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
+
 u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
+
 face vector muv[];
 scalar vof[];
 int main(int argc, char **argv) {
@@ -41,10 +44,12 @@ int main(int argc, char **argv) {
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-          "  -m <resolution level>    the maximum resolution level (positive integer)\n"
+          "  -m <resolution level>    the maximum resolution level (positive "
+          "integer)\n"
           "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal number)\n"
-	  "  -f <force file>          force file\n"
+          "  -e <end time>            end time of the simulation (decimal "
+          "number)\n"
+          "  -f <force file>          force file\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
@@ -154,8 +159,9 @@ event init(t = 0) {
   }
   fractions(phi, vof);
   foreach () {
-    u.x[] = 0;
+    u.x[] = 1 - vof[];
     u.y[] = 0;
+    u.z[] = 0;
   }
 }
 
@@ -180,29 +186,29 @@ event dump(i++; t <= tend) {
       fy = 0;
       fz = 0;
       foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
-	double dv = (1. - vof[]) * dv();
-	fx += u.x[] * dv * dt;
-	fy += u.y[] * dv * dt;
-	fz += u.z[] * dv * dt;
+        double dv = (1 - vof[]) * dv();
+        fx += u.x[] * dv * dt;
+        fy += u.y[] * dv * dt;
+        fz += u.z[] * dv * dt;
       }
       fx /= dt;
       fy /= dt;
       fz /= dt;
       if (pid() == 0) {
-	if (fp == NULL) {
-	  if ((fp = fopen(force_path, "w")) == NULL) {
-	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-	    exit(1);
-	  }
-	} else {
-	  if ((fp = fopen(force_path, "a")) == NULL) {
-	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-	    exit(1);
-	  }
-	}
-	fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx, fy,
-		fz);
-	fflush(fp);
+        if (fp == NULL) {
+          if ((fp = fopen(force_path, "w")) == NULL) {
+            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            exit(1);
+          }
+        } else {
+          if ((fp = fopen(force_path, "a")) == NULL) {
+            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            exit(1);
+          }
+        }
+        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx,
+                fy, fz);
+        fflush(fp);
       }
     }
   }
