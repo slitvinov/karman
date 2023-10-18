@@ -187,9 +187,9 @@ event dump(i++; t <= tend) {
       fz = 0;
       foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
         double dv = (1 - vof[]) * dv();
-        fx += u.x[] * dv * dt;
-        fy += u.y[] * dv * dt;
-        fz += u.z[] * dv * dt;
+        fx += u.x[] * dv;
+        fy += u.y[] * dv;
+        fz += u.z[] * dv;
       }
       fx /= dt;
       fy /= dt;
