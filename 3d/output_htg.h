@@ -147,42 +147,12 @@ void output_htg_data_mpiio(scalar *list, vector *vlist, MPI_File fp) {
                        "byte_order=\"LittleEndian\" ",
                        "header_type=\"UInt32\""));
 
-#if dimension == 2
-    Write2File(
-        sprintf(buffer,
-                "\t<HyperTreeGrid BranchFactor=\"2\" "
-                "TransposedRootIndexing=\"0\" Dimensions=\"%d %d %d\">\n",
-                2, 2, 1));
-#elif dimension == 3
     Write2File(
         sprintf(buffer,
                 "\t<HyperTreeGrid BranchFactor=\"2\" "
                 "TransposedRootIndexing=\"0\" Dimensions=\"%d %d %d\">\n",
                 2, 2, 2));
-#endif
     Write2File(sprintf(buffer, "\t\t<Grid>\n"));
-#if dimension == 2
-    Write2File(sprintf(buffer,
-                       "\t\t\t<DataArray type=\"Float64\" "
-                       "Name=\"XCoordinates\" NumberOfTuples=\"2\" "
-                       "format=\"ascii\" RangeMin=\"%g\" RangeMax=\"%g\">\n",
-                       Y0, Y0 + L0));
-    Write2File(sprintf(buffer, "\t\t\t\t%g %g", Y0, Y0 + L0));
-    Write2File(sprintf(buffer, "\n\t\t\t</DataArray>\n"));
-    Write2File(sprintf(buffer,
-                       "\t\t\t<DataArray type=\"Float64\" "
-                       "Name=\"YCoordinates\" NumberOfTuples=\"2\" "
-                       "format=\"ascii\" RangeMin=\"%g\" RangeMax=\"%g\">\n",
-                       X0, X0 + L0));
-    Write2File(sprintf(buffer, "\t\t\t\t%g %g", X0, X0 + L0));
-    Write2File(sprintf(buffer, "\n\t\t\t</DataArray>\n"));
-    Write2File(sprintf(buffer,
-                       "\t\t\t<DataArray type=\"Float64\" "
-                       "Name=\"ZCoordinates\" NumberOfTuples=\"2\" "
-                       "format=\"ascii\" RangeMin=\"%g\" RangeMax=\"%g\">\n",
-                       Z0, Z0 + L0));
-    Write2File(sprintf(buffer, "\t\t\t\t%g %g", 0., 0.));
-#elif dimension == 3
     Write2File(sprintf(buffer,
                        "\t\t\t<DataArray type=\"Float64\" "
                        "Name=\"XCoordinates\" NumberOfTuples=\"2\" "
@@ -203,7 +173,6 @@ void output_htg_data_mpiio(scalar *list, vector *vlist, MPI_File fp) {
                        "format=\"ascii\" RangeMin=\"%g\" RangeMax=\"%g\">\n",
                        X0, X0 + L0));
     Write2File(sprintf(buffer, "\t\t\t\t%g %g", X0, X0 + L0));
-#endif
     Write2File(sprintf(buffer, "\n\t\t\t</DataArray>\n"));
     Write2File(sprintf(buffer, "\t\t</Grid>\n"));
     Write2File(sprintf(buffer, "\t\t<Trees>\n"));
@@ -557,17 +526,10 @@ void output_htg_data_mpiio(scalar *list, vector *vlist, MPI_File fp) {
       long index = 0;
       for (int lvl = 0; lvl <= grid->maxdepth; ++lvl)
         foreach_level(lvl, serial) if (is_local(cell)) {
-#if dimension == 2
-          vector_struct.data[index] = (float)val(v.y);
-          vector_struct.data[index + 1] = (float)val(v.x);
-          vector_struct.data[index + 2] = (float)0.;
-          index += 3;
-#elif dimension == 3
           vector_struct.data[index] = (float)val(v.z);
           vector_struct.data[index + 1] = (float)val(v.y);
           vector_struct.data[index + 2] = (float)val(v.x);
           index += 3;
-#endif
         }
       MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
       MPI_File_write_all(fp, &vector_struct, 1, m_view, MPI_STATUS_IGNORE);
@@ -635,40 +597,11 @@ void output_htg_data(scalar *list, vector *vlist, FILE *fp) {
           "type=\"HyperTreeGrid\"", maj_v, min_v,
           "byte_order=\"LittleEndian\" ", "header_type=\"UInt32\"");
 
-#if dimension == 2
-  fprintf(fp,
-          "\t<HyperTreeGrid BranchFactor=\"2\" TransposedRootIndexing=\"0\" "
-          "Dimensions=\"%d %d %d\">\n",
-          2, 2, 1);
-#elif dimension == 3
   fprintf(fp,
           "\t<HyperTreeGrid BranchFactor=\"2\" TransposedRootIndexing=\"0\" "
           "Dimensions=\"%d %d %d\">\n",
           2, 2, 2);
-#endif
   fprintf(fp, "\t\t<Grid>\n");
-#if dimension == 2
-  fprintf(fp,
-          "\t\t\t<DataArray type=\"Float64\" Name=\"XCoordinates\" "
-          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
-          "RangeMax=\"%g\">\n",
-          Y0, Y0 + L0);
-  fprintf(fp, "\t\t\t\t%g %g", Y0, Y0 + L0);
-  fprintf(fp, "\n\t\t\t</DataArray>\n");
-  fprintf(fp,
-          "\t\t\t<DataArray type=\"Float64\" Name=\"YCoordinates\" "
-          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
-          "RangeMax=\"%g\">\n",
-          X0, X0 + L0);
-  fprintf(fp, "\t\t\t\t%g %g", X0, X0 + L0);
-  fprintf(fp, "\n\t\t\t</DataArray>\n");
-  fprintf(fp,
-          "\t\t\t<DataArray type=\"Float64\" Name=\"ZCoordinates\" "
-          "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
-          "RangeMax=\"%g\">\n",
-          Z0, Z0 + L0);
-  fprintf(fp, "\t\t\t\t%g %g", 0., 0.);
-#elif dimension == 3
   fprintf(fp,
           "\t\t\t<DataArray type=\"Float64\" Name=\"XCoordinates\" "
           "NumberOfTuples=\"2\" format=\"ascii\" RangeMin=\"%g\" "
@@ -689,7 +622,6 @@ void output_htg_data(scalar *list, vector *vlist, FILE *fp) {
           "RangeMax=\"%g\">\n",
           X0, X0 + L0);
   fprintf(fp, "\t\t\t\t%g %g", X0, X0 + L0);
-#endif
   fprintf(fp, "\n\t\t\t</DataArray>\n");
   fprintf(fp, "\t\t</Grid>\n");
   fprintf(fp, "\t\t<Trees>\n");
@@ -811,19 +743,10 @@ void output_htg_data(scalar *list, vector *vlist, FILE *fp) {
       float *write_cache = malloc(vertices_local_pL[lvl] * cell_size);
       long index = 0;
       foreach_level(lvl, serial) if (is_local(cell)) {
-#if dimension == 2
-
-        write_cache[index] = val(v.y);
-        write_cache[index + 1] = val(v.x);
-        write_cache[index + 2] = 0.;
-        index += 3;
-#elif dimension == 3
-
         write_cache[index] = val(v.z);
         write_cache[index + 1] = val(v.y);
         write_cache[index + 2] = val(v.x);
         index += 3;
-#endif
       }
       fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
       free(write_cache);

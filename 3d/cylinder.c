@@ -4,11 +4,11 @@
 #include "navier-stokes/centered.h"
 #include "fractions.h"
 #include "output_htg.h"
-static const double diameter = 0.125;
+static const double diameter = 0.2;
 static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
-static const char *force_path = "force.txt";
+static const char *force_path;
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -28,22 +28,23 @@ int main(int argc, char **argv) {
   PeriodFlag = 0;
   Verbose = 0;
   TendFlag = 0;
+  force_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
       fprintf(
           stderr,
-          "Usage: cylinder [-h] [-i] [-v] -r <Reynolds "
-          "number> -l <resolution level> -p <dump period> "
+          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
+          "number> -m <maximum resolution level> -p <dump period> "
           "-e <end time>\n"
           "Options:\n"
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-          "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -m <resolution level>    the maximum resolution level (positive integer)\n"
           "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal "
-          "number)\n"
+          "  -e <end time>            end time of the simulation (decimal number)\n"
+	  "  -f <force file>          force file\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
@@ -61,10 +62,10 @@ int main(int argc, char **argv) {
       }
       ReynoldsFlag = 1;
       break;
-    case 'l':
+    case 'm':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        fprintf(stderr, "cylinder: error: -m needs an argument\n");
         exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
@@ -105,6 +106,14 @@ int main(int argc, char **argv) {
       }
       TendFlag = 1;
       break;
+    case 'f':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -f needs an argument\n");
+        exit(1);
+      }
+      force_path = *argv;
+      break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -114,7 +123,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if (!LevelFlag) {
-    fprintf(stderr, "cylinder: error: -l is not set\n");
+    fprintf(stderr, "cylinder: error: -m is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
@@ -140,9 +149,7 @@ event init(t = 0) {
   vertex scalar phi[];
   foreach_vertex() {
     double p0;
-    p0 = 0.5 - y;
-    p0 = min(p0, 0.5 + y);
-    p0 = min(p0, sq(x) + sq(y) - sq(diameter / 2));
+    p0 = sq(x) + sq(y) - sq(diameter / 2);
     phi[] = p0;
   }
   fractions(phi, vof);
@@ -168,32 +175,35 @@ event dump(i++; t <= tend) {
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
     output_htg({p, omega, vof}, {u}, htg);
-    fx = 0;
-    fy = 0;
-    fz = 0;
-    foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
-      double dv = (1. - vof[]) * dv();
-      fx += u.x[] * dv * dt;
-      fy += u.y[] * dv * dt;
-      fz += u.z[] * dv * dt;
-    }
-    fx /= dt;
-    fy /= dt;
-    fz /= dt;
-    if (pid() == 0) {
-      if (fp == NULL) {
-        if ((fp = fopen(force_path, "w")) == NULL) {
-          fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-          exit(1);
-        }
-      } else {
-        if ((fp = fopen(force_path, "a")) == NULL) {
-          fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-          exit(1);
-        }
+    if (force_path) {
+      fx = 0;
+      fy = 0;
+      fz = 0;
+      foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
+	double dv = (1. - vof[]) * dv();
+	fx += u.x[] * dv * dt;
+	fy += u.y[] * dv * dt;
+	fz += u.z[] * dv * dt;
       }
-      fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx, fy,
-              fz);
+      fx /= dt;
+      fy /= dt;
+      fz /= dt;
+      if (pid() == 0) {
+	if (fp == NULL) {
+	  if ((fp = fopen(force_path, "w")) == NULL) {
+	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+	    exit(1);
+	  }
+	} else {
+	  if ((fp = fopen(force_path, "a")) == NULL) {
+	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+	    exit(1);
+	  }
+	}
+	fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx, fy,
+		fz);
+	fflush(fp);
+      }
     }
   }
   iframe++;
