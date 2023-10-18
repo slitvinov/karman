@@ -1,22 +1,22 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "grid/octree.h"
-#include "embed.h"
 #include "navier-stokes/centered.h"
+#include "fractions.h"
 #include "output_htg.h"
 static const double diameter = 0.125;
 static const int minlevel = 7;
 static double reynolds, tend;
-static int maxlevel, period, Image, Surface, Verbose;
+static int maxlevel, period, Surface, Verbose;
+static const char *force_path = "force.txt";
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
 u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
-u.n[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
-u.t[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
 face vector muv[];
+scalar vof[];
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag;
@@ -26,7 +26,6 @@ int main(int argc, char **argv) {
   ReynoldsFlag = 0;
   LevelFlag = 0;
   PeriodFlag = 0;
-  Image = 0;
   Verbose = 0;
   TendFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
@@ -40,7 +39,6 @@ int main(int argc, char **argv) {
           "Options:\n"
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
-          "  -i     Enable PPM image dumping\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
           "  -l <resolution level>    the resolution level (positive integer)\n"
           "  -p <dump period>         the dump period (positive integer)\n"
@@ -91,9 +89,6 @@ int main(int argc, char **argv) {
       }
       PeriodFlag = 1;
       break;
-    case 'i':
-      Image = 1;
-      break;
     case 'v':
       Verbose = 1;
       break;
@@ -137,7 +132,10 @@ int main(int argc, char **argv) {
   run();
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
-
+event velocity(i++) {
+  foreach ()
+    foreach_dimension() u.x[] = vof[] * u.x[];
+}
 event init(t = 0) {
   vertex scalar phi[];
   foreach_vertex() {
@@ -147,7 +145,7 @@ event init(t = 0) {
     p0 = min(p0, sq(x) + sq(y) - sq(diameter / 2));
     phi[] = p0;
   }
-  fractions(phi, cs, fs);
+  fractions(phi, vof);
   foreach () {
     u.x[] = 0;
     u.y[] = 0;
@@ -160,8 +158,7 @@ event dump(i++; t <= tend) {
   scalar omega[], m[];
   FILE *fp;
   long nx, ny;
-  coord n, b;
-
+  double fx, fy, fz;
   if (iframe % period == 0) {
     if (Verbose) {
       fields_stats();
@@ -170,19 +167,42 @@ event dump(i++; t <= tend) {
     }
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
-    output_htg({p, omega}, {u}, htg);
-    if (Image) {
-      foreach ()
-        m[] = cs[] - 0.5;
-      sprintf(png, "%09ld.ppm", iframe);
-      output_ppm(omega, file = png, n = 512,
-                 box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
-                 max = 2 / diameter, linear = false, mask = m);
+    output_htg({p, omega, vof}, {u}, htg);
+    fx = 0;
+    fy = 0;
+    fz = 0;
+    foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
+      double dv = (1. - vof[]) * dv();
+      fx += u.x[] * dv * dt;
+      fy += u.y[] * dv * dt;
+      fz += u.z[] * dv * dt;
+    }
+    fx /= dt;
+    fy /= dt;
+    fz /= dt;
+    if (pid() == 0) {
+      if (fp == NULL) {
+        if ((fp = fopen(force_path, "w")) == NULL) {
+          fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+          exit(1);
+        }
+      } else {
+        if ((fp = fopen(force_path, "a")) == NULL) {
+          fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+          exit(1);
+        }
+      }
+      fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx, fy,
+              fz);
     }
   }
   iframe++;
 }
 event adapt(i++) {
-  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = maxlevel,
-                minlevel = minlevel);
+  double uemax = 0.01;
+  astats s =
+      adapt_wavelet({vof, u}, (double[]){0.01, 0.01, uemax, uemax, uemax},
+                    maxlevel = maxlevel, minlevel = minlevel);
+  fprintf(stderr, "cylinder: # refined %d cells, coarsened %d cells\n", s.nf,
+          s.nc);
 }
