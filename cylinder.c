@@ -6,15 +6,15 @@
 static const double diameter = 0.125;
 static const int minlevel = 7;
 static double reynolds, tend;
-static int maxlevel, period, Image, Surface;
-u.n[left] = dirichlet(1.);
-p[left] = neumann(0.);
-pf[left] = neumann(0.);
-u.n[right] = neumann(0.);
-p[right] = dirichlet(0.);
-pf[right] = dirichlet(0.);
-u.n[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
-u.t[embed] = fabs(y) > 0.45 ? neumann(0.) : dirichlet(0.);
+static int maxlevel, period, Image, Surface, Verbose;
+u.n[left] = dirichlet(1);
+p[left] = neumann(0);
+pf[left] = neumann(0);
+u.n[right] = neumann(0);
+p[right] = dirichlet(0);
+pf[right] = dirichlet(0);
+u.n[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
+u.t[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
 face vector muv[];
 int main(int argc, char **argv) {
   char *end;
@@ -26,16 +26,19 @@ int main(int argc, char **argv) {
   LevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
+  Verbose = 0;
   TendFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
       fprintf(
           stderr,
-          "Usage: cylinder [-h] [-i] [-s] [-z <number of cells>] -r <Reynolds "
-          "number> -l <resolution level> -p <dump period>\n"
+          "Usage: cylinder [-h] [-i] [-v] -r <Reynolds "
+          "number> -l <resolution level> -p <dump period> "
+          "-e <end time>\n"
           "Options:\n"
           "  -h     Display this help message\n"
+          "  -v     Verbose\n"
           "  -i     Enable PPM image dumping\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
           "  -l <resolution level>    the resolution level (positive integer)\n"
@@ -44,7 +47,7 @@ int main(int argc, char **argv) {
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -i -r 100 -l 10 -p 100 -e 2\n");
+          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
@@ -89,6 +92,9 @@ int main(int argc, char **argv) {
       break;
     case 'i':
       Image = 1;
+      break;
+    case 'v':
+      Verbose = 1;
       break;
     case 'e':
       argv++;
@@ -156,9 +162,11 @@ event dump(i++; t <= tend) {
   coord n, b;
 
   if (iframe % period == 0) {
-    fields_stats();
-    if (pid() == 0)
-      fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+    if (Verbose) {
+      fields_stats();
+      if (pid() == 0)
+        fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+    }
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
     output_htg({p, omega}, {u}, htg);
