@@ -219,6 +219,6 @@ event adapt(i++) {
   astats s =
     adapt_wavelet((scalar*){u}, (double[]){uemax, uemax, uemax},
                     maxlevel = maxlevel, minlevel = minlevel);
-  if (Verbose)
+  if (Verbose && pid() == 0)
     fprintf(stderr, "cylinder: refined, coarsened: %d %d\n", s.nf, s.nc);
 }
