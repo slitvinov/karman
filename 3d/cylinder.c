@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  L0 = 4;
+  size(3.0);
   origin(-0.5, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
   mu = muv;
