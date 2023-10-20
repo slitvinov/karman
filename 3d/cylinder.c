@@ -52,7 +52,8 @@ int main(int argc, char **argv) {
           "  -f <force file>          force file\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2\n");
+          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2\n"
+	  "  ./cylinder -v -r 100 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
