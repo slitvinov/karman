@@ -16912,7 +16912,7 @@ char *end;
     fprintf(ferr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  L0 = 4;
+  size(3.0);
   origin((struct _origin){-0.5, -L0 / 2.0, -L0 / 2.0});
   init_grid(1 << minlevel);
   mu = muv;
@@ -17065,7 +17065,7 @@ static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;i
   astats s =
     adapt_wavelet((struct Adapt){(scalar*)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){uemax, uemax, uemax},
                     .maxlevel = maxlevel, .minlevel = minlevel});
-  if (Verbose)
+  if (Verbose && pid() == 0)
     fprintf(ferr, "cylinder: refined, coarsened: %d %d\n", s.nf, s.nc);
 }{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
