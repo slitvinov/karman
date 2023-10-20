@@ -16980,9 +16980,10 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   long nx, ny;
   double fx, fy, fz;
   if (iframe % period == 0) {
-    if (Verbose && pid() == 0) {
+    if (Verbose) {
       fields_stats();
-      fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+      if (pid() == 0)
+ fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
@@ -16998,15 +16999,15 @@ _stencil_val(u.x,0,0,0);
            _stencil_val(u.z,0,0,0); 
           
       
-#line 193
+#line 194
 }end_foreach_stencil();
       
-#line 188
+#line 189
 if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 188
+#line 189
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
         fx += val(u.x,0,0,0) * dv;
@@ -17016,13 +17017,13 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 193
+#line 194
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
       
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 188
+#line 189
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*_const_cm);
         fx += val(u.x,0,0,0) * dv;
@@ -17032,7 +17033,7 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 193
+#line 194
 }
       fx /= dt;
       fy /= dt;
@@ -17059,7 +17060,7 @@ foreach () {
 }{end_tracing("dump_0","cylinder.c",0);return 0;}end_tracing("dump_0","cylinder.c",0);}
 static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 217
+#line 218
       static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
   double uemax = 0.01;
   astats s =
@@ -17179,7 +17180,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
 #line 149 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});  
-#line 217
+#line 218
 event_register((Event){0,1,adapt_0,{adapt_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"adapt"});
   
 #line 24 "ast/init_solver.h"

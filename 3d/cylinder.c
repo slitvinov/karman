@@ -174,9 +174,10 @@ event dump(i++; t <= tend) {
   long nx, ny;
   double fx, fy, fz;
   if (iframe % period == 0) {
-    if (Verbose && pid() == 0) {
+    if (Verbose) {
       fields_stats();
-      fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+      if (pid() == 0)
+	fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
