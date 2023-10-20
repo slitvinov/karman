@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
           "  -f <force file>          force file\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
+          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
@@ -217,7 +217,7 @@ event dump(i++; t <= tend) {
 event adapt(i++) {
   double uemax = 0.01;
   astats s =
-      adapt_wavelet({u}, (double[]){uemax, uemax, uemax},
+    adapt_wavelet((scalar*){u}, (double[]){uemax, uemax, uemax},
                     maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose)
     fprintf(stderr, "cylinder: refined, coarsened: %d %d\n", s.nf, s.nc);
