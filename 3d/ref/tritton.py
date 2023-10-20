@@ -31,5 +31,4 @@ for (i, j), v in np.ndenumerate(a):
         x = (j - j0)/(j1 - j0) * (lx1 - lx0) + lx0
         y = (i - i0)/(i1 - i0) * (ly1 - ly0) + ly0
         print("%.16e %.16e" % (10**x, 10**y))
-print(b.shape)
 matplotlib.image.imsave("o.png", b)
