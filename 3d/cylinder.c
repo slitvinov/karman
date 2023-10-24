@@ -4,11 +4,11 @@
 #include "navier-stokes/centered.h"
 #include "fractions.h"
 #include "output_htg.h"
+static const char *force_path;
 static const double diameter = 0.2;
 static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
-static const char *force_path;
 
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
@@ -22,10 +22,7 @@ face vector muv[];
 scalar vof[];
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag;
-  int LevelFlag;
-  int PeriodFlag;
-  int TendFlag;
+  int ReynoldsFlag, LevelFlag, PeriodFlag, TendFlag;
   ReynoldsFlag = 0;
   LevelFlag = 0;
   PeriodFlag = 0;
@@ -53,7 +50,7 @@ int main(int argc, char **argv) {
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -m 10 -p 100 -e 2\n"
-	  "  ./cylinder -v -r 100 -m 10 -p 100 -e 2 -f force.dat\n");
+          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
@@ -155,9 +152,11 @@ event init(t = 0) {
   vertex scalar phi[];
   foreach_vertex() {
     double p0;
-    p0 = sq(x) + sq(y) - sq(diameter / 2);
+    p0 = sq() + sq(y) - sq(diameter / 2);
     phi[] = p0;
   }
+  refine(sq(x) + sq(y) < sq(1.05 * diameter / 2) &&
+         sq(x) + sq(y) > sq(0.95 * diameter / 2) && level < maxlevel);
   fractions(phi, vof);
   foreach () {
     u.x[] = vof[];
@@ -167,17 +166,17 @@ event init(t = 0) {
 }
 
 event dump(i++; t <= tend) {
-  static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
+  double fx, fy, fz;
+  long nx, ny;
   scalar omega[], m[];
   static FILE *fp;
-  long nx, ny;
-  double fx, fy, fz;
+  static long iframe = 0;
   if (iframe % period == 0) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-	fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+        fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
     sprintf(htg, "h.%09ld.htg", iframe);
     vorticity(u, omega);
@@ -214,12 +213,4 @@ event dump(i++; t <= tend) {
     }
   }
   iframe++;
-}
-event adapt(i++) {
-  double uemax = 0.01;
-  astats s =
-    adapt_wavelet((scalar*){u}, (double[]){uemax, uemax, uemax},
-                    maxlevel = maxlevel, minlevel = minlevel);
-  if (Verbose && pid() == 0)
-    fprintf(stderr, "cylinder: refined, coarsened: %d %d\n", s.nf, s.nc);
 }
