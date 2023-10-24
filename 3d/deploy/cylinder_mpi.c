@@ -16474,7 +16474,7 @@ void output_htg(scalar *list, vector *vlist, const char *path) {
                      MPI_INFO_NULL, &fp);
 
   if (ec == MPI_ERR_FILE_EXISTS) {
-    printf("ERR, htg_name exists!\n");
+    fprintf(ferr, "ERR, htg_name exists!\n");
 
     MPI_File_open(MPI_COMM_WORLD, path, MPI_MODE_WRONLY | MPI_MODE_CREATE,
                   MPI_INFO_NULL, &fp);
@@ -16482,8 +16482,8 @@ void output_htg(scalar *list, vector *vlist, const char *path) {
   }
 
   if (ec != MPI_SUCCESS) {
-    printf("output_htg.h : %s could not be opened\n Does the Folder exist?\n",
-           path);
+    fprintf(ferr, "output_htg.h : %s could not be opened\n",
+     path);
     MPI_Abort(MPI_COMM_WORLD, 2);
   }
 
@@ -17055,9 +17055,9 @@ MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #line 7 "cylinder.c"
-static const char *force_path;
+static const char *force_path, output_prefix;
 static const double diameter = 0.2;
-static const int minlevel = 7;
+static const int minlevel = 6;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
 
@@ -17072,7 +17072,7 @@ static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int i
 vector  muv={{11},{12},{13}};
 scalar  vof={14};
 int main(int argc, char **argv) {
-#line 145
+#line 154
 _init_solver();
   
 #line 24
@@ -17083,6 +17083,7 @@ char *end;
   PeriodFlag = 0;
   Verbose = 0;
   TendFlag = 0;
+  output_prefix = NULL;
   force_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -17172,6 +17173,14 @@ char *end;
       }
       force_path = *argv;
       break;
+    case 'o':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(ferr, "cylinder: error: -o needs an argument\n");
+        exit(1);
+      }
+      output_prefix = *argv;
+      break;
     default:
       fprintf(ferr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -17199,26 +17208,26 @@ char *end;
   run();
 free_solver();
 
-#line 145
+#line 154
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 146
+#line 155
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 147
+#line 156
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   foreach_stencil ()
     { {_stencil_val_a(u.x,0,0,0); _stencil_val(vof,0,0,0); _stencil_val(u.x,0,0,0);  } {_stencil_val_a(u.y,0,0,0); _stencil_val(vof,0,0,0); _stencil_val(u.y,0,0,0);  } {_stencil_val_a(u.z,0,0,0); _stencil_val(vof,0,0,0); _stencil_val(u.z,0,0,0);  }}end_foreach_stencil();
   {
-#line 148
+#line 157
 foreach ()
     { val(u.x,0,0,0) = val(vof,0,0,0) * val(u.x,0,0,0); val(u.y,0,0,0) = val(vof,0,0,0) * val(u.y,0,0,0); val(u.z,0,0,0) = val(vof,0,0,0) * val(u.z,0,0,0);}end_foreach();}
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
-#line 151
+#line 160
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   scalar  phi=new_vertex_scalar("phi");
   foreach_vertex_stencil() { 
@@ -17227,7 +17236,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 153
+#line 162
 foreach_vertex() {
     double p0;
     p0 = sq(x) + sq(y) - sq(diameter / 2);
@@ -17242,7 +17251,7 @@ foreach_vertex() {
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 161
+#line 170
 foreach () {
     val(u.x,0,0,0) = val(vof,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -17253,7 +17262,7 @@ foreach () {
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 168
+#line 177
       static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   char png[FILENAME_MAX], htg[FILENAME_MAX];
   double fx, fy, fz;
@@ -17267,9 +17276,11 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       if (pid() == 0)
         fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
-    sprintf(htg, "h.%09ld.htg", iframe);
-    vorticity(u, omega);
-    output_htg(((scalar[]){p, omega, vof,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), htg);
+    if (output_prefix != NULL) {
+      sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
+      vorticity(u, omega);
+      output_htg(((scalar[]){p, omega, vof,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), htg);
+    }
     if (force_path) {
       fx = 0;
       fy = 0;
@@ -17281,15 +17292,15 @@ _stencil_val(u.x,0,0,0);
            _stencil_val(u.z,0,0,0); 
           
       
-#line 193
+#line 204
 }end_foreach_stencil();
       
-#line 188
+#line 199
 if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 188
+#line 199
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
         fx += val(u.x,0,0,0) * dv;
@@ -17299,13 +17310,13 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 193
+#line 204
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
       
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 188
+#line 199
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*_const_cm);
         fx += val(u.x,0,0,0) * dv;
@@ -17315,7 +17326,7 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 193
+#line 204
 }
       fx /= dt;
       fy /= dt;
@@ -17377,13 +17388,13 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
-#line 147 "cylinder.c"
+#line 156 "cylinder.c"
 event_register((Event){0,1,velocity,{velocity_expr0},((int *)0),((double *)0),"cylinder.c",0,"velocity"});  
 
 
 
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 168
+#line 177
 event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",0,"dump"});
 	
 	
@@ -17449,7 +17460,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
-#line 146 "cylinder.c"
+#line 155 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
   
 #line 24 "ast/init_solver.h"
