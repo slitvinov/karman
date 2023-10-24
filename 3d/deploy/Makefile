@@ -3,7 +3,7 @@
 
 CC = gcc
 MPICC = mpicc
-MPICCFLAGS = -O2 -g
+MPICCFLAGS = -O2
 CFLAGS = -O2
 BASILISK = $(HOME)/basilisk/src
 M = \
