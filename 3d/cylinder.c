@@ -206,8 +206,8 @@ event dump(i++; t <= tend) {
             exit(1);
           }
         }
-        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, dt, t, fx,
-                fy, fz);
+        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx,
+                fy, fz, dt);
         fflush(fp);
       }
     }
