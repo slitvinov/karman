@@ -152,7 +152,7 @@ event init(t = 0) {
   vertex scalar phi[];
   foreach_vertex() {
     double p0;
-    p0 = sq() + sq(y) - sq(diameter / 2);
+    p0 = sq(x) + sq(y) - sq(diameter / 2);
     phi[] = p0;
   }
   refine(sq(x) + sq(y) < sq(1.05 * diameter / 2) &&
