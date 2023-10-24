@@ -4,9 +4,9 @@
 #include "navier-stokes/centered.h"
 #include "fractions.h"
 #include "output_htg.h"
-static const char *force_path;
+static const char *force_path, output_prefix;
 static const double diameter = 0.2;
-static const int minlevel = 7;
+static const int minlevel = 6;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
 
@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
   PeriodFlag = 0;
   Verbose = 0;
   TendFlag = 0;
+  output_prefix = NULL;
   force_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -117,6 +118,14 @@ int main(int argc, char **argv) {
       }
       force_path = *argv;
       break;
+    case 'o':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -o needs an argument\n");
+        exit(1);
+      }
+      output_prefix = *argv;
+      break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -178,9 +187,11 @@ event dump(i++; t <= tend) {
       if (pid() == 0)
         fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
-    sprintf(htg, "h.%09ld.htg", iframe);
-    vorticity(u, omega);
-    output_htg({p, omega, vof}, {u}, htg);
+    if (output_prefix != NULL) {
+      sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
+      vorticity(u, omega);
+      output_htg({p, omega, vof}, {u}, htg);
+    }
     if (force_path) {
       fx = 0;
       fy = 0;

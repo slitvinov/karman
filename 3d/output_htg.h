@@ -14,7 +14,7 @@ void output_htg(scalar *list, vector *vlist, const char *path) {
                      MPI_INFO_NULL, &fp);
 
   if (ec == MPI_ERR_FILE_EXISTS) {
-    printf("ERR, htg_name exists!\n");
+    fprintf(stderr, "ERR, htg_name exists!\n");
 
     MPI_File_open(MPI_COMM_WORLD, path, MPI_MODE_WRONLY | MPI_MODE_CREATE,
                   MPI_INFO_NULL, &fp);
@@ -22,8 +22,8 @@ void output_htg(scalar *list, vector *vlist, const char *path) {
   }
 
   if (ec != MPI_SUCCESS) {
-    printf("output_htg.h : %s could not be opened\n Does the Folder exist?\n",
-           path);
+    fprintf(stderr, "output_htg.h : %s could not be opened\n",
+	    path);
     MPI_Abort(MPI_COMM_WORLD, 2);
   }
 
@@ -39,7 +39,7 @@ void output_htg(scalar *list, vector *vlist, const char *path) {
   FILE *fp;
   fp = fopen(path, "w");
   if (!fp) {
-    printf("output_htg.h : %s could not be opened\n Does the Folder exist?\n",
+    fprintf(stderr, "output_htg.h : %s could not be opened\n Does the Folder exist?\n",
            path);
     exit(1);
   }
