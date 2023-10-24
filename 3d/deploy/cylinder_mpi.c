@@ -17055,7 +17055,7 @@ MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #line 7 "cylinder.c"
-static const char *force_path, output_prefix;
+static const char *force_path, *output_prefix;
 static const double diameter = 0.2;
 static const int minlevel = 6;
 static double reynolds, tend;

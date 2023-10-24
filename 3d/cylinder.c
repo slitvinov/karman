@@ -4,7 +4,7 @@
 #include "navier-stokes/centered.h"
 #include "fractions.h"
 #include "output_htg.h"
-static const char *force_path, output_prefix;
+static const char *force_path, *output_prefix;
 static const double diameter = 0.2;
 static const int minlevel = 6;
 static double reynolds, tend;

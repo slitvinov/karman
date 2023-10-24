@@ -16772,7 +16772,7 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
   fflush(fp);
 }
 #line 7 "cylinder.c"
-static const char *force_path, output_prefix;
+static const char *force_path, *output_prefix;
 static const double diameter = 0.2;
 static const int minlevel = 6;
 static double reynolds, tend;
