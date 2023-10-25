@@ -16773,7 +16773,7 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
 }
 #line 7 "cylinder.c"
 static const char *force_path, *output_prefix;
-static const double diameter = 0.2;
+static const double diameter = 2;
 static const int minlevel = 6;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
@@ -16918,8 +16918,8 @@ char *end;
     fprintf(ferr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  size(3.0);
-  origin((struct _origin){-0.5, -L0 / 2.0, -L0 / 2.0});
+  size(75);
+  origin((struct _origin){-15, -L0 / 2.0, -L0 / 2.0});
   init_grid(1 << minlevel);
   mu = muv;
   run();
@@ -16947,20 +16947,14 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 #line 160
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   scalar  phi=new_vertex_scalar("phi");
-  foreach_vertex_stencil() { 
-     
-           
-    _stencil_val_a(phi,0,0,0);  
-  }end_foreach_vertex_stencil();
+  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.50 * diameter / 2) && sq(x) + sq(y) >= sq(0.98 * diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+                                                                      ;
+  foreach_vertex_stencil()
+    {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
   {
-#line 162
-foreach_vertex() {
-    double p0;
-    p0 = sq(x) + sq(y) - sq(diameter / 2);
-    val(phi,0,0,0) = p0;
-  }end_foreach_vertex();}
-  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) < sq(1.05 * diameter / 2) && sq(x) + sq(y) > sq(0.95 * diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
-                                                                     ;
+#line 164
+foreach_vertex()
+    val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
   fractions((struct Fractions){phi, vof});
   foreach_stencil () {
     _stencil_val_a(u.x,0,0,0); _stencil_val(vof,0,0,0); 
@@ -16968,7 +16962,7 @@ foreach_vertex() {
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 170
+#line 167
 foreach () {
     val(u.x,0,0,0) = val(vof,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -16979,9 +16973,9 @@ foreach () {
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 177
+#line 174
       static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
-  char png[FILENAME_MAX], htg[FILENAME_MAX];
+  char htg[FILENAME_MAX];
   double fx, fy, fz;
   long nx, ny;
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
@@ -16991,7 +16985,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-        fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+        fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
@@ -17009,15 +17003,15 @@ _stencil_val(u.x,0,0,0);
            _stencil_val(u.z,0,0,0); 
           
       
-#line 204
+#line 201
 }end_foreach_stencil();
       
-#line 199
+#line 196
 if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 199
+#line 196
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
         fx += val(u.x,0,0,0) * dv;
@@ -17027,13 +17021,13 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 204
+#line 201
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
       
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 199
+#line 196
 foreach () {
         double dv = (1 - val(vof,0,0,0)) * (cube(Delta)*_const_cm);
         fx += val(u.x,0,0,0) * dv;
@@ -17043,7 +17037,7 @@ foreach () {
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 204
+#line 201
 }
       fx /= dt;
       fy /= dt;
@@ -17111,7 +17105,7 @@ event_register((Event){0,1,velocity,{velocity_expr0},((int *)0),((double *)0),"c
 
 
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 177
+#line 174
 event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",0,"dump"});
 	
 	

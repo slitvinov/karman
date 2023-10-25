@@ -159,8 +159,8 @@ event velocity(i++) {
 }
 event init(t = 0) {
   vertex scalar phi[];
-  refine(sq(x) + sq(y) <= sq(1.20 * diameter / 2) &&
-         sq(x) + sq(y) >= sq(0.99 * diameter / 2) && level < maxlevel);
+  refine(sq(x) + sq(y) <= sq(1.50 * diameter / 2) &&
+         sq(x) + sq(y) >= sq(0.98 * diameter / 2) && level < maxlevel);
   foreach_vertex()
     phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, vof);
@@ -182,7 +182,7 @@ event dump(i++; t <= tend) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-        fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+        fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
