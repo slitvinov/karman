@@ -153,10 +153,6 @@ int main(int argc, char **argv) {
   run();
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
-event velocity(i++) {
-  foreach ()
-    foreach_dimension() u.x[] = vof[] * u.x[];
-}
 event init(t = 0) {
   vertex scalar phi[];
   refine(sq(x) + sq(y) <= sq(1.50 * diameter / 2) &&
@@ -170,8 +166,7 @@ event init(t = 0) {
     u.z[] = 0;
   }
 }
-
-event dump(i++; t <= tend) {
+event velocity(i++; t <= tend) {
   char htg[FILENAME_MAX];
   double fx, fy, fz;
   long nx, ny;
@@ -220,5 +215,7 @@ event dump(i++; t <= tend) {
       }
     }
   }
+  foreach ()
+    foreach_dimension() u.x[] = vof[] * u.x[];
   iframe++;
 }
