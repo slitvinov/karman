@@ -6,9 +6,8 @@
 #include "output_htg.h"
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
-static const int minlevel = 6;
 static double reynolds, tend;
-static int maxlevel, period, Surface, Verbose;
+static int maxlevel, minlevel, period, Surface, Verbose;
 
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
@@ -22,9 +21,10 @@ face vector muv[];
 scalar vof[];
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag, LevelFlag, PeriodFlag, TendFlag;
+  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
   ReynoldsFlag = 0;
-  LevelFlag = 0;
+  MaxLevelFlag = 0;
+  MinLevelFlag = 0;
   PeriodFlag = 0;
   Verbose = 0;
   TendFlag = 0;
@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -l <resolution level>    the minimum resolution level (positive "
+          "integer)\n"
           "  -m <resolution level>    the maximum resolution level (positive "
           "integer)\n"
           "  -p <dump period>         the dump period (positive integer)\n"
@@ -50,8 +52,8 @@ int main(int argc, char **argv) {
           "  -f <force file>          force file\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2\n"
-          "  ./cylinder -v -r 100 -m 10 -p 100 -e 2 -f force.dat\n");
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
@@ -78,7 +80,21 @@ int main(int argc, char **argv) {
                 *argv);
         exit(1);
       }
-      LevelFlag = 1;
+      MaxLevelFlag = 1;
+      break;
+    case 'l':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        exit(1);
+      }
+      minlevel = strtol(*argv, &end, 10);
+      if (*end != '\0' || minlevel <= 0) {
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
+      }
+      MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
@@ -134,8 +150,12 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -r is not set\n");
     exit(1);
   }
-  if (!LevelFlag) {
+  if (!MaxLevelFlag) {
     fprintf(stderr, "cylinder: error: -m is not set\n");
+    exit(1);
+  }
+  if (!MinLevelFlag) {
+    fprintf(stderr, "cylinder: error: -l is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
@@ -155,10 +175,9 @@ int main(int argc, char **argv) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
-  refine(sq(x) + sq(y) <= sq(1.50 * diameter / 2) &&
+  refine(sq(x) + sq(y) <= sq(1.75 * diameter / 2) &&
          sq(x) + sq(y) >= sq(0.98 * diameter / 2) && level < maxlevel);
-  foreach_vertex()
-    phi[] = sq(x) + sq(y) - sq(diameter / 2);
+  foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, vof);
   foreach () {
     u.x[] = vof[];
@@ -209,8 +228,8 @@ event velocity(i++; t <= tend) {
             exit(1);
           }
         }
-        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx,
-                fy, fz, dt);
+        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
+                fz, dt);
         fflush(fp);
       }
     }
