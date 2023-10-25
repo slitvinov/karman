@@ -5,7 +5,7 @@
 #include "fractions.h"
 #include "output_htg.h"
 static const char *force_path, *output_prefix;
-static const double diameter = 0.2;
+static const double diameter = 2;
 static const int minlevel = 6;
 static double reynolds, tend;
 static int maxlevel, period, Surface, Verbose;
@@ -146,8 +146,8 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  size(3.0);
-  origin(-0.5, -L0 / 2.0, -L0 / 2.0);
+  size(75);
+  origin(-15, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
   mu = muv;
   run();
@@ -159,13 +159,10 @@ event velocity(i++) {
 }
 event init(t = 0) {
   vertex scalar phi[];
-  foreach_vertex() {
-    double p0;
-    p0 = sq(x) + sq(y) - sq(diameter / 2);
-    phi[] = p0;
-  }
-  refine(sq(x) + sq(y) < sq(1.05 * diameter / 2) &&
-         sq(x) + sq(y) > sq(0.95 * diameter / 2) && level < maxlevel);
+  refine(sq(x) + sq(y) <= sq(1.20 * diameter / 2) &&
+         sq(x) + sq(y) >= sq(0.99 * diameter / 2) && level < maxlevel);
+  foreach_vertex()
+    phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, vof);
   foreach () {
     u.x[] = vof[];
@@ -175,7 +172,7 @@ event init(t = 0) {
 }
 
 event dump(i++; t <= tend) {
-  char png[FILENAME_MAX], htg[FILENAME_MAX];
+  char htg[FILENAME_MAX];
   double fx, fy, fz;
   long nx, ny;
   scalar omega[], m[];
