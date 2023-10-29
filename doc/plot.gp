@@ -1,7 +1,9 @@
+set term x11
 set macro
 u = 'u 2:($3/75) w l lw 2
-set key off
-# set log y
-plot [50:1400][0:] \
-            "<sh post.sh" u 2:3:1 w p ps 2 pt 7, \
-	    1.4
+# set key off
+plot [50:100] \
+"force.09.dat" u 2:($3/75), \
+"force.10.dat" u 2:($3/75), \
+"force.11.dat" u 2:($3/75), \
+"force.12.dat" u 2:($3/75) t "12"
