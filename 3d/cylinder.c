@@ -238,6 +238,6 @@ event velocity(i++; t <= tend) {
 }
 
 event adapt(i++) {
-  adapt_wavelet((scalar *){u}, (double[]){3e-3, 3e-3, 3e-3},
+  adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3, 3e-3},
                 maxlevel = maxlevel, minlevel = minlevel);
 }
