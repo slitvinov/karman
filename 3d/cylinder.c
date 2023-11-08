@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
           "integer)\n"
           "  -m <resolution level>    the maximum resolution level (positive "
           "integer)\n"
+	  "  -o <preifx>              a prefix for the output files\n"
           "  -p <dump period>         the dump period (positive integer)\n"
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
