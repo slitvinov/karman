@@ -20351,7 +20351,7 @@ static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;i
 
 #line 240
       static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
-  adapt_wavelet((struct Adapt){(scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){3e-3, 3e-3, 3e-3},
+  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){1e-2, 3e-3, 3e-3, 3e-3},
                 .maxlevel = maxlevel, .minlevel = minlevel});
 }{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
