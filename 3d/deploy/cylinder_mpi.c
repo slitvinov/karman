@@ -20182,12 +20182,6 @@ foreach () {
       }
     }
   }
-  foreach_stencil ()
-    { {_stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0,0,0);  } {_stencil_val_a(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0,0);  } {_stencil_val_a(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0);  }}end_foreach_stencil();
-  {
-#line 238
-foreach ()
-    { val(u.x,0,0,0) = val(cs,0,0,0) * val(u.x,0,0,0); val(u.y,0,0,0) = val(cs,0,0,0) * val(u.y,0,0,0); val(u.z,0,0,0) = val(cs,0,0,0) * val(u.z,0,0,0);}end_foreach();}
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
