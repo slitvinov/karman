@@ -235,7 +235,5 @@ event velocity(i++; t <= tend) {
       }
     }
   }
-  foreach ()
-    foreach_dimension() u.x[] = cs[] * u.x[];
   iframe++;
 }
