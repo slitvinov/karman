@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "grid/octree.h"
+#include "embed.h"
 #include "navier-stokes/centered.h"
 #include "fractions.h"
 #include "output_htg.h"
@@ -18,7 +19,6 @@ p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
 
 face vector muv[];
-scalar vof[];
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
@@ -178,9 +178,10 @@ event init(t = 0) {
   refine(sq(x) + sq(y) <= sq(2.00 * diameter / 2) &&
          sq(x) + sq(y) >= sq(0.90 * diameter / 2) && level < maxlevel);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
-  fractions(phi, vof);
+  //  fractions(phi, vof);
+  fractions(phi, cs, fs);
   foreach () {
-    u.x[] = vof[];
+    u.x[] = cs[];
     u.y[] = 0;
     u.z[] = 0;
   }
@@ -201,14 +202,14 @@ event velocity(i++; t <= tend) {
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
       vorticity(u, omega);
-      output_htg({p, omega, vof}, {u}, htg);
+      output_htg({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
       fx = 0;
       fy = 0;
       fz = 0;
       foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
-        double dv = (1 - vof[]) * dv();
+        double dv = (1 - cs[]) * dv();
         fx += u.x[] * dv;
         fy += u.y[] * dv;
         fz += u.z[] * dv;
@@ -235,6 +236,6 @@ event velocity(i++; t <= tend) {
     }
   }
   foreach ()
-    foreach_dimension() u.x[] = vof[] * u.x[];
+    foreach_dimension() u.x[] = cs[] * u.x[];
   iframe++;
 }
