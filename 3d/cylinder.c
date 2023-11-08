@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
           "integer)\n"
           "  -m <resolution level>    the maximum resolution level (positive "
           "integer)\n"
-	  "  -o <preifx>              a prefix for the output files\n"
+          "  -o <preifx>              a prefix for the output files\n"
           "  -p <dump period>         the dump period (positive integer)\n"
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
@@ -176,10 +176,9 @@ int main(int argc, char **argv) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
-  refine(sq(x) + sq(y) <= sq(2.00 * diameter / 2) &&
+  refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
          sq(x) + sq(y) >= sq(0.90 * diameter / 2) && level < maxlevel);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
-  //  fractions(phi, vof);
   fractions(phi, cs, fs);
   foreach () {
     u.x[] = cs[];
@@ -237,4 +236,9 @@ event velocity(i++; t <= tend) {
     }
   }
   iframe++;
+}
+
+event adapt(i++) {
+  adapt_wavelet((scalar *){u}, (double[]){3e-3, 3e-3, 3e-3},
+                maxlevel = maxlevel, minlevel = minlevel);
 }
