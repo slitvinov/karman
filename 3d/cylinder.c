@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   size(5);
-  origin(-1, -L0 / 2.0, -L0 / 2.0);
+  origin(-2, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
   mu = muv;
   run();
