@@ -4,6 +4,36 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
+trace
+void embed_force3 (scalar p, vector u, face vector mu, coord * Fp, coord * Fmu)
+{
+  coord Fps = {0}, Fmus = {0};
+  foreach (reduction(+:Fps) reduction(+:Fmus), nowarning)
+    if (cs[] > 0. && cs[] < 1.) {
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, dimension - 1);
+      double Fn = area*embed_interpolate (point, p, b);
+      foreach_dimension()
+	Fps.x += Fn*n.x;
+      if (constant(mu.x) != 0.) {
+	double mua = 0., fa = 0.;
+	foreach_dimension() {
+	  mua += mu.x[] + mu.x[1];
+	  fa  += fs.x[] + fs.x[1];
+	}
+	mua /= (fa + SEPS);
+	coord dudn = embed_gradient (point, u, b, n);
+	foreach_dimension()
+	  Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
+			      dudn.y*n.x*n.y +
+			      dudn.z*n.x*n.z);
+      }
+    }
+  *Fp = Fps; *Fmu = Fmus;
+}
+
+
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
 static double reynolds, tend;
@@ -180,12 +210,10 @@ event init(t = 0) {
   int l;
   double eps;
   vertex scalar phi[];
-  /*
   for (l = minlevel + 1; l <= maxlevel; l++)
     refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
 	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
 	   level < l);
-  */
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
   foreach () {
@@ -213,7 +241,7 @@ event velocity(i++; t <= tend) {
       output_htg({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
-      embed_force(p, u, mu, &Fp, &Fmu);
+      embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
 	if (fp == NULL) {
 	  if ((fp = fopen(force_path, "w")) == NULL) {
@@ -235,7 +263,7 @@ event velocity(i++; t <= tend) {
       }
     }
   }
-  astats s = adapt_wavelet({cs, u}, (double[]){2e-2, 3e-3, 3e-3, 3e-3},
+  astats s = adapt_wavelet((scalar*){u}, (double[]){3e-3, 3e-3, 3e-3},
 			   maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
