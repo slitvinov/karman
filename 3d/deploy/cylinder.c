@@ -19775,7 +19775,7 @@ char *end;
     exit(1);
   }
   size(5);
-  origin((struct _origin){-1, -L0 / 2.0, -L0 / 2.0});
+  origin((struct _origin){-2, -L0 / 2.0, -L0 / 2.0});
   init_grid(1 << minlevel);
   mu = muv;
   run();
