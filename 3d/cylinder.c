@@ -3,7 +3,7 @@
 #include "grid/octree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
-#include "navier-stokes/double-projection.h"
+#include "navier-stokes/perfs.h"
 #include "output_htg.h"
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
@@ -17,6 +17,10 @@ pf[left] = neumann(0);
 u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
+
+u.n[embed] = dirichlet(0);
+u.t[embed] = dirichlet(0);
+u.r[embed] = dirichlet(0);
 
 face vector muv[];
 int main(int argc, char **argv) {
@@ -176,7 +180,7 @@ int main(int argc, char **argv) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
-  refine(level <= maxlevel*(1 - sqrt(fabs(sq(x) + sq(y) - sq(diameter/2)))/2));
+  refine(sq(x) + sq(y) < sq(1.2*diameter/2) && level < maxlevel);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
   foreach () {
