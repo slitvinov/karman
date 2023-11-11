@@ -36,80 +36,80 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(
-	  stderr,
-	  "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
-	  "number> -m <maximum resolution level> -p <dump period> "
-	  "-e <end time>\n"
-	  "Options:\n"
-	  "  -h     Display this help message\n"
-	  "  -v     Verbose\n"
-	  "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-	  "  -l <resolution level>    the minimum resolution level (positive "
-	  "integer)\n"
-	  "  -m <resolution level>    the maximum resolution level (positive "
-	  "integer)\n"
-	  "  -o <preifx>              a prefix for the output files\n"
-	  "  -p <dump period>         the dump period (positive integer)\n"
-	  "  -e <end time>            end time of the simulation (decimal "
-	  "number)\n"
-	  "  -f <force file>          force file\n"
-	  "\n"
-	  "Example usage:\n"
-	  "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
-	  "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
+          stderr,
+          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
+          "number> -m <maximum resolution level> -p <dump period> "
+          "-e <end time>\n"
+          "Options:\n"
+          "  -h     Display this help message\n"
+          "  -v     Verbose\n"
+          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -l <resolution level>    the minimum resolution level (positive "
+          "integer)\n"
+          "  -m <resolution level>    the maximum resolution level (positive "
+          "integer)\n"
+          "  -o <preifx>              a prefix for the output files\n"
+          "  -p <dump period>         the dump period (positive integer)\n"
+          "  -e <end time>            end time of the simulation (decimal "
+          "number)\n"
+          "  -f <force file>          force file\n"
+          "\n"
+          "Example usage:\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error:  -r needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error:  -r needs an argument\n");
+        exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'm':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -m needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -m needs an argument\n");
+        exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || maxlevel <= 0) {
-	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-		*argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
       }
       MaxLevelFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -l needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        exit(1);
       }
       minlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || minlevel <= 0) {
-	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-		*argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
       }
       MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -p needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -p needs an argument\n");
+        exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-		*argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -119,29 +119,29 @@ int main(int argc, char **argv) {
     case 'e':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -e needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -e needs an argument\n");
+        exit(1);
       }
       tend = strtod(*argv, &end);
       if (*end != '\0') {
-	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
       }
       TendFlag = 1;
       break;
     case 'f':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -f needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -f needs an argument\n");
+        exit(1);
       }
       force_path = *argv;
       break;
     case 'o':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -o needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -o needs an argument\n");
+        exit(1);
       }
       output_prefix = *argv;
       break;
@@ -177,10 +177,11 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
+  int l;
   vertex scalar phi[];
-  refine(sq(x) + sq(y) < sq(1.2*diameter/2) && sq(x) + sq(y) > sq(0.9*diameter/2) && level < maxlevel);
-  foreach_vertex()
-    phi[] = sq(x) + sq(y) - sq(diameter / 2);
+  for (l = minlevel + 1; l <= maxlevel; l++)
+    refine(sq(x) + sq(y) < sq(1.2 * diameter / 2) && level < l);
+  foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
   foreach () {
     u.x[] = cs[];
@@ -199,7 +200,7 @@ event velocity(i++; t <= tend) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-	fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
+        fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
@@ -211,36 +212,37 @@ event velocity(i++; t <= tend) {
       fy = 0;
       fz = 0;
       foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
-	double dv = (1 - cs[]) * dv();
-	fx += u.x[] * dv;
-	fy += u.y[] * dv;
-	fz += u.z[] * dv;
+        double dv = (1 - cs[]) * dv();
+        fx += u.x[] * dv;
+        fy += u.y[] * dv;
+        fz += u.z[] * dv;
       }
       fx /= dt;
       fy /= dt;
       fz /= dt;
       if (pid() == 0) {
-	if (fp == NULL) {
-	  if ((fp = fopen(force_path, "w")) == NULL) {
-	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-	    exit(1);
-	  }
-	} else {
-	  if ((fp = fopen(force_path, "a")) == NULL) {
-	    fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
-	    exit(1);
-	  }
-	}
-	fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
-		fz, dt);
-	fflush(fp);
+        if (fp == NULL) {
+          if ((fp = fopen(force_path, "w")) == NULL) {
+            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            exit(1);
+          }
+        } else {
+          if ((fp = fopen(force_path, "a")) == NULL) {
+            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            exit(1);
+          }
+        }
+        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
+                fz, dt);
+        fflush(fp);
       }
     }
   }
   /*
   astats s = adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3, 3e-3},
-			   maxlevel = maxlevel, minlevel = minlevel);
+                           maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose && iframe % period == 0 && pid() == 0)
-  fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf, s.nc); */
+  fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
+  s.nc); */
   iframe++;
 }
