@@ -3,7 +3,6 @@
 #include "grid/octree.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
-#include "navier-stokes/perfs.h"
 #include "output_htg.h"
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
