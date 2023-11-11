@@ -19924,80 +19924,80 @@ char *end;
     switch (argv[0][1]) {
     case 'h':
       fprintf(
-          ferr,
-          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
-          "number> -m <maximum resolution level> -p <dump period> "
-          "-e <end time>\n"
-          "Options:\n"
-          "  -h     Display this help message\n"
-          "  -v     Verbose\n"
-          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-          "  -l <resolution level>    the minimum resolution level (positive "
-          "integer)\n"
-          "  -m <resolution level>    the maximum resolution level (positive "
-          "integer)\n"
-          "  -o <preifx>              a prefix for the output files\n"
-          "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal "
-          "number)\n"
-          "  -f <force file>          force file\n"
-          "\n"
-          "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
+   ferr,
+   "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
+   "number> -m <maximum resolution level> -p <dump period> "
+   "-e <end time>\n"
+   "Options:\n"
+   "  -h     Display this help message\n"
+   "  -v     Verbose\n"
+   "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+   "  -l <resolution level>    the minimum resolution level (positive "
+   "integer)\n"
+   "  -m <resolution level>    the maximum resolution level (positive "
+   "integer)\n"
+   "  -o <preifx>              a prefix for the output files\n"
+   "  -p <dump period>         the dump period (positive integer)\n"
+   "  -e <end time>            end time of the simulation (decimal "
+   "number)\n"
+   "  -f <force file>          force file\n"
+   "\n"
+   "Example usage:\n"
+   "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
+   "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error:  -r needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error:  -r needs an argument\n");
+ exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
+ exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'm':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -m needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -m needs an argument\n");
+ exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || maxlevel <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       MaxLevelFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -l needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -l needs an argument\n");
+ exit(1);
       }
       minlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || minlevel <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -p needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -p needs an argument\n");
+ exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -20007,29 +20007,29 @@ char *end;
     case 'e':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -e needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -e needs an argument\n");
+ exit(1);
       }
       tend = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
+ exit(1);
       }
       TendFlag = 1;
       break;
     case 'f':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -f needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -f needs an argument\n");
+ exit(1);
       }
       force_path = *argv;
       break;
     case 'o':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -o needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -o needs an argument\n");
+ exit(1);
       }
       output_prefix = *argv;
       break;
@@ -20078,11 +20078,12 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   double eps;
   scalar  phi=new_vertex_scalar("phi");
   for (l = minlevel + 1; l <= maxlevel; l++)
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) < sq(1.25 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) && sq(x) + sq(y) >= sq(0.95 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+
               ;
   foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
   {
-#line 186
+#line 187
 foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
@@ -20091,7 +20092,7 @@ foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_v
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 188
+#line 189
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -20100,7 +20101,7 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 194
+#line 195
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
   coord Fp, Fmu;
@@ -20112,7 +20113,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-        fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
+ fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
@@ -20122,23 +20123,23 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
     if (force_path) {
       embed_force(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
-        if (fp == NULL) {
-          if ((fp = fopen(force_path, "w")) == NULL) {
-            fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        } else {
-          if ((fp = fopen(force_path, "a")) == NULL) {
-            fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        }
-        fprintf(fp,
-                "%ld %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
-                "%.16e %.16e\n",
-                iframe, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
-                Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
-        fflush(fp);
+ if (fp == NULL) {
+   if ((fp = fopen(force_path, "w")) == NULL) {
+     fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
+     exit(1);
+   }
+ } else {
+   if ((fp = fopen(force_path, "a")) == NULL) {
+     fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
+     exit(1);
+   }
+ }
+ fprintf(fp,
+  "%ld %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
+  "%.16e %.16e\n",
+  iframe, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
+  Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
+ fflush(fp);
       }
     }
   }
@@ -20194,7 +20195,7 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
 #line 179 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 194
+#line 195
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
