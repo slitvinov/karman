@@ -18,9 +18,8 @@ u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
 
-u.n[embed] = dirichlet(0);
-u.t[embed] = dirichlet(0);
-u.r[embed] = dirichlet(0);
+u.n[embed] = fabs(z) > 2 * diameter ? neumann(0) : dirichlet(0);
+u.t[embed] = fabs(z) > 2 * diameter ? neumann(0) : dirichlet(0);
 
 face vector muv[];
 int main(int argc, char **argv) {
