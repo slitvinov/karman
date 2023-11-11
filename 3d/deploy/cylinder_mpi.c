@@ -19968,80 +19968,80 @@ char *end;
     switch (argv[0][1]) {
     case 'h':
       fprintf(
-          ferr,
-          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
-          "number> -m <maximum resolution level> -p <dump period> "
-          "-e <end time>\n"
-          "Options:\n"
-          "  -h     Display this help message\n"
-          "  -v     Verbose\n"
-          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-          "  -l <resolution level>    the minimum resolution level (positive "
-          "integer)\n"
-          "  -m <resolution level>    the maximum resolution level (positive "
-          "integer)\n"
-          "  -o <preifx>              a prefix for the output files\n"
-          "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal "
-          "number)\n"
-          "  -f <force file>          force file\n"
-          "\n"
-          "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
+   ferr,
+   "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
+   "number> -m <maximum resolution level> -p <dump period> "
+   "-e <end time>\n"
+   "Options:\n"
+   "  -h     Display this help message\n"
+   "  -v     Verbose\n"
+   "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+   "  -l <resolution level>    the minimum resolution level (positive "
+   "integer)\n"
+   "  -m <resolution level>    the maximum resolution level (positive "
+   "integer)\n"
+   "  -o <preifx>              a prefix for the output files\n"
+   "  -p <dump period>         the dump period (positive integer)\n"
+   "  -e <end time>            end time of the simulation (decimal "
+   "number)\n"
+   "  -f <force file>          force file\n"
+   "\n"
+   "Example usage:\n"
+   "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
+   "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error:  -r needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error:  -r needs an argument\n");
+ exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
+ exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'm':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -m needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -m needs an argument\n");
+ exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || maxlevel <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       MaxLevelFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -l needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -l needs an argument\n");
+ exit(1);
       }
       minlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || minlevel <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -p needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -p needs an argument\n");
+ exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+  *argv);
+ exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -20051,29 +20051,29 @@ char *end;
     case 'e':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -e needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -e needs an argument\n");
+ exit(1);
       }
       tend = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+ fprintf(ferr, "cylinder: error: '%s' is not a number\n", *argv);
+ exit(1);
       }
       TendFlag = 1;
       break;
     case 'f':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -f needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -f needs an argument\n");
+ exit(1);
       }
       force_path = *argv;
       break;
     case 'o':
       argv++;
       if (*argv == NULL) {
-        fprintf(ferr, "cylinder: error: -o needs an argument\n");
-        exit(1);
+ fprintf(ferr, "cylinder: error: -o needs an argument\n");
+ exit(1);
       }
       output_prefix = *argv;
       break;
@@ -20152,7 +20152,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-        fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
+ fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
@@ -20164,11 +20164,11 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       fy = 0;
       fz = 0;
       foreach_stencil () {      
-        _stencil_val(cm,0,0,0); _stencil_val(cs,0,0,0); 
+ _stencil_val(cm,0,0,0); _stencil_val(cs,0,0,0); 
 _stencil_val(u.x,0,0,0); 
-           _stencil_val(u.y,0,0,0); 
-           _stencil_val(u.z,0,0,0); 
-          
+    _stencil_val(u.y,0,0,0); 
+    _stencil_val(u.z,0,0,0); 
+   
       
 #line 219
 }end_foreach_stencil();
@@ -20180,10 +20180,10 @@ if(!is_constant(cm)){
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
 #line 214
 foreach () {
-        double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
-        fx += val(u.x,0,0,0) * dv;
-        fy += val(u.y,0,0,0) * dv;
-        fz += val(u.z,0,0,0) * dv;
+ double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
+ fx += val(u.x,0,0,0) * dv;
+ fy += val(u.y,0,0,0) * dv;
+ fz += val(u.z,0,0,0) * dv;
       }end_foreach();mpi_all_reduce_array(&fz,double,MPI_SUM,1);mpi_all_reduce_array(&fy,double,MPI_SUM,1);mpi_all_reduce_array(&fx,double,MPI_SUM,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
@@ -20196,10 +20196,10 @@ foreach () {
 OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
 #line 214
 foreach () {
-        double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*_const_cm);
-        fx += val(u.x,0,0,0) * dv;
-        fy += val(u.y,0,0,0) * dv;
-        fz += val(u.z,0,0,0) * dv;
+ double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*_const_cm);
+ fx += val(u.x,0,0,0) * dv;
+ fy += val(u.y,0,0,0) * dv;
+ fz += val(u.z,0,0,0) * dv;
       }end_foreach();mpi_all_reduce_array(&fz,double,MPI_SUM,1);mpi_all_reduce_array(&fy,double,MPI_SUM,1);mpi_all_reduce_array(&fx,double,MPI_SUM,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
@@ -20210,34 +20210,29 @@ foreach () {
       fy /= dt;
       fz /= dt;
       if (pid() == 0) {
-        if (fp == NULL) {
-          if ((fp = fopen(force_path, "w")) == NULL) {
-            fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        } else {
-          if ((fp = fopen(force_path, "a")) == NULL) {
-            fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        }
-        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
-                fz, dt);
-        fflush(fp);
+ if (fp == NULL) {
+   if ((fp = fopen(force_path, "w")) == NULL) {
+     fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
+     exit(1);
+   }
+ } else {
+   if ((fp = fopen(force_path, "a")) == NULL) {
+     fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
+     exit(1);
+   }
+ }
+ fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
+  fz, dt);
+ fflush(fp);
       }
     }
   }
+  astats s = adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){1e-2, 3e-3, 3e-3, 3e-3},
+      .maxlevel = maxlevel, .minlevel = minlevel});
+  if (Verbose && iframe % period == 0 && pid() == 0)
+    fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf, s.nc);
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
-
-static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
-
-
-#line 244
-      static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
-  adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){1e-2, 3e-3, 3e-3, 3e-3},
-                .maxlevel = maxlevel, .minlevel = minlevel});
-}{end_tracing("adapt_0","cylinder.c",0);return 0;}end_tracing("adapt_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20354,9 +20349,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
 #line 180 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});  
-#line 244
-event_register((Event){0,1,adapt_0,{adapt_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"adapt"});
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
