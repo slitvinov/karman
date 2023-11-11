@@ -19794,7 +19794,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   int l;
   double eps;
   scalar  phi=new_vertex_scalar("phi");
-  eps = 1e-6;
+  eps = 1e-3;
   for (l = minlevel + 1; l <= maxlevel; l++)
     do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x + eps) + sq(y) < sq(1.30 * diameter / 2) && sq(x + eps) + sq(y) > sq(0.95 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
 

@@ -180,7 +180,7 @@ event init(t = 0) {
   int l;
   double eps;
   vertex scalar phi[];
-  eps = 1e-6;
+  eps = 1e-3;
   for (l = minlevel + 1; l <= maxlevel; l++)
     refine(sq(x + eps) + sq(y) < sq(1.30 * diameter / 2) &&
 	   sq(x + eps) + sq(y) > sq(0.95 * diameter / 2) &&
