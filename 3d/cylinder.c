@@ -181,7 +181,7 @@ event init(t = 0) {
   double eps;
   vertex scalar phi[];
   for (l = minlevel + 1; l <= maxlevel; l++)
-    refine(sq(x) + sq(y) < sq(1.30 * diameter / 2) &&
+    refine(sq(x) + sq(y) < sq(1.25 * diameter / 2) &&
 	   level < l);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
