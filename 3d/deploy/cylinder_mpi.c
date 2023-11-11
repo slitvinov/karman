@@ -20142,11 +20142,13 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       }
     }
   }
-  astats s = adapt_wavelet((struct Adapt){(scalar*)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){3e-3, 3e-3, 3e-3},
-                           .maxlevel = maxlevel, .minlevel = minlevel});
-  if (Verbose && iframe % period == 0 && pid() == 0)
-    fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
-            s.nc);
+
+
+
+
+
+
+
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
