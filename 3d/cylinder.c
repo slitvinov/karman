@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
-  refine(sq(x) + sq(y) < sq(1.2*diameter/2) && level < maxlevel);
+  refine(sq(x) + sq(y) < sq(1.2*diameter/2) && sq(x) + sq(y) > sq(0.9*diameter/2) && level < maxlevel);
   foreach_vertex()
     phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
