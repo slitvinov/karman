@@ -180,8 +180,7 @@ event init(t = 0) {
   int l;
   vertex scalar phi[];
   for (l = minlevel + 1; l <= maxlevel; l++)
-    refine(sq(x + 1e-8) + sq(y) < sq(1.25 * diameter / 2) &&
-	   sq(x + 1e-8) + sq(y) > sq(0.95 * diameter / 2) &&
+    refine(sq(x) + sq(y) < sq(1.25 * diameter / 2) &&
 	   level < l);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
