@@ -18,8 +18,8 @@ u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
 
-u.n[embed] = fabs(z) > 2 * diameter ? neumann(0) : dirichlet(0);
-u.t[embed] = fabs(z) > 2 * diameter ? neumann(0) : dirichlet(0);
+u.n[embed] = dirichlet(0);
+u.t[embed] = dirichlet(0);
 
 face vector muv[];
 int main(int argc, char **argv) {
@@ -180,7 +180,8 @@ event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
   refine(sq(x) + sq(y) < sq(1.2*diameter/2) && level < maxlevel);
-  foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
+  foreach_vertex()
+    phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
   foreach () {
     u.x[] = cs[];
