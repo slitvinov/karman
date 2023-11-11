@@ -20140,7 +20140,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       }
     }
   }
-  astats s = adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){1e-2, 3e-3, 3e-3, 3e-3},
+  astats s = adapt_wavelet((struct Adapt){(scalar*)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){3e-3, 3e-3, 3e-3},
                            .maxlevel = maxlevel, .minlevel = minlevel});
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
