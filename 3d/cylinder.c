@@ -169,8 +169,8 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  size(75);
-  origin(-15, -L0 / 2.0, -L0 / 2.0);
+  size(5);
+  origin(-1, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
   mu = muv;
   run();
