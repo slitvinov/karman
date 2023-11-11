@@ -180,8 +180,7 @@ event init(t = 0) {
   int l;
   vertex scalar phi[];
   for (l = minlevel + 1; l <= maxlevel; l++)
-    refine(sq(x) + sq(y) < sq(1.25 * diameter / 2) &&
-	   level < l);
+    refine(sq(x) + sq(y) < sq(1.25 * diameter / 2) && level < l);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
   foreach () {
@@ -192,7 +191,7 @@ event init(t = 0) {
 }
 event velocity(i++; t <= tend) {
   char htg[FILENAME_MAX];
-  double fx, fy, fz;
+  coord Fp, Fmu;
   long nx, ny;
   scalar omega[], m[];
   static FILE *fp;
@@ -209,32 +208,24 @@ event velocity(i++; t <= tend) {
       output_htg({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
-      fx = 0;
-      fy = 0;
-      fz = 0;
-      foreach (reduction(+ : fx), reduction(+ : fy), reduction(+ : fz)) {
-        double dv = (1 - cs[]) * dv();
-        fx += u.x[] * dv;
-        fy += u.y[] * dv;
-        fz += u.z[] * dv;
-      }
-      fx /= dt;
-      fy /= dt;
-      fz /= dt;
+      embed_force(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
         if (fp == NULL) {
           if ((fp = fopen(force_path, "w")) == NULL) {
-            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
           }
         } else {
           if ((fp = fopen(force_path, "a")) == NULL) {
-            fprintf(stderr, "stl: error: fail to open '%s'\n", force_path);
+            fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
           }
         }
-        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
-                fz, dt);
+        fprintf(fp,
+                "%ld %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
+                "%.16e %.16e\n",
+                iframe, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
+                Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
         fflush(fp);
       }
     }
@@ -242,7 +233,7 @@ event velocity(i++; t <= tend) {
   astats s = adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3, 3e-3},
                            maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose && iframe % period == 0 && pid() == 0)
-  fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
-	  s.nc);
+    fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
+            s.nc);
   iframe++;
 }

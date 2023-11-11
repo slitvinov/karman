@@ -20077,11 +20077,10 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   int l;
   scalar  phi=new_vertex_scalar("phi");
   for (l = minlevel + 1; l <= maxlevel; l++)
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) < sq(1.25 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
-              ;
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) < sq(1.25 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
   foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
   {
-#line 185
+#line 184
 foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
@@ -20090,7 +20089,7 @@ foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_v
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 187
+#line 186
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -20099,10 +20098,10 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 193
+#line 192
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
-  double fx, fy, fz;
+  coord Fp, Fmu;
   long nx, ny;
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
   static FILE *fp;
@@ -20119,69 +20118,24 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       output_htg(((scalar[]){p, omega, cs,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), htg);
     }
     if (force_path) {
-      fx = 0;
-      fy = 0;
-      fz = 0;
-      foreach_stencil () {      
-        _stencil_val(cm,0,0,0); _stencil_val(cs,0,0,0); 
-_stencil_val(u.x,0,0,0); 
-           _stencil_val(u.y,0,0,0); 
-           _stencil_val(u.z,0,0,0); 
-          
-      
-#line 220
-}end_foreach_stencil();
-      
-#line 215
-if(!is_constant(cm)){
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 215
-foreach () {
-        double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*val(cm,0,0,0));
-        fx += val(u.x,0,0,0) * dv;
-        fy += val(u.y,0,0,0) * dv;
-        fz += val(u.z,0,0,0) * dv;
-      }end_foreach();mpi_all_reduce_array(&fz,double,MPI_SUM,1);mpi_all_reduce_array(&fy,double,MPI_SUM,1);mpi_all_reduce_array(&fx,double,MPI_SUM,1);
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-#line 220
-}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
-      
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel  reduction(+ : fz) reduction(+ : fy)reduction(+ : fx)){
-#line 215
-foreach () {
-        double dv = (1 - val(cs,0,0,0)) * (cube(Delta)*_const_cm);
-        fx += val(u.x,0,0,0) * dv;
-        fy += val(u.y,0,0,0) * dv;
-        fz += val(u.z,0,0,0) * dv;
-      }end_foreach();mpi_all_reduce_array(&fz,double,MPI_SUM,1);mpi_all_reduce_array(&fy,double,MPI_SUM,1);mpi_all_reduce_array(&fx,double,MPI_SUM,1);
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-#line 220
-}
-      fx /= dt;
-      fy /= dt;
-      fz /= dt;
+      embed_force(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
         if (fp == NULL) {
           if ((fp = fopen(force_path, "w")) == NULL) {
-            fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
+            fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
           }
         } else {
           if ((fp = fopen(force_path, "a")) == NULL) {
-            fprintf(ferr, "stl: error: fail to open '%s'\n", force_path);
+            fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
           }
         }
-        fprintf(fp, "%ld %.16e %.16e %.16e %.16e %.16e\n", iframe, t, fx, fy,
-                fz, dt);
+        fprintf(fp,
+                "%ld %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
+                "%.16e %.16e\n",
+                iframe, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
+                Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
         fflush(fp);
       }
     }
@@ -20189,8 +20143,8 @@ foreach () {
   astats s = adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){1e-2, 3e-3, 3e-3, 3e-3},
                            .maxlevel = maxlevel, .minlevel = minlevel});
   if (Verbose && iframe % period == 0 && pid() == 0)
-  fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
-   s.nc);
+    fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
+            s.nc);
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
@@ -20236,7 +20190,7 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
 #line 179 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 193
+#line 192
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
