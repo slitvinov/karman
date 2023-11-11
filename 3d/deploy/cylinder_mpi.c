@@ -19888,6 +19888,305 @@ MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #line 7 "cylinder.c"
+bool emerged = true;
+scalar  csm1={15};
+static double embed_interpolate3 (Point point, scalar s, coord b)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  int i = sign(b.x), j = sign(b.y);
+  int k = sign(b.z);
+  if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0) &&
+      val(cs,0,0,k) && val(cs,i,0,k) && val(cs,0,j,k) && val(cs,i,j,k) &&
+      (emerged || (val(csm1,i,0,0) && val(csm1,0,j,0) && val(csm1,i,j,0) &&
+     val(csm1,0,0,k) && val(csm1,i,0,k) && val(csm1,0,j,k) && val(csm1,i,j,k)))) {
+    double val_0, val_k;
+
+    val_0 = (val(s,0,0,0)*(1. - fabs(b.x)) + val(s,i,0,0)*fabs(b.x))*(1. - fabs(b.y)) +
+      (val(s,0,j,0)*(1. - fabs(b.x)) + val(s,i,j,0)*fabs(b.x))*fabs(b.y);
+    val_k = (val(s,0,0,k)*(1. - fabs(b.x)) + val(s,i,0,k)*fabs(b.x))*(1. - fabs(b.y)) +
+      (val(s,0,j,k)*(1. - fabs(b.x)) + val(s,i,j,k)*fabs(b.x))*fabs(b.y);
+
+    return (val_0*(1. - fabs(b.z)) + val_k*fabs(b.z));
+  }
+  else {
+
+
+    double val = val(s,0,0,0);
+     {
+      int i = sign(b.x);
+      if (val(cs,i,0,0) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,i,0,0))))
+ val += fabs(b.x)*(val(s,i,0,0) - val(s,0,0,0));
+      else if (val(cs,-i,0,0) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,-i,0,0))))
+ val += fabs(b.x)*(val(s,0,0,0) - val(s,-i,0,0));
+    } 
+#line 30
+{
+      int i = sign(b.y);
+      if (val(cs,0,i,0) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,0,i,0))))
+ val += fabs(b.y)*(val(s,0,i,0) - val(s,0,0,0));
+      else if (val(cs,0,-i,0) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,0,-i,0))))
+ val += fabs(b.y)*(val(s,0,0,0) - val(s,0,-i,0));
+    } 
+#line 30
+{
+      int i = sign(b.z);
+      if (val(cs,0,0,i) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,0,0,i))))
+ val += fabs(b.z)*(val(s,0,0,i) - val(s,0,0,0));
+      else if (val(cs,0,0,-i) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,0,0,-i))))
+ val += fabs(b.z)*(val(s,0,0,0) - val(s,0,0,-i));
+    }
+    return val;
+  }
+}
+
+#line 9
+static void _stencil_embed_interpolate3 (Point point, scalar s,_stencil_undefined * b)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
+  
+  
+_stencil_val(cs,o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);
+      _stencil_val(cs,0,0,o_stencil); _stencil_val(cs,o_stencil,0,o_stencil); _stencil_val(cs,0,o_stencil,o_stencil); _stencil_val(cs,o_stencil,o_stencil,o_stencil);
+_stencil_val(csm1,o_stencil,0,0); _stencil_val(csm1,0,o_stencil,0); _stencil_val(csm1,o_stencil,o_stencil,0);
+     _stencil_val(csm1,0,0,o_stencil); _stencil_val(csm1,o_stencil,0,o_stencil); _stencil_val(csm1,0,o_stencil,o_stencil); _stencil_val(csm1,o_stencil,o_stencil,o_stencil);
+#line 13
+{ 
+
+
+{  
+    
+
+_stencil_val(s,0,0,0); _stencil_val(s,o_stencil,0,0);
+_stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0); 
+
+              
+      
+#line 21
+_stencil_val(s,0,0,o_stencil); _stencil_val(s,o_stencil,0,o_stencil);
+_stencil_val(s,0,o_stencil,o_stencil); _stencil_val(s,o_stencil,o_stencil,o_stencil);     
+
+    
+  } 
+{  
+
+
+     _stencil_val(s,0,0,0);
+     {   
+      
+_stencil_val(cs,o_stencil,0,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
+#line 32
+{
+ 
+{_stencil_val(s,o_stencil,0,0); _stencil_val(s,0,0,0);   } 
+{_stencil_val(cs,o_stencil,0,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
+ {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);   }     
+        
+#line 37
+}}
+           
+   
+      
+    
+#line 38
+} 
+#line 30
+{   
+      
+_stencil_val(cs,0,o_stencil,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
+#line 32
+{
+ 
+{_stencil_val(s,0,o_stencil,0); _stencil_val(s,0,0,0);   } 
+{_stencil_val(cs,0,o_stencil,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
+ {_stencil_val(s,0,0,0);_stencil_val(s,0, o_stencil,0);   }     
+        
+#line 37
+}}
+           
+   
+      
+    
+#line 38
+} 
+#line 30
+{   
+      
+_stencil_val(cs,0,0,o_stencil);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
+#line 32
+{
+ 
+{_stencil_val(s,0,0,o_stencil); _stencil_val(s,0,0,0);   } 
+{_stencil_val(cs,0,0,o_stencil);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
+ {_stencil_val(s,0,0,0);_stencil_val(s,0,0, o_stencil);   }     
+        
+#line 37
+}}
+           
+   
+      
+    
+#line 38
+} 
+    
+  }}
+                  
+      
+  
+
+#line 41
+}
+
+static
+double embed_geometry3 (Point point, coord * b, coord * n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  *n = facet_normal (point, cs, fs);
+  double alpha = plane_alpha (val(cs,0,0,0), *n);
+  double area = plane_area_center (*n, alpha, b);
+  normalize (n);
+  return area;
+}
+
+
+#line 43
+static void 
+_stencil_embed_geometry3 (Point point,_stencil_undefined  * b,_stencil_undefined  * n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
+_stencil_facet_normal (point, cs, fs);     
+   
+  
+#line 47
+_stencil_val(cs,0,0,0);      
+   
+  
+  return ;
+}
+
+static
+coord embed_gradient3 (Point point, vector u, coord b, coord n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  coord dudn;
+   {
+    bool dirichlet;
+    double vb = _attribute[u.x.i].boundary[embed] (point, point, u.x, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.x = dirichlet_gradient (point, u.x, cs, n, b, vb, &val);
+      dudn.x += val(u.x,0,0,0)*val;
+    }
+    else
+      dudn.x = vb;
+    if (dudn.x == 1e30)
+      dudn.x = 0.;
+  } 
+#line 57
+{
+    bool dirichlet;
+    double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.y = dirichlet_gradient (point, u.y, cs, n, b, vb, &val);
+      dudn.y += val(u.y,0,0,0)*val;
+    }
+    else
+      dudn.y = vb;
+    if (dudn.y == 1e30)
+      dudn.y = 0.;
+  } 
+#line 57
+{
+    bool dirichlet;
+    double vb = _attribute[u.z.i].boundary[embed] (point, point, u.z, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.z = dirichlet_gradient (point, u.z, cs, n, b, vb, &val);
+      dudn.z += val(u.z,0,0,0)*val;
+    }
+    else
+      dudn.z = vb;
+    if (dudn.z == 1e30)
+      dudn.z = 0.;
+  }
+  return dudn;
+}
+
+
+#line 53
+static void 
+_stencil_embed_gradient3 (Point point, vector u,_stencil_undefined * b,_stencil_undefined * n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
+  
+   {   
+    
+    default_stencil ( point,((scalar[]){ u.x,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.x,0,0,0);
+       
+    
+#line 64
+}   
+     
+    
+        
+     
+       
+  
+#line 69
+} 
+#line 57
+{   
+    
+    default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.y,0,0,0);
+       
+    
+#line 64
+}   
+     
+    
+        
+     
+       
+  
+#line 69
+} 
+#line 57
+{   
+    
+    default_stencil ( point,((scalar[]){ u.z,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.z,0,0,0);
+       
+    
+#line 64
+}   
+     
+    
+        
+     
+       
+  
+#line 69
+}
+  return ;
+}
+
      
 void embed_force3 (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
 {tracing("embed_force3","cylinder.c",0);
@@ -19895,9 +20194,9 @@ void embed_force3 (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
   foreach_stencil ()
     {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
       
-       _stencil_embed_geometry (point,NULL ,NULL );   
+       _stencil_embed_geometry3 (point,NULL ,NULL );    
             
-      _stencil_embed_interpolate (point, p,NULL );
+       _stencil_embed_interpolate3 (point, p,NULL );
        
   
       if (constant(mu.x) != 0.) {      
@@ -19907,26 +20206,26 @@ _stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0);
      _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
     
  
-#line 24
+#line 90
 } 
-#line 21
+#line 87
 { 
 _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
      _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
     
  
-#line 24
+#line 90
 } 
-#line 21
+#line 87
 { 
 _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
      _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
     
  
-#line 24
+#line 90
 }  
      
-  _stencil_embed_gradient (point, u,NULL ,NULL );
+  _stencil_embed_gradient3 (point, u,NULL ,NULL );
   
     
          
@@ -19937,20 +20236,20 @@ _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 11
+#line 77
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
       coord n, b;
-      double area = embed_geometry (point, &b, &n);
+      double area = embed_geometry3 (point, &b, &n);
       area *= pow (Delta, 3 - 1);
-      double Fn = area*embed_interpolate (point, p, b);
+      double Fn = area * embed_interpolate3 (point, p, b);
       
  Fps.x += Fn*n.x;
  
-#line 18
+#line 84
 Fps.y += Fn*n.y;
  
-#line 18
+#line 84
 Fps.z += Fn*n.z;
       if (constant(mu.x) != 0.) {
  double mua = 0., fa = 0.;
@@ -19958,29 +20257,29 @@ Fps.z += Fn*n.z;
    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
    fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
  } 
-#line 21
+#line 87
 {
    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
    fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
  } 
-#line 21
+#line 87
 {
    mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
    fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
  }
  mua /= (fa + 1e-30);
- coord dudn = embed_gradient (point, u, b, n);
+ coord dudn = embed_gradient3 (point, u, b, n);
  
    Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
          dudn.y*n.x*n.y +
          dudn.z*n.x*n.z);
    
-#line 28
+#line 94
 Fmus.y -= area*mua*(dudn.y*(sq (n.y) + 1.) +
          dudn.z*n.y*n.z +
          dudn.x*n.y*n.x);
    
-#line 28
+#line 94
 Fmus.z -= area*mua*(dudn.z*(sq (n.z) + 1.) +
          dudn.x*n.z*n.x +
          dudn.y*n.z*n.y);
@@ -19990,7 +20289,7 @@ Fmus.z -= area*mua*(dudn.z*(sq (n.z) + 1.) +
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 33
+#line 99
 *Fp = Fps; *Fmu = Fmus;
 end_tracing("embed_force3","cylinder.c",0);}
 
@@ -20011,12 +20310,12 @@ static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary12(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary12_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary13_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 
-vector  muv={{15},{16},{17}};
+vector  muv={{16},{17},{18}};
 int main(int argc, char **argv) {
-#line 207
+#line 273
 _init_solver();
   
-#line 55
+#line 121
 char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
   ReynoldsFlag = 0;
@@ -20171,15 +20470,15 @@ char *end;
   run();
 free_solver();
 
-#line 207
+#line 273
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 208
+#line 274
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
-#line 209
+#line 275
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   int l;
   double eps;
@@ -20190,7 +20489,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
               ;
   foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
   {
-#line 217
+#line 283
 foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
@@ -20199,7 +20498,7 @@ foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_v
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 219
+#line 285
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -20208,7 +20507,7 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 225
+#line 291
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
   coord Fp, Fmu;
@@ -20262,7 +20561,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 static void _init_solver (void)
 {
   void init_solver();
-datasize=18*sizeof(double);
+datasize=19*sizeof(double);
   
 #line 6
 init_solver();
@@ -20298,9 +20597,9 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
-#line 209 "cylinder.c"
+#line 275 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 225
+#line 291
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
@@ -20319,7 +20618,7 @@ init_const_scalar((scalar){_NVARMAX+7},"zeroc", 0.);
 init_const_vector((vector){{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}},"unityf0",(double[]){1.,1.,1.});
 init_const_scalar((scalar){_NVARMAX+11},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_face_vector((vector){{1},{2},{3}},"fs"); 
 #line 462 "/home/lisergey/basilisk/src/embed.h"
-embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_face_vector((vector){{15},{16},{17}},"muv");
+embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_scalar((scalar){15},"csm1");  init_face_vector((vector){{16},{17},{18}},"muv");
     
 #line 23 "ast/init_solver.h"
 }_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary1,_attribute[p.i].boundary_homogeneous[left]=_boundary1_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[top]=_boundary2,_attribute[p.i].boundary_homogeneous[top]=_boundary2_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[bottom]=_boundary3,_attribute[p.i].boundary_homogeneous[bottom]=_boundary3_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[front]=_boundary4,_attribute[p.i].boundary_homogeneous[front]=_boundary4_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[back]=_boundary5,_attribute[p.i].boundary_homogeneous[back]=_boundary5_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[left]=_boundary6,_attribute[u.x.i].boundary_homogeneous[left]=_boundary6_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary7,_attribute[p.i].boundary_homogeneous[left]=_boundary7_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[left]=_boundary8,_attribute[pf.i].boundary_homogeneous[left]=_boundary8_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[right]=_boundary9,_attribute[u.x.i].boundary_homogeneous[right]=_boundary9_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary10,_attribute[p.i].boundary_homogeneous[right]=_boundary10_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[right]=_boundary11,_attribute[pf.i].boundary_homogeneous[right]=_boundary11_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[embed]=_boundary12,_attribute[u.x.i].boundary_homogeneous[embed]=_boundary12_homogeneous;_attribute[u.y.i].dirty=1,_attribute[u.y.i].boundary[embed]=_boundary13,_attribute[u.y.i].boundary_homogeneous[embed]=_boundary13_homogeneous;  
@@ -20368,7 +20667,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
-#line 208 "cylinder.c"
+#line 274 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
   
 #line 24 "ast/init_solver.h"
