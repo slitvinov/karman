@@ -134,7 +134,8 @@ event defaults (i = 0)
   p.nodump = pf.nodump = true;
   
   /**
-  The default density field is set to unity (times the metric). */
+  The default density field is set to unity (times the metric and the
+  solid factors). */
 
   if (alpha.x.i == unityf.x.i) {
     alpha = fm;
