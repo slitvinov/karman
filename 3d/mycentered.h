@@ -160,16 +160,15 @@ event defaults (i = 0)
 
 #if EMBED
   uf.x.refine = refine_face;
-  
   foreach_dimension()
     uf.x.prolongation = refine_embed_face_x;
   for (scalar s in {p, pf, u, g}) {
     s.restriction = restriction_embed_linear;
     s.refine = s.prolongation = refine_embed_linear;
-    s.depends = list_add (s.depends, cs); // todo: add cms1?    
+    s.depends = list_add (s.depends, cs);
   }
   for (scalar s in {p, pf})
-    s.embed_gradient = pressure_embed_gradient;  
+    s.embed_gradient = pressure_embed_gradient;
 #endif // EMBED
 #endif // TREE
 }
@@ -399,8 +398,7 @@ void centered_gradient (scalar p, vector g)
 
   face vector gf[];
   foreach_face()
-    gf.x[] = fm.x[]*a.x[] - alpha.x[]*(p[] - p[-1])/Delta; // fixme: More stable? More consistent?
-    /* gf.x[] = fm.x[]*a.x[] - alpha.x[]*face_gradient_x(p, 0); */
+    gf.x[] = fm.x[]*a.x[] - alpha.x[]*(p[] - p[-1])/Delta;
   
   /**
   We average these face values to obtain the centered, combined
@@ -418,7 +416,7 @@ velocity field (which will also be used for tracer advection at the
 next timestep). Then compute the centered gradient field *g*. */
 
 event projection (i++,last)
-{  
+{
   mgp = project (uf, p, alpha, dt, mgp.nrelax);
   centered_gradient (p, g);
 
