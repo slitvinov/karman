@@ -253,7 +253,7 @@ event velocity(i++; t <= tend) {
       output_htg({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
-      embed_force(p, u, mu, &Fp, &Fmu);
+      embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
 	if (fp == NULL) {
 	  if ((fp = fopen(force_path, "w")) == NULL) {
