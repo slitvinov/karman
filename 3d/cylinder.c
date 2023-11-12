@@ -184,9 +184,10 @@ event init(t = 0) {
   for (l = minlevel + 1; l <= maxlevel; l++)
     refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
 	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
-	   fabs(z) < 4 &&
 	   level < l);
-  foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
+  foreach_vertex() {
+    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+  }
   fractions(phi, cs, fs);
   foreach () {
     u.x[] = cs[];

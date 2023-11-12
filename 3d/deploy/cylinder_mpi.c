@@ -21812,14 +21812,17 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   double eps;
   scalar  phi=new_vertex_scalar("phi");
   for (l = minlevel + 1; l <= maxlevel; l++)
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) && sq(x) + sq(y) >= sq(0.95 * diameter / 2) && fabs(z) < 4 && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
-
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) && sq(x) + sq(y) >= sq(0.95 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
 
               ;
-  foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
+  foreach_vertex_stencil() {
+    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+  }end_foreach_vertex_stencil();
   {
-#line 189
-foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
+#line 188
+foreach_vertex() {
+    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+  }end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
     _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
@@ -21827,7 +21830,7 @@ foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_v
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 191
+#line 192
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -21836,7 +21839,7 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 197
+#line 198
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
   coord Fp, Fmu;
@@ -21928,7 +21931,7 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
 #line 180 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 197
+#line 198
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
