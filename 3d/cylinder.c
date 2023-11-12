@@ -1,5 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
+#define BGHOSTS 2
+#define EMBED 2
 #include "grid/octree.h"
 #include "fractions.h"
 #include "myquadratic.h"

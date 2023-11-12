@@ -32,8 +32,6 @@ cut-cell. In the following, interpolations (for Dirichlet boundary
 conditions for example) assume that the current cell has access to a
 5x5 stencil. */
 
-#define BGHOSTS 3
-#define EMBED 2
 
 /**
 Using the geometric quantities $\mathbf{\bar{n}}_{\Gamma}$ and
