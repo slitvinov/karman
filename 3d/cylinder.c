@@ -1,104 +1,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "grid/octree.h"
-#include "embed.h"
+#include "myembed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
-bool emerged = true;
-scalar csm1[];
-static double embed_interpolate3 (Point point, scalar s, coord b)
-{
-  int i = sign(b.x), j = sign(b.y);
-  int k = sign(b.z);
-  if (cs[i,0,0] && cs[0,j,0] && cs[i,j,0] &&
-      cs[0,0,k] && cs[i,0,k] && cs[0,j,k] && cs[i,j,k] &&
-      (emerged || (csm1[i,0,0] && csm1[0,j,0] && csm1[i,j,0] &&
-		   csm1[0,0,k] && csm1[i,0,k] && csm1[0,j,k] && csm1[i,j,k]))) {
-    double val_0, val_k;
-    // bilinear interpolation in x-y-planes when all neighbors are defined
-    val_0 = (s[0,0,0]*(1. - fabs(b.x)) + s[i,0,0]*fabs(b.x))*(1. - fabs(b.y)) +
-      (s[0,j,0]*(1. - fabs(b.x)) + s[i,j,0]*fabs(b.x))*fabs(b.y);
-    val_k = (s[0,0,k]*(1. - fabs(b.x)) + s[i,0,k]*fabs(b.x))*(1. - fabs(b.y)) +
-      (s[0,j,k]*(1. - fabs(b.x)) + s[i,j,k]*fabs(b.x))*fabs(b.y);
-    // trilinear interpolation when all neighbors are defined
-    return (val_0*(1. - fabs(b.z)) + val_k*fabs(b.z));
-  }
-  else {
-    // linear interpolation with gradients biased toward the
-    // cells which are defined
-    double val = s[];
-    foreach_dimension() {
-      int i = sign(b.x);
-      if (cs[i] &&
-	  (emerged || (csm1[] && csm1[i])))
-	val += fabs(b.x)*(s[i] - s[]);
-      else if (cs[-i] &&
-	       (emerged || (csm1[] && csm1[-i])))
-	val += fabs(b.x)*(s[] - s[-i]);
-    }
-    return val;
-  }
-}
-
-static
-double embed_geometry3 (Point point, coord * b, coord * n)
-{
-  *n = facet_normal (point, cs, fs);
-  double alpha = plane_alpha (cs[], *n);
-  double area = plane_area_center (*n, alpha, b);
-  normalize (n);
-  return area;
-}
-
-static
-coord embed_gradient3 (Point point, vector u, coord b, coord n)
-{
-  coord dudn;
-  foreach_dimension() {
-    bool dirichlet;
-    double vb = u.x.boundary[embed] (point, point, u.x, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.x = dirichlet_gradient (point, u.x, cs, n, b, vb, &val);
-      dudn.x += u.x[]*val; // For pathological situations
-    }
-    else // Neumann
-      dudn.x = vb;
-    if (dudn.x == nodata)
-      dudn.x = 0.;
-  }
-  return dudn;
-}
-
-trace
-void embed_force3 (scalar p, vector u, face vector mu, coord * Fp, coord * Fmu)
-{
-  coord Fps = {0}, Fmus = {0};
-  foreach (reduction(+:Fps) reduction(+:Fmus), nowarning)
-    if (cs[] > 0. && cs[] < 1.) {
-      coord n, b;
-      double area = embed_geometry3 (point, &b, &n);
-      area *= pow (Delta, dimension - 1);
-      double Fn = area * embed_interpolate3 (point, p, b);
-      foreach_dimension()
-	Fps.x += Fn*n.x;
-      if (constant(mu.x) != 0.) {
-	double mua = 0., fa = 0.;
-	foreach_dimension() {
-	  mua += mu.x[] + mu.x[1];
-	  fa  += fs.x[] + fs.x[1];
-	}
-	mua /= (fa + SEPS);
-	coord dudn = embed_gradient3 (point, u, b, n);
-	foreach_dimension()
-	  Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
-			      dudn.y*n.x*n.y +
-			      dudn.z*n.x*n.z);
-      }
-    }
-  *Fp = Fps; *Fmu = Fmus;
-}
-
 
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
@@ -307,7 +212,7 @@ event velocity(i++; t <= tend) {
       output_htg({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
-      embed_force3(p, u, mu, &Fp, &Fmu);
+      embed_force(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
 	if (fp == NULL) {
 	  if ((fp = fopen(force_path, "w")) == NULL) {
@@ -335,28 +240,4 @@ event velocity(i++; t <= tend) {
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
 	    s.nc);
   iframe++;
-}
-
-event metric (i = 0)
-{
-  foreach() {
-    cs[] = 1.;
-    csm1[] = 1.;
-  }
-  foreach_face()
-    fs.x[] = 1.;
-#if TREE
-  cs.restriction   = restriction_average;
-  csm1.restriction = restriction_average;
-  cs.refine        = embed_fraction_refine;
-  cs.prolongation = fraction_refine;
-  csm1.refine = csm1.prolongation = fraction_refine;
-  foreach_dimension()
-    fs.x.prolongation = embed_face_fraction_refine_x;
-#endif
-  restriction ({cs, csm1, fs});
-  assert (is_constant (cm) || cm.i == cs.i);
-  cm = cs;
-  fm = fs;
-  csm1.nodump = true;
 }

@@ -1063,10 +1063,10 @@ void (* coarsen) (Point, scalar);
 #line 82 "/home/lisergey/basilisk/src/fractions.h"
 vector n;
   
-#line 207 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 257 "./myembed-tree-moving.h"
 void (* embed_gradient) (Point, scalar, coord *);
   
-#line 178 "/home/lisergey/basilisk/src/embed.h"
+#line 513 "./myembed.h"
 bool third;
 
 #line 987 "/home/lisergey/basilisk/src/common.h"
@@ -9013,9 +9013,9 @@ void octree_methods() {
   tree_methods();
 }
 #line 4 "cylinder.c"
-#line 1 "embed.h"
-#line 1 "/home/lisergey/basilisk/src/embed.h"
-#line 12 "/home/lisergey/basilisk/src/embed.h"
+#line 1 "myembed.h"
+#line 1 "./myembed.h"
+#line 35 "./myembed.h"
 #line 1 "fractions.h"
 #line 1 "/home/lisergey/basilisk/src/fractions.h"
 #line 12 "/home/lisergey/basilisk/src/fractions.h"
@@ -11460,26 +11460,22 @@ foreach ()
 #line 559
 {end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);return area;}
 end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);}
-#line 13 "/home/lisergey/basilisk/src/embed.h"
+#line 36 "./myembed.h"
+#line 50 "./myembed.h"
+scalar  cs={0},  csm1={1};
+vector  fs={{2},{3},{4}};
 
 
 
 
 
 
-scalar  cs={0};
-vector  fs={{1},{2},{3}};
 
-double (* metric_embed_factor) (Point, coord) = NULL;
-
-
-
-
-
-
-#line 1 "embed-tree.h"
-#line 1 "/home/lisergey/basilisk/src/embed-tree.h"
-#line 14 "/home/lisergey/basilisk/src/embed-tree.h"
+bool emerged = true;
+#line 69 "./myembed.h"
+#line 1 "myembed-tree-moving.h"
+#line 1 "./myembed-tree-moving.h"
+#line 14 "./myembed-tree-moving.h"
 static void embed_fraction_refine (Point point, scalar cs)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   double cc = val(cs,0,0,0);
@@ -11558,9 +11554,11 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
 
     coord n = facet_normal (point, cs, fs);
     double alpha = plane_alpha (val(cs,0,0,0), n);
-#line 114 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 114 "./myembed-tree-moving.h"
     for (int j = 0; j <= 1; j++)
       for (int k = 0; k <= 1; k++)
+
+
  if (!fine(cs,0,j,k) || !fine(cs,1,j,k))
    fine(fs.x,1,j,k) = 0.;
  else {
@@ -11569,7 +11567,7 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
    nc.x = 0., nc.y = (2.*j - 1.)*n.y, nc.z = (2.*k - 1.)*n.z;
    fine(fs.x,1,j,k) = rectangle_fraction (nc, alpha, a, b);
  }
-#line 132 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 134 "./myembed-tree-moving.h"
     for (int i = 0; i <= 1; i++)
       if (neighbor(2*i-1,0,0).neighbors &&
    (is_local(cell) || is_local(neighbor(2*i-1,0,0)))) {
@@ -11579,7 +11577,7 @@ static void embed_face_fraction_refine_x (Point point, scalar s)
        for (int k = 0; k <= 1; k++)
   fine(fs.x,2*i,j,k) = val(fs.x,i,0,0);
    else {
-#line 164 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 166 "./myembed-tree-moving.h"
      for (int j = 0; j <= 1; j++)
        for (int k = 0; k <= 1; k++) {
   static const coord a = {0.,0.,0.}, b = {.5,.5,.5};
@@ -11640,9 +11638,11 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
 
     coord n = facet_normal (point, cs, fs);
     double alpha = plane_alpha (val(cs,0,0,0), n);
-#line 114 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 114 "./myembed-tree-moving.h"
     for (int j = 0; j <= 1; j++)
       for (int k = 0; k <= 1; k++)
+
+
  if (!fine(cs,k,0,j) || !fine(cs,k,1,j))
    fine(fs.y,k,1,j) = 0.;
  else {
@@ -11651,7 +11651,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
    nc.y = 0., nc.z = (2.*j - 1.)*n.z, nc.x = (2.*k - 1.)*n.x;
    fine(fs.y,k,1,j) = rectangle_fraction (nc, alpha, a, b);
  }
-#line 132 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 134 "./myembed-tree-moving.h"
     for (int i = 0; i <= 1; i++)
       if (neighbor(0,2*i-1,0).neighbors &&
    (is_local(cell) || is_local(neighbor(0,2*i-1,0)))) {
@@ -11661,7 +11661,7 @@ static void embed_face_fraction_refine_y (Point point, scalar s)
        for (int k = 0; k <= 1; k++)
   fine(fs.y,k,2*i,j) = val(fs.y,0,i,0);
    else {
-#line 164 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 166 "./myembed-tree-moving.h"
      for (int j = 0; j <= 1; j++)
        for (int k = 0; k <= 1; k++) {
   static const coord a = {0.,0.,0.}, b = {.5,.5,.5};
@@ -11722,9 +11722,11 @@ static void embed_face_fraction_refine_z (Point point, scalar s)
 
     coord n = facet_normal (point, cs, fs);
     double alpha = plane_alpha (val(cs,0,0,0), n);
-#line 114 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 114 "./myembed-tree-moving.h"
     for (int j = 0; j <= 1; j++)
       for (int k = 0; k <= 1; k++)
+
+
  if (!fine(cs,j,k,0) || !fine(cs,j,k,1))
    fine(fs.z,j,k,1) = 0.;
  else {
@@ -11733,7 +11735,7 @@ static void embed_face_fraction_refine_z (Point point, scalar s)
    nc.z = 0., nc.x = (2.*j - 1.)*n.x, nc.y = (2.*k - 1.)*n.y;
    fine(fs.z,j,k,1) = rectangle_fraction (nc, alpha, a, b);
  }
-#line 132 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 134 "./myembed-tree-moving.h"
     for (int i = 0; i <= 1; i++)
       if (neighbor(0,0,2*i-1).neighbors &&
    (is_local(cell) || is_local(neighbor(0,0,2*i-1)))) {
@@ -11743,7 +11745,7 @@ static void embed_face_fraction_refine_z (Point point, scalar s)
        for (int k = 0; k <= 1; k++)
   fine(fs.z,j,k,2*i) = val(fs.z,0,0,i);
    else {
-#line 164 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 166 "./myembed-tree-moving.h"
      for (int j = 0; j <= 1; j++)
        for (int k = 0; k <= 1; k++) {
   static const coord a = {0.,0.,0.}, b = {.5,.5,.5};
@@ -11769,7 +11771,7 @@ static void embed_face_fraction_refine_z (Point point, scalar s)
       }
   }
 }
-#line 206 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 256 "./myembed-tree-moving.h"
 
 
 
@@ -11787,12 +11789,14 @@ static inline void restriction_embed_linear (Point point, scalar s)
 
 
 
+
   double val = 0., nv = 0.;
   for (int i = 0; i <= 1; i++)
 
     for (int j = 0; j <= 1; j++)
 
-      if (fine(cs,0,i,j) && fine(cs,1,!i,!j))
+      if (fine(cs,0,i,j) && fine(cs,1,!i,!j) &&
+   (emerged || (fine(csm1,0,i,j) && fine(csm1,1,!i,!j))))
  val += (fine(s,0,i,j) + fine(s,1,!i,!j))/2., nv++;
   if (nv > 0.) {
     val(s,0,0,0) = val/nv;
@@ -11803,41 +11807,56 @@ static inline void restriction_embed_linear (Point point, scalar s)
 
 
 
+
+
   coord p = {0.,0.,0.};
   {foreach_child()
-    if (val(cs,0,0,0))
+    if (val(cs,0,0,0) && (emerged || val(csm1,0,0,0)))
       p.x += x, p.y += y, p.z += z, val += val(s,0,0,0), nv++;end_foreach_child()}
-  if (!(nv > 0.)) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "nv > 0.");
-  val(s,0,0,0) = val/nv;
+  if (nv > 0.)
+    val(s,0,0,0) = val/nv;
+  else {
+    {foreach_child()
+      if (val(cs,0,0,0))
+ p.x += x, p.y += y, p.z += z, val += val(s,0,0,0), nv++;end_foreach_child()}
+    if (!(nv > 0.)) qassert ("./myembed-tree-moving.h", 0, "nv > 0.");
+    val(s,0,0,0) = val/nv;
+  }
 
 
 
 
 
 
-  if (_attribute[s.i].embed_gradient && _attribute[s.i].boundary[0] != _attribute[s.i].boundary_homogeneous[0]) {
+
+  bool homogeneous = true;
+  for (int b = 0; b < nboundary; b++)
+    if (_attribute[s.i].boundary[b] != _attribute[s.i].boundary_homogeneous[b])
+      homogeneous = false;
+
+  if (_attribute[s.i].embed_gradient && !homogeneous) {
     coord o = {x,y,z}, g;
     _attribute[s.i].embed_gradient (point, s, &g);
     
       val(s,0,0,0) += (o.x - p.x/nv)*g.x;
       
-#line 255
+#line 322
 val(s,0,0,0) += (o.y - p.y/nv)*g.y;
       
-#line 255
+#line 322
 val(s,0,0,0) += (o.z - p.z/nv)*g.z;
   }
 }
-#line 268 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 382 "./myembed-tree-moving.h"
 static inline void refine_embed_linear (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   {foreach_child() {
     if (!val(cs,0,0,0))
       val(s,0,0,0) = 0.;
     else {
-      if (!(coarse(cs,0,0,0))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs)");
+      if (!(coarse(cs,0,0,0))) qassert ("./myembed-tree-moving.h", 0, "coarse(cs)");
       int i = (child.x + 1)/2, j = (child.y + 1)/2;
-#line 299 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 416 "./myembed-tree-moving.h"
       int k = (child.z + 1)/2;
       if (coarse(fs.x,i,0,0) > 0.25 && coarse(fs.y,0,j,0) > 0.25 &&
    coarse(fs.z,0,0,k) > 0.25 &&
@@ -11845,13 +11864,20 @@ static inline void refine_embed_linear (Point point, scalar s)
     coarse(cs,0,child.y,0) == 1. || coarse(cs,child.x,child.y,0) == 1. ||
     coarse(cs,0,0,child.z) == 1. || coarse(cs,child.x,0,child.z) == 1. ||
     coarse(cs,0,child.y,child.z) == 1. ||
-    coarse(cs,child.x,child.y,child.z) == 1.)) {
- if (!(coarse(cs,child.x,0,0) && coarse(cs,0,child.y,0) && coarse(cs,0,0,child.z))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x) && coarse(cs,0,child.y) && coarse(cs,0,0,child.z)")
+    coarse(cs,child.x,child.y,child.z) == 1.) &&
+   (emerged || (coarse(csm1,0,0,0) && coarse(csm1,child.x,0,0) &&
+         coarse(csm1,0,child.y,0) && coarse(csm1,child.x,child.y,0) &&
+         coarse(csm1,0,0,child.z) && coarse(csm1,child.x,0,child.z) &&
+         coarse(csm1,0,child.y,child.z) && coarse(csm1,child.x,child.y,child.z)))) {
+ if (!(coarse(cs,child.x,0,0) && coarse(cs,0,child.y,0) && coarse(cs,0,0,child.z))) qassert ("./myembed-tree-moving.h", 0, "coarse(cs,child.x) && coarse(cs,0,child.y) && coarse(cs,0,0,child.z)")
                          ;
  if (coarse(fs.x,i,child.y,0) && coarse(fs.y,child.x,j,0) &&
+     coarse(fs.x,i,0,child.z) && coarse(fs.y,0,j,child.z) &&
+     coarse(fs.x,i,child.y,child.z) && coarse(fs.y,child.x,j,child.z) &&
+
      coarse(fs.z,child.x,child.y,k) &&
      coarse(fs.z,child.x,0,k) && coarse(fs.z,0,child.y,k)) {
-   if (!(coarse(cs,child.x,child.y,0) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z))) qassert ("/home/lisergey/basilisk/src/embed-tree.h", 0, "coarse(cs,child.x,child.y) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z)")
+   if (!(coarse(cs,child.x,child.y,0) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z))) qassert ("./myembed-tree-moving.h", 0, "coarse(cs,child.x,child.y) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z)")
 
                                        ;
 
@@ -11865,7 +11891,7 @@ static inline void refine_embed_linear (Point point, scalar s)
  else
 
    val(s,0,0,0) = (coarse(s,0,0,0) + coarse(s,child.x,0,0) + coarse(s,0,child.y,0) +
-   coarse(s,0,0,child.z))/4.;
+     coarse(s,0,0,child.z))/4.;
       }
       else if (coarse(cs,child.x,child.y,child.z) &&
         ((coarse(fs.z,child.x,child.y,k) &&
@@ -11881,7 +11907,8 @@ static inline void refine_embed_linear (Point point, scalar s)
   ||
   (coarse(fs.z,0,child.y,k) &&
    coarse(fs.y,0,j,0) && coarse(fs.x,i,child.y,child.z))
-  ))
+  ) &&
+        (emerged || (coarse(csm1,0,0,0) && coarse(csm1,child.x,child.y,child.z))))
 
  val(s,0,0,0) = (3.*coarse(s,0,0,0) + coarse(s,child.x,child.y,child.z))/4.;
 
@@ -11889,30 +11916,36 @@ static inline void refine_embed_linear (Point point, scalar s)
 
  val(s,0,0,0) = coarse(s,0,0,0);
   {
-   if (coarse(fs.x,(child.x + 1)/2,0,0) && coarse(cs,child.x,0,0))
+   if (coarse(fs.x,(child.x + 1)/2,0,0) && coarse(cs,child.x,0,0) &&
+       (emerged || (coarse(csm1,0,0,0) && coarse(csm1,child.x,0,0))))
      val(s,0,0,0) += (coarse(s,child.x,0,0) - coarse(s,0,0,0))/4.;
-   else if (coarse(fs.x,(- child.x + 1)/2,0,0) && coarse(cs,- child.x,0,0))
+   else if (coarse(fs.x,(- child.x + 1)/2,0,0) && coarse(cs,- child.x,0,0) &&
+     (emerged || (coarse(csm1,0,0,0) && coarse(csm1,- child.x,0,0))))
      val(s,0,0,0) -= (coarse(s,- child.x,0,0) - coarse(s,0,0,0))/4.;
  } 
-#line 349
+#line 474
 {
-   if (coarse(fs.y,0,(child.y + 1)/2,0) && coarse(cs,0,child.y,0))
+   if (coarse(fs.y,0,(child.y + 1)/2,0) && coarse(cs,0,child.y,0) &&
+       (emerged || (coarse(csm1,0,0,0) && coarse(csm1,0,child.y,0))))
      val(s,0,0,0) += (coarse(s,0,child.y,0) - coarse(s,0,0,0))/4.;
-   else if (coarse(fs.y,0,(- child.y + 1)/2,0) && coarse(cs,0,- child.y,0))
+   else if (coarse(fs.y,0,(- child.y + 1)/2,0) && coarse(cs,0,- child.y,0) &&
+     (emerged || (coarse(csm1,0,0,0) && coarse(csm1,0,- child.y,0))))
      val(s,0,0,0) -= (coarse(s,0,- child.y,0) - coarse(s,0,0,0))/4.;
  } 
-#line 349
+#line 474
 {
-   if (coarse(fs.z,0,0,(child.z + 1)/2) && coarse(cs,0,0,child.z))
+   if (coarse(fs.z,0,0,(child.z + 1)/2) && coarse(cs,0,0,child.z) &&
+       (emerged || (coarse(csm1,0,0,0) && coarse(csm1,0,0,child.z))))
      val(s,0,0,0) += (coarse(s,0,0,child.z) - coarse(s,0,0,0))/4.;
-   else if (coarse(fs.z,0,0,(- child.z + 1)/2) && coarse(cs,0,0,- child.z))
+   else if (coarse(fs.z,0,0,(- child.z + 1)/2) && coarse(cs,0,0,- child.z) &&
+     (emerged || (coarse(csm1,0,0,0) && coarse(csm1,0,0,- child.z))))
      val(s,0,0,0) -= (coarse(s,0,0,- child.z) - coarse(s,0,0,0))/4.;
  }
       }
     }
   }end_foreach_child()}
 }
-#line 369 "/home/lisergey/basilisk/src/embed-tree.h"
+#line 496 "./myembed-tree-moving.h"
 
 void refine_embed_face_x (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
@@ -11945,7 +11978,7 @@ void refine_embed_face_x (Point point, scalar s)
   }
 }
 
-#line 370
+#line 497
 void refine_embed_face_y (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
@@ -11977,7 +12010,7 @@ void refine_embed_face_y (Point point, scalar s)
   }
 }
 
-#line 370
+#line 497
 void refine_embed_face_z (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
@@ -12008,501 +12041,26 @@ void refine_embed_face_z (Point point, scalar s)
        (2*j - 1)*g1 + (2*k - 1)*g2) : 0.;
   }
 }
-#line 30 "/home/lisergey/basilisk/src/embed.h"
-#line 95 "/home/lisergey/basilisk/src/embed.h"
-
-static inline coord embed_face_barycentre_z (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-
-  coord n1 = {0};
-  double nn = 0.;
-  scalar f = fs.z;
-   {
-    n1.x = (val(f,-1,-1,i) + 2.*val(f,-1,0,i) + val(f,-1,1,i) -
-     val(f,+1,-1,i) - 2.*val(f,+1,0,i) - val(f,+1,1,i));
-    nn += fabs(n1.x);
-  } 
-#line 102
-{
-    n1.y = (val(f,-1,-1,i) + 2.*val(f,0,-1,i) + val(f,1,-1,i) -
-     val(f,-1,+1,i) - 2.*val(f,0,+1,i) - val(f,1,+1,i));
-    nn += fabs(n1.y);
-  }
-  if (!nn)
-    return (coord){0.,0.,0.};
-  
-    n1.x /= nn;
-    
-#line 110
-n1.y /= nn;
-
-  coord n, p1, p;
-  ((double *)&n)[0] = n1.x, ((double *)&n)[1] = n1.y;
-  double alpha = line_alpha (val(f,0,0,i), n);
-  line_center (n, alpha, val(f,0,0,i), &p1);
-  p.x = ((double *)&p1)[0], p.y = ((double *)&p1)[1], p.z = 0.;
-  return p;
-}
-
-#line 96
-static inline coord embed_face_barycentre_x (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-
-  coord n1 = {0};
-  double nn = 0.;
-  scalar f = fs.x;
-   {
-    n1.y = (val(f,i,-1,-1) + 2.*val(f,i,-1,0) + val(f,i,-1,1) -
-     val(f,i,+1,-1) - 2.*val(f,i,+1,0) - val(f,i,+1,1));
-    nn += fabs(n1.y);
-  } 
-#line 102
-{
-    n1.z = (val(f,i,-1,-1) + 2.*val(f,i,0,-1) + val(f,i,1,-1) -
-     val(f,i,-1,+1) - 2.*val(f,i,0,+1) - val(f,i,1,+1));
-    nn += fabs(n1.z);
-  }
-  if (!nn)
-    return (coord){0.,0.,0.};
-  
-    n1.y /= nn;
-    
-#line 110
-n1.z /= nn;
-
-  coord n, p1, p;
-  ((double *)&n)[0] = n1.y, ((double *)&n)[1] = n1.z;
-  double alpha = line_alpha (val(f,i,0,0), n);
-  line_center (n, alpha, val(f,i,0,0), &p1);
-  p.y = ((double *)&p1)[0], p.z = ((double *)&p1)[1], p.x = 0.;
-  return p;
-}
-
-#line 96
-static inline coord embed_face_barycentre_y (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-
-  coord n1 = {0};
-  double nn = 0.;
-  scalar f = fs.y;
-   {
-    n1.z = (val(f,-1,i,-1) + 2.*val(f,0,i,-1) + val(f,1,i,-1) -
-     val(f,-1,i,+1) - 2.*val(f,0,i,+1) - val(f,1,i,+1));
-    nn += fabs(n1.z);
-  } 
-#line 102
-{
-    n1.x = (val(f,-1,i,-1) + 2.*val(f,-1,i,0) + val(f,-1,i,1) -
-     val(f,+1,i,-1) - 2.*val(f,+1,i,0) - val(f,+1,i,1));
-    nn += fabs(n1.x);
-  }
-  if (!nn)
-    return (coord){0.,0.,0.};
-  
-    n1.z /= nn;
-    
-#line 110
-n1.x /= nn;
-
-  coord n, p1, p;
-  ((double *)&n)[0] = n1.z, ((double *)&n)[1] = n1.x;
-  double alpha = line_alpha (val(f,0,i,0), n);
-  line_center (n, alpha, val(f,0,i,0), &p1);
-  p.z = ((double *)&p1)[0], p.x = ((double *)&p1)[1], p.y = 0.;
-  return p;
-}
-#line 30 "/home/lisergey/basilisk/src/embed.h"
-#line 95 "/home/lisergey/basilisk/src/embed.h"
-
-static void _stencil_embed_face_barycentre_z (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
-
-  
-  
-  scalar f = fs.z;
-   {
-_stencil_val(f,-1,-1,i);_stencil_val(f,-1,0,i); _stencil_val(f,-1,1,i);
-     _stencil_val(f,+1,-1,i);_stencil_val(f,+1,0,i); _stencil_val(f,+1,1,i);  
-            
-     
-  
-#line 106
-} 
-#line 102
-{
-_stencil_val(f,-1,-1,i);_stencil_val(f,0,-1,i); _stencil_val(f,1,-1,i);
-     _stencil_val(f,-1,+1,i);_stencil_val(f,0,+1,i); _stencil_val(f,1,+1,i);  
-            
-     
-  
-#line 106
-}         
-    
-   
-  
-      
-
-    
-       
-  _stencil_val(f,0,0,i); 
-_stencil_val(f,0,0,i);   
-  
-            
-  
-#line 117
-return ;
-}
-
-#line 96
-static void _stencil_embed_face_barycentre_x (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
-
-  
-  
-  scalar f = fs.x;
-   {
-_stencil_val(f,i,-1,-1);_stencil_val(f,i,-1,0); _stencil_val(f,i,-1,1);
-     _stencil_val(f,i,+1,-1);_stencil_val(f,i,+1,0); _stencil_val(f,i,+1,1);  
-            
-     
-  
-#line 106
-} 
-#line 102
-{
-_stencil_val(f,i,-1,-1);_stencil_val(f,i,0,-1); _stencil_val(f,i,1,-1);
-     _stencil_val(f,i,-1,+1);_stencil_val(f,i,0,+1); _stencil_val(f,i,1,+1);  
-            
-     
-  
-#line 106
-}         
-    
-   
-  
-      
-
-    
-       
-  _stencil_val(f,i,0,0); 
-_stencil_val(f,i,0,0);   
-  
-            
-  
-#line 117
-return ;
-}
-
-#line 96
-static void _stencil_embed_face_barycentre_y (Point point, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
-
-  
-  
-  scalar f = fs.y;
-   {
-_stencil_val(f,-1,i,-1);_stencil_val(f,0,i,-1); _stencil_val(f,1,i,-1);
-     _stencil_val(f,-1,i,+1);_stencil_val(f,0,i,+1); _stencil_val(f,1,i,+1);  
-            
-     
-  
-#line 106
-} 
-#line 102
-{
-_stencil_val(f,-1,i,-1);_stencil_val(f,-1,i,0); _stencil_val(f,-1,i,1);
-     _stencil_val(f,+1,i,-1);_stencil_val(f,+1,i,0); _stencil_val(f,+1,i,1);  
-            
-     
-  
-#line 106
-}         
-    
-   
-  
-      
-
-    
-       
-  _stencil_val(f,0,i,0); 
-_stencil_val(f,0,i,0);   
-  
-            
-  
-#line 117
-return ;
-}
-#line 138 "/home/lisergey/basilisk/src/embed.h"
-
-static inline double embed_face_gradient_x (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (!(val(cs,i,0,0) && val(cs,i-1,0,0))) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
-  coord p = embed_face_barycentre_x (point, i);
-
-  int j = sign(p.y), k = sign(p.z);
-  if ((val(fs.x,i,j,k) > 0.5 && (val(fs.x,i,j,0) > 0.5 || val(fs.x,i,0,k) > 0.5) && val(fs.y,i,j + (j < 0),0) && val(fs.y,i-1,j + (j < 0),0) && val(fs.y,i,j + (j < 0),k) && val(fs.y,i-1,j + (j < 0),k) && val(fs.z,i,0,k + (k < 0)) && val(fs.z,i-1,0,k + (k < 0)) && val(fs.z,i,j,k + (k < 0)) && val(fs.z,i-1,j,k + (k < 0)) && val(cs,i-1,j,0) && val(cs,i-1,0,k) && val(cs,i-1,j,k) && val(cs,i,j,0) && val(cs,i,0,k) && val(cs,i,j,k))) {
-    p.y = fabs(p.y), p.z = fabs(p.z);
-    return (((val(a,i,0,0) - val(a,i-1,0,0))*(1. - p.y) +
-      (val(a,i,j,0) - val(a,i-1,j,0))*p.y)*(1. - p.z) +
-     ((val(a,i,0,k) - val(a,i-1,0,k))*(1. - p.y) +
-      (val(a,i,j,k) - val(a,i-1,j,k))*p.y)*p.z)/Delta;
-  }
-  return (val(a,i,0,0) - val(a,i-1,0,0))/Delta;
-}
-
-#line 139
-static inline double embed_face_gradient_y (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (!(val(cs,0,i,0) && val(cs,0,i-1,0))) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
-  coord p = embed_face_barycentre_y (point, i);
-
-  int j = sign(p.z), k = sign(p.x);
-  if ((val(fs.y,k,i,j) > 0.5 && (val(fs.y,0,i,j) > 0.5 || val(fs.y,k,i,0) > 0.5) && val(fs.z,0,i,j + (j < 0)) && val(fs.z,0,i-1,j + (j < 0)) && val(fs.z,k,i,j + (j < 0)) && val(fs.z,k,i-1,j + (j < 0)) && val(fs.x,k + (k < 0),i,0) && val(fs.x,k + (k < 0),i-1,0) && val(fs.x,k + (k < 0),i,j) && val(fs.x,k + (k < 0),i-1,j) && val(cs,0,i-1,j) && val(cs,k,i-1,0) && val(cs,k,i-1,j) && val(cs,0,i,j) && val(cs,k,i,0) && val(cs,k,i,j))) {
-    p.z = fabs(p.z), p.x = fabs(p.x);
-    return (((val(a,0,i,0) - val(a,0,i-1,0))*(1. - p.z) +
-      (val(a,0,i,j) - val(a,0,i-1,j))*p.z)*(1. - p.x) +
-     ((val(a,k,i,0) - val(a,k,i-1,0))*(1. - p.z) +
-      (val(a,k,i,j) - val(a,k,i-1,j))*p.z)*p.x)/Delta;
-  }
-  return (val(a,0,i,0) - val(a,0,i-1,0))/Delta;
-}
-
-#line 139
-static inline double embed_face_gradient_z (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (!(val(cs,0,0,i) && val(cs,0,0,i-1))) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "cs[i] && cs[i-1]");
-  coord p = embed_face_barycentre_z (point, i);
-
-  int j = sign(p.x), k = sign(p.y);
-  if ((val(fs.z,j,k,i) > 0.5 && (val(fs.z,j,0,i) > 0.5 || val(fs.z,0,k,i) > 0.5) && val(fs.x,j + (j < 0),0,i) && val(fs.x,j + (j < 0),0,i-1) && val(fs.x,j + (j < 0),k,i) && val(fs.x,j + (j < 0),k,i-1) && val(fs.y,0,k + (k < 0),i) && val(fs.y,0,k + (k < 0),i-1) && val(fs.y,j,k + (k < 0),i) && val(fs.y,j,k + (k < 0),i-1) && val(cs,j,0,i-1) && val(cs,0,k,i-1) && val(cs,j,k,i-1) && val(cs,j,0,i) && val(cs,0,k,i) && val(cs,j,k,i))) {
-    p.x = fabs(p.x), p.y = fabs(p.y);
-    return (((val(a,0,0,i) - val(a,0,0,i-1))*(1. - p.x) +
-      (val(a,j,0,i) - val(a,j,0,i-1))*p.x)*(1. - p.y) +
-     ((val(a,0,k,i) - val(a,0,k,i-1))*(1. - p.x) +
-      (val(a,j,k,i) - val(a,j,k,i-1))*p.x)*p.y)/Delta;
-  }
-  return (val(a,0,0,i) - val(a,0,0,i-1))/Delta;
-}
-#line 138 "/home/lisergey/basilisk/src/embed.h"
-
-static void _stencil_embed_face_gradient_x (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);    
-      
-   
-#line 142
-_stencil_embed_face_barycentre_x (point, i);      
-
-  
-_stencil_val(fs.x,i,o_stencil,o_stencil);_stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.x,i,0,o_stencil); _stencil_val(fs.y,i,o_stencil    ,0); _stencil_val(fs.y,i-1,o_stencil    ,0); _stencil_val(fs.y,i,o_stencil,    o_stencil); _stencil_val(fs.y,i-1,o_stencil,    o_stencil); _stencil_val(fs.z,i,0,o_stencil    ); _stencil_val(fs.z,i-1,0,o_stencil    ); _stencil_val(fs.z,i,o_stencil,o_stencil    ); _stencil_val(fs.z,i-1,o_stencil,o_stencil    ); _stencil_val(cs,i-1,o_stencil,0); _stencil_val(cs,i-1,0,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil); {
-         
-_stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0);
-_stencil_val(a,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0);
-_stencil_val(a,i,0,o_stencil); _stencil_val(a,i-1,0,o_stencil);
-_stencil_val(a,i,o_stencil,o_stencil); _stencil_val(a,i-1,o_stencil,o_stencil);       
-            
-      
-      
-    
-  
-#line 151
-}
-_stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0);
-                          
-  
-#line 152
-return  ;
-}
-
-#line 139
-static void _stencil_embed_face_gradient_y (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);    
-      
-   
-#line 142
-_stencil_embed_face_barycentre_y (point, i);      
-
-  
-_stencil_val(fs.y,o_stencil,i,o_stencil);_stencil_val(fs.y,0,i,o_stencil); _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.z,0,i    ,o_stencil); _stencil_val(fs.z,0,i-1    ,o_stencil); _stencil_val(fs.z,    o_stencil,i,o_stencil); _stencil_val(fs.z,    o_stencil,i-1,o_stencil); _stencil_val(fs.x,o_stencil,i,0    ); _stencil_val(fs.x,o_stencil,i-1,0    ); _stencil_val(fs.x,o_stencil,i,o_stencil    ); _stencil_val(fs.x,o_stencil,i-1,o_stencil    ); _stencil_val(cs,0,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i,o_stencil); {
-         
-_stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0);
-_stencil_val(a,0,i,o_stencil); _stencil_val(a,0,i-1,o_stencil);
-_stencil_val(a,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0);
-_stencil_val(a,o_stencil,i,o_stencil); _stencil_val(a,o_stencil,i-1,o_stencil);       
-            
-      
-      
-    
-  
-#line 151
-}
-_stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0);
-                          
-  
-#line 152
-return  ;
-}
-
-#line 139
-static void _stencil_embed_face_gradient_z (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);    
-      
-   
-#line 142
-_stencil_embed_face_barycentre_z (point, i);      
-
-  
-_stencil_val(fs.z,o_stencil,o_stencil,i);_stencil_val(fs.z,o_stencil,0,i); _stencil_val(fs.z,0,o_stencil,i); _stencil_val(fs.x,o_stencil,0    ,i); _stencil_val(fs.x,o_stencil,0    ,i-1); _stencil_val(fs.x,o_stencil,    o_stencil,i); _stencil_val(fs.x,o_stencil,    o_stencil,i-1); _stencil_val(fs.y,0,o_stencil,i    ); _stencil_val(fs.y,0,o_stencil,i-1    ); _stencil_val(fs.y,o_stencil,o_stencil,i    ); _stencil_val(fs.y,o_stencil,o_stencil,i-1    ); _stencil_val(cs,o_stencil,0,i-1); _stencil_val(cs,0,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,0,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i); {
-         
-_stencil_val(a,0,0,i); _stencil_val(a,0,0,i-1);
-_stencil_val(a,o_stencil,0,i); _stencil_val(a,o_stencil,0,i-1);
-_stencil_val(a,0,o_stencil,i); _stencil_val(a,0,o_stencil,i-1);
-_stencil_val(a,o_stencil,o_stencil,i); _stencil_val(a,o_stencil,o_stencil,i-1);       
-            
-      
-      
-    
-  
-#line 151
-}
-_stencil_val(a,0,0,i); _stencil_val(a,0,0,i-1);
-                          
-  
-#line 152
-return  ;
-}
-
-
-static inline double embed_face_value_x (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  coord p = embed_face_barycentre_x (point, i);
-
-  int j = sign(p.y), k = sign(p.z);
-  if ((val(fs.x,i,j,k) > 0.5 && (val(fs.x,i,j,0) > 0.5 || val(fs.x,i,0,k) > 0.5) && val(fs.y,i,j + (j < 0),0) && val(fs.y,i-1,j + (j < 0),0) && val(fs.y,i,j + (j < 0),k) && val(fs.y,i-1,j + (j < 0),k) && val(fs.z,i,0,k + (k < 0)) && val(fs.z,i-1,0,k + (k < 0)) && val(fs.z,i,j,k + (k < 0)) && val(fs.z,i-1,j,k + (k < 0)) && val(cs,i-1,j,0) && val(cs,i-1,0,k) && val(cs,i-1,j,k) && val(cs,i,j,0) && val(cs,i,0,k) && val(cs,i,j,k))) {
-    p.y = fabs(p.y), p.z = fabs(p.z);
-    return ((((val(a,i,0,0)*(1.5 + val(cs,i,0,0)) + val(a,i-1,0,0)*(1.5 + val(cs,i-1,0,0)))/ (val(cs,i,0,0) + val(cs,i-1,0,0) + 3.))*(1. - p.y) + ((val(a,i,j,0)*(1.5 + val(cs,i,j,0)) + val(a,i-1,j,0)*(1.5 + val(cs,i-1,j,0)))/ (val(cs,i,j,0) + val(cs,i-1,j,0) + 3.))*p.y)*(1. - p.z) +
-     (((val(a,i,0,k)*(1.5 + val(cs,i,0,k)) + val(a,i-1,0,k)*(1.5 + val(cs,i-1,0,k)))/ (val(cs,i,0,k) + val(cs,i-1,0,k) + 3.))*(1. - p.y) + ((val(a,i,j,k)*(1.5 + val(cs,i,j,k)) + val(a,i-1,j,k)*(1.5 + val(cs,i-1,j,k)))/ (val(cs,i,j,k) + val(cs,i-1,j,k) + 3.))*p.y)*p.z);
-  }
-  return ((val(a,i,0,0)*(1.5 + val(cs,i,0,0)) + val(a,i-1,0,0)*(1.5 + val(cs,i-1,0,0)))/ (val(cs,i,0,0) + val(cs,i-1,0,0) + 3.));
-}
-
-#line 156
-static inline double embed_face_value_y (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  coord p = embed_face_barycentre_y (point, i);
-
-  int j = sign(p.z), k = sign(p.x);
-  if ((val(fs.y,k,i,j) > 0.5 && (val(fs.y,0,i,j) > 0.5 || val(fs.y,k,i,0) > 0.5) && val(fs.z,0,i,j + (j < 0)) && val(fs.z,0,i-1,j + (j < 0)) && val(fs.z,k,i,j + (j < 0)) && val(fs.z,k,i-1,j + (j < 0)) && val(fs.x,k + (k < 0),i,0) && val(fs.x,k + (k < 0),i-1,0) && val(fs.x,k + (k < 0),i,j) && val(fs.x,k + (k < 0),i-1,j) && val(cs,0,i-1,j) && val(cs,k,i-1,0) && val(cs,k,i-1,j) && val(cs,0,i,j) && val(cs,k,i,0) && val(cs,k,i,j))) {
-    p.z = fabs(p.z), p.x = fabs(p.x);
-    return ((((val(a,0,i,0)*(1.5 + val(cs,0,i,0)) + val(a,0,i-1,0)*(1.5 + val(cs,0,i-1,0)))/ (val(cs,0,i,0) + val(cs,0,i-1,0) + 3.))*(1. - p.z) + ((val(a,0,i,j)*(1.5 + val(cs,0,i,j)) + val(a,0,i-1,j)*(1.5 + val(cs,0,i-1,j)))/ (val(cs,0,i,j) + val(cs,0,i-1,j) + 3.))*p.z)*(1. - p.x) +
-     (((val(a,k,i,0)*(1.5 + val(cs,k,i,0)) + val(a,k,i-1,0)*(1.5 + val(cs,k,i-1,0)))/ (val(cs,k,i,0) + val(cs,k,i-1,0) + 3.))*(1. - p.z) + ((val(a,k,i,j)*(1.5 + val(cs,k,i,j)) + val(a,k,i-1,j)*(1.5 + val(cs,k,i-1,j)))/ (val(cs,k,i,j) + val(cs,k,i-1,j) + 3.))*p.z)*p.x);
-  }
-  return ((val(a,0,i,0)*(1.5 + val(cs,0,i,0)) + val(a,0,i-1,0)*(1.5 + val(cs,0,i-1,0)))/ (val(cs,0,i,0) + val(cs,0,i-1,0) + 3.));
-}
-
-#line 156
-static inline double embed_face_value_z (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  coord p = embed_face_barycentre_z (point, i);
-
-  int j = sign(p.x), k = sign(p.y);
-  if ((val(fs.z,j,k,i) > 0.5 && (val(fs.z,j,0,i) > 0.5 || val(fs.z,0,k,i) > 0.5) && val(fs.x,j + (j < 0),0,i) && val(fs.x,j + (j < 0),0,i-1) && val(fs.x,j + (j < 0),k,i) && val(fs.x,j + (j < 0),k,i-1) && val(fs.y,0,k + (k < 0),i) && val(fs.y,0,k + (k < 0),i-1) && val(fs.y,j,k + (k < 0),i) && val(fs.y,j,k + (k < 0),i-1) && val(cs,j,0,i-1) && val(cs,0,k,i-1) && val(cs,j,k,i-1) && val(cs,j,0,i) && val(cs,0,k,i) && val(cs,j,k,i))) {
-    p.x = fabs(p.x), p.y = fabs(p.y);
-    return ((((val(a,0,0,i)*(1.5 + val(cs,0,0,i)) + val(a,0,0,i-1)*(1.5 + val(cs,0,0,i-1)))/ (val(cs,0,0,i) + val(cs,0,0,i-1) + 3.))*(1. - p.x) + ((val(a,j,0,i)*(1.5 + val(cs,j,0,i)) + val(a,j,0,i-1)*(1.5 + val(cs,j,0,i-1)))/ (val(cs,j,0,i) + val(cs,j,0,i-1) + 3.))*p.x)*(1. - p.y) +
-     (((val(a,0,k,i)*(1.5 + val(cs,0,k,i)) + val(a,0,k,i-1)*(1.5 + val(cs,0,k,i-1)))/ (val(cs,0,k,i) + val(cs,0,k,i-1) + 3.))*(1. - p.x) + ((val(a,j,k,i)*(1.5 + val(cs,j,k,i)) + val(a,j,k,i-1)*(1.5 + val(cs,j,k,i-1)))/ (val(cs,j,k,i) + val(cs,j,k,i-1) + 3.))*p.x)*p.y);
-  }
-  return ((val(a,0,0,i)*(1.5 + val(cs,0,0,i)) + val(a,0,0,i-1)*(1.5 + val(cs,0,0,i-1)))/ (val(cs,0,0,i) + val(cs,0,0,i-1) + 3.));
-}
-
-
-
-#line 156
-static void _stencil_embed_face_value_x (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;  
-   _stencil_embed_face_barycentre_x (point, i);      
-
-  
-_stencil_val(fs.x,i,o_stencil,o_stencil);_stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.x,i,0,o_stencil); _stencil_val(fs.y,i,o_stencil    ,0); _stencil_val(fs.y,i-1,o_stencil    ,0); _stencil_val(fs.y,i,o_stencil,    o_stencil); _stencil_val(fs.y,i-1,o_stencil,    o_stencil); _stencil_val(fs.z,i,0,o_stencil    ); _stencil_val(fs.z,i-1,0,o_stencil    ); _stencil_val(fs.z,i,o_stencil,o_stencil    ); _stencil_val(fs.z,i-1,o_stencil,o_stencil    ); _stencil_val(cs,i-1,o_stencil,0); _stencil_val(cs,i-1,0,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil); {
-         
-_stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(a,i,o_stencil,0); _stencil_val(cs,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);_stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);
-_stencil_val(a,i,0,o_stencil); _stencil_val(cs,i,0,o_stencil); _stencil_val(a,i-1,0,o_stencil); _stencil_val(cs,i-1,0,o_stencil);_stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i-1,0,o_stencil);_stencil_val(a,i,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil); _stencil_val(a,i-1,o_stencil,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil);_stencil_val(cs,i,o_stencil,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil);                                       
-      
-    
-  
-#line 165
-}
-_stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);
-                          
-  
-#line 166
-return        ;
-}
-
-#line 156
-static void _stencil_embed_face_value_y (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;  
-   _stencil_embed_face_barycentre_y (point, i);      
-
-  
-_stencil_val(fs.y,o_stencil,i,o_stencil);_stencil_val(fs.y,0,i,o_stencil); _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.z,0,i    ,o_stencil); _stencil_val(fs.z,0,i-1    ,o_stencil); _stencil_val(fs.z,    o_stencil,i,o_stencil); _stencil_val(fs.z,    o_stencil,i-1,o_stencil); _stencil_val(fs.x,o_stencil,i,0    ); _stencil_val(fs.x,o_stencil,i-1,0    ); _stencil_val(fs.x,o_stencil,i,o_stencil    ); _stencil_val(fs.x,o_stencil,i-1,o_stencil    ); _stencil_val(cs,0,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i,o_stencil); {
-         
-_stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);_stencil_val(a,0,i,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(a,0,i-1,o_stencil); _stencil_val(cs,0,i-1,o_stencil);_stencil_val(cs,0,i,o_stencil); _stencil_val(cs,0,i-1,o_stencil);
-_stencil_val(a,o_stencil,i,0); _stencil_val(cs,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,0);_stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i-1,0);_stencil_val(a,o_stencil,i,o_stencil); _stencil_val(cs,o_stencil,i,o_stencil); _stencil_val(a,o_stencil,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,o_stencil);_stencil_val(cs,o_stencil,i,o_stencil); _stencil_val(cs,o_stencil,i-1,o_stencil);                                       
-      
-    
-  
-#line 165
-}
-_stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);
-                          
-  
-#line 166
-return        ;
-}
-
-#line 156
-static void _stencil_embed_face_value_z (Point point, scalar a, int i)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;  
-   _stencil_embed_face_barycentre_z (point, i);      
-
-  
-_stencil_val(fs.z,o_stencil,o_stencil,i);_stencil_val(fs.z,o_stencil,0,i); _stencil_val(fs.z,0,o_stencil,i); _stencil_val(fs.x,o_stencil,0    ,i); _stencil_val(fs.x,o_stencil,0    ,i-1); _stencil_val(fs.x,o_stencil,    o_stencil,i); _stencil_val(fs.x,o_stencil,    o_stencil,i-1); _stencil_val(fs.y,0,o_stencil,i    ); _stencil_val(fs.y,0,o_stencil,i-1    ); _stencil_val(fs.y,o_stencil,o_stencil,i    ); _stencil_val(fs.y,o_stencil,o_stencil,i-1    ); _stencil_val(cs,o_stencil,0,i-1); _stencil_val(cs,0,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,0,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i); {
-         
-_stencil_val(a,0,0,i); _stencil_val(cs,0,0,i); _stencil_val(a,0,0,i-1); _stencil_val(cs,0,0,i-1);_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);_stencil_val(a,o_stencil,0,i); _stencil_val(cs,o_stencil,0,i); _stencil_val(a,o_stencil,0,i-1); _stencil_val(cs,o_stencil,0,i-1);_stencil_val(cs,o_stencil,0,i); _stencil_val(cs,o_stencil,0,i-1);
-_stencil_val(a,0,o_stencil,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(a,0,o_stencil,i-1); _stencil_val(cs,0,o_stencil,i-1);_stencil_val(cs,0,o_stencil,i); _stencil_val(cs,0,o_stencil,i-1);_stencil_val(a,o_stencil,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i); _stencil_val(a,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1);_stencil_val(cs,o_stencil,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i-1);                                       
-      
-    
-  
-#line 165
-}
-_stencil_val(a,0,0,i); _stencil_val(cs,0,0,i); _stencil_val(a,0,0,i-1); _stencil_val(cs,0,0,i-1);_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);
-                          
-  
-#line 166
-return        ;
-}
-#line 177 "/home/lisergey/basilisk/src/embed.h"
-
-#line 222 "/home/lisergey/basilisk/src/embed.h"
+#line 70 "./myembed.h"
+#line 82 "./myembed.h"
 static inline
-double embed_geometry (Point point, coord * p, coord * n)
+double embed_geometry (Point point, coord * b, coord * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   *n = facet_normal (point, cs, fs);
   double alpha = plane_alpha (val(cs,0,0,0), *n);
-  double area = plane_area_center (*n, alpha, p);
+  double area = plane_area_center (*n, alpha, b);
   normalize (n);
   return area;
 }
-#line 222 "/home/lisergey/basilisk/src/embed.h"
+#line 70 "./myembed.h"
+#line 82 "./myembed.h"
 static void 
-_stencil_embed_geometry (Point point,_stencil_undefined  * p,_stencil_undefined  * n)
+_stencil_embed_geometry (Point point,_stencil_undefined  * b,_stencil_undefined  * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
 _stencil_facet_normal (point, cs, fs);     
    
   
-#line 226
+#line 86
 _stencil_val(cs,0,0,0);      
    
   
@@ -12513,125 +12071,202 @@ _stencil_val(cs,0,0,0);
 
 
 
+
 static inline
 double embed_area_center (Point point, double * x1, double * y1, double * z1)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   double area = 0.;
   if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-    coord n, p;
-    area = embed_geometry (point, &p, &n);
-    *x1 += p.x*Delta, *y1 += p.y*Delta, *z1 += p.z*Delta;
+    coord n, b;
+    area = embed_geometry (point, &b, &n);
+    *x1 += b.x*Delta, *y1 += b.y*Delta, *z1 += b.z*Delta;
   }
   return area;
 }
-#line 255 "/home/lisergey/basilisk/src/embed.h"
-double embed_interpolate (Point point, scalar s, coord p)
+#line 116 "./myembed.h"
+double embed_interpolate (Point point, scalar s, coord b)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
-  int i = sign(p.x), j = sign(p.y);
-  if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0))
+  int i = sign(b.x), j = sign(b.y);
 
-    return ((val(s,0,0,0)*(1. - fabs(p.x)) + val(s,i,0,0)*fabs(p.x))*(1. - fabs(p.y)) +
-     (val(s,0,j,0)*(1. - fabs(p.x)) + val(s,i,j,0)*fabs(p.x))*fabs(p.y));
+
+
+
+
+
+
+  int k = sign(b.z);
+  if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0) &&
+      val(cs,0,0,k) && val(cs,i,0,k) && val(cs,0,j,k) && val(cs,i,j,k) &&
+      (emerged || (val(csm1,i,0,0) && val(csm1,0,j,0) && val(csm1,i,j,0) &&
+     val(csm1,0,0,k) && val(csm1,i,0,k) && val(csm1,0,j,k) && val(csm1,i,j,k)))) {
+    double val_0, val_k;
+
+    val_0 = (val(s,0,0,0)*(1. - fabs(b.x)) + val(s,i,0,0)*fabs(b.x))*(1. - fabs(b.y)) +
+      (val(s,0,j,0)*(1. - fabs(b.x)) + val(s,i,j,0)*fabs(b.x))*fabs(b.y);
+    val_k = (val(s,0,0,k)*(1. - fabs(b.x)) + val(s,i,0,k)*fabs(b.x))*(1. - fabs(b.y)) +
+      (val(s,0,j,k)*(1. - fabs(b.x)) + val(s,i,j,k)*fabs(b.x))*fabs(b.y);
+
+    return (val_0*(1. - fabs(b.z)) + val_k*fabs(b.z));
+  }
+
   else {
 
 
     double val = val(s,0,0,0);
      {
-      int i = sign(p.x);
-      if (val(cs,i,0,0))
- val += fabs(p.x)*(val(s,i,0,0) - val(s,0,0,0));
-      else if (val(cs,-i,0,0))
- val += fabs(p.x)*(val(s,0,0,0) - val(s,-i,0,0));
+      int i = sign(b.x);
+      if (val(cs,i,0,0) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,i,0,0))))
+ val += fabs(b.x)*(val(s,i,0,0) - val(s,0,0,0));
+      else if (val(cs,-i,0,0) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,-i,0,0))))
+ val += fabs(b.x)*(val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 267
+#line 145
 {
-      int i = sign(p.y);
-      if (val(cs,0,i,0))
- val += fabs(p.y)*(val(s,0,i,0) - val(s,0,0,0));
-      else if (val(cs,0,-i,0))
- val += fabs(p.y)*(val(s,0,0,0) - val(s,0,-i,0));
+      int i = sign(b.y);
+      if (val(cs,0,i,0) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,0,i,0))))
+ val += fabs(b.y)*(val(s,0,i,0) - val(s,0,0,0));
+      else if (val(cs,0,-i,0) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,0,-i,0))))
+ val += fabs(b.y)*(val(s,0,0,0) - val(s,0,-i,0));
     } 
-#line 267
+#line 145
 {
-      int i = sign(p.z);
-      if (val(cs,0,0,i))
- val += fabs(p.z)*(val(s,0,0,i) - val(s,0,0,0));
-      else if (val(cs,0,0,-i))
- val += fabs(p.z)*(val(s,0,0,0) - val(s,0,0,-i));
+      int i = sign(b.z);
+      if (val(cs,0,0,i) &&
+   (emerged || (val(csm1,0,0,0) && val(csm1,0,0,i))))
+ val += fabs(b.z)*(val(s,0,0,i) - val(s,0,0,0));
+      else if (val(cs,0,0,-i) &&
+        (emerged || (val(csm1,0,0,0) && val(csm1,0,0,-i))))
+ val += fabs(b.z)*(val(s,0,0,0) - val(s,0,0,-i));
     }
     return val;
   }
 }
-#line 255 "/home/lisergey/basilisk/src/embed.h"
-static void _stencil_embed_interpolate (Point point, scalar s,_stencil_undefined * p)
+#line 116 "./myembed.h"
+static void _stencil_embed_interpolate (Point point, scalar s,_stencil_undefined * b)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
-      
   
-_stencil_val(cs,o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);{
 
-    {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);
-_stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0);         
+
+
+
+
+
+
+  
+_stencil_val(cs,o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);
+      _stencil_val(cs,0,0,o_stencil); _stencil_val(cs,o_stencil,0,o_stencil); _stencil_val(cs,0,o_stencil,o_stencil); _stencil_val(cs,o_stencil,o_stencil,o_stencil);
+_stencil_val(csm1,o_stencil,0,0); _stencil_val(csm1,0,o_stencil,0); _stencil_val(csm1,o_stencil,o_stencil,0);
+     _stencil_val(csm1,0,0,o_stencil); _stencil_val(csm1,o_stencil,0,o_stencil); _stencil_val(csm1,0,o_stencil,o_stencil); _stencil_val(csm1,o_stencil,o_stencil,o_stencil);
+#line 127
+{ 
+
+
+{  
+    
+
+_stencil_val(s,0,0,0); _stencil_val(s,o_stencil,0,0);
+_stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0); 
+
+              
       
-#line 262
-} 
+#line 135
+_stencil_val(s,0,0,o_stencil); _stencil_val(s,o_stencil,0,o_stencil);
+_stencil_val(s,0,o_stencil,o_stencil); _stencil_val(s,o_stencil,o_stencil,o_stencil);     
+
+    
+  } 
+
 {  
 
 
      _stencil_val(s,0,0,0);
      {   
       
-_stencil_val(cs,o_stencil,0,0);{
- {_stencil_val(s,o_stencil,0,0); _stencil_val(s,0,0,0);   } 
+_stencil_val(cs,o_stencil,0,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
+#line 147
+{
+ 
+{_stencil_val(s,o_stencil,0,0); _stencil_val(s,0,0,0);   } 
 {_stencil_val(cs,o_stencil,0,0);
- {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);   } }}
-       
+_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
+ {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);   }     
+        
+#line 152
+}}
+           
+   
       
     
-#line 273
+#line 153
 } 
-#line 267
+#line 145
 {   
       
-_stencil_val(cs,0,o_stencil,0);{
- {_stencil_val(s,0,o_stencil,0); _stencil_val(s,0,0,0);   } 
+_stencil_val(cs,0,o_stencil,0);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
+#line 147
+{
+ 
+{_stencil_val(s,0,o_stencil,0); _stencil_val(s,0,0,0);   } 
 {_stencil_val(cs,0,o_stencil,0);
- {_stencil_val(s,0,0,0);_stencil_val(s,0, o_stencil,0);   } }}
-       
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
+ {_stencil_val(s,0,0,0);_stencil_val(s,0, o_stencil,0);   }     
+        
+#line 152
+}}
+           
+   
       
     
-#line 273
+#line 153
 } 
-#line 267
+#line 145
 {   
       
-_stencil_val(cs,0,0,o_stencil);{
- {_stencil_val(s,0,0,o_stencil); _stencil_val(s,0,0,0);   } 
+_stencil_val(cs,0,0,o_stencil);
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
+#line 147
+{
+ 
+{_stencil_val(s,0,0,o_stencil); _stencil_val(s,0,0,0);   } 
 {_stencil_val(cs,0,0,o_stencil);
- {_stencil_val(s,0,0,0);_stencil_val(s,0,0, o_stencil);   } }}
-       
+_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
+ {_stencil_val(s,0,0,0);_stencil_val(s,0,0, o_stencil);   }     
+        
+#line 152
+}}
+           
+   
       
     
-#line 273
+#line 153
 } 
     
   }}
-     
+                  
+      
+
   
 
-#line 276
+#line 156
 }
-#line 285 "/home/lisergey/basilisk/src/embed.h"
+#line 165 "./myembed.h"
 struct Cleanup {
   scalar c;
   vector s;
   double smin;
+  double cmin;
   bool opposite;
 };
 
      
 int fractions_cleanup (struct Cleanup p)
-{tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);
+{tracing("fractions_cleanup","./myembed.h",0);
   scalar c = p.c;
   vector s = p.s;
 
@@ -12641,8 +12276,8 @@ int fractions_cleanup (struct Cleanup p)
 
 
 
-  int changed = 1, schanged = 0, i;
-  for (i = 0; i < 100 && changed; i++) {
+  int changed = 1, schanged = 0, i = 0;
+  for (int i = 0; i < 100 && changed; i++) {
 
 
 
@@ -12650,11 +12285,11 @@ int fractions_cleanup (struct Cleanup p)
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val(s.x,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,-1,0,0); _stencil_val(s.x,0,0,0);
  {_stencil_val_a(s.x,0,0,0);  }        }}end__stencil_is_face_x()
-#line 310
+#line 191
 _stencil_is_face_y(){
       {_stencil_val(s.y,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,0,-1,0); _stencil_val(s.y,0,0,0);
  {_stencil_val_a(s.y,0,0,0);  }        }}end__stencil_is_face_y()
-#line 310
+#line 191
 _stencil_is_face_z(){
       {_stencil_val(s.z,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,0,0,-1); _stencil_val(s.z,0,0,0);
  {_stencil_val_a(s.z,0,0,0);  }        }}end__stencil_is_face_z()}end_foreach_face_stencil();
@@ -12663,18 +12298,42 @@ _stencil_is_face_z(){
 
 
     {
-#line 310
+#line 191
 foreach_face_generic(){is_face_x(){
       if (val(s.x,0,0,0) && ((!val(c,0,0,0) || !val(c,-1,0,0)) || val(s.x,0,0,0) < p.smin))
  val(s.x,0,0,0) = 0.;}end_is_face_x()
-#line 310
+#line 191
 is_face_y(){
       if (val(s.y,0,0,0) && ((!val(c,0,0,0) || !val(c,0,-1,0)) || val(s.y,0,0,0) < p.smin))
  val(s.y,0,0,0) = 0.;}end_is_face_y()
-#line 310
+#line 191
 is_face_z(){
       if (val(s.z,0,0,0) && ((!val(c,0,0,0) || !val(c,0,0,-1)) || val(s.z,0,0,0) < p.smin))
  val(s.z,0,0,0) = 0.;}end_is_face_z()}end_foreach_face_generic();}
+#line 206 "./myembed.h"
+    foreach_face_stencil(){_stencil_is_face_x(){
+      {_stencil_val(s.x,0,0,0);_stencil_val(c,-1,0,0); _stencil_val(c,0,0,0);
+ {_stencil_val_a(s.x,0,0,0);  }          }}end__stencil_is_face_x()
+#line 206
+_stencil_is_face_y(){
+      {_stencil_val(s.y,0,0,0);_stencil_val(c,0,-1,0); _stencil_val(c,0,0,0);
+ {_stencil_val_a(s.y,0,0,0);  }          }}end__stencil_is_face_y()
+#line 206
+_stencil_is_face_z(){
+      {_stencil_val(s.z,0,0,0);_stencil_val(c,0,0,-1); _stencil_val(c,0,0,0);
+ {_stencil_val_a(s.z,0,0,0);  }          }}end__stencil_is_face_z()}end_foreach_face_stencil();
+#line 206 "./myembed.h"
+    {foreach_face_generic(){is_face_x(){
+      if (val(s.x,0,0,0) > 0 && (val(c,-1,0,0) == 1 || val(c,0,0,0) == 1))
+ val(s.x,0,0,0) = 1.;}end_is_face_x()
+#line 206
+is_face_y(){
+      if (val(s.y,0,0,0) > 0 && (val(c,0,-1,0) == 1 || val(c,0,0,0) == 1))
+ val(s.y,0,0,0) = 1.;}end_is_face_y()
+#line 206
+is_face_z(){
+      if (val(s.z,0,0,0) > 0 && (val(c,0,0,-1) == 1 || val(c,0,0,0) == 1))
+ val(s.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
 
     changed = 0;
     foreach_stencil()
@@ -12684,59 +12343,35 @@ is_face_z(){
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.x,i,0,0);
           } 
-
-
-
-
-
-
-
-
-
-_stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
+#line 229
+_stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0); _stencil_val(c,0,0,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-          
+#line 229 "./myembed.h"
+             
  
 } 
-#line 318
+#line 214
 {
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.y,0,i,0);
           } 
-
-
-
-
-
-
-
-
-
-_stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);
+#line 229
+_stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0); _stencil_val(c,0,0,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-          
+#line 229 "./myembed.h"
+             
  
 } 
-#line 318
+#line 214
 {
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.z,0,0,i);
           } 
-
-
-
-
-
-
-
-
-
-_stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
+#line 229
+_stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1); _stencil_val(c,0,0,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-          
+#line 229 "./myembed.h"
+             
  
 }
    
@@ -12755,15 +12390,24 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
 
 
 
-    
+     
+#line 246
+_stencil_val(c,0,0,0);
+   {_stencil_val_a(c,0,0,0);   }
+
+
+
+
+
       
-#line 343
+      
+#line 248
 }      }end_foreach_stencil();
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:changed)){
-#line 315
+#line 211
 foreach()
       if (val(c,0,0,0) > 0. && val(c,0,0,0) < 1.) {
  int n = 0;
@@ -12771,26 +12415,26 @@ foreach()
    for (int i = 0; i <= 1; i++)
      if (val(s.x,i,0,0) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.x,0,0,0) == 0. && val(s.x,1,0,0) == 0.)
+#line 229 "./myembed.h"
+   if ((p.opposite && val(s.x,0,0,0) == 0. && val(s.x,1,0,0) == 0.) || val(c,0,0,0) < p.cmin)
      val(c,0,0,0) = 0., changed++;
  } 
-#line 318
+#line 214
 {
    for (int i = 0; i <= 1; i++)
      if (val(s.y,0,i,0) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.y,0,0,0) == 0. && val(s.y,0,1,0) == 0.)
+#line 229 "./myembed.h"
+   if ((p.opposite && val(s.y,0,0,0) == 0. && val(s.y,0,1,0) == 0.) || val(c,0,0,0) < p.cmin)
      val(c,0,0,0) = 0., changed++;
  } 
-#line 318
+#line 214
 {
    for (int i = 0; i <= 1; i++)
      if (val(s.z,0,0,i) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.z,0,0,0) == 0. && val(s.z,0,0,1) == 0.)
+#line 229 "./myembed.h"
+   if ((p.opposite && val(s.z,0,0,0) == 0. && val(s.z,0,0,1) == 0.) || val(c,0,0,0) < p.cmin)
      val(c,0,0,0) = 0., changed++;
  }
 
@@ -12802,72 +12446,877 @@ foreach()
 
  if (n < 3)
    val(c,0,0,0) = 0., changed++;
+
+
+
+
+
+ if (fabs (1. - val(c,0,0,0)) < 1.e-14)
+   val(c,0,0,0) = 1., changed++;
       }end_foreach();mpi_all_reduce_array(&changed,int,MPI_SUM,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
 
     
-#line 345
+#line 250
 schanged += changed;
   }
-  if (changed)
-    fprintf (ferr, "WARNING: fractions_cleanup() did not converge after "
-      "%d iterations\n", i);
-  {end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);return schanged;}
-end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",0);}
-#line 375 "/home/lisergey/basilisk/src/embed.h"
+  restriction (((scalar[]){c, s.x, s.y, s.z,{-1}}));
 
-static inline double dirichlet_gradient_x (Point point, scalar s, scalar cs,
-        coord n, coord p, double bc,
-        double * coef)
+  if (changed)
+    fprintf (ferr, "#WARNING: fractions_cleanup() did not converge after "
+      "%d iterations\n", i);
+  {end_tracing("fractions_cleanup","./myembed.h",0);return schanged;}
+end_tracing("fractions_cleanup","./myembed.h",0);}
+
+
+
+
+
+
+
+bid embed;
+#line 279 "./myembed.h"
+#undef neumann
+#define _neumann(expr, point, neighbor, _s, data) (data ? embed_area_center (point, &x, &y, &z),\
+        *((bool *)data) = false, (expr) :\
+        Delta*(expr) + val(_s,0,0,0))\
+
+#line 283
+
+#undef neumann_homogeneous
+#define neumann_homogeneous() (data ? *((bool *)data) = false, (0) :\
+       val(_s,0,0,0))\
+
+#line 287
+
+#undef dirichlet
+#define _dirichlet(expr, point, neighbor, _s, data) (data ? embed_area_center (point, &x, &y, &z),\
+        *((bool *)data) = true, (expr) :\
+        2.*(expr) - val(_s,0,0,0))\
+
+#line 292
+
+#undef dirichlet_homogeneous
+#define dirichlet_homogeneous() (data ? *((bool *)data) = true, (0) :\
+         - val(_s,0,0,0))\
+
+#line 296
+
+#line 435 "./myembed.h"
+
+static inline coord embed_face_barycentre_z (Point point, int i)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
+  coord n1 = {0};
+  double nn = 0.;
+  scalar f = fs.z;
+   {
+    n1.x = (val(f,-1,-1,i) + 2.*val(f,-1,0,i) + val(f,-1,1,i) -
+     val(f,+1,-1,i) - 2.*val(f,+1,0,i) - val(f,+1,1,i));
+    nn += fabs(n1.x);
+  } 
+#line 442
+{
+    n1.y = (val(f,-1,-1,i) + 2.*val(f,0,-1,i) + val(f,1,-1,i) -
+     val(f,-1,+1,i) - 2.*val(f,0,+1,i) - val(f,1,+1,i));
+    nn += fabs(n1.y);
+  }
+  if (!nn)
+    return (coord){0.,0.,0.};
   
-    n.x = - n.x;
+    n1.x /= nn;
     
-#line 381
-n.y = - n.y;
+#line 450
+n1.y /= nn;
+
+  coord n, p1, p;
+  ((double *)&n)[0] = n1.x, ((double *)&n)[1] = n1.y;
+  double alpha = line_alpha (val(f,0,0,i), n);
+  line_center (n, alpha, val(f,0,0,i), &p1);
+  p.x = ((double *)&p1)[0], p.y = ((double *)&p1)[1], p.z = 0.;
+  return p;
+}
+
+#line 436
+static inline coord embed_face_barycentre_x (Point point, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
+  coord n1 = {0};
+  double nn = 0.;
+  scalar f = fs.x;
+   {
+    n1.y = (val(f,i,-1,-1) + 2.*val(f,i,-1,0) + val(f,i,-1,1) -
+     val(f,i,+1,-1) - 2.*val(f,i,+1,0) - val(f,i,+1,1));
+    nn += fabs(n1.y);
+  } 
+#line 442
+{
+    n1.z = (val(f,i,-1,-1) + 2.*val(f,i,0,-1) + val(f,i,1,-1) -
+     val(f,i,-1,+1) - 2.*val(f,i,0,+1) - val(f,i,1,+1));
+    nn += fabs(n1.z);
+  }
+  if (!nn)
+    return (coord){0.,0.,0.};
+  
+    n1.y /= nn;
     
-#line 381
-n.z = - n.z;
+#line 450
+n1.z /= nn;
+
+  coord n, p1, p;
+  ((double *)&n)[0] = n1.y, ((double *)&n)[1] = n1.z;
+  double alpha = line_alpha (val(f,i,0,0), n);
+  line_center (n, alpha, val(f,i,0,0), &p1);
+  p.y = ((double *)&p1)[0], p.z = ((double *)&p1)[1], p.x = 0.;
+  return p;
+}
+
+#line 436
+static inline coord embed_face_barycentre_y (Point point, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
+  coord n1 = {0};
+  double nn = 0.;
+  scalar f = fs.y;
+   {
+    n1.z = (val(f,-1,i,-1) + 2.*val(f,0,i,-1) + val(f,1,i,-1) -
+     val(f,-1,i,+1) - 2.*val(f,0,i,+1) - val(f,1,i,+1));
+    nn += fabs(n1.z);
+  } 
+#line 442
+{
+    n1.x = (val(f,-1,i,-1) + 2.*val(f,-1,i,0) + val(f,-1,i,1) -
+     val(f,+1,i,-1) - 2.*val(f,+1,i,0) - val(f,+1,i,1));
+    nn += fabs(n1.x);
+  }
+  if (!nn)
+    return (coord){0.,0.,0.};
+  
+    n1.z /= nn;
+    
+#line 450
+n1.x /= nn;
+
+  coord n, p1, p;
+  ((double *)&n)[0] = n1.z, ((double *)&n)[1] = n1.x;
+  double alpha = line_alpha (val(f,0,i,0), n);
+  line_center (n, alpha, val(f,0,i,0), &p1);
+  p.z = ((double *)&p1)[0], p.x = ((double *)&p1)[1], p.y = 0.;
+  return p;
+}
+#line 279 "./myembed.h"
+#undef neumann
+#define _neumann(expr, point, neighbor, _s, data) (data ? embed_area_center (point, &x, &y, &z),\
+        *((bool *)data) = false, (expr) :\
+        Delta*(expr) + val(_s,0,0,0))\
+
+#line 283
+
+#undef neumann_homogeneous
+#define neumann_homogeneous() (data ? *((bool *)data) = false, (0) :\
+       val(_s,0,0,0))\
+
+#line 287
+
+#undef dirichlet
+#define _dirichlet(expr, point, neighbor, _s, data) (data ? embed_area_center (point, &x, &y, &z),\
+        *((bool *)data) = true, (expr) :\
+        2.*(expr) - val(_s,0,0,0))\
+
+#line 292
+
+#undef dirichlet_homogeneous
+#define dirichlet_homogeneous() (data ? *((bool *)data) = true, (0) :\
+         - val(_s,0,0,0))\
+
+#line 296
+
+#line 435 "./myembed.h"
+
+static void _stencil_embed_face_barycentre_z (Point point, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
+
+  
+  
+  scalar f = fs.z;
+   {
+_stencil_val(f,-1,-1,i);_stencil_val(f,-1,0,i); _stencil_val(f,-1,1,i);
+     _stencil_val(f,+1,-1,i);_stencil_val(f,+1,0,i); _stencil_val(f,+1,1,i);  
+            
+     
+  
+#line 446
+} 
+#line 442
+{
+_stencil_val(f,-1,-1,i);_stencil_val(f,0,-1,i); _stencil_val(f,1,-1,i);
+     _stencil_val(f,-1,+1,i);_stencil_val(f,0,+1,i); _stencil_val(f,1,+1,i);  
+            
+     
+  
+#line 446
+}         
+    
+   
+  
+      
+
+    
+       
+  _stencil_val(f,0,0,i); 
+_stencil_val(f,0,0,i);   
+  
+            
+  
+#line 457
+return ;
+}
+
+#line 436
+static void _stencil_embed_face_barycentre_x (Point point, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
+
+  
+  
+  scalar f = fs.x;
+   {
+_stencil_val(f,i,-1,-1);_stencil_val(f,i,-1,0); _stencil_val(f,i,-1,1);
+     _stencil_val(f,i,+1,-1);_stencil_val(f,i,+1,0); _stencil_val(f,i,+1,1);  
+            
+     
+  
+#line 446
+} 
+#line 442
+{
+_stencil_val(f,i,-1,-1);_stencil_val(f,i,0,-1); _stencil_val(f,i,1,-1);
+     _stencil_val(f,i,-1,+1);_stencil_val(f,i,0,+1); _stencil_val(f,i,1,+1);  
+            
+     
+  
+#line 446
+}         
+    
+   
+  
+      
+
+    
+       
+  _stencil_val(f,i,0,0); 
+_stencil_val(f,i,0,0);   
+  
+            
+  
+#line 457
+return ;
+}
+
+#line 436
+static void _stencil_embed_face_barycentre_y (Point point, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;      
+
+  
+  
+  scalar f = fs.y;
+   {
+_stencil_val(f,-1,i,-1);_stencil_val(f,0,i,-1); _stencil_val(f,1,i,-1);
+     _stencil_val(f,-1,i,+1);_stencil_val(f,0,i,+1); _stencil_val(f,1,i,+1);  
+            
+     
+  
+#line 446
+} 
+#line 442
+{
+_stencil_val(f,-1,i,-1);_stencil_val(f,-1,i,0); _stencil_val(f,-1,i,1);
+     _stencil_val(f,+1,i,-1);_stencil_val(f,+1,i,0); _stencil_val(f,+1,i,1);  
+            
+     
+  
+#line 446
+}         
+    
+   
+  
+      
+
+    
+       
+  _stencil_val(f,0,i,0); 
+_stencil_val(f,0,i,0);   
+  
+            
+  
+#line 457
+return ;
+}
+#line 472 "./myembed.h"
+
+static inline double embed_face_gradient_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,i,0,0) && val(cs,i-1,0,0) && (emerged || (val(csm1,i,0,0) && val(csm1,i-1,0,0))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_x (point, i);
+
+  int j = sign(p.y), k = sign(p.z);
+  if ((val(fs.x,i,j,k) > 0.25 && (val(fs.x,i,j,0) > 0.25 || val(fs.x,i,0,k) > 0.25) && val(fs.y,i,j + (j < 0),0) && val(fs.y,i-1,j + (j < 0),0) && val(fs.y,i,j + (j < 0),k) && val(fs.y,i-1,j + (j < 0),k) && val(fs.z,i,0,k + (k < 0)) && val(fs.z,i-1,0,k + (k < 0)) && val(fs.z,i,j,k + (k < 0)) && val(fs.z,i-1,j,k + (k < 0)) && val(cs,i-1,j,0) && val(cs,i-1,0,k) && val(cs,i-1,j,k) && val(cs,i,j,0) && val(cs,i,0,k) && val(cs,i,j,k) && (emerged || (val(csm1,i-1,j,0) && val(csm1,i-1,0,k) && val(csm1,i-1,j,k) && val(csm1,i,j,0) && val(csm1,i,0,k) && val(csm1,i,j,k))))) {
+    p.y = fabs(p.y), p.z = fabs(p.z);
+    return (((val(a,i,0,0) - val(a,i-1,0,0))*(1. - p.y) +
+      (val(a,i,j,0) - val(a,i-1,j,0))*p.y)*(1. - p.z) +
+     ((val(a,i,0,k) - val(a,i-1,0,k))*(1. - p.y) +
+      (val(a,i,j,k) - val(a,i-1,j,k))*p.y)*p.z)/Delta;
+  }
+  return (val(a,i,0,0) - val(a,i-1,0,0))/Delta;
+}
+
+#line 473
+static inline double embed_face_gradient_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,0,i,0) && val(cs,0,i-1,0) && (emerged || (val(csm1,0,i,0) && val(csm1,0,i-1,0))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_y (point, i);
+
+  int j = sign(p.z), k = sign(p.x);
+  if ((val(fs.y,k,i,j) > 0.25 && (val(fs.y,0,i,j) > 0.25 || val(fs.y,k,i,0) > 0.25) && val(fs.z,0,i,j + (j < 0)) && val(fs.z,0,i-1,j + (j < 0)) && val(fs.z,k,i,j + (j < 0)) && val(fs.z,k,i-1,j + (j < 0)) && val(fs.x,k + (k < 0),i,0) && val(fs.x,k + (k < 0),i-1,0) && val(fs.x,k + (k < 0),i,j) && val(fs.x,k + (k < 0),i-1,j) && val(cs,0,i-1,j) && val(cs,k,i-1,0) && val(cs,k,i-1,j) && val(cs,0,i,j) && val(cs,k,i,0) && val(cs,k,i,j) && (emerged || (val(csm1,0,i-1,j) && val(csm1,k,i-1,0) && val(csm1,k,i-1,j) && val(csm1,0,i,j) && val(csm1,k,i,0) && val(csm1,k,i,j))))) {
+    p.z = fabs(p.z), p.x = fabs(p.x);
+    return (((val(a,0,i,0) - val(a,0,i-1,0))*(1. - p.z) +
+      (val(a,0,i,j) - val(a,0,i-1,j))*p.z)*(1. - p.x) +
+     ((val(a,k,i,0) - val(a,k,i-1,0))*(1. - p.z) +
+      (val(a,k,i,j) - val(a,k,i-1,j))*p.z)*p.x)/Delta;
+  }
+  return (val(a,0,i,0) - val(a,0,i-1,0))/Delta;
+}
+
+#line 473
+static inline double embed_face_gradient_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,0,0,i) && val(cs,0,0,i-1) && (emerged || (val(csm1,0,0,i) && val(csm1,0,0,i-1))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_z (point, i);
+
+  int j = sign(p.x), k = sign(p.y);
+  if ((val(fs.z,j,k,i) > 0.25 && (val(fs.z,j,0,i) > 0.25 || val(fs.z,0,k,i) > 0.25) && val(fs.x,j + (j < 0),0,i) && val(fs.x,j + (j < 0),0,i-1) && val(fs.x,j + (j < 0),k,i) && val(fs.x,j + (j < 0),k,i-1) && val(fs.y,0,k + (k < 0),i) && val(fs.y,0,k + (k < 0),i-1) && val(fs.y,j,k + (k < 0),i) && val(fs.y,j,k + (k < 0),i-1) && val(cs,j,0,i-1) && val(cs,0,k,i-1) && val(cs,j,k,i-1) && val(cs,j,0,i) && val(cs,0,k,i) && val(cs,j,k,i) && (emerged || (val(csm1,j,0,i-1) && val(csm1,0,k,i-1) && val(csm1,j,k,i-1) && val(csm1,j,0,i) && val(csm1,0,k,i) && val(csm1,j,k,i))))) {
+    p.x = fabs(p.x), p.y = fabs(p.y);
+    return (((val(a,0,0,i) - val(a,0,0,i-1))*(1. - p.x) +
+      (val(a,j,0,i) - val(a,j,0,i-1))*p.x)*(1. - p.y) +
+     ((val(a,0,k,i) - val(a,0,k,i-1))*(1. - p.x) +
+      (val(a,j,k,i) - val(a,j,k,i-1))*p.x)*p.y)/Delta;
+  }
+  return (val(a,0,0,i) - val(a,0,0,i-1))/Delta;
+}
+#line 472 "./myembed.h"
+
+static void _stencil_embed_face_gradient_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(csm1,i,0,0); _stencil_val(csm1,i-1,0,0);         
+      
+   
+#line 476
+_stencil_embed_face_barycentre_x (point, i);      
+
+  
+_stencil_val(fs.x,i,o_stencil,o_stencil);_stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.x,i,0,o_stencil); _stencil_val(fs.y,i,o_stencil    ,0); _stencil_val(fs.y,i-1,o_stencil    ,0); _stencil_val(fs.y,i,o_stencil,    o_stencil); _stencil_val(fs.y,i-1,o_stencil,    o_stencil); _stencil_val(fs.z,i,0,o_stencil    ); _stencil_val(fs.z,i-1,0,o_stencil    ); _stencil_val(fs.z,i,o_stencil,o_stencil    ); _stencil_val(fs.z,i-1,o_stencil,o_stencil    ); _stencil_val(cs,i-1,o_stencil,0); _stencil_val(cs,i-1,0,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil);_stencil_val(csm1,i-1,o_stencil,0); _stencil_val(csm1,i-1,0,o_stencil); _stencil_val(csm1,i-1,o_stencil,o_stencil); _stencil_val(csm1,i,o_stencil,0); _stencil_val(csm1,i,0,o_stencil); _stencil_val(csm1,i,o_stencil,o_stencil); {
+         
+_stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0);
+_stencil_val(a,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0);
+_stencil_val(a,i,0,o_stencil); _stencil_val(a,i-1,0,o_stencil);
+_stencil_val(a,i,o_stencil,o_stencil); _stencil_val(a,i-1,o_stencil,o_stencil);       
+            
+      
+      
+    
+  
+#line 485
+}
+_stencil_val(a,i,0,0); _stencil_val(a,i-1,0,0);
+                                   
+  
+#line 486
+return  ;
+}
+
+#line 473
+static void _stencil_embed_face_gradient_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);_stencil_val(csm1,0,i,0); _stencil_val(csm1,0,i-1,0);         
+      
+   
+#line 476
+_stencil_embed_face_barycentre_y (point, i);      
+
+  
+_stencil_val(fs.y,o_stencil,i,o_stencil);_stencil_val(fs.y,0,i,o_stencil); _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.z,0,i    ,o_stencil); _stencil_val(fs.z,0,i-1    ,o_stencil); _stencil_val(fs.z,    o_stencil,i,o_stencil); _stencil_val(fs.z,    o_stencil,i-1,o_stencil); _stencil_val(fs.x,o_stencil,i,0    ); _stencil_val(fs.x,o_stencil,i-1,0    ); _stencil_val(fs.x,o_stencil,i,o_stencil    ); _stencil_val(fs.x,o_stencil,i-1,o_stencil    ); _stencil_val(cs,0,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i,o_stencil);_stencil_val(csm1,0,i-1,o_stencil); _stencil_val(csm1,o_stencil,i-1,0); _stencil_val(csm1,o_stencil,i-1,o_stencil); _stencil_val(csm1,0,i,o_stencil); _stencil_val(csm1,o_stencil,i,0); _stencil_val(csm1,o_stencil,i,o_stencil); {
+         
+_stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0);
+_stencil_val(a,0,i,o_stencil); _stencil_val(a,0,i-1,o_stencil);
+_stencil_val(a,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0);
+_stencil_val(a,o_stencil,i,o_stencil); _stencil_val(a,o_stencil,i-1,o_stencil);       
+            
+      
+      
+    
+  
+#line 485
+}
+_stencil_val(a,0,i,0); _stencil_val(a,0,i-1,0);
+                                   
+  
+#line 486
+return  ;
+}
+
+#line 473
+static void _stencil_embed_face_gradient_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);_stencil_val(csm1,0,0,i); _stencil_val(csm1,0,0,i-1);         
+      
+   
+#line 476
+_stencil_embed_face_barycentre_z (point, i);      
+
+  
+_stencil_val(fs.z,o_stencil,o_stencil,i);_stencil_val(fs.z,o_stencil,0,i); _stencil_val(fs.z,0,o_stencil,i); _stencil_val(fs.x,o_stencil,0    ,i); _stencil_val(fs.x,o_stencil,0    ,i-1); _stencil_val(fs.x,o_stencil,    o_stencil,i); _stencil_val(fs.x,o_stencil,    o_stencil,i-1); _stencil_val(fs.y,0,o_stencil,i    ); _stencil_val(fs.y,0,o_stencil,i-1    ); _stencil_val(fs.y,o_stencil,o_stencil,i    ); _stencil_val(fs.y,o_stencil,o_stencil,i-1    ); _stencil_val(cs,o_stencil,0,i-1); _stencil_val(cs,0,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,0,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i);_stencil_val(csm1,o_stencil,0,i-1); _stencil_val(csm1,0,o_stencil,i-1); _stencil_val(csm1,o_stencil,o_stencil,i-1); _stencil_val(csm1,o_stencil,0,i); _stencil_val(csm1,0,o_stencil,i); _stencil_val(csm1,o_stencil,o_stencil,i); {
+         
+_stencil_val(a,0,0,i); _stencil_val(a,0,0,i-1);
+_stencil_val(a,o_stencil,0,i); _stencil_val(a,o_stencil,0,i-1);
+_stencil_val(a,0,o_stencil,i); _stencil_val(a,0,o_stencil,i-1);
+_stencil_val(a,o_stencil,o_stencil,i); _stencil_val(a,o_stencil,o_stencil,i-1);       
+            
+      
+      
+    
+  
+#line 485
+}
+_stencil_val(a,0,0,i); _stencil_val(a,0,0,i-1);
+                                   
+  
+#line 486
+return  ;
+}
+
+
+static inline double embed_face_value_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,i,0,0) && val(cs,i-1,0,0) && (emerged || (val(csm1,i,0,0) && val(csm1,i-1,0,0))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_x (point, i);
+
+  int j = sign(p.y), k = sign(p.z);
+  if ((val(fs.x,i,j,k) > 0.25 && (val(fs.x,i,j,0) > 0.25 || val(fs.x,i,0,k) > 0.25) && val(fs.y,i,j + (j < 0),0) && val(fs.y,i-1,j + (j < 0),0) && val(fs.y,i,j + (j < 0),k) && val(fs.y,i-1,j + (j < 0),k) && val(fs.z,i,0,k + (k < 0)) && val(fs.z,i-1,0,k + (k < 0)) && val(fs.z,i,j,k + (k < 0)) && val(fs.z,i-1,j,k + (k < 0)) && val(cs,i-1,j,0) && val(cs,i-1,0,k) && val(cs,i-1,j,k) && val(cs,i,j,0) && val(cs,i,0,k) && val(cs,i,j,k) && (emerged || (val(csm1,i-1,j,0) && val(csm1,i-1,0,k) && val(csm1,i-1,j,k) && val(csm1,i,j,0) && val(csm1,i,0,k) && val(csm1,i,j,k))))) {
+    p.y = fabs(p.y), p.z = fabs(p.z);
+    return ((((val(a,i,0,0)*(1.5 + val(cs,i,0,0)) + val(a,i-1,0,0)*(1.5 + val(cs,i-1,0,0)))/ (val(cs,i,0,0) + val(cs,i-1,0,0) + 3.))*(1. - p.y) + ((val(a,i,j,0)*(1.5 + val(cs,i,j,0)) + val(a,i-1,j,0)*(1.5 + val(cs,i-1,j,0)))/ (val(cs,i,j,0) + val(cs,i-1,j,0) + 3.))*p.y)*(1. - p.z) +
+     (((val(a,i,0,k)*(1.5 + val(cs,i,0,k)) + val(a,i-1,0,k)*(1.5 + val(cs,i-1,0,k)))/ (val(cs,i,0,k) + val(cs,i-1,0,k) + 3.))*(1. - p.y) + ((val(a,i,j,k)*(1.5 + val(cs,i,j,k)) + val(a,i-1,j,k)*(1.5 + val(cs,i-1,j,k)))/ (val(cs,i,j,k) + val(cs,i-1,j,k) + 3.))*p.y)*p.z);
+  }
+  return ((val(a,i,0,0)*(1.5 + val(cs,i,0,0)) + val(a,i-1,0,0)*(1.5 + val(cs,i-1,0,0)))/ (val(cs,i,0,0) + val(cs,i-1,0,0) + 3.));
+}
+
+#line 490
+static inline double embed_face_value_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,0,i,0) && val(cs,0,i-1,0) && (emerged || (val(csm1,0,i,0) && val(csm1,0,i-1,0))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_y (point, i);
+
+  int j = sign(p.z), k = sign(p.x);
+  if ((val(fs.y,k,i,j) > 0.25 && (val(fs.y,0,i,j) > 0.25 || val(fs.y,k,i,0) > 0.25) && val(fs.z,0,i,j + (j < 0)) && val(fs.z,0,i-1,j + (j < 0)) && val(fs.z,k,i,j + (j < 0)) && val(fs.z,k,i-1,j + (j < 0)) && val(fs.x,k + (k < 0),i,0) && val(fs.x,k + (k < 0),i-1,0) && val(fs.x,k + (k < 0),i,j) && val(fs.x,k + (k < 0),i-1,j) && val(cs,0,i-1,j) && val(cs,k,i-1,0) && val(cs,k,i-1,j) && val(cs,0,i,j) && val(cs,k,i,0) && val(cs,k,i,j) && (emerged || (val(csm1,0,i-1,j) && val(csm1,k,i-1,0) && val(csm1,k,i-1,j) && val(csm1,0,i,j) && val(csm1,k,i,0) && val(csm1,k,i,j))))) {
+    p.z = fabs(p.z), p.x = fabs(p.x);
+    return ((((val(a,0,i,0)*(1.5 + val(cs,0,i,0)) + val(a,0,i-1,0)*(1.5 + val(cs,0,i-1,0)))/ (val(cs,0,i,0) + val(cs,0,i-1,0) + 3.))*(1. - p.z) + ((val(a,0,i,j)*(1.5 + val(cs,0,i,j)) + val(a,0,i-1,j)*(1.5 + val(cs,0,i-1,j)))/ (val(cs,0,i,j) + val(cs,0,i-1,j) + 3.))*p.z)*(1. - p.x) +
+     (((val(a,k,i,0)*(1.5 + val(cs,k,i,0)) + val(a,k,i-1,0)*(1.5 + val(cs,k,i-1,0)))/ (val(cs,k,i,0) + val(cs,k,i-1,0) + 3.))*(1. - p.z) + ((val(a,k,i,j)*(1.5 + val(cs,k,i,j)) + val(a,k,i-1,j)*(1.5 + val(cs,k,i-1,j)))/ (val(cs,k,i,j) + val(cs,k,i-1,j) + 3.))*p.z)*p.x);
+  }
+  return ((val(a,0,i,0)*(1.5 + val(cs,0,i,0)) + val(a,0,i-1,0)*(1.5 + val(cs,0,i-1,0)))/ (val(cs,0,i,0) + val(cs,0,i-1,0) + 3.));
+}
+
+#line 490
+static inline double embed_face_value_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!(val(cs,0,0,i) && val(cs,0,0,i-1) && (emerged || (val(csm1,0,0,i) && val(csm1,0,0,i-1))))) qassert ("./myembed.h", 0, "cs[i] && cs[i-1] && (emerged || (csm1[i] && csm1[i-1]))");
+  coord p = embed_face_barycentre_z (point, i);
+
+  int j = sign(p.x), k = sign(p.y);
+  if ((val(fs.z,j,k,i) > 0.25 && (val(fs.z,j,0,i) > 0.25 || val(fs.z,0,k,i) > 0.25) && val(fs.x,j + (j < 0),0,i) && val(fs.x,j + (j < 0),0,i-1) && val(fs.x,j + (j < 0),k,i) && val(fs.x,j + (j < 0),k,i-1) && val(fs.y,0,k + (k < 0),i) && val(fs.y,0,k + (k < 0),i-1) && val(fs.y,j,k + (k < 0),i) && val(fs.y,j,k + (k < 0),i-1) && val(cs,j,0,i-1) && val(cs,0,k,i-1) && val(cs,j,k,i-1) && val(cs,j,0,i) && val(cs,0,k,i) && val(cs,j,k,i) && (emerged || (val(csm1,j,0,i-1) && val(csm1,0,k,i-1) && val(csm1,j,k,i-1) && val(csm1,j,0,i) && val(csm1,0,k,i) && val(csm1,j,k,i))))) {
+    p.x = fabs(p.x), p.y = fabs(p.y);
+    return ((((val(a,0,0,i)*(1.5 + val(cs,0,0,i)) + val(a,0,0,i-1)*(1.5 + val(cs,0,0,i-1)))/ (val(cs,0,0,i) + val(cs,0,0,i-1) + 3.))*(1. - p.x) + ((val(a,j,0,i)*(1.5 + val(cs,j,0,i)) + val(a,j,0,i-1)*(1.5 + val(cs,j,0,i-1)))/ (val(cs,j,0,i) + val(cs,j,0,i-1) + 3.))*p.x)*(1. - p.y) +
+     (((val(a,0,k,i)*(1.5 + val(cs,0,k,i)) + val(a,0,k,i-1)*(1.5 + val(cs,0,k,i-1)))/ (val(cs,0,k,i) + val(cs,0,k,i-1) + 3.))*(1. - p.x) + ((val(a,j,k,i)*(1.5 + val(cs,j,k,i)) + val(a,j,k,i-1)*(1.5 + val(cs,j,k,i-1)))/ (val(cs,j,k,i) + val(cs,j,k,i-1) + 3.))*p.x)*p.y);
+  }
+  return ((val(a,0,0,i)*(1.5 + val(cs,0,0,i)) + val(a,0,0,i-1)*(1.5 + val(cs,0,0,i-1)))/ (val(cs,0,0,i) + val(cs,0,0,i-1) + 3.));
+}
+
+
+
+#line 490
+static void _stencil_embed_face_value_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(csm1,i,0,0); _stencil_val(csm1,i-1,0,0);         
+      
+   
+#line 493
+_stencil_embed_face_barycentre_x (point, i);      
+
+  
+_stencil_val(fs.x,i,o_stencil,o_stencil);_stencil_val(fs.x,i,o_stencil,0); _stencil_val(fs.x,i,0,o_stencil); _stencil_val(fs.y,i,o_stencil    ,0); _stencil_val(fs.y,i-1,o_stencil    ,0); _stencil_val(fs.y,i,o_stencil,    o_stencil); _stencil_val(fs.y,i-1,o_stencil,    o_stencil); _stencil_val(fs.z,i,0,o_stencil    ); _stencil_val(fs.z,i-1,0,o_stencil    ); _stencil_val(fs.z,i,o_stencil,o_stencil    ); _stencil_val(fs.z,i-1,o_stencil,o_stencil    ); _stencil_val(cs,i-1,o_stencil,0); _stencil_val(cs,i-1,0,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil);_stencil_val(csm1,i-1,o_stencil,0); _stencil_val(csm1,i-1,0,o_stencil); _stencil_val(csm1,i-1,o_stencil,o_stencil); _stencil_val(csm1,i,o_stencil,0); _stencil_val(csm1,i,0,o_stencil); _stencil_val(csm1,i,o_stencil,o_stencil); {
+         
+_stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(a,i,o_stencil,0); _stencil_val(cs,i,o_stencil,0); _stencil_val(a,i-1,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);_stencil_val(cs,i,o_stencil,0); _stencil_val(cs,i-1,o_stencil,0);
+_stencil_val(a,i,0,o_stencil); _stencil_val(cs,i,0,o_stencil); _stencil_val(a,i-1,0,o_stencil); _stencil_val(cs,i-1,0,o_stencil);_stencil_val(cs,i,0,o_stencil); _stencil_val(cs,i-1,0,o_stencil);_stencil_val(a,i,o_stencil,o_stencil); _stencil_val(cs,i,o_stencil,o_stencil); _stencil_val(a,i-1,o_stencil,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil);_stencil_val(cs,i,o_stencil,o_stencil); _stencil_val(cs,i-1,o_stencil,o_stencil);                                       
+      
+    
+  
+#line 500
+}
+_stencil_val(a,i,0,0); _stencil_val(cs,i,0,0); _stencil_val(a,i-1,0,0); _stencil_val(cs,i-1,0,0);_stencil_val(cs,i,0,0); _stencil_val(cs,i-1,0,0);
+                                   
+  
+#line 501
+return        ;
+}
+
+#line 490
+static void _stencil_embed_face_value_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);_stencil_val(csm1,0,i,0); _stencil_val(csm1,0,i-1,0);         
+      
+   
+#line 493
+_stencil_embed_face_barycentre_y (point, i);      
+
+  
+_stencil_val(fs.y,o_stencil,i,o_stencil);_stencil_val(fs.y,0,i,o_stencil); _stencil_val(fs.y,o_stencil,i,0); _stencil_val(fs.z,0,i    ,o_stencil); _stencil_val(fs.z,0,i-1    ,o_stencil); _stencil_val(fs.z,    o_stencil,i,o_stencil); _stencil_val(fs.z,    o_stencil,i-1,o_stencil); _stencil_val(fs.x,o_stencil,i,0    ); _stencil_val(fs.x,o_stencil,i-1,0    ); _stencil_val(fs.x,o_stencil,i,o_stencil    ); _stencil_val(fs.x,o_stencil,i-1,o_stencil    ); _stencil_val(cs,0,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i,o_stencil);_stencil_val(csm1,0,i-1,o_stencil); _stencil_val(csm1,o_stencil,i-1,0); _stencil_val(csm1,o_stencil,i-1,o_stencil); _stencil_val(csm1,0,i,o_stencil); _stencil_val(csm1,o_stencil,i,0); _stencil_val(csm1,o_stencil,i,o_stencil); {
+         
+_stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);_stencil_val(a,0,i,o_stencil); _stencil_val(cs,0,i,o_stencil); _stencil_val(a,0,i-1,o_stencil); _stencil_val(cs,0,i-1,o_stencil);_stencil_val(cs,0,i,o_stencil); _stencil_val(cs,0,i-1,o_stencil);
+_stencil_val(a,o_stencil,i,0); _stencil_val(cs,o_stencil,i,0); _stencil_val(a,o_stencil,i-1,0); _stencil_val(cs,o_stencil,i-1,0);_stencil_val(cs,o_stencil,i,0); _stencil_val(cs,o_stencil,i-1,0);_stencil_val(a,o_stencil,i,o_stencil); _stencil_val(cs,o_stencil,i,o_stencil); _stencil_val(a,o_stencil,i-1,o_stencil); _stencil_val(cs,o_stencil,i-1,o_stencil);_stencil_val(cs,o_stencil,i,o_stencil); _stencil_val(cs,o_stencil,i-1,o_stencil);                                       
+      
+    
+  
+#line 500
+}
+_stencil_val(a,0,i,0); _stencil_val(cs,0,i,0); _stencil_val(a,0,i-1,0); _stencil_val(cs,0,i-1,0);_stencil_val(cs,0,i,0); _stencil_val(cs,0,i-1,0);
+                                   
+  
+#line 501
+return        ;
+}
+
+#line 490
+static void _stencil_embed_face_value_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);_stencil_val(csm1,0,0,i); _stencil_val(csm1,0,0,i-1);         
+      
+   
+#line 493
+_stencil_embed_face_barycentre_z (point, i);      
+
+  
+_stencil_val(fs.z,o_stencil,o_stencil,i);_stencil_val(fs.z,o_stencil,0,i); _stencil_val(fs.z,0,o_stencil,i); _stencil_val(fs.x,o_stencil,0    ,i); _stencil_val(fs.x,o_stencil,0    ,i-1); _stencil_val(fs.x,o_stencil,    o_stencil,i); _stencil_val(fs.x,o_stencil,    o_stencil,i-1); _stencil_val(fs.y,0,o_stencil,i    ); _stencil_val(fs.y,0,o_stencil,i-1    ); _stencil_val(fs.y,o_stencil,o_stencil,i    ); _stencil_val(fs.y,o_stencil,o_stencil,i-1    ); _stencil_val(cs,o_stencil,0,i-1); _stencil_val(cs,0,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,0,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i);_stencil_val(csm1,o_stencil,0,i-1); _stencil_val(csm1,0,o_stencil,i-1); _stencil_val(csm1,o_stencil,o_stencil,i-1); _stencil_val(csm1,o_stencil,0,i); _stencil_val(csm1,0,o_stencil,i); _stencil_val(csm1,o_stencil,o_stencil,i); {
+         
+_stencil_val(a,0,0,i); _stencil_val(cs,0,0,i); _stencil_val(a,0,0,i-1); _stencil_val(cs,0,0,i-1);_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);_stencil_val(a,o_stencil,0,i); _stencil_val(cs,o_stencil,0,i); _stencil_val(a,o_stencil,0,i-1); _stencil_val(cs,o_stencil,0,i-1);_stencil_val(cs,o_stencil,0,i); _stencil_val(cs,o_stencil,0,i-1);
+_stencil_val(a,0,o_stencil,i); _stencil_val(cs,0,o_stencil,i); _stencil_val(a,0,o_stencil,i-1); _stencil_val(cs,0,o_stencil,i-1);_stencil_val(cs,0,o_stencil,i); _stencil_val(cs,0,o_stencil,i-1);_stencil_val(a,o_stencil,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i); _stencil_val(a,o_stencil,o_stencil,i-1); _stencil_val(cs,o_stencil,o_stencil,i-1);_stencil_val(cs,o_stencil,o_stencil,i); _stencil_val(cs,o_stencil,o_stencil,i-1);                                       
+      
+    
+  
+#line 500
+}
+_stencil_val(a,0,0,i); _stencil_val(cs,0,0,i); _stencil_val(a,0,0,i-1); _stencil_val(cs,0,0,i-1);_stencil_val(cs,0,0,i); _stencil_val(cs,0,0,i-1);
+                                   
+  
+#line 501
+return        ;
+}
+#line 512 "./myembed.h"
+
+#line 560 "./myembed.h"
+
+double embed_face_avg_gradient_t1_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,0,i,0) && (emerged || val(csm1,0,i,0)))
+    up = (val(fs.x,0,i,0) && val(fs.x,1,i,0) &&
+   val(cs,1,i,0) && val(cs,-1,i,0) &&
+   (emerged || (val(csm1,1,i,0) && val(csm1,-1,i,0))) ? (val(a,1,i,0) - val(a,-1,i,0))/(2.*Delta) :
+   val(fs.x,1,i,0) && val(fs.x,2,i,0) &&
+   val(cs,1,i,0) && val(cs,2,i,0) &&
+   (emerged || (val(csm1,1,i,0) && val(csm1,2,i,0))) ? (-val(a,2,i,0) + 4.*val(a,1,i,0) - 3.*val(a,0,i,0))/(2.*Delta) :
+   val(fs.x,0,i,0) && val(fs.x,-1,i,0) &&
+   val(cs,-1,i,0) && val(cs,-2,i,0) &&
+   (emerged || (val(csm1,-1,i,0) && val(csm1,-2,i,0))) ? (val(a,-2,i,0) - 4.*val(a,-1,i,0) + 3.*val(a,0,i,0))/(2.*Delta) :
+   val(fs.x,1,i,0) && val(cs,1,i,0) &&
+   (emerged || val(csm1,1,i,0)) ? (val(a,1,i,0) - val(a,0,i,0))/Delta :
+   val(fs.x,0,i,0) && val(cs,-1,i,0) &&
+   (emerged || val(csm1,-1,i,0)) ? (val(a,0,i,0) - val(a,-1,i,0))/Delta : 1e30);
+  if (val(cs,0,i-1,0) && (emerged || val(csm1,0,i-1,0)))
+    down = (val(fs.x,0,i-1,0) && val(fs.x,1,i-1,0) &&
+   val(cs,1,i-1,0) && val(cs,-1,i-1,0) &&
+   (emerged || (val(csm1,1,i-1,0) && val(csm1,-1,i-1,0))) ? (val(a,1,i-1,0) - val(a,-1,i-1,0))/(2.*Delta) :
+   val(fs.x,1,i-1,0) && val(fs.x,2,i-1,0) &&
+   val(cs,1,i-1,0) && val(cs,2,i-1,0) &&
+   (emerged || (val(csm1,1,i-1,0) && val(csm1,2,i-1,0))) ? (-val(a,2,i-1,0) + 4.*val(a,1,i-1,0) - 3.*val(a,0,i-1,0))/(2.*Delta) :
+   val(fs.x,0,i-1,0) && val(fs.x,-1,i-1,0) &&
+   val(cs,-1,i-1,0) && val(cs,-2,i-1,0) &&
+   (emerged || (val(csm1,-1,i-1,0) && val(csm1,-2,i-1,0))) ? (val(a,-2,i-1,0) - 4.*val(a,-1,i-1,0) + 3.*val(a,0,i-1,0))/(2.*Delta) :
+   val(fs.x,1,i-1,0) && val(cs,1,i-1,0) &&
+   (emerged || val(csm1,1,i-1,0)) ? (val(a,1,i-1,0) - val(a,0,i-1,0))/Delta :
+   val(fs.x,0,i-1,0) && val(cs,-1,i-1,0) &&
+   (emerged || val(csm1,-1,i-1,0)) ? (val(a,0,i-1,0) - val(a,-1,i-1,0))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.y,0,i,0) ? (down + up)/2. : 0.);
+}
+
+#line 561
+double embed_face_avg_gradient_t1_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,0,0,i) && (emerged || val(csm1,0,0,i)))
+    up = (val(fs.y,0,0,i) && val(fs.y,0,1,i) &&
+   val(cs,0,1,i) && val(cs,0,-1,i) &&
+   (emerged || (val(csm1,0,1,i) && val(csm1,0,-1,i))) ? (val(a,0,1,i) - val(a,0,-1,i))/(2.*Delta) :
+   val(fs.y,0,1,i) && val(fs.y,0,2,i) &&
+   val(cs,0,1,i) && val(cs,0,2,i) &&
+   (emerged || (val(csm1,0,1,i) && val(csm1,0,2,i))) ? (-val(a,0,2,i) + 4.*val(a,0,1,i) - 3.*val(a,0,0,i))/(2.*Delta) :
+   val(fs.y,0,0,i) && val(fs.y,0,-1,i) &&
+   val(cs,0,-1,i) && val(cs,0,-2,i) &&
+   (emerged || (val(csm1,0,-1,i) && val(csm1,0,-2,i))) ? (val(a,0,-2,i) - 4.*val(a,0,-1,i) + 3.*val(a,0,0,i))/(2.*Delta) :
+   val(fs.y,0,1,i) && val(cs,0,1,i) &&
+   (emerged || val(csm1,0,1,i)) ? (val(a,0,1,i) - val(a,0,0,i))/Delta :
+   val(fs.y,0,0,i) && val(cs,0,-1,i) &&
+   (emerged || val(csm1,0,-1,i)) ? (val(a,0,0,i) - val(a,0,-1,i))/Delta : 1e30);
+  if (val(cs,0,0,i-1) && (emerged || val(csm1,0,0,i-1)))
+    down = (val(fs.y,0,0,i-1) && val(fs.y,0,1,i-1) &&
+   val(cs,0,1,i-1) && val(cs,0,-1,i-1) &&
+   (emerged || (val(csm1,0,1,i-1) && val(csm1,0,-1,i-1))) ? (val(a,0,1,i-1) - val(a,0,-1,i-1))/(2.*Delta) :
+   val(fs.y,0,1,i-1) && val(fs.y,0,2,i-1) &&
+   val(cs,0,1,i-1) && val(cs,0,2,i-1) &&
+   (emerged || (val(csm1,0,1,i-1) && val(csm1,0,2,i-1))) ? (-val(a,0,2,i-1) + 4.*val(a,0,1,i-1) - 3.*val(a,0,0,i-1))/(2.*Delta) :
+   val(fs.y,0,0,i-1) && val(fs.y,0,-1,i-1) &&
+   val(cs,0,-1,i-1) && val(cs,0,-2,i-1) &&
+   (emerged || (val(csm1,0,-1,i-1) && val(csm1,0,-2,i-1))) ? (val(a,0,-2,i-1) - 4.*val(a,0,-1,i-1) + 3.*val(a,0,0,i-1))/(2.*Delta) :
+   val(fs.y,0,1,i-1) && val(cs,0,1,i-1) &&
+   (emerged || val(csm1,0,1,i-1)) ? (val(a,0,1,i-1) - val(a,0,0,i-1))/Delta :
+   val(fs.y,0,0,i-1) && val(cs,0,-1,i-1) &&
+   (emerged || val(csm1,0,-1,i-1)) ? (val(a,0,0,i-1) - val(a,0,-1,i-1))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.z,0,0,i) ? (down + up)/2. : 0.);
+}
+
+#line 561
+double embed_face_avg_gradient_t1_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,i,0,0) && (emerged || val(csm1,i,0,0)))
+    up = (val(fs.z,i,0,0) && val(fs.z,i,0,1) &&
+   val(cs,i,0,1) && val(cs,i,0,-1) &&
+   (emerged || (val(csm1,i,0,1) && val(csm1,i,0,-1))) ? (val(a,i,0,1) - val(a,i,0,-1))/(2.*Delta) :
+   val(fs.z,i,0,1) && val(fs.z,i,0,2) &&
+   val(cs,i,0,1) && val(cs,i,0,2) &&
+   (emerged || (val(csm1,i,0,1) && val(csm1,i,0,2))) ? (-val(a,i,0,2) + 4.*val(a,i,0,1) - 3.*val(a,i,0,0))/(2.*Delta) :
+   val(fs.z,i,0,0) && val(fs.z,i,0,-1) &&
+   val(cs,i,0,-1) && val(cs,i,0,-2) &&
+   (emerged || (val(csm1,i,0,-1) && val(csm1,i,0,-2))) ? (val(a,i,0,-2) - 4.*val(a,i,0,-1) + 3.*val(a,i,0,0))/(2.*Delta) :
+   val(fs.z,i,0,1) && val(cs,i,0,1) &&
+   (emerged || val(csm1,i,0,1)) ? (val(a,i,0,1) - val(a,i,0,0))/Delta :
+   val(fs.z,i,0,0) && val(cs,i,0,-1) &&
+   (emerged || val(csm1,i,0,-1)) ? (val(a,i,0,0) - val(a,i,0,-1))/Delta : 1e30);
+  if (val(cs,i-1,0,0) && (emerged || val(csm1,i-1,0,0)))
+    down = (val(fs.z,i-1,0,0) && val(fs.z,i-1,0,1) &&
+   val(cs,i-1,0,1) && val(cs,i-1,0,-1) &&
+   (emerged || (val(csm1,i-1,0,1) && val(csm1,i-1,0,-1))) ? (val(a,i-1,0,1) - val(a,i-1,0,-1))/(2.*Delta) :
+   val(fs.z,i-1,0,1) && val(fs.z,i-1,0,2) &&
+   val(cs,i-1,0,1) && val(cs,i-1,0,2) &&
+   (emerged || (val(csm1,i-1,0,1) && val(csm1,i-1,0,2))) ? (-val(a,i-1,0,2) + 4.*val(a,i-1,0,1) - 3.*val(a,i-1,0,0))/(2.*Delta) :
+   val(fs.z,i-1,0,0) && val(fs.z,i-1,0,-1) &&
+   val(cs,i-1,0,-1) && val(cs,i-1,0,-2) &&
+   (emerged || (val(csm1,i-1,0,-1) && val(csm1,i-1,0,-2))) ? (val(a,i-1,0,-2) - 4.*val(a,i-1,0,-1) + 3.*val(a,i-1,0,0))/(2.*Delta) :
+   val(fs.z,i-1,0,1) && val(cs,i-1,0,1) &&
+   (emerged || val(csm1,i-1,0,1)) ? (val(a,i-1,0,1) - val(a,i-1,0,0))/Delta :
+   val(fs.z,i-1,0,0) && val(cs,i-1,0,-1) &&
+   (emerged || val(csm1,i-1,0,-1)) ? (val(a,i-1,0,0) - val(a,i-1,0,-1))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.x,i,0,0) ? (down + up)/2. : 0.);
+}
+
+
+double embed_face_avg_gradient_t2_x (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,0,0,i) && (emerged || val(csm1,0,0,i)))
+    up = (val(fs.x,0,0,i) && val(fs.x,1,0,i) &&
+   val(cs,1,0,i) && val(cs,-1,0,i) &&
+   (emerged || (val(csm1,1,0,i) && val(csm1,-1,0,i))) ? (val(a,1,0,i) - val(a,-1,0,i))/(2.*Delta) :
+   val(fs.x,1,0,i) && val(fs.x,2,0,i) &&
+   val(cs,1,0,i) && val(cs,2,0,i) &&
+   (emerged || (val(csm1,1,0,i) && val(csm1,2,0,i))) ? (-val(a,2,0,i) + 4.*val(a,1,0,i) - 3.*val(a,0,0,i))/(2.*Delta) :
+   val(fs.x,0,0,i) && val(fs.x,-1,0,i) &&
+   val(cs,-1,0,i) && val(cs,-2,0,i) &&
+   (emerged || (val(csm1,-1,0,i) && val(csm1,-2,0,i))) ? (val(a,-2,0,i) - 4.*val(a,-1,0,i) + 3.*val(a,0,0,i))/(2.*Delta) :
+   val(fs.x,1,0,i) && val(cs,1,0,i) &&
+   (emerged || val(csm1,1,0,i)) ? (val(a,1,0,i) - val(a,0,0,i))/Delta :
+   val(fs.x,0,0,i) && val(cs,-1,0,i) &&
+   (emerged || val(csm1,-1,0,i)) ? (val(a,0,0,i) - val(a,-1,0,i))/Delta : 1e30);
+  if (val(cs,0,0,i-1) && (emerged || val(csm1,0,0,i-1)))
+    down = (val(fs.x,0,0,i-1) && val(fs.x,1,0,i-1) &&
+   val(cs,1,0,i-1) && val(cs,-1,0,i-1) &&
+   (emerged || (val(csm1,1,0,i-1) && val(csm1,-1,0,i-1))) ? (val(a,1,0,i-1) - val(a,-1,0,i-1))/(2.*Delta) :
+   val(fs.x,1,0,i-1) && val(fs.x,2,0,i-1) &&
+   val(cs,1,0,i-1) && val(cs,2,0,i-1) &&
+   (emerged || (val(csm1,1,0,i-1) && val(csm1,2,0,i-1))) ? (-val(a,2,0,i-1) + 4.*val(a,1,0,i-1) - 3.*val(a,0,0,i-1))/(2.*Delta) :
+   val(fs.x,0,0,i-1) && val(fs.x,-1,0,i-1) &&
+   val(cs,-1,0,i-1) && val(cs,-2,0,i-1) &&
+   (emerged || (val(csm1,-1,0,i-1) && val(csm1,-2,0,i-1))) ? (val(a,-2,0,i-1) - 4.*val(a,-1,0,i-1) + 3.*val(a,0,0,i-1))/(2.*Delta) :
+   val(fs.x,1,0,i-1) && val(cs,1,0,i-1) &&
+   (emerged || val(csm1,1,0,i-1)) ? (val(a,1,0,i-1) - val(a,0,0,i-1))/Delta :
+   val(fs.x,0,0,i-1) && val(cs,-1,0,i-1) &&
+   (emerged || val(csm1,-1,0,i-1)) ? (val(a,0,0,i-1) - val(a,-1,0,i-1))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.z,0,0,i) ? (down + up)/2. : 0.);
+}
+
+#line 599
+double embed_face_avg_gradient_t2_y (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,i,0,0) && (emerged || val(csm1,i,0,0)))
+    up = (val(fs.y,i,0,0) && val(fs.y,i,1,0) &&
+   val(cs,i,1,0) && val(cs,i,-1,0) &&
+   (emerged || (val(csm1,i,1,0) && val(csm1,i,-1,0))) ? (val(a,i,1,0) - val(a,i,-1,0))/(2.*Delta) :
+   val(fs.y,i,1,0) && val(fs.y,i,2,0) &&
+   val(cs,i,1,0) && val(cs,i,2,0) &&
+   (emerged || (val(csm1,i,1,0) && val(csm1,i,2,0))) ? (-val(a,i,2,0) + 4.*val(a,i,1,0) - 3.*val(a,i,0,0))/(2.*Delta) :
+   val(fs.y,i,0,0) && val(fs.y,i,-1,0) &&
+   val(cs,i,-1,0) && val(cs,i,-2,0) &&
+   (emerged || (val(csm1,i,-1,0) && val(csm1,i,-2,0))) ? (val(a,i,-2,0) - 4.*val(a,i,-1,0) + 3.*val(a,i,0,0))/(2.*Delta) :
+   val(fs.y,i,1,0) && val(cs,i,1,0) &&
+   (emerged || val(csm1,i,1,0)) ? (val(a,i,1,0) - val(a,i,0,0))/Delta :
+   val(fs.y,i,0,0) && val(cs,i,-1,0) &&
+   (emerged || val(csm1,i,-1,0)) ? (val(a,i,0,0) - val(a,i,-1,0))/Delta : 1e30);
+  if (val(cs,i-1,0,0) && (emerged || val(csm1,i-1,0,0)))
+    down = (val(fs.y,i-1,0,0) && val(fs.y,i-1,1,0) &&
+   val(cs,i-1,1,0) && val(cs,i-1,-1,0) &&
+   (emerged || (val(csm1,i-1,1,0) && val(csm1,i-1,-1,0))) ? (val(a,i-1,1,0) - val(a,i-1,-1,0))/(2.*Delta) :
+   val(fs.y,i-1,1,0) && val(fs.y,i-1,2,0) &&
+   val(cs,i-1,1,0) && val(cs,i-1,2,0) &&
+   (emerged || (val(csm1,i-1,1,0) && val(csm1,i-1,2,0))) ? (-val(a,i-1,2,0) + 4.*val(a,i-1,1,0) - 3.*val(a,i-1,0,0))/(2.*Delta) :
+   val(fs.y,i-1,0,0) && val(fs.y,i-1,-1,0) &&
+   val(cs,i-1,-1,0) && val(cs,i-1,-2,0) &&
+   (emerged || (val(csm1,i-1,-1,0) && val(csm1,i-1,-2,0))) ? (val(a,i-1,-2,0) - 4.*val(a,i-1,-1,0) + 3.*val(a,i-1,0,0))/(2.*Delta) :
+   val(fs.y,i-1,1,0) && val(cs,i-1,1,0) &&
+   (emerged || val(csm1,i-1,1,0)) ? (val(a,i-1,1,0) - val(a,i-1,0,0))/Delta :
+   val(fs.y,i-1,0,0) && val(cs,i-1,-1,0) &&
+   (emerged || val(csm1,i-1,-1,0)) ? (val(a,i-1,0,0) - val(a,i-1,-1,0))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.x,i,0,0) ? (down + up)/2. : 0.);
+}
+
+#line 599
+double embed_face_avg_gradient_t2_z (Point point, scalar a, int i)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double up = 1e30, down = 1e30;
+  if (val(cs,0,i,0) && (emerged || val(csm1,0,i,0)))
+    up = (val(fs.z,0,i,0) && val(fs.z,0,i,1) &&
+   val(cs,0,i,1) && val(cs,0,i,-1) &&
+   (emerged || (val(csm1,0,i,1) && val(csm1,0,i,-1))) ? (val(a,0,i,1) - val(a,0,i,-1))/(2.*Delta) :
+   val(fs.z,0,i,1) && val(fs.z,0,i,2) &&
+   val(cs,0,i,1) && val(cs,0,i,2) &&
+   (emerged || (val(csm1,0,i,1) && val(csm1,0,i,2))) ? (-val(a,0,i,2) + 4.*val(a,0,i,1) - 3.*val(a,0,i,0))/(2.*Delta) :
+   val(fs.z,0,i,0) && val(fs.z,0,i,-1) &&
+   val(cs,0,i,-1) && val(cs,0,i,-2) &&
+   (emerged || (val(csm1,0,i,-1) && val(csm1,0,i,-2))) ? (val(a,0,i,-2) - 4.*val(a,0,i,-1) + 3.*val(a,0,i,0))/(2.*Delta) :
+   val(fs.z,0,i,1) && val(cs,0,i,1) &&
+   (emerged || val(csm1,0,i,1)) ? (val(a,0,i,1) - val(a,0,i,0))/Delta :
+   val(fs.z,0,i,0) && val(cs,0,i,-1) &&
+   (emerged || val(csm1,0,i,-1)) ? (val(a,0,i,0) - val(a,0,i,-1))/Delta : 1e30);
+  if (val(cs,0,i-1,0) && (emerged || val(csm1,0,i-1,0)))
+    down = (val(fs.z,0,i-1,0) && val(fs.z,0,i-1,1) &&
+   val(cs,0,i-1,1) && val(cs,0,i-1,-1) &&
+   (emerged || (val(csm1,0,i-1,1) && val(csm1,0,i-1,-1))) ? (val(a,0,i-1,1) - val(a,0,i-1,-1))/(2.*Delta) :
+   val(fs.z,0,i-1,1) && val(fs.z,0,i-1,2) &&
+   val(cs,0,i-1,1) && val(cs,0,i-1,2) &&
+   (emerged || (val(csm1,0,i-1,1) && val(csm1,0,i-1,2))) ? (-val(a,0,i-1,2) + 4.*val(a,0,i-1,1) - 3.*val(a,0,i-1,0))/(2.*Delta) :
+   val(fs.z,0,i-1,0) && val(fs.z,0,i-1,-1) &&
+   val(cs,0,i-1,-1) && val(cs,0,i-1,-2) &&
+   (emerged || (val(csm1,0,i-1,-1) && val(csm1,0,i-1,-2))) ? (val(a,0,i-1,-2) - 4.*val(a,0,i-1,-1) + 3.*val(a,0,i-1,0))/(2.*Delta) :
+   val(fs.z,0,i-1,1) && val(cs,0,i-1,1) &&
+   (emerged || val(csm1,0,i-1,1)) ? (val(a,0,i-1,1) - val(a,0,i-1,0))/Delta :
+   val(fs.z,0,i-1,0) && val(cs,0,i-1,-1) &&
+   (emerged || val(csm1,0,i-1,-1)) ? (val(a,0,i-1,0) - val(a,0,i-1,-1))/Delta : 1e30);
+  return (up == 1e30 && down == 1e30 ? 0. :
+   up == 1e30 ? down :
+   down == 1e30 ? up :
+   val(fs.y,0,i,0) ? (down + up)/2. : 0.);
+}
+#line 711 "./myembed.h"
+
+static inline void embed_evaluate_x (Point point, scalar s, scalar cs,
+         coord n, coord b,
+         double * d0, double * v0,
+         double * d1, double * v1)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!((val(cs,0,0,0)) > 0. && (val(cs,0,0,0)) < 1.)) qassert ("./myembed.h", 0, "(cs[]) > 0. && (cs[]) < 1.");
+
+
+
+
+  
+    n.x = -n.x;
+    
+#line 723
+n.y = -n.y;
+    
+#line 723
+n.z = -n.z;
+
+
+
+
+
   double d[2], v[2] = {1e30,1e30};
+
+
+
+
+
   bool defined = true;
   
     if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
+#line 747 "./myembed.h"
   if (defined)
     for (int l = 0; l <= 1; l++) {
+
       int i = (l + 1)*sign(n.x);
-      d[l] = (i - p.x)/n.x;
-      double y1 = p.y + d[l]*n.y;
+      d[l] = (i - b.x)/(n.x);
+
+      double y1 = (b.y) + (d[l])*(n.y);
       int j = y1 > 0.5 ? 1 : y1 < -0.5 ? -1 : 0;
       y1 -= j;
-
-
-
-
-
-      double z = p.z + d[l]*n.z;
-      int k = z > 0.5 ? 1 : z < -0.5 ? -1 : 0;
-      z -= k;
+#line 764 "./myembed.h"
+      double z1 = (b.z) + (d[l])*(n.z);
+      int k = z1 > 0.5 ? 1 : z1 < -0.5 ? -1 : 0;
+      z1 -= k;
       bool defined = val(fs.x,i + (i < 0),j,k);
       for (int m = -1; m <= 1 && defined; m++)
  if (!val(fs.y,i,j,k+m) || !val(fs.y,i,j+1,k+m) ||
      !val(fs.z,i,j+m,k) || !val(fs.z,i,j+m,k+1) ||
-     !val(cs,i,j+m,k-1) || !val(cs,i,j+m,k) || !val(cs,i,j+m,k+1))
+     !val(cs,i,j+m,k-1) || !val(cs,i,j+m,k) || !val(cs,i,j+m,k+1) ||
+     (!emerged && (!val(csm1,i,j+m,k-1) || !val(csm1,i,j+m,k) || !val(csm1,i,j+m,k+1))))
    defined = false;
       if (defined)
 
  v[l] =
-   (((((((val(s,i,j-1,k-1)))*((y1) - 1.) + ((val(s,i,j+1,k-1)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k-1)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.) + (((((val(s,i,j-1,k+1)))*((y1) - 1.) + ((val(s,i,j+1,k+1)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k+1)))*((y1) - 1.)*((y1) + 1.)))*((z) + 1.))*(z)/2. - (((((val(s,i,j-1,k)))*((y1) - 1.) + ((val(s,i,j+1,k)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.)*((z) + 1.))
+   (((((((val(s,i,j-1,k-1)))*((y1) - 1.) + ((val(s,i,j+1,k-1)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k-1)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.) + (((((val(s,i,j-1,k+1)))*((y1) - 1.) + ((val(s,i,j+1,k+1)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k+1)))*((y1) - 1.)*((y1) + 1.)))*((z1) + 1.))*(z1)/2. - (((((val(s,i,j-1,k)))*((y1) - 1.) + ((val(s,i,j+1,k)))*((y1) + 1.))*(y1)/2. - ((val(s,i,j,k)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.)*((z1) + 1.))
 
 
 
@@ -12878,78 +13327,77 @@ if (defined && !val(fs.z,0,0,(n.z > 0.)))
       else
  break;
     }
-  if (v[0] == 1e30) {
-
-
-
-
-
-    d[0] = max(1e-3, fabs(p.x/n.x));
-    *coef = - 1./(d[0]*Delta);
-    return bc/(d[0]*Delta);
-  }
-
-
-
-
-
-  *coef = 0.;
-  if (v[1] != 1e30)
-    return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
-  return (bc - v[0])/(d[0]*Delta);
+  *d0 = d[0]; *v0 = v[0];
+  *d1 = d[1]; *v1 = v[1];
 }
 
-#line 376
-static inline double dirichlet_gradient_y (Point point, scalar s, scalar cs,
-        coord n, coord p, double bc,
-        double * coef)
+#line 712
+static inline void embed_evaluate_y (Point point, scalar s, scalar cs,
+         coord n, coord b,
+         double * d0, double * v0,
+         double * d1, double * v1)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!((val(cs,0,0,0)) > 0. && (val(cs,0,0,0)) < 1.)) qassert ("./myembed.h", 0, "(cs[]) > 0. && (cs[]) < 1.");
+
+
+
+
   
-    n.y = - n.y;
+    n.y = -n.y;
     
-#line 381
-n.z = - n.z;
+#line 723
+n.z = -n.z;
     
-#line 381
-n.x = - n.x;
+#line 723
+n.x = -n.x;
+
+
+
+
+
   double d[2], v[2] = {1e30,1e30};
+
+
+
+
+
   bool defined = true;
   
     if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
+#line 747 "./myembed.h"
   if (defined)
     for (int l = 0; l <= 1; l++) {
+
       int i = (l + 1)*sign(n.y);
-      d[l] = (i - p.y)/n.y;
-      double y1 = p.z + d[l]*n.z;
+      d[l] = (i - b.y)/(n.y);
+
+      double y1 = (b.z) + (d[l])*(n.z);
       int j = y1 > 0.5 ? 1 : y1 < -0.5 ? -1 : 0;
       y1 -= j;
-
-
-
-
-
-      double z = p.x + d[l]*n.x;
-      int k = z > 0.5 ? 1 : z < -0.5 ? -1 : 0;
-      z -= k;
+#line 764 "./myembed.h"
+      double z1 = (b.x) + (d[l])*(n.x);
+      int k = z1 > 0.5 ? 1 : z1 < -0.5 ? -1 : 0;
+      z1 -= k;
       bool defined = val(fs.y,k,i + (i < 0),j);
       for (int m = -1; m <= 1 && defined; m++)
  if (!val(fs.z,k+m,i,j) || !val(fs.z,k+m,i,j+1) ||
      !val(fs.x,k,i,j+m) || !val(fs.x,k+1,i,j+m) ||
-     !val(cs,k-1,i,j+m) || !val(cs,k,i,j+m) || !val(cs,k+1,i,j+m))
+     !val(cs,k-1,i,j+m) || !val(cs,k,i,j+m) || !val(cs,k+1,i,j+m) ||
+     (!emerged && (!val(csm1,k-1,i,j+m) || !val(csm1,k,i,j+m) || !val(csm1,k+1,i,j+m))))
    defined = false;
       if (defined)
 
  v[l] =
-   (((((((val(s,k-1,i,j-1)))*((y1) - 1.) + ((val(s,k-1,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k-1,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.) + (((((val(s,k+1,i,j-1)))*((y1) - 1.) + ((val(s,k+1,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k+1,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z) + 1.))*(z)/2. - (((((val(s,k,i,j-1)))*((y1) - 1.) + ((val(s,k,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.)*((z) + 1.))
+   (((((((val(s,k-1,i,j-1)))*((y1) - 1.) + ((val(s,k-1,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k-1,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.) + (((((val(s,k+1,i,j-1)))*((y1) - 1.) + ((val(s,k+1,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k+1,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z1) + 1.))*(z1)/2. - (((((val(s,k,i,j-1)))*((y1) - 1.) + ((val(s,k,i,j+1)))*((y1) + 1.))*(y1)/2. - ((val(s,k,i,j)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.)*((z1) + 1.))
 
 
 
@@ -12960,78 +13408,77 @@ if (defined && !val(fs.x,(n.x > 0.),0,0))
       else
  break;
     }
-  if (v[0] == 1e30) {
-
-
-
-
-
-    d[0] = max(1e-3, fabs(p.y/n.y));
-    *coef = - 1./(d[0]*Delta);
-    return bc/(d[0]*Delta);
-  }
-
-
-
-
-
-  *coef = 0.;
-  if (v[1] != 1e30)
-    return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
-  return (bc - v[0])/(d[0]*Delta);
+  *d0 = d[0]; *v0 = v[0];
+  *d1 = d[1]; *v1 = v[1];
 }
 
-#line 376
-static inline double dirichlet_gradient_z (Point point, scalar s, scalar cs,
-        coord n, coord p, double bc,
-        double * coef)
+#line 712
+static inline void embed_evaluate_z (Point point, scalar s, scalar cs,
+         coord n, coord b,
+         double * d0, double * v0,
+         double * d1, double * v1)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!((val(cs,0,0,0)) > 0. && (val(cs,0,0,0)) < 1.)) qassert ("./myembed.h", 0, "(cs[]) > 0. && (cs[]) < 1.");
+
+
+
+
   
-    n.z = - n.z;
+    n.z = -n.z;
     
-#line 381
-n.x = - n.x;
+#line 723
+n.x = -n.x;
     
-#line 381
-n.y = - n.y;
+#line 723
+n.y = -n.y;
+
+
+
+
+
   double d[2], v[2] = {1e30,1e30};
+
+
+
+
+
   bool defined = true;
   
     if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
     
-#line 385
+#line 737
 if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
+#line 747 "./myembed.h"
   if (defined)
     for (int l = 0; l <= 1; l++) {
+
       int i = (l + 1)*sign(n.z);
-      d[l] = (i - p.z)/n.z;
-      double y1 = p.x + d[l]*n.x;
+      d[l] = (i - b.z)/(n.z);
+
+      double y1 = (b.x) + (d[l])*(n.x);
       int j = y1 > 0.5 ? 1 : y1 < -0.5 ? -1 : 0;
       y1 -= j;
-
-
-
-
-
-      double z = p.y + d[l]*n.y;
-      int k = z > 0.5 ? 1 : z < -0.5 ? -1 : 0;
-      z -= k;
+#line 764 "./myembed.h"
+      double z1 = (b.y) + (d[l])*(n.y);
+      int k = z1 > 0.5 ? 1 : z1 < -0.5 ? -1 : 0;
+      z1 -= k;
       bool defined = val(fs.z,j,k,i + (i < 0));
       for (int m = -1; m <= 1 && defined; m++)
  if (!val(fs.x,j,k+m,i) || !val(fs.x,j+1,k+m,i) ||
      !val(fs.y,j+m,k,i) || !val(fs.y,j+m,k+1,i) ||
-     !val(cs,j+m,k-1,i) || !val(cs,j+m,k,i) || !val(cs,j+m,k+1,i))
+     !val(cs,j+m,k-1,i) || !val(cs,j+m,k,i) || !val(cs,j+m,k+1,i) ||
+     (!emerged && (!val(csm1,j+m,k-1,i) || !val(csm1,j+m,k,i) || !val(csm1,j+m,k+1,i))))
    defined = false;
       if (defined)
 
  v[l] =
-   (((((((val(s,j-1,k-1,i)))*((y1) - 1.) + ((val(s,j+1,k-1,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k-1,i)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.) + (((((val(s,j-1,k+1,i)))*((y1) - 1.) + ((val(s,j+1,k+1,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k+1,i)))*((y1) - 1.)*((y1) + 1.)))*((z) + 1.))*(z)/2. - (((((val(s,j-1,k,i)))*((y1) - 1.) + ((val(s,j+1,k,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k,i)))*((y1) - 1.)*((y1) + 1.)))*((z) - 1.)*((z) + 1.))
+   (((((((val(s,j-1,k-1,i)))*((y1) - 1.) + ((val(s,j+1,k-1,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k-1,i)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.) + (((((val(s,j-1,k+1,i)))*((y1) - 1.) + ((val(s,j+1,k+1,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k+1,i)))*((y1) - 1.)*((y1) + 1.)))*((z1) + 1.))*(z1)/2. - (((((val(s,j-1,k,i)))*((y1) - 1.) + ((val(s,j+1,k,i)))*((y1) + 1.))*(y1)/2. - ((val(s,j,k,i)))*((y1) - 1.)*((y1) + 1.)))*((z1) - 1.)*((z1) + 1.))
 
 
 
@@ -13042,65 +13489,76 @@ if (defined && !val(fs.y,0,(n.y > 0.),0))
       else
  break;
     }
-  if (v[0] == 1e30) {
-
-
-
-
-
-    d[0] = max(1e-3, fabs(p.z/n.z));
-    *coef = - 1./(d[0]*Delta);
-    return bc/(d[0]*Delta);
-  }
-
-
-
-
-
-  *coef = 0.;
-  if (v[1] != 1e30)
-    return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
-  return (bc - v[0])/(d[0]*Delta);
+  *d0 = d[0]; *v0 = v[0];
+  *d1 = d[1]; *v1 = v[1];
 }
-#line 375 "/home/lisergey/basilisk/src/embed.h"
+#line 711 "./myembed.h"
 
-static void _stencil_dirichlet_gradient_x (Point point, scalar s, scalar cs,
+static void _stencil_embed_evaluate_x (Point point, scalar s, scalar cs,
 _stencil_undefined *
-        
-#line 377
-n,_stencil_undefined * p,_stencil_undefined * bc,
+         
+#line 713
+n,_stencil_undefined * b,
 _stencil_undefined 
-        
-#line 378
-* coef)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
+         
+#line 714
+* d0,_stencil_undefined  * v0,
+_stencil_undefined 
+         
+#line 715
+* d1,_stencil_undefined  * v1)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,0,0);_stencil_val(cs,0,0,0);              
+      
+
+
+
+
   
-       
+      
+
+
+
+
+
+  
+
+
+
+
+
   
   
-  
-    {_stencil_val(fs.x,o_stencil,0,0  ); 
+    
+#line 737
+{_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
+
+
+
+
+
+
+
+
 for (int l = 0; l <= 1; l++) {                                               
+
        
          
+
       
       
         
-
-
-
-
-
+#line 764 "./myembed.h"
       
       
         
@@ -13109,10 +13567,12 @@ for (int l = 0; l <= 1; l++) {
  {_stencil_val(fs.y,o_stencil,o_stencil,o_stencil);_stencil_val(fs.y,o_stencil,o_stencil,o_stencil);
 _stencil_val(fs.z,o_stencil,o_stencil,o_stencil);_stencil_val(fs.z,o_stencil,o_stencil,o_stencil);
 _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);
+_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);
          
         
-         
-#line 407
+                
+     
+#line 773
 }
 {
 
@@ -13125,7 +13585,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 783
 }
  
 
@@ -13134,67 +13594,82 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
-}         
-     
+#line 787
+}
+#line 747 "./myembed.h"
    
-     
+       
+       
 
-
-
-
-
-   
-     
-  
-
-
-
-
-
-
-
-return   ;
+#line 790
 }
 
-#line 376
-static void _stencil_dirichlet_gradient_y (Point point, scalar s, scalar cs,
+#line 712
+static void _stencil_embed_evaluate_y (Point point, scalar s, scalar cs,
 _stencil_undefined *
-        
-#line 377
-n,_stencil_undefined * p,_stencil_undefined * bc,
+         
+#line 713
+n,_stencil_undefined * b,
 _stencil_undefined 
-        
-#line 378
-* coef)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
+         
+#line 714
+* d0,_stencil_undefined  * v0,
+_stencil_undefined 
+         
+#line 715
+* d1,_stencil_undefined  * v1)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,0,0);_stencil_val(cs,0,0,0);              
+      
+
+
+
+
   
-       
+      
+
+
+
+
+
+  
+
+
+
+
+
   
   
-  
-    {_stencil_val(fs.y,0,o_stencil,0  ); 
+    
+#line 737
+{_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
+
+
+
+
+
+
+
+
 for (int l = 0; l <= 1; l++) {                                               
+
        
          
+
       
       
         
-
-
-
-
-
+#line 764 "./myembed.h"
       
       
         
@@ -13203,10 +13678,12 @@ for (int l = 0; l <= 1; l++) {
  {_stencil_val(fs.z,o_stencil,o_stencil,o_stencil);_stencil_val(fs.z,o_stencil,o_stencil,o_stencil);
 _stencil_val(fs.x,o_stencil,o_stencil,o_stencil);_stencil_val(fs.x,o_stencil,o_stencil,o_stencil);
 _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);
+_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);
          
         
-         
-#line 407
+                
+     
+#line 773
 }
 {
 
@@ -13219,7 +13696,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 783
 }
  
 
@@ -13228,67 +13705,82 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
-}         
-     
+#line 787
+}
+#line 747 "./myembed.h"
    
-     
+       
+       
 
-
-
-
-
-   
-     
-  
-
-
-
-
-
-
-
-return   ;
+#line 790
 }
 
-#line 376
-static void _stencil_dirichlet_gradient_z (Point point, scalar s, scalar cs,
+#line 712
+static void _stencil_embed_evaluate_z (Point point, scalar s, scalar cs,
 _stencil_undefined *
-        
-#line 377
-n,_stencil_undefined * p,_stencil_undefined * bc,
+         
+#line 713
+n,_stencil_undefined * b,
 _stencil_undefined 
-        
-#line 378
-* coef)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
+         
+#line 714
+* d0,_stencil_undefined  * v0,
+_stencil_undefined 
+         
+#line 715
+* d1,_stencil_undefined  * v1)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+_stencil_val(cs,0,0,0);_stencil_val(cs,0,0,0);              
+      
+
+
+
+
   
-       
+      
+
+
+
+
+
+  
+
+
+
+
+
   
   
-  
-    {_stencil_val(fs.z,0,0,o_stencil  ); 
+    
+#line 737
+{_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
-#line 385
+#line 737
 {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
+
+
+
+
+
+
+
+
 for (int l = 0; l <= 1; l++) {                                               
+
        
          
+
       
       
         
-
-
-
-
-
+#line 764 "./myembed.h"
       
       
         
@@ -13297,10 +13789,12 @@ for (int l = 0; l <= 1; l++) {
  {_stencil_val(fs.x,o_stencil,o_stencil,o_stencil);_stencil_val(fs.x,o_stencil,o_stencil,o_stencil);
 _stencil_val(fs.y,o_stencil,o_stencil,o_stencil);_stencil_val(fs.y,o_stencil,o_stencil,o_stencil);
 _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stencil,o_stencil);
+_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);_stencil_val(csm1,o_stencil,o_stencil,o_stencil);
          
         
-         
-#line 407
+                
+     
+#line 773
 }
 {
 
@@ -13313,7 +13807,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 783
 }
  
 
@@ -13322,32 +13816,22 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
-}         
-     
+#line 787
+}
+#line 747 "./myembed.h"
    
-     
+       
+       
 
-
-
-
-
-   
-     
-  
-
-
-
-
-
-
-
-return   ;
+#line 790
 }
 
-double dirichlet_gradient (Point point, scalar s, scalar cs,
-      coord n, coord p, double bc, double * coef)
+void embed_evaluate (Point point, scalar s, scalar cs,
+       coord n, coord b,
+       double * d0, double * v0,
+       double * d1, double * v1)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
 
 
 
@@ -13355,349 +13839,213 @@ double dirichlet_gradient (Point point, scalar s, scalar cs,
 
   if (fabs(n.x) >= fabs(n.y)) {
     if (fabs(n.x) >= fabs(n.z))
-      return dirichlet_gradient_x (point, s, cs, n, p, bc, coef);
+      embed_evaluate_x (point, s, cs, n, b, d0, v0, d1, v1);
+    else
+      embed_evaluate_z (point, s, cs, n, b, d0, v0, d1, v1);
   }
   else if (fabs(n.y) >= fabs(n.z))
-    return dirichlet_gradient_y (point, s, cs, n, p, bc, coef);
-  return dirichlet_gradient_z (point, s, cs, n, p, bc, coef);
+    embed_evaluate_y (point, s, cs, n, b, d0, v0, d1, v1);
+  else
+    embed_evaluate_z (point, s, cs, n, b, d0, v0, d1, v1);
 
-  return 1e30;
 }
 
 
-#line 443
+#line 792
+static void _stencil_embed_evaluate (Point point, scalar s, scalar cs,
+_stencil_undefined *
+       
+#line 793
+n,_stencil_undefined * b,
+_stencil_undefined 
+       
+#line 794
+* d0,_stencil_undefined  * v0,
+_stencil_undefined 
+       
+#line 795
+* d1,_stencil_undefined  * v1)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
+
+
+
+
+
+{ {
+{
+      _stencil_embed_evaluate_x (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );
+      
+_stencil_embed_evaluate_z (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );}
+       
+    
+  
+#line 808
+}
+{
+    _stencil_embed_evaluate_y (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );
+    
+_stencil_embed_evaluate_z (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );}}
+
+
+
+
+
+
+     
+      
+  
+
+
+#line 814
+}
+#line 872 "./myembed.h"
+double dirichlet_gradient (Point point, scalar s, scalar cs,
+      coord n, coord b, double bc, double * coef)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double d[2], v[2] = {1e30,1e30};
+  embed_evaluate (point, s, cs, n, b, &d[0], &v[0], &d[1], &v[1]);
+
+
+
+
+
+  if (v[0] == 1e30) {
+
+
+
+
+
+
+    if (fabs(n.x) >= fabs(n.y)) {
+      if (fabs(n.x) >= fabs(n.z))
+ d[0] = max(1e-3, fabs(b.x/n.x));
+      else
+ d[0] = max(1e-3, fabs(b.z/n.z));
+    }
+    else if (fabs(n.y) >= fabs(n.z))
+      d[0] = max(1e-3, fabs(b.y/n.y));
+    else
+      d[0] = max(1e-3, fabs(b.z/n.z));
+
+
+    *coef = - 1./(d[0]*Delta);
+    return bc/(d[0]*Delta);
+  }
+
+
+
+
+
+  *coef = 0.;
+  if (v[1] != 1e30)
+    return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
+  return (bc - v[0])/(d[0]*Delta);
+}
+#line 872 "./myembed.h"
 static void _stencil_dirichlet_gradient (Point point, scalar s, scalar cs,
 _stencil_undefined *
       
-#line 444
-n,_stencil_undefined * p,_stencil_undefined * bc,_stencil_undefined  * coef)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-
-
-
-
-
-{ {
-      
-{ _stencil_dirichlet_gradient_x (point, s, cs,NULL ,NULL ,NULL ,NULL );}
-       
+#line 873
+n,_stencil_undefined * b,_stencil_undefined * bc,_stencil_undefined  * coef)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;    
   
-#line 454
-}
-    
-{ _stencil_dirichlet_gradient_y (point, s, cs,NULL ,NULL ,NULL ,NULL );}} 
-_stencil_dirichlet_gradient_z (point, s, cs,NULL ,NULL ,NULL ,NULL );
+  _stencil_embed_evaluate (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );         
+     
 
 
 
 
 
      
-      
+
+
+
+
+
+   
+     
   
-#line 457
-return;
-
-  return ;
+#line 912
+return   ;
 }
-
-bid embed;
-#line 471 "/home/lisergey/basilisk/src/embed.h"
-static inline
-coord embed_gradient (Point point, vector u, coord p, coord n)
+#line 925 "./myembed.h"
+double neumann_scalar (Point point, scalar s, scalar cs,
+         coord n, coord b, double grad, double * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  coord dudn;
-   {
-    bool dirichlet = false;
-    double vb = _attribute[u.x.i].boundary[embed] (point, point, u.x, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.x = dirichlet_gradient (point, u.x, cs, n, p, vb, &val);
+  double d[2], v[2] = {1e30,1e30};
+  embed_evaluate (point, s, cs, n, b, &d[0], &v[0], &d[1], &v[1]);
+
+
+
+
+
+
+  if (v[0] == 1e30) {
+
+
+
+
+
+
+
+    if (fabs(n.x) >= fabs(n.y)) {
+      if (fabs(n.x) >= fabs(n.z))
+ d[0] = max(1e-3, fabs(b.x/n.x));
+      else
+ d[0] = max(1e-3, fabs(b.z/n.z));
     }
+    else if (fabs(n.y) >= fabs(n.z))
+      d[0] = max(1e-3, fabs(b.y/n.y));
     else
-      dudn.x = vb;
-    if (dudn.x == 1e30)
-      dudn.x = 0.;
-  } 
-#line 475
-{
-    bool dirichlet = false;
-    double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.y = dirichlet_gradient (point, u.y, cs, n, p, vb, &val);
-    }
-    else
-      dudn.y = vb;
-    if (dudn.y == 1e30)
-      dudn.y = 0.;
-  } 
-#line 475
-{
-    bool dirichlet = false;
-    double vb = _attribute[u.z.i].boundary[embed] (point, point, u.z, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.z = dirichlet_gradient (point, u.z, cs, n, p, vb, &val);
-    }
-    else
-      dudn.z = vb;
-    if (dudn.z == 1e30)
-      dudn.z = 0.;
+      d[0] = max(1e-3, fabs(b.z/n.z));
+
+
+    *coef = 1.;
+    return (grad)*(d[0]*Delta);
   }
-  return dudn;
+
+
+
+
+
+  *coef = 0.;
+  if (v[1] != 1e30)
+    return ((grad)*((d[1] - d[0])*Delta) + v[0]*d[1]/d[0] - v[1]*d[0]/d[1])/(d[1]/d[0] - d[0]/d[1]);
+  return (grad)*(d[0]*Delta) + v[0];
 }
-#line 471 "/home/lisergey/basilisk/src/embed.h"
-static void 
-_stencil_embed_gradient (Point point, vector u,_stencil_undefined * p,_stencil_undefined * n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
+#line 925 "./myembed.h"
+static void _stencil_neumann_scalar (Point point, scalar s, scalar cs,
+_stencil_undefined *
+         
+#line 926
+n,_stencil_undefined * b,_stencil_undefined * grad,_stencil_undefined  * coef)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;    
   
-   {     
-    
-    default_stencil ( point,((scalar[]){ u.x,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
-      
-    
-#line 481
-}   
+  _stencil_embed_evaluate (point, s, cs,NULL ,NULL ,NULL ,NULL ,NULL ,NULL );         
      
-    
-        
+
+
+
+
+
+
      
-       
-  
-#line 486
-} 
-#line 475
-{     
-    
-    default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
-      
-    
-#line 481
-}   
-     
-    
-        
-     
-       
-  
-#line 486
-} 
-#line 475
-{     
-    
-    default_stencil ( point,((scalar[]){ u.z,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL ); 
-      
-    
-#line 481
-}   
-     
-    
-        
-     
-       
-  
-#line 486
-}
-  return ;
-}
-#line 509 "/home/lisergey/basilisk/src/embed.h"
-     
-void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
-{tracing("embed_force","/home/lisergey/basilisk/src/embed.h",0);
-  coord Fps = {0}, Fmus = {0};
-  foreach_stencil ()
-    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
 
 
 
 
 
-
-      
-       _stencil_embed_geometry (point,NULL ,NULL );   
-            
-      _stencil_embed_interpolate (point, p,NULL );
-       
-  
-#line 535 "/home/lisergey/basilisk/src/embed.h"
-      if (constant(mu.x) != 0.) {      
- 
-  { 
-_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
-     _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); 
-    
- 
-#line 540
-} 
-#line 537
-{ 
-_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
-     _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0); 
-    
- 
-#line 540
-} 
-#line 537
-{ 
-_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
-     _stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0,0,1); 
-    
- 
-#line 540
-}  
-      
-#line 600 "/home/lisergey/basilisk/src/embed.h"
-     
-  _stencil_embed_gradient (point, u,NULL ,NULL );
-  
-        
-      }
-    }      }end_foreach_stencil();
-  
-#line 513
-if(!is_constant(fm.x)){
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 513
-foreach ()
-    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-
-
-
-
-
-
-      coord n, b;
-      double area = embed_geometry (point, &b, &n);
-      area *= pow (Delta, 3 - 1);
-      double Fn = area*embed_interpolate (point, p, b);
-      
- Fps.x += Fn*n.x;
- 
-#line 526
-Fps.y += Fn*n.y;
- 
-#line 526
-Fps.z += Fn*n.z;
-#line 535 "/home/lisergey/basilisk/src/embed.h"
-      if (constant(mu.x) != 0.) {
- double mua = 0., fa = 0.;
-  {
-   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-   fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
- } 
-#line 537
-{
-   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-   fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
- } 
-#line 537
-{
-   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
-   fa += val(fm.z,0,0,0) + val(fm.z,0,0,1);
- }
- mua /= fa;
-#line 600 "/home/lisergey/basilisk/src/embed.h"
- if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
- coord dudn = embed_gradient (point, u, b, n);
- 
-   Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
    
-#line 603
-Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.z*n.y*n.z);
-   
-#line 603
-Fmus.z -= area*mua*(dudn.z*(sq(n.z) + 1.) + dudn.x*n.z*n.x);
-      }
-    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-#line 605
-}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+     
   
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 513
-foreach ()
-    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-
-
-
-
-
-
-      coord n, b;
-      double area = embed_geometry (point, &b, &n);
-      area *= pow (Delta, 3 - 1);
-      double Fn = area*embed_interpolate (point, p, b);
-      
- Fps.x += Fn*n.x;
- 
-#line 526
-Fps.y += Fn*n.y;
- 
-#line 526
-Fps.z += Fn*n.z;
-#line 535 "/home/lisergey/basilisk/src/embed.h"
-      if (constant(mu.x) != 0.) {
- double mua = 0., fa = 0.;
-  {
-   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-   fa += _const_fm.x + _const_fm.x;
- } 
-#line 537
-{
-   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-   fa += _const_fm.y + _const_fm.y;
- } 
-#line 537
-{
-   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
-   fa += _const_fm.z + _const_fm.z;
- }
- mua /= fa;
-#line 600 "/home/lisergey/basilisk/src/embed.h"
- if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "dimension == 2");
- coord dudn = embed_gradient (point, u, b, n);
- 
-   Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
-   
-#line 603
-Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.z*n.y*n.z);
-   
-#line 603
-Fmus.z -= area*mua*(dudn.z*(sq(n.z) + 1.) + dudn.x*n.z*n.x);
-      }
-    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
+#line 967
+return   ;
 }
-#line 605
-}
-
-  *Fp = Fps; *Fmu = Fmus;
-end_tracing("embed_force","/home/lisergey/basilisk/src/embed.h",0);}
-#line 656 "/home/lisergey/basilisk/src/embed.h"
+#line 1005 "./myembed.h"
 double embed_flux (Point point, scalar s, vector mu, double * val)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
-#line 657
-if(!is_constant(fm.x)){{
-
-
 
 
 
@@ -13709,7 +14057,7 @@ if(!is_constant(fm.x)){{
 
 
 
-  bool dirichlet = false;
+  bool dirichlet;
   double grad = _attribute[s.i].boundary[embed] (point, point, s, &dirichlet);
   if (!grad && !dirichlet)
     return 0.;
@@ -13718,21 +14066,16 @@ if(!is_constant(fm.x)){{
 
 
 
-  coord n = facet_normal (point, cs, fs), p;
-  double alpha = plane_alpha (val(cs,0,0,0), n);
-  double area = plane_area_center (n, alpha, &p);
-  if (metric_embed_factor)
-    area *= metric_embed_factor (point, p);
+  coord n, b;
+  double area = embed_geometry (point, &b, &n);
 
 
 
 
 
   double coef = 0.;
-  if (dirichlet) {
-    normalize (&n);
-    grad = dirichlet_gradient (point, s, cs, n, p, grad, &coef);
-  }
+  if (dirichlet)
+    grad = dirichlet_gradient (point, s, cs, n, b, grad, &coef);
 
 
 
@@ -13740,532 +14083,154 @@ if(!is_constant(fm.x)){{
   double mua = 0., fa = 0.;
    {
     mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-    fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
+    fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
   } 
-#line 700
+#line 1043
 {
     mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-    fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
+    fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
   } 
-#line 700
+#line 1043
 {
     mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
-    fa += val(fm.z,0,0,0) + val(fm.z,0,0,1);
+    fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
   }
   *val = - mua/(fa + 1e-30)*grad*area/Delta;
   return - mua/(fa + 1e-30)*coef*area/Delta;
-}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
-
-#line 657
-{
-
-
-
-
-
-  *val = 0.;
-  if (val(cs,0,0,0) >= 1. || val(cs,0,0,0) <= 0.)
-    return 0.;
-
-
-
-
-
-  bool dirichlet = false;
-  double grad = _attribute[s.i].boundary[embed] (point, point, s, &dirichlet);
-  if (!grad && !dirichlet)
-    return 0.;
-
-
-
-
-
-  coord n = facet_normal (point, cs, fs), p;
-  double alpha = plane_alpha (val(cs,0,0,0), n);
-  double area = plane_area_center (n, alpha, &p);
-  if (metric_embed_factor)
-    area *= metric_embed_factor (point, p);
-
-
-
-
-
-  double coef = 0.;
-  if (dirichlet) {
-    normalize (&n);
-    grad = dirichlet_gradient (point, s, cs, n, p, grad, &coef);
-  }
-
-
-
-
-  double mua = 0., fa = 0.;
-   {
-    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-    fa += _const_fm.x + _const_fm.x;
-  } 
-#line 700
-{
-    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-    fa += _const_fm.y + _const_fm.y;
-  } 
-#line 700
-{
-    mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
-    fa += _const_fm.z + _const_fm.z;
-  }
-  *val = - mua/(fa + 1e-30)*grad*area/Delta;
-  return - mua/(fa + 1e-30)*coef*area/Delta;
-}}
-
-#line 706
 }
-#line 715 "/home/lisergey/basilisk/src/embed.h"
-#undef _neumann
-#define _neumann(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
-       *((bool *)data) = false, (expr) :\
-       Delta*(expr) + val(_s,0,0,0))\
-
-#line 719
-
-#undef _neumann_homogeneous
-#define _neumann_homogeneous(...) (data ? *((bool *)data) = false, (0) :\
-    val(_s,0,0,0))\
-
-#line 723
-
-#undef _dirichlet
-#define _dirichlet(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
-       *((bool *)data) = true, (expr) :\
-       2.*(expr) - val(_s,0,0,0))\
-
-#line 728
-
-#undef _dirichlet_homogeneous
-#define _dirichlet_homogeneous(...) (data ? *((bool *)data) = true, (0) :\
-      - val(_s,0,0,0))\
-
-#line 732
-
-#line 743 "/home/lisergey/basilisk/src/embed.h"
-static inline double bilinear_embed (Point point, scalar s)
+#line 1068 "./myembed.h"
+void embed_stress_flux (Point point, vector s, vector mu,
+   coord * Fmu, coord * Fval)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (!coarse(cs,0,0,0) || !coarse(cs,child.x,0,0))
-    return coarse(s,0,0,0);
-
-  if (!coarse(cs,0,child.y,0) || !coarse(cs,child.x,child.y,0))
-    return coarse(s,0,0,0);
-
-
-  if (!coarse(cs,0,0,child.z) || !coarse(cs,child.x,0,child.z) ||
-      !coarse(cs,0,child.y,child.z) ||
-      !coarse(cs,child.x,child.y,child.z))
-    return coarse(s,0,0,0);
-
-  return bilinear (point, s);
-}
-#line 790 "/home/lisergey/basilisk/src/embed.h"
-     
-void update_tracer (scalar f, vector uf, vector flux, double dt)
-{tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",0);
-#line 802 "/home/lisergey/basilisk/src/embed.h"
-  scalar  e=new_scalar("e");
-  foreach_stencil() {
 
 
 
 
-_stencil_val(cs,0,0,0);{
-      {_stencil_val_a(e,0,0,0);  } 
-
-
-
-
-
-
-{_stencil_val(cs,0,0,0);{ {
+  if (val(cs,0,0,0) >= 1. || val(cs,0,0,0) <= 0.) {
+    
+      Fmu->x = 0., Fval->x = 0.;
       
- {_stencil_val_r(f,0,0,0);_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);   }
- 
-#line 818
-{_stencil_val_r(f,0,0,0);_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);   }
- 
-#line 818
-{_stencil_val_r(f,0,0,0);_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);   }
-      _stencil_val_a(e,0,0,0);  
-    } 
-#line 831
-{   
+#line 1077
+Fmu->y = 0., Fval->y = 0.;
       
-      for (int i = 0; i <= 1; i++)
- {
-   {_stencil_val(uf.x,i,0,0);
-     {_stencil_val(uf.x,i,0,0);  }   }
-   
-#line 835
-{_stencil_val(uf.y,0,i,0);
-     {_stencil_val(uf.y,0,i,0);  }   }
-   
-#line 835
-{_stencil_val(uf.z,0,0,i);
-     {_stencil_val(uf.z,0,0,i);  }   }}     
-      _stencil_val(cm,0,0,0);   
-
-
-
-
-      
-      
- { _stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);  }
- 
-#line 844
-{ _stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);  }
- 
-#line 844
-{ _stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);  }
-_stencil_val(cm,0,0,0);
+#line 1077
+Fmu->z = 0., Fval->z = 0.;
+    return;
+  }
+#line 1088 "./myembed.h"
+  double mua = 0., fa = 0.;
+   {
+    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+    fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+  } 
+#line 1089
+{
+    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+    fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+  } 
+#line 1089
+{
+    mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
+    fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
+  }
+  mua /= (fa + 1e-30);
 
 
 
 
 
+  coord n, b;
+  double area = embed_geometry (point, &b, &n);
 
-{ {
- _stencil_val_r(f,0,0,0);  
- _stencil_val_a(e,0,0,0);  
+
+
+
+
+
+
+  coord dsdn = {0., 0., 0.}, val = {0., 0., 0.};
+   {
+    bool dirichlet;
+    double vb = _attribute[s.x.i].boundary[embed] (point, point, s.x, &dirichlet);
+    if (dirichlet)
+      dsdn.x = dirichlet_gradient (point, s.x, cs, n, b, vb, &(val.x));
+    else
+      dsdn.x = vb;
+    if (dsdn.x == 1e30)
+      dsdn.x = 0., val.x = 0.;
+  } 
+#line 1109
+{
+    bool dirichlet;
+    double vb = _attribute[s.y.i].boundary[embed] (point, point, s.y, &dirichlet);
+    if (dirichlet)
+      dsdn.y = dirichlet_gradient (point, s.y, cs, n, b, vb, &(val.y));
+    else
+      dsdn.y = vb;
+    if (dsdn.y == 1e30)
+      dsdn.y = 0., val.y = 0.;
+  } 
+#line 1109
+{
+    bool dirichlet;
+    double vb = _attribute[s.z.i].boundary[embed] (point, point, s.z, &dirichlet);
+    if (dirichlet)
+      dsdn.z = dirichlet_gradient (point, s.z, cs, n, b, vb, &(val.z));
+    else
+      dsdn.z = vb;
+    if (dsdn.z == 1e30)
+      dsdn.z = 0., val.z = 0.;
+  }
+#line 1131 "./myembed.h"
+       {
+        Fmu->x = -area*mua*(dsdn.x*(sq (n.x) + 1.) +
+        (dsdn.y + val.y*val(s.y,0,0,0))*n.x*n.y +
+        (dsdn.z + val.z*val(s.z,0,0,0))*n.x*n.z)/Delta;
+        Fval->x = -area*mua*(val.x*(sq (n.x) + 1.))/Delta;
       } 
-
-
-
-
-
-
-
+#line 1131
 {
- _stencil_val_r(f,0,0,0);     
- 
- {foreach_neighbor(1)
-   {_stencil_val(cm,0,0,0);  }end_foreach_neighbor()}
- _stencil_val_a(e,0,0,0);_stencil_val(cm,0,0,0);    
-      }}
-        
-
-
-
-
-
-
-         
-
-
-
-
-
-
-
-      
-    
-#line 870
-}}   
-#line 831 "/home/lisergey/basilisk/src/embed.h"
-    
-#line 870
-}}
-
-
-
-
-       
-
-
-
-
-
-
-    
-  
-#line 871
-}end_foreach_stencil();
-  
-#line 803
-if(!is_constant(cm)){{foreach() {
-
-
-
-
-    if (val(cs,0,0,0) <= 0.)
-      val(e,0,0,0) = 0.;
-
-
-
-
-
-
-    else if (val(cs,0,0,0) >= 1.) {
-      
- val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
- 
-#line 818
-val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
- 
-#line 818
-val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
-      val(e,0,0,0) = 0.;
-    }
-#line 831 "/home/lisergey/basilisk/src/embed.h"
-    else {
-      double umax = 0.;
-      for (int i = 0; i <= 1; i++)
- {
-   if (fabs(val(uf.x,i,0,0)) > umax)
-     umax = fabs(val(uf.x,i,0,0));
-   
-#line 835
-if (fabs(val(uf.y,0,i,0)) > umax)
-     umax = fabs(val(uf.y,0,i,0));
-   
-#line 835
-if (fabs(val(uf.z,0,0,i)) > umax)
-     umax = fabs(val(uf.z,0,0,i));}
-      double dtmax = Delta*val(cm,0,0,0)/(umax + 1e-30);
-
-
-
-
-      double F = 0.;
-      
- F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
- 
-#line 844
-F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
- 
-#line 844
-F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
-      F /= Delta*val(cm,0,0,0);
-
-
-
-
-
-
-      if (dt <= dtmax) {
- val(f,0,0,0) += dt*F;
- val(e,0,0,0) = 0.;
-      }
-
-
-
-
-
-
-
-      else {
- val(f,0,0,0) += dtmax*F;
- double scs = 0.;
- {foreach_neighbor(1)
-   scs += sq(val(cm,0,0,0));end_foreach_neighbor()}
- val(e,0,0,0) = (dt - dtmax)*F*val(cm,0,0,0)/scs;
-      }
-    }
-  }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
-  {
-#line 803
-foreach() {
-
-
-
-
-    if (val(cs,0,0,0) <= 0.)
-      val(e,0,0,0) = 0.;
-
-
-
-
-
-
-    else if (val(cs,0,0,0) >= 1.) {
-      
- val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
- 
-#line 818
-val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
- 
-#line 818
-val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
-      val(e,0,0,0) = 0.;
-    }
-#line 831 "/home/lisergey/basilisk/src/embed.h"
-    else {
-      double umax = 0.;
-      for (int i = 0; i <= 1; i++)
- {
-   if (fabs(val(uf.x,i,0,0)) > umax)
-     umax = fabs(val(uf.x,i,0,0));
-   
-#line 835
-if (fabs(val(uf.y,0,i,0)) > umax)
-     umax = fabs(val(uf.y,0,i,0));
-   
-#line 835
-if (fabs(val(uf.z,0,0,i)) > umax)
-     umax = fabs(val(uf.z,0,0,i));}
-      double dtmax = Delta*_const_cm/(umax + 1e-30);
-
-
-
-
-      double F = 0.;
-      
- F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
- 
-#line 844
-F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
- 
-#line 844
-F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
-      F /= Delta*_const_cm;
-
-
-
-
-
-
-      if (dt <= dtmax) {
- val(f,0,0,0) += dt*F;
- val(e,0,0,0) = 0.;
-      }
-
-
-
-
-
-
-
-      else {
- val(f,0,0,0) += dtmax*F;
- double scs = 0.;
- {foreach_neighbor(1)
-   scs += sq(_const_cm);end_foreach_neighbor()}
- val(e,0,0,0) = (dt - dtmax)*F*_const_cm/scs;
-      }
-    }
-  }end_foreach();}}
-
-
-
-
-
-  foreach_stencil() {   
-    
-    {foreach_neighbor(1)
-      { _stencil_val(e,0,0,0); }end_foreach_neighbor()}
-    _stencil_val_r(f,0,0,0); _stencil_val(cs,0,0,0); 
-  }end_foreach_stencil();
-
-
-
-
-
-  {
-#line 877
-foreach() {
-    double se = 0.;
-    {foreach_neighbor(1)
-      se += val(e,0,0,0);end_foreach_neighbor()}
-    val(f,0,0,0) += val(cs,0,0,0)*se;
-  }end_foreach();}delete((scalar*)((scalar[]){e,{-1}}));
-end_tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",0);}
-#line 896
-static int metric_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
-#line 896 "/home/lisergey/basilisk/src/embed.h"
-      static int metric(const int i,const double t,Event *_ev){tracing("metric","/home/lisergey/basilisk/src/embed.h",0);
+        Fmu->y = -area*mua*(dsdn.y*(sq (n.y) + 1.) +
+        (dsdn.z + val.z*val(s.z,0,0,0))*n.y*n.z +
+        (dsdn.x + val.x*val(s.x,0,0,0))*n.y*n.x)/Delta;
+        Fval->y = -area*mua*(val.y*(sq (n.y) + 1.))/Delta;
+      } 
+#line 1131
 {
-  if (is_constant (fm.x)) {
-    
-      if (!(constant (fm.x) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (fm.x) == 1.");
-      
-#line 900
-if (!(constant (fm.y) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (fm.x) == 1.");
-      
-#line 900
-if (!(constant (fm.z) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (fm.x) == 1.");
-    fm = fs;
-  }
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
-#line 903
-_stencil_is_face_y(){
-    {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()
-#line 903
-_stencil_is_face_z(){
-    {_stencil_val_a(fs.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
-  {
-#line 903
-foreach_face_generic(){is_face_x(){
-    val(fs.x,0,0,0) = 1.;}end_is_face_x()
-#line 903
-is_face_y(){
-    val(fs.y,0,0,0) = 1.;}end_is_face_y()
-#line 903
-is_face_z(){
-    val(fs.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
-  if (is_constant (cm)) {
-    if (!(constant (cm) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 0, "constant (cm) == 1.");
-    cm = cs;
-  }
-  foreach_stencil()
-    {_stencil_val_a(cs,0,0,0);  }end_foreach_stencil();
-  {
-#line 909
-foreach()
-    val(cs,0,0,0) = 1.;end_foreach();}
+        Fmu->z = -area*mua*(dsdn.z*(sq (n.z) + 1.) +
+        (dsdn.x + val.x*val(s.x,0,0,0))*n.z*n.x +
+        (dsdn.y + val.y*val(s.y,0,0,0))*n.z*n.y)/Delta;
+        Fval->z = -area*mua*(val.z*(sq (n.z) + 1.))/Delta;
+      }
+#line 1150 "./myembed.h"
+  return;
+}
+#line 1181 "./myembed.h"
+double embed_extrapolate (Point point, scalar s, scalar cs,
+     coord n, coord c, double sb)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  double d[2], v[2] = {1e30,1e30};
+  embed_evaluate (point, s, cs, n, c, &d[0], &v[0], &d[1], &v[1]);
 
 
-  _attribute[cs.i].refine = embed_fraction_refine;
-#line 923 "/home/lisergey/basilisk/src/embed.h"
-  _attribute[cs.i].prolongation = fraction_refine;
-  
-    _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
-    
-#line 925
-_attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
-    
-#line 925
-_attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
+
+
+  if (v[0] == 1e30)
+    return (sb);
 
 
 
 
 
-
-
-  restriction (((scalar[]){cs, fs.x, fs.y, fs.z,{-1}}));
-}{end_tracing("metric","/home/lisergey/basilisk/src/embed.h",0);return 0;}end_tracing("metric","/home/lisergey/basilisk/src/embed.h",0);}
-
-
-
-
-static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
-
-
-
-
-
-#line 939
-      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/home/lisergey/basilisk/src/embed.h",0); {
-  display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
-    "fc = {0.5,0.5,0.5}, order = 2);"});
-}{end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);return 0;}end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);}
-#line 5 "cylinder.c"
-#line 1 "navier-stokes/centered.h"
-#line 1 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
-#line 27 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
-#line 1 "./run.h"
-#line 1 "/home/lisergey/basilisk/src/run.h"
-#line 9 "/home/lisergey/basilisk/src/run.h"
-double dt = 1.;
-
-#line 1 "./utils.h"
+  if (v[1] != 1e30)
+    return ((v[0]*(0. - d[1])/(d[0] - d[1]) + v[1]*(0. - d[0])/(d[1] - d[0])));
+  else
+    return v[0];
+}
+#line 1214 "./myembed.h"
+#line 1 "myquadratic.h"
+#line 1 "./myquadratic.h"
+#line 1 "utils.h"
 #line 1 "/home/lisergey/basilisk/src/utils.h"
 
 
@@ -14927,7 +14892,7 @@ void fields_stats()
   }}}
 }
 
-#line 1 "./output.h"
+#line 1 "output.h"
 #line 1 "/home/lisergey/basilisk/src/output.h"
 #line 37 "/home/lisergey/basilisk/src/output.h"
 struct OutputField {
@@ -16037,6 +16002,1774 @@ bool restore (struct Dump p)
   {end_tracing("restore","/home/lisergey/basilisk/src/output.h",0);return true;}
 end_tracing("restore","/home/lisergey/basilisk/src/output.h",0);}
 #line 431 "/home/lisergey/basilisk/src/utils.h"
+#line 2 "./myquadratic.h"
+
+typedef struct {
+  coord o;
+  int n, m;
+
+
+
+
+
+  double ** M, rhs[10], a[10];
+
+  bool linear;
+} QuadraticFit;
+
+
+
+
+int neigh = 5;
+
+double pivtol = 1.e-10;
+
+static void quadratic_fit_init (QuadraticFit * p, coord o, bool linear)
+{
+
+  
+    p->o.x = o.x;
+    
+#line 27
+p->o.y = o.y;
+    
+#line 27
+p->o.z = o.z;
+
+
+
+
+  p->n = 10;
+  p->m = 10;
+
+
+  p->M = (double **) matrix_new (p->n, p->n, sizeof(double));
+  for (int i = 0; i < p->n; i++) {
+    for (int j = 0; j < p->n; j++)
+      p->M[i][j] = 0.;
+    p->rhs[i] = 0.;
+  }
+
+  p->linear = linear;
+}
+
+static void quadratic_fit_add (QuadraticFit * p, coord o, double m)
+{
+#line 68 "./myquadratic.h"
+  double x1 = o.x - p->o.x, y1 = o.y - p->o.y, z1 = o.z - p->o.z;
+
+  double x2 = x1*x1, y2 = y1*y1, z2 = z1*z1, xy = x1*y1, xz = x1*z1, yz = y1*z1;
+  double x3 = x1*x2, y3 = y1*y2, z3 = z1*z2, x2y = x1*xy, x2z = x1*xz, xy2 = y1*xy, y2z = y1*yz, xz2 = z1*xz, yz2 = z1*yz, xyz = x1*y1*z1;
+  double x4 = x1*x3, y4 = y1*y3, z4 = z1*z3, x3y = x1*x2y, x3z = x1*x2z, xy3 = y1*xy2, y3z = y1*y2z, xz3 = z1*xz2, yz3 = z1*yz2, x2y2 = xy*xy, x2z2 = xz*xz, y2z2 = yz*yz, xyz2 = xy*z2, xy2z = xz*y2, x2yz = x2*yz;
+
+  p->M[0][0] += 1.;
+  p->M[1][0] += x1; p->M[1][1] += x2;
+  p->M[2][0] += y1; p->M[2][1] += xy; p->M[2][2] += y2;
+  p->M[3][0] += z1; p->M[3][1] += xz; p->M[3][2] += yz; p->M[3][3] += z2;
+  p->M[4][0] += xy; p->M[4][1] += x2y; p->M[4][2] += xy2; p->M[4][3] += xyz; p->M[4][4] += x2y2;
+  p->M[5][0] += xz; p->M[5][1] += x2z; p->M[5][2] += xyz; p->M[5][3] += xz2; p->M[5][4] += x2yz; p->M[5][5] += x2z2;
+  p->M[6][0] += yz; p->M[6][1] += xyz; p->M[6][2] += y2z; p->M[6][3] += yz2; p->M[6][4] += xy2z; p->M[6][5] += xyz2; p->M[6][6] += y2z2;
+  p->M[7][0] += x2; p->M[7][1] += x3; p->M[7][2] += x2y; p->M[7][3] += x2z; p->M[7][4] += x3y; p->M[7][5] += x3z; p->M[7][6] += x2yz; p->M[7][7] += x4;
+  p->M[8][0] += y2; p->M[8][1] += xy2; p->M[8][2] += y3; p->M[8][3] += y2z; p->M[8][4] += xy3; p->M[8][5] += xy2z; p->M[8][6] += y3z; p->M[8][7] += x2y2; p->M[8][8] += y4;
+  p->M[9][0] += z2; p->M[9][1] += xz2; p->M[9][2] += yz2; p->M[9][3] += z3; p->M[9][4] += xyz2; p->M[9][5] += xz3; p->M[9][6] += yz3; p->M[9][7] += x2z2; p->M[9][8] += y2z2; p->M[9][9] += z4;
+  p->rhs[0] += m; p->rhs[1] += x1*m; p->rhs[2] += y1*m; p->rhs[3] += z1*m; p->rhs[4] += xy*m; p->rhs[5] += xz*m; p->rhs[6] += yz*m; p->rhs[7] += x2*m; p->rhs[8] += y2*m; p->rhs[9] += z2*m;
+
+}
+
+static void quadratic_fit_set (QuadraticFit * p, const int nc)
+{
+
+
+
+  for (int i = 0; i < p->n; i++)
+    for (int j = i + 1; j < p->n; j++)
+      p->M[i][j] = p->M[j][i];
+#line 109 "./myquadratic.h"
+  if (nc < (3 + 1))
+    p->m = 1;
+
+  else if (nc < p->n + neigh || p->linear)
+    p->m = 3 + 1;
+
+  if (p->m != p->n)
+    for (int i = 0; i < p->n; i++)
+      for (int j = p->m; j < p->n; j++)
+ p->M[i][j] = p->M[j][i] = 0.;
+}
+
+static double quadratic_fit_solve (QuadraticFit * p, const int nc)
+{
+  quadratic_fit_set (p, nc);
+  double pivmin = matrix_inverse (p->M, p->m, pivtol);
+  if (pivmin)
+    for (int i = 0; i < p->n; i++) {
+      p->a[i] = 0.;
+      for (int j = 0; j < p->n; j++)
+ p->a[i] += p->M[i][j]*p->rhs[j];
+    }
+  else
+    for (int i = 0; i < p->n; i++)
+      p->a[i] = 0.;
+  matrix_free (p->M);
+  return pivmin;
+}
+#line 1215 "./myembed.h"
+
+double embed_extrapolate_ls (Point point, scalar s, scalar cs,
+        coord c, bool linear)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+
+
+
+  int nc = 0;
+  QuadraticFit fit;
+  quadratic_fit_init (&fit, c, linear);
+#line 1234 "./myembed.h"
+  int neigh = 2;
+  if (linear)
+    neigh = 1;
+
+  for (int i = -neigh; i <= neigh; i++) {
+    for (int j = -neigh; j <= neigh; j++) {
+#line 1256 "./myembed.h"
+      for (int k = -neigh; k <= neigh; k++) {
+ if ((i || j || k) &&
+     val(cs,i,j,k) &&
+     val(cs,i - (i > 0) + (i < 0), j, k) &&
+     val(cs,i, j - (j > 0) + (j < 0), k) &&
+     val(cs,i, j, k - (k > 0) + (k < 0)) &&
+     (
+      i && !j && !k ? val(fs.x,i + (i < 0), j, k) :
+      !i && j && !k ? val(fs.y,i, j + (j < 0), k) :
+      !i && !j && k ? val(fs.z,i, j, k + (k < 0)) :
+      i && j && !k ? (val(fs.x,i + (i < 0), j, k) && val(fs.y,i, j + (j < 0), k)) :
+      i && !j && k ? (val(fs.x,i + (i < 0), j, k) && val(fs.z,i, j, k + (k < 0))) :
+      !i && j && k ? (val(fs.y,i, j + (j < 0), k) && val(fs.z,i, j, k + (k < 0))) :
+      (val(fs.x,i + (i < 0), j, k) && val(fs.y,i, j + (j < 0), k) && val(fs.z,i, j, k + (k < 0)))
+      ) &&
+     (emerged || val(csm1,i,j,k))) {
+   nc ++;
+   coord o = {i, j, k};
+   quadratic_fit_add (&fit, o, val(s,i,j,k));
+ }
+      }
+
+    }
+  }
+
+
+
+
+
+
+  quadratic_fit_solve (&fit, nc);
+  return fit.a[0];
+}
+#line 1298 "./myembed.h"
+static inline
+coord embed_gradient (Point point, vector u, coord b, coord n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  coord dudn;
+   {
+    bool dirichlet;
+    double vb = _attribute[u.x.i].boundary[embed] (point, point, u.x, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.x = dirichlet_gradient (point, u.x, cs, n, b, vb, &val);
+      dudn.x += val(u.x,0,0,0)*val;
+    }
+    else
+      dudn.x = vb;
+    if (dudn.x == 1e30)
+      dudn.x = 0.;
+  } 
+#line 1302
+{
+    bool dirichlet;
+    double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.y = dirichlet_gradient (point, u.y, cs, n, b, vb, &val);
+      dudn.y += val(u.y,0,0,0)*val;
+    }
+    else
+      dudn.y = vb;
+    if (dudn.y == 1e30)
+      dudn.y = 0.;
+  } 
+#line 1302
+{
+    bool dirichlet;
+    double vb = _attribute[u.z.i].boundary[embed] (point, point, u.z, &dirichlet);
+    if (dirichlet) {
+      double val;
+      dudn.z = dirichlet_gradient (point, u.z, cs, n, b, vb, &val);
+      dudn.z += val(u.z,0,0,0)*val;
+    }
+    else
+      dudn.z = vb;
+    if (dudn.z == 1e30)
+      dudn.z = 0.;
+  }
+  return dudn;
+}
+#line 1298 "./myembed.h"
+static void 
+_stencil_embed_gradient (Point point, vector u,_stencil_undefined * b,_stencil_undefined * n)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
+  
+   {   
+    
+    default_stencil ( point,((scalar[]){ u.x,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.x,0,0,0);
+       
+    
+#line 1309
+}   
+     
+    
+        
+     
+       
+  
+#line 1314
+} 
+#line 1302
+{   
+    
+    default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.y,0,0,0);
+       
+    
+#line 1309
+}   
+     
+    
+        
+     
+       
+  
+#line 1314
+} 
+#line 1302
+{   
+    
+    default_stencil ( point,((scalar[]){ u.z,{-1}}) ); 
+{ 
+       
+_stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL ); 
+       _stencil_val(u.z,0,0,0);
+       
+    
+#line 1309
+}   
+     
+    
+        
+     
+       
+  
+#line 1314
+}
+  return ;
+}
+#line 1339 "./myembed.h"
+     
+void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
+{tracing("embed_force","./myembed.h",0);
+  coord Fps = {0}, Fmus = {0};
+  foreach_stencil ()
+    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
+
+
+
+
+
+
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );   
+            
+
+      _stencil_embed_interpolate (point, p,NULL );
+       
+  
+#line 1367 "./myembed.h"
+      if (constant(mu.x) != 0.) {      
+ 
+  { 
+_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
+     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
+    
+ 
+#line 1372
+} 
+#line 1369
+{ 
+_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
+     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
+    
+ 
+#line 1372
+} 
+#line 1369
+{ 
+_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
+     _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
+    
+ 
+#line 1372
+}  
+     
+#line 1460 "./myembed.h"
+  _stencil_embed_gradient (point, u,NULL ,NULL );
+
+
+
+
+
+  
+    
+         
+              
+
+      }
+    }      }end_foreach_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
+#line 1343
+foreach ()
+    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
+
+
+
+
+
+
+
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, 3 - 1);
+
+      double Fn = area*embed_interpolate (point, p, b);
+      
+ Fps.x += Fn*n.x;
+ 
+#line 1358
+Fps.y += Fn*n.y;
+ 
+#line 1358
+Fps.z += Fn*n.z;
+#line 1367 "./myembed.h"
+      if (constant(mu.x) != 0.) {
+ double mua = 0., fa = 0.;
+  {
+   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+ } 
+#line 1369
+{
+   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+ } 
+#line 1369
+{
+   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
+   fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
+ }
+ mua /= (fa + 1e-30);
+#line 1460 "./myembed.h"
+ coord dudn = embed_gradient (point, u, b, n);
+
+
+
+
+
+ 
+   Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
+         dudn.y*n.x*n.y +
+         dudn.z*n.x*n.z);
+   
+#line 1467
+Fmus.y -= area*mua*(dudn.y*(sq (n.y) + 1.) +
+         dudn.z*n.y*n.z +
+         dudn.x*n.y*n.x);
+   
+#line 1467
+Fmus.z -= area*mua*(dudn.z*(sq (n.z) + 1.) +
+         dudn.x*n.z*n.x +
+         dudn.y*n.z*n.y);
+
+      }
+    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 1474
+*Fp = Fps; *Fmu = Fmus;
+end_tracing("embed_force","./myembed.h",0);}
+
+
+
+
+
+void embed_color_force (scalar p, vector u, vector mu, scalar color, coord * Fp, coord * Fmu)
+{
+  coord Fps = {0}, Fmus = {0};
+  foreach_stencil ()
+    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(color,0,0,0); _stencil_val(color,0,0,0); {    
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );   
+            
+
+      _stencil_embed_interpolate (point, p,NULL );
+       
+  
+
+      if (constant(mu.x) != 0.) {      
+ 
+  { 
+_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
+     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
+    
+ 
+#line 1500
+} 
+#line 1497
+{ 
+_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
+     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
+    
+ 
+#line 1500
+} 
+#line 1497
+{ 
+_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
+     _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
+    
+ 
+#line 1500
+}  
+     
+
+  _stencil_embed_gradient (point, u,NULL ,NULL );
+
+
+
+
+
+  
+    
+         
+              
+
+      }
+    }            }end_foreach_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
+#line 1484
+foreach ()
+    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1. && val(color,0,0,0) > 0. && val(color,0,0,0) < 1.) {
+
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, 3 - 1);
+
+      double Fn = area*embed_interpolate (point, p, b);
+      
+ Fps.x += Fn*n.x;
+ 
+#line 1493
+Fps.y += Fn*n.y;
+ 
+#line 1493
+Fps.z += Fn*n.z;
+
+      if (constant(mu.x) != 0.) {
+ double mua = 0., fa = 0.;
+  {
+   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+ } 
+#line 1497
+{
+   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+ } 
+#line 1497
+{
+   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
+   fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
+ }
+ mua /= (fa + 1e-30);
+
+ coord dudn = embed_gradient (point, u, b, n);
+
+
+
+
+
+ 
+   Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
+         dudn.y*n.x*n.y +
+         dudn.z*n.x*n.z);
+   
+#line 1510
+Fmus.y -= area*mua*(dudn.y*(sq (n.y) + 1.) +
+         dudn.z*n.y*n.z +
+         dudn.x*n.y*n.x);
+   
+#line 1510
+Fmus.z -= area*mua*(dudn.z*(sq (n.z) + 1.) +
+         dudn.x*n.z*n.x +
+         dudn.y*n.z*n.y);
+
+      }
+    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 1517
+*Fp = Fps; *Fmu = Fmus;
+}
+#line 1546 "./myembed.h"
+     
+void embed_torque (scalar p, vector u, vector mu, coord c, coord * Tp, coord * Tmu)
+{tracing("embed_torque","./myembed.h",0);
+  coord Tps = {0}, Tmus = {0};
+  foreach_stencil ()
+    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );      
+            
+
+
+
+
+
+
+
+      
+
+       
+     
+ 
+       
+       
+          
+          
+  
+       
+
+      _stencil_embed_interpolate (point, p,NULL );
+
+
+
+
+       
+    
+
+
+      if (constant(mu.x) != 0.) {      
+ 
+  { 
+_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
+     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
+    
+ 
+#line 1589
+} 
+#line 1586
+{ 
+_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
+     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
+    
+ 
+#line 1589
+} 
+#line 1586
+{ 
+_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
+     _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
+    
+ 
+#line 1589
+}  
+     
+
+  _stencil_embed_gradient (point, u,NULL ,NULL );   
+ 
+
+
+
+
+
+  
+    
+         
+              
+
+
+
+
+
+
+  
+      
+
+      }
+    }      }end_foreach_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(+:Tmus)reduction(+:Tps)){
+#line 1550
+foreach ()
+    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
+
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, 3 - 1);
+
+
+
+
+
+
+
+      coord r = {x,y,z};
+
+       {
+ r.x += b.x*Delta - c.x;
+ if (Period.x) {
+   if (fabs (r.x) > fabs (r.x + (L0)))
+     r.x += (L0);
+   if (fabs (r.x) > fabs (r.x - (L0)))
+     r.x -= (L0);
+ }
+      } 
+#line 1565
+{
+ r.y += b.y*Delta - c.y;
+ if (Period.y) {
+   if (fabs (r.y) > fabs (r.y + (L0)))
+     r.y += (L0);
+   if (fabs (r.y) > fabs (r.y - (L0)))
+     r.y -= (L0);
+ }
+      } 
+#line 1565
+{
+ r.z += b.z*Delta - c.z;
+ if (Period.z) {
+   if (fabs (r.z) > fabs (r.z + (L0)))
+     r.z += (L0);
+   if (fabs (r.z) > fabs (r.z - (L0)))
+     r.z -= (L0);
+ }
+      }
+
+      double Fn = area*embed_interpolate (point, p, b);
+
+
+
+
+      
+ Tps.x += Fn*(r.y*n.z - r.z*n.y);
+ 
+#line 1581
+Tps.y += Fn*(r.z*n.x - r.x*n.z);
+ 
+#line 1581
+Tps.z += Fn*(r.x*n.y - r.y*n.x);
+
+
+      if (constant(mu.x) != 0.) {
+ double mua = 0., fa = 0.;
+  {
+   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+ } 
+#line 1586
+{
+   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+ } 
+#line 1586
+{
+   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
+   fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
+ }
+ mua /= (fa + 1e-30);
+
+ coord dudn = embed_gradient (point, u, b, n);
+ coord Fmus = {0};
+
+
+
+
+
+ 
+   Fmus.x = -area*mua*(dudn.x*(sq (n.x) + 1.) +
+         dudn.y*n.x*n.y +
+         dudn.z*n.x*n.z);
+   
+#line 1600
+Fmus.y = -area*mua*(dudn.y*(sq (n.y) + 1.) +
+         dudn.z*n.y*n.z +
+         dudn.x*n.y*n.x);
+   
+#line 1600
+Fmus.z = -area*mua*(dudn.z*(sq (n.z) + 1.) +
+         dudn.x*n.z*n.x +
+         dudn.y*n.z*n.y);
+
+
+
+
+
+
+ 
+   Tmus.x += r.y*Fmus.z - r.z*Fmus.y;
+   
+#line 1610
+Tmus.y += r.z*Fmus.x - r.x*Fmus.z;
+   
+#line 1610
+Tmus.z += r.x*Fmus.y - r.y*Fmus.x;
+
+      }
+    }end_foreach();mpi_all_reduce_array(&Tmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Tps.x,double,MPI_SUM,3);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 1615
+*Tp = Tps; *Tmu = Tmus;
+end_tracing("embed_torque","./myembed.h",0);}
+
+
+
+
+
+void embed_color_torque (scalar p, vector u, vector mu, scalar color, coord c, coord * Tp, coord * Tmu)
+{
+  coord Tps = {0}, Tmus = {0};
+  foreach_stencil ()
+    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(color,0,0,0); _stencil_val(color,0,0,0); {    
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );      
+            
+
+
+
+
+
+
+
+      
+
+       
+     
+ 
+       
+       
+          
+          
+  
+       
+
+      _stencil_embed_interpolate (point, p,NULL );
+
+
+
+
+       
+    
+
+
+      if (constant(mu.x) != 0.) {      
+ 
+  { 
+_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
+     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
+    
+ 
+#line 1664
+} 
+#line 1661
+{ 
+_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
+     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
+    
+ 
+#line 1664
+} 
+#line 1661
+{ 
+_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
+     _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
+    
+ 
+#line 1664
+}  
+     
+
+  _stencil_embed_gradient (point, u,NULL ,NULL );   
+ 
+
+
+
+
+
+  
+    
+         
+              
+
+
+
+
+
+
+  
+      
+
+      }
+    }            }end_foreach_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(+:Tmus)reduction(+:Tps)){
+#line 1625
+foreach ()
+    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1. && val(color,0,0,0) > 0. && val(color,0,0,0) < 1.) {
+
+      coord n, b;
+      double area = embed_geometry (point, &b, &n);
+      area *= pow (Delta, 3 - 1);
+
+
+
+
+
+
+
+      coord r = {x,y,z};
+
+       {
+ r.x += b.x*Delta - c.x;
+ if (Period.x) {
+   if (fabs (r.x) > fabs (r.x + (L0)))
+     r.x += (L0);
+   if (fabs (r.x) > fabs (r.x - (L0)))
+     r.x -= (L0);
+ }
+      } 
+#line 1640
+{
+ r.y += b.y*Delta - c.y;
+ if (Period.y) {
+   if (fabs (r.y) > fabs (r.y + (L0)))
+     r.y += (L0);
+   if (fabs (r.y) > fabs (r.y - (L0)))
+     r.y -= (L0);
+ }
+      } 
+#line 1640
+{
+ r.z += b.z*Delta - c.z;
+ if (Period.z) {
+   if (fabs (r.z) > fabs (r.z + (L0)))
+     r.z += (L0);
+   if (fabs (r.z) > fabs (r.z - (L0)))
+     r.z -= (L0);
+ }
+      }
+
+      double Fn = area*embed_interpolate (point, p, b);
+
+
+
+
+      
+ Tps.x += Fn*(r.y*n.z - r.z*n.y);
+ 
+#line 1656
+Tps.y += Fn*(r.z*n.x - r.x*n.z);
+ 
+#line 1656
+Tps.z += Fn*(r.x*n.y - r.y*n.x);
+
+
+      if (constant(mu.x) != 0.) {
+ double mua = 0., fa = 0.;
+  {
+   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
+   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
+ } 
+#line 1661
+{
+   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
+   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
+ } 
+#line 1661
+{
+   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
+   fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
+ }
+ mua /= (fa + 1e-30);
+
+ coord dudn = embed_gradient (point, u, b, n);
+ coord Fmus = {0};
+
+
+
+
+
+ 
+   Fmus.x = -area*mua*(dudn.x*(sq (n.x) + 1.) +
+         dudn.y*n.x*n.y +
+         dudn.z*n.x*n.z);
+   
+#line 1675
+Fmus.y = -area*mua*(dudn.y*(sq (n.y) + 1.) +
+         dudn.z*n.y*n.z +
+         dudn.x*n.y*n.x);
+   
+#line 1675
+Fmus.z = -area*mua*(dudn.z*(sq (n.z) + 1.) +
+         dudn.x*n.z*n.x +
+         dudn.y*n.z*n.y);
+
+
+
+
+
+
+ 
+   Tmus.x += r.y*Fmus.z - r.z*Fmus.y;
+   
+#line 1685
+Tmus.y += r.z*Fmus.x - r.x*Fmus.z;
+   
+#line 1685
+Tmus.z += r.x*Fmus.y - r.y*Fmus.x;
+
+      }
+    }end_foreach();mpi_all_reduce_array(&Tmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Tps.x,double,MPI_SUM,3);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 1690
+*Tp = Tps; *Tmu = Tmus;
+}
+#line 1734 "./myembed.h"
+static inline double bilinear_embed (Point point, scalar s)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!coarse(cs,0,0,0)) {
+
+
+    return 0;
+  }
+  if (!coarse(cs,child.x,0,0) ||
+      (!emerged && !coarse(csm1,child.x,0,0)))
+    return coarse(s,0,0,0);
+
+  if (!coarse(cs,0,child.y,0) || !coarse(cs,child.x,child.y,0) ||
+      (!emerged && (!coarse(csm1,0,child.y,0) || !coarse(csm1,child.x,child.y,0))))
+    return coarse(s,0,0,0);
+
+
+  if (!coarse(cs,0,0,child.z) || !coarse(cs,child.x,0,child.z) ||
+      !coarse(cs,0,child.y,child.z) || !coarse(cs,child.x,child.y,child.z) ||
+      (!emerged &&
+       (!coarse(csm1,0,0,child.z) || !coarse(csm1,child.x,0,child.z) ||
+ !coarse(csm1,0,child.y,child.z) || !coarse(csm1,child.x,child.y,child.z))))
+    return coarse(s,0,0,0);
+
+  return bilinear (point, s);
+}
+
+
+
+
+
+static inline double bilinear_embed_2 (Point point, scalar s)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+  if (!coarse(cs,0,0,0)) {
+    if (!(coarse(s,0,0,0) == 0.)) qassert ("./myembed.h", 0, "coarse(s) == 0.");
+    return coarse(s,0,0,0);
+  }
+  else {
+    if (!(coarse(cs,0,0,0))) qassert ("./myembed.h", 0, "coarse(cs)");
+    int i = (child.x + 1)/2, j = (child.y + 1)/2;
+#line 1799 "./myembed.h"
+    int k = (child.z + 1)/2;
+    if (coarse(fs.x,i,0,0) > 0.25 && coarse(fs.y,0,j,0) > 0.25 &&
+ coarse(fs.z,0,0,k) > 0.25 &&
+ (coarse(cs,0,0,0) == 1. || coarse(cs,child.x,0,0) == 1. ||
+  coarse(cs,0,child.y,0) == 1. || coarse(cs,child.x,child.y,0) == 1. ||
+  coarse(cs,0,0,child.z) == 1. || coarse(cs,child.x,0,child.z) == 1. ||
+  coarse(cs,0,child.y,child.z) == 1. ||
+  coarse(cs,child.x,child.y,child.z) == 1.) &&
+ (emerged || (coarse(csm1,0,0,0) && coarse(csm1,child.x,0,0) &&
+       coarse(csm1,0,child.y,0) && coarse(csm1,child.x,child.y,0) &&
+       coarse(csm1,0,0,child.z) && coarse(csm1,child.x,0,child.z) &&
+       coarse(csm1,0,child.y,child.z) && coarse(csm1,child.x,child.y,child.z)))) {
+      if (!(coarse(cs,child.x,0,0) && coarse(cs,0,child.y,0) && coarse(cs,0,0,child.z))) qassert ("./myembed.h", 0, "coarse(cs,child.x) && coarse(cs,0,child.y) && coarse(cs,0,0,child.z)")
+                              ;
+      if (coarse(fs.x,i,child.y,0) && coarse(fs.y,child.x,j,0) &&
+   coarse(fs.x,i,0,child.z) && coarse(fs.y,0,j,child.z) &&
+   coarse(fs.x,i,child.y,child.z) && coarse(fs.y,child.x,j,child.z) &&
+
+   coarse(fs.z,child.x,child.y,k) &&
+   coarse(fs.z,child.x,0,k) && coarse(fs.z,0,child.y,k)) {
+ if (!(coarse(cs,child.x,child.y,0) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z))) qassert ("./myembed.h", 0, "coarse(cs,child.x,child.y) && coarse(cs,child.x,0,child.z) && coarse(cs,0,child.y,child.z) && coarse(cs,child.x,child.y,child.z)")
+
+                                     ;
+
+ return (27.*coarse(s,0,0,0) +
+  9.*(coarse(s,child.x,0,0) + coarse(s,0,child.y,0) +
+      coarse(s,0,0,child.z)) +
+  3.*(coarse(s,child.x,child.y,0) + coarse(s,child.x,0,child.z) +
+      coarse(s,0,child.y,child.z)) +
+  coarse(s,child.x,child.y,child.z))/64.;
+      }
+      else
+
+ return (coarse(s,0,0,0) + coarse(s,child.x,0,0) + coarse(s,0,child.y,0) +
+  coarse(s,0,0,child.z))/4.;
+    }
+    else if (coarse(cs,child.x,child.y,child.z) &&
+      ((coarse(fs.z,child.x,child.y,k) &&
+        ((coarse(fs.x,i,0,0) && coarse(fs.y,child.x,j,0)) ||
+  (coarse(fs.y,0,j,0) && coarse(fs.x,i,child.y,0))))
+       ||
+       (coarse(fs.z,0,0,k) &&
+        ((coarse(fs.x,i,0,child.z) && coarse(fs.y,child.x,j,child.z)) ||
+    (coarse(fs.y,0,j,child.z) && coarse(fs.x,i,child.y,child.z))))
+       ||
+       (coarse(fs.z,child.x,0,k) &&
+        coarse(fs.x,i,0,0) && coarse(fs.y,child.x,j,child.z))
+       ||
+       (coarse(fs.z,0,child.y,k) &&
+        coarse(fs.y,0,j,0) && coarse(fs.x,i,child.y,child.z))
+       ) &&
+      (emerged || (coarse(csm1,0,0,0) && coarse(csm1,child.x,child.y,child.z))))
+
+      return (3.*coarse(s,0,0,0) + coarse(s,child.x,child.y,child.z))/4.;
+
+    else
+      return coarse(s,0,0,0);
+  }
+}
+#line 1900 "./myembed.h"
+     
+void update_tracer (scalar f, vector uf, vector flux, double dt)
+{tracing("update_tracer","./myembed.h",0);
+#line 1940 "./myembed.h"
+  scalar  divfc=new_scalar("divfc"),  divfc_cor=new_scalar("divfc_cor");
+
+
+
+
+
+  foreach_stencil () {
+
+
+
+
+_stencil_val(cs,0,0,0);{
+      {_stencil_val_a(divfc,0,0,0); _stencil_val_a(divfc_cor,0,0,0);   } 
+
+
+
+
+
+{_stencil_val(cs,0,0,0);{ {
+      _stencil_val_a(divfc,0,0,0);  
+      
+ {_stencil_val_r(divfc,0,0,0);_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);   }
+ 
+#line 1961
+{_stencil_val_r(divfc,0,0,0);_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);   }
+ 
+#line 1961
+{_stencil_val_r(divfc,0,0,0);_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);   }      
+#line 1970 "./myembed.h"
+      
+      
+      {foreach_neighbor(1)
+ {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {   
+    
+   
+   _stencil_embed_geometry (point,NULL ,NULL );      
+   
+   default_stencil (point,((scalar[]){ f,{-1}}) ); 
+{   
+      
+_stencil_neumann_scalar (point, f, cs,NULL ,NULL ,NULL ,NULL );
+      _stencil_val(f,0,0,0);
+       
+   
+#line 1983
+} 
+    
+    
+ 
+#line 1985
+}      }end_foreach_neighbor()}
+          
+
+      _stencil_val_a(divfc_cor,0,0,0);_stencil_val(cs,0,0,0); _stencil_val(csm1,0,0,0);_stencil_val(f,0,0,0);     
+    } 
+
+
+
+
+
+
+
+{    
+
+
+
+
+
+
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );      
+      
+      default_stencil (point,((scalar[]){ f,{-1}}) ); 
+{   
+  
+_stencil_neumann_scalar (point, f, cs,NULL ,NULL ,NULL ,NULL );
+  _stencil_val(f,0,0,0);
+   
+      
+#line 2013
+}
+       
+
+
+
+
+      
+#line 2018
+_stencil_val_a(divfc,0,0,0);  
+       {      
+
+
+
+
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2026
+uf.x,{-1}}) ); 
+     
+
+
+
+
+
+
+ _stencil_val_r(divfc,0,0,0); _stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);    
+      } 
+#line 2019
+{      
+
+
+
+
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2026
+uf.y,{-1}}) ); 
+     
+
+
+
+
+
+
+ _stencil_val_r(divfc,0,0,0); _stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);    
+      } 
+#line 2019
+{      
+
+
+
+
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2026
+uf.z,{-1}}) ); 
+     
+
+
+
+
+
+
+ _stencil_val_r(divfc,0,0,0); _stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);    
+      }
+
+
+
+
+
+
+      _stencil_val_a(divfc_cor,0,0,0);_stencil_val(cs,0,0,0); _stencil_val(csm1,0,0,0);_stencil_val(f,0,0,0);     
+
+
+
+
+      _stencil_val_r(divfc,0,0,0);_stencil_val(cs,0,0,0);  
+      _stencil_val_r(divfc_cor,0,0,0);_stencil_val(cs,0,0,0);  
+    }}   
+
+
+
+
+
+
+
+    
+#line 2049
+}}
+
+
+
+
+       
+
+
+
+
+
+    
+  
+#line 2050
+}end_foreach_stencil();
+
+
+
+
+
+  {
+#line 1946
+foreach () {
+
+
+
+
+    if (val(cs,0,0,0) <= 0.)
+      val(divfc,0,0,0) = val(divfc_cor,0,0,0) = 0.;
+
+
+
+
+
+    else if (val(cs,0,0,0) >= 1.) {
+      val(divfc,0,0,0) = 0.;
+      
+ val(divfc,0,0,0) += (val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
+ 
+#line 1961
+val(divfc,0,0,0) += (val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
+ 
+#line 1961
+val(divfc,0,0,0) += (val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
+#line 1970 "./myembed.h"
+      int sn = 0;
+      double fb = 0.;
+      {foreach_neighbor(1)
+ if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
+   sn += 1;
+   coord b, n;
+   embed_geometry (point, &b, &n);
+   bool dirichlet = true;
+   double ffb = (_attribute[f.i].boundary[embed] (point, point, f, &dirichlet));
+   if (!dirichlet) {
+     double coef = 0.;
+     ffb = neumann_scalar (point, f, cs, n, b, ffb, &coef);
+     ffb += coef*val(f,0,0,0);
+   }
+   fb += ffb;
+ }end_foreach_neighbor()}
+      fb /= (sn + 1e-30);
+
+      val(divfc_cor,0,0,0) = -(val(cs,0,0,0) - val(csm1,0,0,0))*(val(f,0,0,0) - fb)/dt;
+    }
+
+
+
+
+
+
+
+    else {
+
+
+
+
+
+
+
+      coord b, n;
+      double area = embed_geometry (point, &b, &n);
+      bool dirichlet = true;
+      double fb = (_attribute[f.i].boundary[embed] (point, point, f, &dirichlet));
+      if (!dirichlet) {
+ double coef = 0.;
+ fb = neumann_scalar (point, f, cs, n, b, fb, &coef);
+ fb += coef*val(f,0,0,0);
+      }
+
+
+
+
+      val(divfc,0,0,0) = 0.;
+       {
+
+
+
+
+ bool dirichlet_uf = true;
+ double ufb = area*(_attribute[uf.x.i].boundary[embed] (point, point,
+       uf.x, &dirichlet_uf));
+ if (!(dirichlet_uf)) qassert ("./myembed.h", 0, "dirichlet_uf");
+
+
+
+
+
+
+ val(divfc,0,0,0) += val(flux.x,0,0,0) - val(flux.x,1,0,0) - fb*ufb*n.x;
+      } 
+#line 2019
+{
+
+
+
+
+ bool dirichlet_uf = true;
+ double ufb = area*(_attribute[uf.y.i].boundary[embed] (point, point,
+       uf.y, &dirichlet_uf));
+ if (!(dirichlet_uf)) qassert ("./myembed.h", 0, "dirichlet_uf");
+
+
+
+
+
+
+ val(divfc,0,0,0) += val(flux.y,0,0,0) - val(flux.y,0,1,0) - fb*ufb*n.y;
+      } 
+#line 2019
+{
+
+
+
+
+ bool dirichlet_uf = true;
+ double ufb = area*(_attribute[uf.z.i].boundary[embed] (point, point,
+       uf.z, &dirichlet_uf));
+ if (!(dirichlet_uf)) qassert ("./myembed.h", 0, "dirichlet_uf");
+
+
+
+
+
+
+ val(divfc,0,0,0) += val(flux.z,0,0,0) - val(flux.z,0,0,1) - fb*ufb*n.z;
+      }
+
+
+
+
+
+
+      val(divfc_cor,0,0,0) = -(val(cs,0,0,0) - val(csm1,0,0,0))*(val(f,0,0,0) - fb)*(Delta)/dt;
+
+
+
+
+      val(divfc,0,0,0) /= (Delta*val(cs,0,0,0));
+      val(divfc_cor,0,0,0) /= (Delta*val(cs,0,0,0));
+    }
+  }end_foreach();}
+#line 2119 "./myembed.h"
+  scalar  e=new_scalar("e");
+
+
+
+
+
+  foreach_stencil () {
+
+_stencil_val(cs,0,0,0);{
+      {_stencil_val_a(e,0,0,0);  } 
+
+{_stencil_val(cs,0,0,0);{ {
+      _stencil_val_r(f,0,0,0);_stencil_val(divfc,0,0,0); _stencil_val(divfc_cor,0,0,0);   
+      _stencil_val_a(e,0,0,0);  
+    } 
+
+{      
+
+
+
+      
+      {foreach_neighbor(1) {
+_stencil_val(cs,0,0,0); 
+   _stencil_val(cs,0,0,0);_stencil_val(divfc,0,0,0); 
+   
+      
+#line 2143
+}end_foreach_neighbor()}         
+
+          
+      
+
+
+
+
+
+      
+
+      for (int i = 0; i <= 1; i++)
+ {
+   {_stencil_val(uf.x,i,0,0);
+     {_stencil_val(uf.x,i,0,0);   }    }
+   
+#line 2156
+{_stencil_val(uf.y,0,i,0);
+     {_stencil_val(uf.y,0,i,0);   }    }
+   
+#line 2156
+{_stencil_val(uf.z,0,0,i);
+     {_stencil_val(uf.z,0,0,i);   }    }}    
+
+      
+       _stencil_embed_geometry (point,NULL ,NULL );   
+      
+       {      
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2165
+uf.x,{-1}}) );  
+     
+  
+      } 
+#line 2162
+{      
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2165
+uf.y,{-1}}) );  
+     
+  
+      } 
+#line 2162
+{      
+ 
+ default_stencil (point
+,((scalar[]){
+       
+#line 2165
+uf.z,{-1}}) );  
+     
+  
+      }     
+    
+         
+
+      _stencil_val(cs,0,0,0);                                         
+#line 2181 "./myembed.h"
+      
+
+
+      _stencil_val_r(f,0,0,0);_stencil_val(divfc,0,0,0); _stencil_val(divfc_cor,0,0,0);       
+
+
+
+
+
+
+
+      _stencil_val_a(e,0,0,0);_stencil_val(cs,0,0,0);_stencil_val(divfc,0,0,0); _stencil_val(divfc_cor,0,0,0);         
+    }}   
+
+    
+#line 2193
+}}
+
+       
+
+    
+  
+#line 2194
+}end_foreach_stencil();
+
+
+
+
+
+  {
+#line 2125
+foreach () {
+
+    if (val(cs,0,0,0) <= 0.)
+      val(e,0,0,0) = 0.;
+
+    else if (val(cs,0,0,0) >= 1.) {
+      val(f,0,0,0) += dt*(val(divfc,0,0,0) + val(divfc_cor,0,0,0));
+      val(e,0,0,0) = 0.;
+    }
+
+    else {
+
+
+
+      double scs = 0., sdivfc = 0.;
+      {foreach_neighbor(1) {
+ scs += sq (val(cs,0,0,0));
+ sdivfc += sq (val(cs,0,0,0))*val(divfc,0,0,0);
+      }end_foreach_neighbor()}
+
+      if (!(scs)) qassert ("./myembed.h", 0, "scs");
+      double divfnc = sdivfc/(scs + 1e-30);
+
+
+
+
+
+      double umax = 0.;
+
+      for (int i = 0; i <= 1; i++)
+ {
+   if (fabs (val(uf.x,i,0,0)) > umax)
+     umax = fabs (val(uf.x,i,0,0));
+   
+#line 2156
+if (fabs (val(uf.y,0,i,0)) > umax)
+     umax = fabs (val(uf.y,0,i,0));
+   
+#line 2156
+if (fabs (val(uf.z,0,0,i)) > umax)
+     umax = fabs (val(uf.z,0,0,i));}
+
+      coord b, n;
+      double area = embed_geometry (point, &b, &n);
+      double ub = 0.;
+       {
+ bool dirichlet = true;
+ double ufb = area*(_attribute[uf.x.i].boundary[embed] (point, point,
+       uf.x, &dirichlet));
+ if (!(dirichlet)) qassert ("./myembed.h", 0, "dirichlet");
+ ub += (ufb*n.x);
+      } 
+#line 2162
+{
+ bool dirichlet = true;
+ double ufb = area*(_attribute[uf.y.i].boundary[embed] (point, point,
+       uf.y, &dirichlet));
+ if (!(dirichlet)) qassert ("./myembed.h", 0, "dirichlet");
+ ub += (ufb*n.y);
+      } 
+#line 2162
+{
+ bool dirichlet = true;
+ double ufb = area*(_attribute[uf.z.i].boundary[embed] (point, point,
+       uf.z, &dirichlet));
+ if (!(dirichlet)) qassert ("./myembed.h", 0, "dirichlet");
+ ub += (ufb*n.z);
+      }
+      if (fabs(ub) > umax)
+ umax = fabs (ub);
+
+      double dtmax = Delta*val(cs,0,0,0)/(umax + 1e-30);
+#line 2181 "./myembed.h"
+      double kc = (((min (1., dtmax/(dt + 1e-30))) < 0. ? 0. : ((min (1., dtmax/(dt + 1e-30))) > 1. ? 1. : (((2.) + 1.)*pow ((min (1., dtmax/(dt + 1e-30))), (2.)) - (2.)*pow ((min (1., dtmax/(dt + 1e-30))), ((2.) + 1.))))));
+
+
+      val(f,0,0,0) += dt*(kc*(val(divfc,0,0,0) + val(divfc_cor,0,0,0)) + (1. - kc)*divfnc);
+
+
+
+
+
+
+
+      val(e,0,0,0) = dt*val(cs,0,0,0)*(1. - kc)*((val(divfc,0,0,0) + val(divfc_cor,0,0,0)) - divfnc)/(scs + 1e-30);
+    }
+  }end_foreach();}
+
+
+
+
+
+  foreach_stencil() {   
+    
+    {foreach_neighbor(1)
+      { _stencil_val(e,0,0,0); }end_foreach_neighbor()}
+    _stencil_val_r(f,0,0,0); _stencil_val(cs,0,0,0); 
+  }end_foreach_stencil();
+
+
+
+
+
+  {
+#line 2200
+foreach() {
+    double se = 0.;
+    {foreach_neighbor(1)
+      se += val(e,0,0,0);end_foreach_neighbor()}
+    val(f,0,0,0) += val(cs,0,0,0)*se;
+  }end_foreach();}delete((scalar*)((scalar[]){e,divfc_cor,divfc,{-1}}));
+end_tracing("update_tracer","./myembed.h",0);}
+
+
+
+
+
+
+
+
+
+static int metric_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+#line 2216 "./myembed.h"
+      static int metric(const int i,const double t,Event *_ev){tracing("metric","./myembed.h",0);
+{
+  foreach_stencil() {
+    _stencil_val_a(cs,0,0,0);  
+    _stencil_val_a(csm1,0,0,0);  
+  }end_foreach_stencil();
+  {
+#line 2218
+foreach() {
+    val(cs,0,0,0) = 1.;
+    val(csm1,0,0,0) = 1.;
+  }end_foreach();}
+  foreach_face_stencil(){_stencil_is_face_x(){
+    {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
+#line 2222
+_stencil_is_face_y(){
+    {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()
+#line 2222
+_stencil_is_face_z(){
+    {_stencil_val_a(fs.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  {
+#line 2222
+foreach_face_generic(){is_face_x(){
+    val(fs.x,0,0,0) = 1.;}end_is_face_x()
+#line 2222
+is_face_y(){
+    val(fs.y,0,0,0) = 1.;}end_is_face_y()
+#line 2222
+is_face_z(){
+    val(fs.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
+
+
+  _attribute[cs.i].restriction = restriction_average;
+  _attribute[csm1.i].restriction = restriction_average;
+  _attribute[cs.i].refine = embed_fraction_refine;
+
+
+
+
+
+
+
+  _attribute[cs.i].prolongation = fraction_refine;
+  _attribute[csm1.i].refine = _attribute[csm1.i].prolongation = fraction_refine;
+  
+    _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
+    
+#line 2239
+_attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
+    
+#line 2239
+_attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
+
+
+
+
+
+
+  restriction (((scalar[]){cs, csm1, fs.x, fs.y, fs.z,{-1}}));
+
+
+  if (!(is_constant (cm) || cm.i == cs.i)) qassert ("./myembed.h", 0, "is_constant (cm) || cm.i == cs.i");
+
+  cm = cs;
+  fm = fs;
+
+
+
+
+
+  _attribute[csm1.i].nodump = true;
+}{end_tracing("metric","./myembed.h",0);return 0;}end_tracing("metric","./myembed.h",0);}
+
+
+
+
+static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+#line 2264
+      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","./myembed.h",0); {
+  display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
+    "fc = {0.5,0.5,0.5}, order = 2);"});
+}{end_tracing("defaults","./myembed.h",0);return 0;}end_tracing("defaults","./myembed.h",0);}
+#line 5 "cylinder.c"
+#line 1 "navier-stokes/centered.h"
+#line 1 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+#line 27 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+#line 1 "./run.h"
+#line 1 "/home/lisergey/basilisk/src/run.h"
+#line 9 "/home/lisergey/basilisk/src/run.h"
+double dt = 1.;
+
+#line 1 "./utils.h"
 #line 12 "/home/lisergey/basilisk/src/run.h"
 
      
@@ -18185,10 +19918,10 @@ val(r.z,0,0,0) = val(rho,0,0,0)*val(u.z,0,0,0);}end_foreach();}
 end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",0);}
 #line 32 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 44 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
-scalar  p={4};
-vector  u={{5},{6},{7}},  g={{8},{9},{10}};
-scalar  pf={11};
-vector  uf={{12},{13},{14}};
+scalar  p={5};
+vector  u={{6},{7},{8}},  g={{9},{10},{11}};
+scalar  pf={12};
+vector  uf={{13},{14},{15}};
 #line 70 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
         vector mu = {{_NVARMAX+0},{_NVARMAX+1},{_NVARMAX+2}}, a = {{_NVARMAX+0},{_NVARMAX+1},{_NVARMAX+2}}, alpha = {{_NVARMAX+3},{_NVARMAX+4},{_NVARMAX+5}};
         scalar rho = {_NVARMAX+6};
@@ -19888,411 +21621,6 @@ MPI_File_set_view(fp, offset, f_view, f_view, "native", MPI_INFO_NULL);
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #line 7 "cylinder.c"
-bool emerged = true;
-scalar  csm1={15};
-static double embed_interpolate3 (Point point, scalar s, coord b)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  int i = sign(b.x), j = sign(b.y);
-  int k = sign(b.z);
-  if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0) &&
-      val(cs,0,0,k) && val(cs,i,0,k) && val(cs,0,j,k) && val(cs,i,j,k) &&
-      (emerged || (val(csm1,i,0,0) && val(csm1,0,j,0) && val(csm1,i,j,0) &&
-     val(csm1,0,0,k) && val(csm1,i,0,k) && val(csm1,0,j,k) && val(csm1,i,j,k)))) {
-    double val_0, val_k;
-
-    val_0 = (val(s,0,0,0)*(1. - fabs(b.x)) + val(s,i,0,0)*fabs(b.x))*(1. - fabs(b.y)) +
-      (val(s,0,j,0)*(1. - fabs(b.x)) + val(s,i,j,0)*fabs(b.x))*fabs(b.y);
-    val_k = (val(s,0,0,k)*(1. - fabs(b.x)) + val(s,i,0,k)*fabs(b.x))*(1. - fabs(b.y)) +
-      (val(s,0,j,k)*(1. - fabs(b.x)) + val(s,i,j,k)*fabs(b.x))*fabs(b.y);
-
-    return (val_0*(1. - fabs(b.z)) + val_k*fabs(b.z));
-  }
-  else {
-
-
-    double val = val(s,0,0,0);
-     {
-      int i = sign(b.x);
-      if (val(cs,i,0,0) &&
-   (emerged || (val(csm1,0,0,0) && val(csm1,i,0,0))))
- val += fabs(b.x)*(val(s,i,0,0) - val(s,0,0,0));
-      else if (val(cs,-i,0,0) &&
-        (emerged || (val(csm1,0,0,0) && val(csm1,-i,0,0))))
- val += fabs(b.x)*(val(s,0,0,0) - val(s,-i,0,0));
-    } 
-#line 30
-{
-      int i = sign(b.y);
-      if (val(cs,0,i,0) &&
-   (emerged || (val(csm1,0,0,0) && val(csm1,0,i,0))))
- val += fabs(b.y)*(val(s,0,i,0) - val(s,0,0,0));
-      else if (val(cs,0,-i,0) &&
-        (emerged || (val(csm1,0,0,0) && val(csm1,0,-i,0))))
- val += fabs(b.y)*(val(s,0,0,0) - val(s,0,-i,0));
-    } 
-#line 30
-{
-      int i = sign(b.z);
-      if (val(cs,0,0,i) &&
-   (emerged || (val(csm1,0,0,0) && val(csm1,0,0,i))))
- val += fabs(b.z)*(val(s,0,0,i) - val(s,0,0,0));
-      else if (val(cs,0,0,-i) &&
-        (emerged || (val(csm1,0,0,0) && val(csm1,0,0,-i))))
- val += fabs(b.z)*(val(s,0,0,0) - val(s,0,0,-i));
-    }
-    return val;
-  }
-}
-
-#line 9
-static void _stencil_embed_interpolate3 (Point point, scalar s,_stencil_undefined * b)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
-  
-  
-_stencil_val(cs,o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0);
-      _stencil_val(cs,0,0,o_stencil); _stencil_val(cs,o_stencil,0,o_stencil); _stencil_val(cs,0,o_stencil,o_stencil); _stencil_val(cs,o_stencil,o_stencil,o_stencil);
-_stencil_val(csm1,o_stencil,0,0); _stencil_val(csm1,0,o_stencil,0); _stencil_val(csm1,o_stencil,o_stencil,0);
-     _stencil_val(csm1,0,0,o_stencil); _stencil_val(csm1,o_stencil,0,o_stencil); _stencil_val(csm1,0,o_stencil,o_stencil); _stencil_val(csm1,o_stencil,o_stencil,o_stencil);
-#line 13
-{ 
-
-
-{  
-    
-
-_stencil_val(s,0,0,0); _stencil_val(s,o_stencil,0,0);
-_stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0); 
-
-              
-      
-#line 21
-_stencil_val(s,0,0,o_stencil); _stencil_val(s,o_stencil,0,o_stencil);
-_stencil_val(s,0,o_stencil,o_stencil); _stencil_val(s,o_stencil,o_stencil,o_stencil);     
-
-    
-  } 
-{  
-
-
-     _stencil_val(s,0,0,0);
-     {   
-      
-_stencil_val(cs,o_stencil,0,0);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
-#line 32
-{
- 
-{_stencil_val(s,o_stencil,0,0); _stencil_val(s,0,0,0);   } 
-{_stencil_val(cs,o_stencil,0,0);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1, o_stencil,0,0);
- {_stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);   }     
-        
-#line 37
-}}
-           
-   
-      
-    
-#line 38
-} 
-#line 30
-{   
-      
-_stencil_val(cs,0,o_stencil,0);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
-#line 32
-{
- 
-{_stencil_val(s,0,o_stencil,0); _stencil_val(s,0,0,0);   } 
-{_stencil_val(cs,0,o_stencil,0);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1,0, o_stencil,0);
- {_stencil_val(s,0,0,0);_stencil_val(s,0, o_stencil,0);   }     
-        
-#line 37
-}}
-           
-   
-      
-    
-#line 38
-} 
-#line 30
-{   
-      
-_stencil_val(cs,0,0,o_stencil);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
-#line 32
-{
- 
-{_stencil_val(s,0,0,o_stencil); _stencil_val(s,0,0,0);   } 
-{_stencil_val(cs,0,0,o_stencil);
-_stencil_val(csm1,0,0,0);_stencil_val(csm1,0,0, o_stencil);
- {_stencil_val(s,0,0,0);_stencil_val(s,0,0, o_stencil);   }     
-        
-#line 37
-}}
-           
-   
-      
-    
-#line 38
-} 
-    
-  }}
-                  
-      
-  
-
-#line 41
-}
-
-static
-double embed_geometry3 (Point point, coord * b, coord * n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  *n = facet_normal (point, cs, fs);
-  double alpha = plane_alpha (val(cs,0,0,0), *n);
-  double area = plane_area_center (*n, alpha, b);
-  normalize (n);
-  return area;
-}
-
-
-#line 43
-static void 
-_stencil_embed_geometry3 (Point point,_stencil_undefined  * b,_stencil_undefined  * n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
-_stencil_facet_normal (point, cs, fs);     
-   
-  
-#line 47
-_stencil_val(cs,0,0,0);      
-   
-  
-  return ;
-}
-
-static
-coord embed_gradient3 (Point point, vector u, coord b, coord n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  coord dudn;
-   {
-    bool dirichlet;
-    double vb = _attribute[u.x.i].boundary[embed] (point, point, u.x, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.x = dirichlet_gradient (point, u.x, cs, n, b, vb, &val);
-      dudn.x += val(u.x,0,0,0)*val;
-    }
-    else
-      dudn.x = vb;
-    if (dudn.x == 1e30)
-      dudn.x = 0.;
-  } 
-#line 57
-{
-    bool dirichlet;
-    double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.y = dirichlet_gradient (point, u.y, cs, n, b, vb, &val);
-      dudn.y += val(u.y,0,0,0)*val;
-    }
-    else
-      dudn.y = vb;
-    if (dudn.y == 1e30)
-      dudn.y = 0.;
-  } 
-#line 57
-{
-    bool dirichlet;
-    double vb = _attribute[u.z.i].boundary[embed] (point, point, u.z, &dirichlet);
-    if (dirichlet) {
-      double val;
-      dudn.z = dirichlet_gradient (point, u.z, cs, n, b, vb, &val);
-      dudn.z += val(u.z,0,0,0)*val;
-    }
-    else
-      dudn.z = vb;
-    if (dudn.z == 1e30)
-      dudn.z = 0.;
-  }
-  return dudn;
-}
-
-
-#line 53
-static void 
-_stencil_embed_gradient3 (Point point, vector u,_stencil_undefined * b,_stencil_undefined * n)
-{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
-  
-   {   
-    
-    default_stencil ( point,((scalar[]){ u.x,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
-       _stencil_val(u.x,0,0,0);
-       
-    
-#line 64
-}   
-     
-    
-        
-     
-       
-  
-#line 69
-} 
-#line 57
-{   
-    
-    default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
-       _stencil_val(u.y,0,0,0);
-       
-    
-#line 64
-}   
-     
-    
-        
-     
-       
-  
-#line 69
-} 
-#line 57
-{   
-    
-    default_stencil ( point,((scalar[]){ u.z,{-1}}) ); 
-{ 
-       
-_stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL ); 
-       _stencil_val(u.z,0,0,0);
-       
-    
-#line 64
-}   
-     
-    
-        
-     
-       
-  
-#line 69
-}
-  return ;
-}
-
-     
-void embed_force3 (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
-{tracing("embed_force3","cylinder.c",0);
-  coord Fps = {0}, Fmus = {0};
-  foreach_stencil ()
-    {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
-      
-       _stencil_embed_geometry3 (point,NULL ,NULL );    
-            
-       _stencil_embed_interpolate3 (point, p,NULL );
-       
-  
-      if (constant(mu.x) != 0.) {      
- 
-  { 
-_stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0); 
-     _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
-    
- 
-#line 90
-} 
-#line 87
-{ 
-_stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
-     _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
-    
- 
-#line 90
-} 
-#line 87
-{ 
-_stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
-     _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
-    
- 
-#line 90
-}  
-     
-  _stencil_embed_gradient3 (point, u,NULL ,NULL );
-  
-    
-         
-              
-      }
-    }      }end_foreach_stencil();
-  
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 77
-foreach ()
-    if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
-      coord n, b;
-      double area = embed_geometry3 (point, &b, &n);
-      area *= pow (Delta, 3 - 1);
-      double Fn = area * embed_interpolate3 (point, p, b);
-      
- Fps.x += Fn*n.x;
- 
-#line 84
-Fps.y += Fn*n.y;
- 
-#line 84
-Fps.z += Fn*n.z;
-      if (constant(mu.x) != 0.) {
- double mua = 0., fa = 0.;
-  {
-   mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
-   fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
- } 
-#line 87
-{
-   mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
-   fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
- } 
-#line 87
-{
-   mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
-   fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
- }
- mua /= (fa + 1e-30);
- coord dudn = embed_gradient3 (point, u, b, n);
- 
-   Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) +
-         dudn.y*n.x*n.y +
-         dudn.z*n.x*n.z);
-   
-#line 94
-Fmus.y -= area*mua*(dudn.y*(sq (n.y) + 1.) +
-         dudn.z*n.y*n.z +
-         dudn.x*n.y*n.x);
-   
-#line 94
-Fmus.z -= area*mua*(dudn.z*(sq (n.z) + 1.) +
-         dudn.x*n.z*n.x +
-         dudn.y*n.z*n.y);
-      }
-    }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-  
-#line 99
-*Fp = Fps; *Fmu = Fmus;
-end_tracing("embed_force3","cylinder.c",0);}
-
 
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
@@ -20312,10 +21640,10 @@ static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int i
 
 vector  muv={{16},{17},{18}};
 int main(int argc, char **argv) {
-#line 273
+#line 178
 _init_solver();
   
-#line 121
+#line 26
 char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
   ReynoldsFlag = 0;
@@ -20470,15 +21798,15 @@ char *end;
   run();
 free_solver();
 
-#line 273
+#line 178
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 274
+#line 179
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
-#line 275
+#line 180
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   int l;
   double eps;
@@ -20489,7 +21817,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
               ;
   foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();
   {
-#line 283
+#line 188
 foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
@@ -20498,7 +21826,7 @@ foreach_vertex() val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_v
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 285
+#line 190
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -20507,7 +21835,7 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 291
+#line 196
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
   coord Fp, Fmu;
@@ -20527,7 +21855,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       output_htg(((scalar[]){p, omega, cs,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), htg);
     }
     if (force_path) {
-      embed_force3(p, u, mu, &Fp, &Fmu);
+      embed_force(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
  if (fp == NULL) {
    if ((fp = fopen(force_path, "w")) == NULL) {
@@ -20556,62 +21884,6 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
      s.nc);
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
-
-static int metric_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
-
-
-#line 340
-      static int metric_0(const int i,const double t,Event *_ev){tracing("metric_0","cylinder.c",0);
-{
-  foreach_stencil() {
-    _stencil_val_a(cs,0,0,0);  
-    _stencil_val_a(csm1,0,0,0);  
-  }end_foreach_stencil();
-  {
-#line 342
-foreach() {
-    val(cs,0,0,0) = 1.;
-    val(csm1,0,0,0) = 1.;
-  }end_foreach();}
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
-#line 346
-_stencil_is_face_y(){
-    {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()
-#line 346
-_stencil_is_face_z(){
-    {_stencil_val_a(fs.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
-  {
-#line 346
-foreach_face_generic(){is_face_x(){
-    val(fs.x,0,0,0) = 1.;}end_is_face_x()
-#line 346
-is_face_y(){
-    val(fs.y,0,0,0) = 1.;}end_is_face_y()
-#line 346
-is_face_z(){
-    val(fs.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
-
-  _attribute[cs.i].restriction = restriction_average;
-  _attribute[csm1.i].restriction = restriction_average;
-  _attribute[cs.i].refine = embed_fraction_refine;
-  _attribute[cs.i].prolongation = fraction_refine;
-  _attribute[csm1.i].refine = _attribute[csm1.i].prolongation = fraction_refine;
-  
-    _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
-    
-#line 355
-_attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
-    
-#line 355
-_attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
-
-  restriction (((scalar[]){cs, csm1, fs.x, fs.y, fs.z,{-1}}));
-  if (!(is_constant (cm) || cm.i == cs.i)) qassert ("cylinder.c", 0, "is_constant (cm) || cm.i == cs.i");
-  cm = cs;
-  fm = fs;
-  _attribute[csm1.i].nodump = true;
-}{end_tracing("metric_0","cylinder.c",0);return 0;}end_tracing("metric_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20634,10 +21906,10 @@ octree_methods();
       
     
       {  
-#line 896 "/home/lisergey/basilisk/src/embed.h"
-event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",0,"metric"});  
-#line 939
-event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",0,"defaults"});  
+#line 2216 "./myembed.h"
+event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"./myembed.h",0,"metric"});  
+#line 2264
+event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"./myembed.h",0,"defaults"});  
 #line 42 "/home/lisergey/basilisk/src/run.h"
 event_register((Event){0,1,defaults_0,{defaults_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/run.h",0,"defaults"});  
 #line 126 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
@@ -20653,12 +21925,10 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
-#line 275 "cylinder.c"
+#line 180 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 291
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});  
-#line 340
-event_register((Event){0,1,metric_0,{metric_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"metric"});
+#line 196
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
 	
@@ -20674,9 +21944,9 @@ init_const_scalar((scalar){_NVARMAX+7},"zeroc", 0.);
 
 
 init_const_vector((vector){{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}},"unityf0",(double[]){1.,1.,1.});
-init_const_scalar((scalar){_NVARMAX+11},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_face_vector((vector){{1},{2},{3}},"fs"); 
-#line 462 "/home/lisergey/basilisk/src/embed.h"
-embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_scalar((scalar){15},"csm1");  init_face_vector((vector){{16},{17},{18}},"muv");
+init_const_scalar((scalar){_NVARMAX+11},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_scalar((scalar){1},"csm1");  init_face_vector((vector){{2},{3},{4}},"fs"); 
+#line 266 "./myembed.h"
+embed=new_bid();  init_scalar((scalar){5},"p");  init_vector((vector){{6},{7},{8}},"u");  init_vector((vector){{9},{10},{11}},"g");  init_scalar((scalar){12},"pf");  init_face_vector((vector){{13},{14},{15}},"uf");  init_face_vector((vector){{16},{17},{18}},"muv");
     
 #line 23 "ast/init_solver.h"
 }_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary1,_attribute[p.i].boundary_homogeneous[left]=_boundary1_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[top]=_boundary2,_attribute[p.i].boundary_homogeneous[top]=_boundary2_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[bottom]=_boundary3,_attribute[p.i].boundary_homogeneous[bottom]=_boundary3_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[front]=_boundary4,_attribute[p.i].boundary_homogeneous[front]=_boundary4_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[back]=_boundary5,_attribute[p.i].boundary_homogeneous[back]=_boundary5_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[left]=_boundary6,_attribute[u.x.i].boundary_homogeneous[left]=_boundary6_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary7,_attribute[p.i].boundary_homogeneous[left]=_boundary7_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[left]=_boundary8,_attribute[pf.i].boundary_homogeneous[left]=_boundary8_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[right]=_boundary9,_attribute[u.x.i].boundary_homogeneous[right]=_boundary9_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary10,_attribute[p.i].boundary_homogeneous[right]=_boundary10_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[right]=_boundary11,_attribute[pf.i].boundary_homogeneous[right]=_boundary11_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[embed]=_boundary12,_attribute[u.x.i].boundary_homogeneous[embed]=_boundary12_homogeneous;_attribute[u.y.i].dirty=1,_attribute[u.y.i].boundary[embed]=_boundary13,_attribute[u.y.i].boundary_homogeneous[embed]=_boundary13_homogeneous;  
@@ -20725,7 +21995,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
-#line 274 "cylinder.c"
+#line 179 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
   
 #line 24 "ast/init_solver.h"
