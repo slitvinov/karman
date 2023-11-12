@@ -275,12 +275,10 @@ event velocity(i++; t <= tend) {
       }
     }
   }
-  /*
   astats s = adapt_wavelet((scalar*){u}, (double[]){3e-3, 3e-3, 3e-3},
 			   maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
 	    s.nc);
-  */
   iframe++;
 }
