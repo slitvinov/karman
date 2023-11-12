@@ -220,10 +220,12 @@ int main(int argc, char **argv) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   double eps;
+  int l;
   vertex scalar phi[];
-  refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-	 sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
-	 level < maxlevel);
+  for (l = minlevel + 1; l <= maxlevel; l++)
+    refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
+	   level < l);
   foreach_vertex() {
     phi[] = sq(x) + sq(y) - sq(diameter / 2);
   }
