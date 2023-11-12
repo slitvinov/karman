@@ -196,7 +196,7 @@ event init(t = 0) {
     u.y[] = 0;
     u.z[] = 0;
   }
-  DT = 1;
+  DT = 0.1;
 }
 event velocity(i++; t <= tend) {
   char htg[FILENAME_MAX];
