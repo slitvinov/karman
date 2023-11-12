@@ -1,12 +1,10 @@
 #include <stdbool.h>
 #include <stdint.h>
-#define BGHOSTS 2
-#define EMBED 2
 #include "grid/octree.h"
 #include "fractions.h"
 #include "myquadratic.h"
 #include "myembed.h"
-#include "navier-stokes/centered.h"
+#include "mycentered.h"
 #include "output_htg.h"
 
 static const char *force_path, *output_prefix;
