@@ -184,6 +184,7 @@ event init(t = 0) {
   for (l = minlevel + 1; l <= maxlevel; l++)
     refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
 	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
+	   fabs(z) < 4 &&
 	   level < l);
   foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
   fractions(phi, cs, fs);
@@ -234,5 +235,10 @@ event velocity(i++; t <= tend) {
       }
     }
   }
+  astats s = adapt_wavelet((scalar*){u}, (double[]){3e-3, 3e-3, 3e-3},
+			   maxlevel = maxlevel, minlevel = minlevel);
+  if (Verbose && iframe % period == 0 && pid() == 0)
+    fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
+	    s.nc);
   iframe++;
 }
