@@ -25,7 +25,7 @@ solver. If embedded boundaries are used, a different scheme is used
 for viscosity. */
 
 #include "run.h"
-#include "mytimestep.h"
+#include "timestep.h"
 #include "bcg.h"
 #if EMBED
 # include "myviscosity-embed.h"
@@ -69,7 +69,7 @@ for which inertia is negligible compared to viscosity. */
 
 (const) face vector mu = zerof, a = zerof, alpha = unityf;
 (const) scalar rho = unity;
-mgstats mgp, mgpf, mgu;
+mgstats mgp = {0}, mgpf = {0}, mgu = {0};
 bool stokes = false;
 
 /**
@@ -447,10 +447,10 @@ event adapt (i++,last) {
   foreach_face()
     if (uf.x[] && !fs.x[])
       uf.x[] = 0.;
-#endif // EMBED
+#endif
   event ("properties");
 }
-#endif // TREE
+#endif
 
 /**
 ## See also
