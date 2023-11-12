@@ -20556,6 +20556,62 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
      s.nc);
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
 }{end_tracing("velocity","cylinder.c",0);return 0;}end_tracing("velocity","cylinder.c",0);}
+
+static int metric_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 340
+      static int metric_0(const int i,const double t,Event *_ev){tracing("metric_0","cylinder.c",0);
+{
+  foreach_stencil() {
+    _stencil_val_a(cs,0,0,0);  
+    _stencil_val_a(csm1,0,0,0);  
+  }end_foreach_stencil();
+  {
+#line 342
+foreach() {
+    val(cs,0,0,0) = 1.;
+    val(csm1,0,0,0) = 1.;
+  }end_foreach();}
+  foreach_face_stencil(){_stencil_is_face_x(){
+    {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
+#line 346
+_stencil_is_face_y(){
+    {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()
+#line 346
+_stencil_is_face_z(){
+    {_stencil_val_a(fs.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  {
+#line 346
+foreach_face_generic(){is_face_x(){
+    val(fs.x,0,0,0) = 1.;}end_is_face_x()
+#line 346
+is_face_y(){
+    val(fs.y,0,0,0) = 1.;}end_is_face_y()
+#line 346
+is_face_z(){
+    val(fs.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
+
+  _attribute[cs.i].restriction = restriction_average;
+  _attribute[csm1.i].restriction = restriction_average;
+  _attribute[cs.i].refine = embed_fraction_refine;
+  _attribute[cs.i].prolongation = fraction_refine;
+  _attribute[csm1.i].refine = _attribute[csm1.i].prolongation = fraction_refine;
+  
+    _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
+    
+#line 355
+_attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
+    
+#line 355
+_attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
+
+  restriction (((scalar[]){cs, csm1, fs.x, fs.y, fs.z,{-1}}));
+  if (!(is_constant (cm) || cm.i == cs.i)) qassert ("cylinder.c", 0, "is_constant (cm) || cm.i == cs.i");
+  cm = cs;
+  fm = fs;
+  _attribute[csm1.i].nodump = true;
+}{end_tracing("metric_0","cylinder.c",0);return 0;}end_tracing("metric_0","cylinder.c",0);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20600,7 +20656,9 @@ event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lis
 #line 275 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
 #line 291
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});  
+#line 340
+event_register((Event){0,1,metric_0,{metric_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"metric"});
 	
 	
 	

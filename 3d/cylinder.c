@@ -336,3 +336,27 @@ event velocity(i++; t <= tend) {
 	    s.nc);
   iframe++;
 }
+
+event metric (i = 0)
+{
+  foreach() {
+    cs[] = 1.;
+    csm1[] = 1.;
+  }
+  foreach_face()
+    fs.x[] = 1.;
+#if TREE
+  cs.restriction   = restriction_average;
+  csm1.restriction = restriction_average;
+  cs.refine        = embed_fraction_refine;
+  cs.prolongation = fraction_refine;
+  csm1.refine = csm1.prolongation = fraction_refine;
+  foreach_dimension()
+    fs.x.prolongation = embed_face_fraction_refine_x;
+#endif
+  restriction ({cs, csm1, fs});
+  assert (is_constant (cm) || cm.i == cs.i);
+  cm = cs;
+  fm = fs;
+  csm1.nodump = true;
+}
