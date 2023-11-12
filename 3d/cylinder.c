@@ -230,6 +230,7 @@ event init(t = 0) {
     phi[] = sq(x) + sq(y) - sq(diameter / 2);
   }
   fractions(phi, cs, fs);
+  fractions_cleanup(cs, fs);
   foreach () {
     u.x[] = cs[];
     u.y[] = 0;
