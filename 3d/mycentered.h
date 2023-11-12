@@ -1,4 +1,4 @@
-/**
+  /**
 # Incompressible Navier--Stokes solver (centered formulation)
 
 We wish to approximate numerically the incompressible,
