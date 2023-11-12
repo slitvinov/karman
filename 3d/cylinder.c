@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "grid/octree.h"
+#include "fractions.h"
+#include "myquadratic.h"
 #include "myembed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"

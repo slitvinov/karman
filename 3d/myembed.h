@@ -32,7 +32,6 @@ cut-cell. In the following, interpolations (for Dirichlet boundary
 conditions for example) assume that the current cell has access to a
 5x5 stencil. */
 
-#include "fractions.h"
 #define BGHOSTS 2
 #define EMBED 1
 
@@ -1211,7 +1210,6 @@ embedded boundary. If *linear = true*, then a linear polynomial and
 the 3x3 stencil of the cell are used. Details of the methodology are
 provide in [myquadratic.h](myquadratic.h). */
 
-#include "myquadratic.h"
 
 double embed_extrapolate_ls (Point point, scalar s, scalar cs,
 			     coord c, bool linear)

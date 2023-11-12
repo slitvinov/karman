@@ -1,5 +1,3 @@
-#include "utils.h"
-
 typedef struct {
   coord o; //
   int n, m;
