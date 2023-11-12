@@ -2,15 +2,54 @@
 #include <stdint.h>
 #include "grid/octree.h"
 #include "fractions.h"
-#include "myquadratic.h"
-#include "myembed.h"
-#include "mycentered.h"
+#include "embed.h"
+#include "navier-stokes/centered.h"
 #include "output_htg.h"
 
 static const char *force_path, *output_prefix;
 static const double diameter = 2;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
+
+double embed_interpolate3(Point point, scalar s, coord p) {
+  int i = sign(p.x), j = sign(p.y);
+  int k = sign(p.z);
+  x = fabs(p.x); y = fabs(p.y); z = fabs(p.z);
+  if (cs[i] && cs[0,j] && cs[i,j] && cs[0,0,k] &&
+      cs[i,0,k] && cs[0,j,k] && cs[i,j,k]) {
+    return (((s[]*(1. - x) + s[i]*x)*(1. - y) +
+         (s[0,j]*(1. - x) + s[i,j]*x)*y)*(1. - z) +
+        ((s[0,0,k]*(1. - x) + s[i,0,k]*x)*(1. - y) +
+         (s[0,j,k]*(1. - x) + s[i,j,k]*x)*y)*z);
+  }
+  else {
+    double val = s[];
+    foreach_dimension() {
+      int i = sign(p.x);
+      if (cs[i])
+    val += fabs(p.x)*(s[i] - s[]);
+      else if (cs[-i])
+    val += fabs(p.x)*(s[] - s[-i]);
+    }
+    return val;
+  }
+}
+
+trace
+void embed_force3(scalar p, vector u, face vector mu, coord * Fp, coord * Fmu)
+{
+  coord Fps = {0}, Fmus = {0};
+  foreach (reduction(+:Fps) reduction(+:Fmus), nowarning)
+    if (cs[] > 0. && cs[] < 1.) {
+      coord n, b;
+      double area = embed_geometry(point, &b, &n);
+      area *= pow (Delta, dimension - 1);
+      double Fn = area*embed_interpolate3(point, p, b);
+      foreach_dimension()
+	Fps.x += Fn*n.x;
+    }
+  *Fp = Fps; *Fmu = Fmus;
+}
 
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
@@ -180,13 +219,11 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
-  int l;
   double eps;
   vertex scalar phi[];
-  for (l = minlevel + 1; l <= maxlevel; l++)
-    refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
-	   level < l);
+  refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+	 sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
+	 level < maxlevel);
   foreach_vertex() {
     phi[] = sq(x) + sq(y) - sq(diameter / 2);
   }
@@ -196,7 +233,6 @@ event init(t = 0) {
     u.y[] = 0;
     u.z[] = 0;
   }
-  DT = 0.1;
 }
 event velocity(i++; t <= tend) {
   char htg[FILENAME_MAX];
