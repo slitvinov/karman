@@ -186,7 +186,7 @@ event init(t = 0) {
 	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
 	   level < l);
   foreach_vertex() {
-    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + z);
   }
   fractions(phi, cs, fs);
   foreach () {

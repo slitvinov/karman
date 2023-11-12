@@ -21533,12 +21533,12 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
               ;
   foreach_vertex_stencil() {
-    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+    _stencil_val_a(phi,0,0,0);              
   }end_foreach_vertex_stencil();
   {
 #line 188
 foreach_vertex() {
-    phi[] = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + );
+    val(phi,0,0,0) = min(min(sq(x) + sq(y) - sq(diameter / 2), 4 - z), 4 + z);
   }end_foreach_vertex();}
   fractions((struct Fractions){phi, cs, fs});
   foreach_stencil () {
