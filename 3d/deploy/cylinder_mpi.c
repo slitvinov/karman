@@ -15,7 +15,6 @@
 #endif
 
 
-
 #line 1 "/home/lisergey/basilisk/src/common.h"
 #line 1 "/home/lisergey/basilisk/src/ast/std/stdlib.h"
 #include <stdlib.h>
@@ -2012,7 +2011,7 @@ pfree (listf.z,__func__,__FILE__,0);
   }
 }
 #line 1455 "/home/lisergey/basilisk/src/common.h"
-#line 14 "cylinder-cpp.c"
+#line 13 "cylinder-cpp.c"
 #line 1 "cylinder.c"
 #line 1 "/home/lisergey/basilisk/src/ast/std/stdbool.h"
 #include <stdbool.h>
@@ -2332,6 +2331,12 @@ void mem_free (struct _Memindex * m, int i, int j, int k, int len)
 
 #define end_foreach_mem() }}
 #line 7 "/home/lisergey/basilisk/src/grid/tree.h"
+
+
+
+
+
+# define BGHOSTS 1
 #line 24 "/home/lisergey/basilisk/src/grid/tree.h"
 typedef struct {
   unsigned short flags;
@@ -3097,7 +3102,7 @@ static void update_cache_f (void)
 #line 601 "/home/lisergey/basilisk/src/grid/tree.h"
     if (!(cell.pid < 0)) {
 
-      {foreach_neighbor (2)
+      {foreach_neighbor (BGHOSTS)
  if (allocated(0,0,0) && (cell.pid < 0) && !(cell.flags & fboundary)) {
    cache_level_append (&q->boundary[level], point);
    cell.flags |= fboundary;
@@ -3557,7 +3562,7 @@ static inline void no_restriction (Point point, scalar s);
 
 static bool normal_neighbor (Point point, scalar * scalars, vector * vectors)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  for (int k = 1; k <= 2; k++)
+  for (int k = 1; k <= BGHOSTS; k++)
     {
       for (int i = -k; i <= k; i += 2*k)
  if ((allocated(i,0,0) && !(neighbor(i,0,0).pid < 0))) {
@@ -3636,7 +3641,7 @@ static bool diagonal_neighbor_2D (Point point,
       scalar * scalars, vector * vectors)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
-  for (int k = 1; k <= 2; k++)
+  for (int k = 1; k <= BGHOSTS; k++)
 
     {
 
@@ -3747,7 +3752,7 @@ static bool diagonal_neighbor_3D (Point point,
       scalar * scalars, vector * vectors)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
-  for (int n = 1; n <= 2; n++)
+  for (int n = 1; n <= BGHOSTS; n++)
     for (int i = -n; i <= n; i += 2*n)
       for (int j = -n; j <= n; j += 2*n)
  for (int k = -n; k <= n; k += 2*n)
@@ -3796,7 +3801,7 @@ static bool diagonal_neighbor_3D (Point point,
 
 static Point tangential_neighbor_x (Point point, bool * zn)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  for (int k = 1; k <= 2; k++)
+  for (int k = 1; k <= BGHOSTS; k++)
     for (int j = -k; j <= k; j += 2*k) {
       if ((allocated(0,j,0) && !(neighbor(0,j,0).pid < 0)) || (allocated(-1,j,0) && !(neighbor(-1,j,0).pid < 0))) {
  *zn = false;
@@ -3816,7 +3821,7 @@ static Point tangential_neighbor_x (Point point, bool * zn)
 #line 1271
 static Point tangential_neighbor_y (Point point, bool * zn)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  for (int k = 1; k <= 2; k++)
+  for (int k = 1; k <= BGHOSTS; k++)
     for (int j = -k; j <= k; j += 2*k) {
       if ((allocated(0,0,j) && !(neighbor(0,0,j).pid < 0)) || (allocated(0,-1,j) && !(neighbor(0,-1,j).pid < 0))) {
  *zn = false;
@@ -3836,7 +3841,7 @@ static Point tangential_neighbor_y (Point point, bool * zn)
 #line 1271
 static Point tangential_neighbor_z (Point point, bool * zn)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  for (int k = 1; k <= 2; k++)
+  for (int k = 1; k <= BGHOSTS; k++)
     for (int j = -k; j <= k; j += 2*k) {
       if ((allocated(j,0,0) && !(neighbor(j,0,0).pid < 0)) || (allocated(j,0,-1) && !(neighbor(j,0,-1).pid < 0))) {
  *zn = false;
