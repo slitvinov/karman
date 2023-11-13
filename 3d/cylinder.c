@@ -7,8 +7,8 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
-@include "predicate.inc"
-@include "predicate_c.inc"
+#include "predicate.h"
+#include "predicate_c.h"
 
 static const char *force_path, *output_prefix, *stl_path;
 static const double diameter = 2;
