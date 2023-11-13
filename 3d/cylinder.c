@@ -12,6 +12,7 @@
 
 static const char *force_path, *output_prefix, *stl_path;
 static const double diameter = 2;
+static const int outlevel = 2;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
 static float *stl_ver;
@@ -347,13 +348,14 @@ int main(int argc, char **argv) {
   }
   size(5);
   origin(-2, -L0 / 2.0, -L0 / 2.0);
-  init_grid(1 << minlevel);
+  init_grid(1 << outlevel);
   mu = muv;
   run();
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
+  refine(x < X0 + 0.8 * L0 && level < minlevel);
   refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
 	 sq(x) + sq(y) >= sq(0.75 * diameter / 2) &&
 	 level < maxlevel);
