@@ -1,13 +1,6 @@
 import struct
 import math
-
-L = 4
-R = 1
-n = 10
-
-ver = []
-tri = []
-
+import sys
 def circle(z, orient):
     i0 = len(ver)
     ver.append((0, 0, z))
@@ -24,6 +17,23 @@ def circle(z, orient):
             tri.append((b, a, c))
         else:
             tri.append((a, b, c))
+
+def write(path, ver, tri):
+    with open(path, "wb") as out:
+        out.write(bytes(80 + 4))
+        nt = 0
+        for i, j, k in tri:
+            out.write(struct.pack('12f', 0, 0, 0, *ver[i], *ver[j], *ver[k]))
+            out.write(bytes(2))
+            nt += 1
+        out.seek(80)
+        out.write(struct.pack('<I', nt))
+            
+L = 6
+R = 1
+n = 10
+ver = []
+tri = []
 circle(-L/2, True)
 circle(L/2, False)
 for i in range(n):
@@ -33,13 +43,5 @@ for i in range(n):
     d = b + (n + 1)
     tri.append((a, b, c))
     tri.append((c, b, d))
-
-with open("a.stl", "wb") as out:
-    out.write(bytes(80 + 4))
-    nt = 0
-    for i, j, k in tri:
-        out.write(struct.pack('12f', 0, 0, 0, *ver[i], *ver[j], *ver[k]))
-        out.write(bytes(2))
-        nt += 1
-    out.seek(80)
-    out.write(struct.pack('<I', nt))
+write("a.stl", ver, tri)
+write("trans.stl", [(z, y, x) for x, y, z in ver], tri)

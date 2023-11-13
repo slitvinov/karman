@@ -1,15 +1,111 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <math.h>
 #include "grid/octree.h"
 #include "fractions.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_htg.h"
+@include "predicate.inc"
+@include "predicate_c.inc"
 
-static const char *force_path, *output_prefix;
+static const char *force_path, *output_prefix, *stl_path;
 static const double diameter = 2;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
+static float *stl_ver;
+static uint32_t stl_nt;
+
+static double
+vec_dot(const double a[3], const double b[3])
+{
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+static double
+edg_sq(const double a[3], const double b[3])
+{
+    double u[3];
+    u[0] = a[0] - b[0];
+    u[1] = a[1] - b[1];
+    u[2] = a[2] - b[2];
+    return vec_dot(u, u);
+}
+
+static double
+edg_point_distance2(const double a[3], const double b[3], const double p[3])
+{
+  enum {X, Y, Z};
+    double t, s, x, y, z;
+
+    s = edg_sq(a, b);
+    if (s == 0)
+	return edg_sq(p, a);
+    t = ((b[X] - a[X]) * (p[X] - a[X]) + (b[Y] - a[Y]) * (p[Y] - a[Y]) +
+	 (b[Z] - a[Z]) * (p[Z] - a[Z])) / s;
+    if (t > 1.0)
+	return edg_sq(p, b);
+    if (t < 0.0)
+	return edg_sq(p, a);
+    x = (1 - t) * a[X] + t * b[X] - p[X];
+    y = (1 - t) * a[Y] + t * b[Y] - p[Y];
+    z = (1 - t) * a[Z] + t * b[Z] - p[Z];
+    return x * x + y * y + z * z;
+}
+
+static void
+vec_minus(const double a[3], const double b[3], /**/ double c[3])
+{
+  enum {X, Y, Z};
+  c[X] = a[X] - b[X];
+  c[Y] = a[Y] - b[Y];
+  c[Z] = a[Z] - b[Z];
+}
+
+
+static double
+tri_point_distance2(const double a[3], const double b[3], const double c[3],
+		    const double p[3])
+{
+  enum {X, Y, Z};
+
+    double u[3], v[3], q[3];
+    double A, B, C, D, E, det;
+    double t1, t2;
+    double x, y, z;
+    double d1, d2;
+
+    vec_minus(b, a, u);
+    vec_minus(c, a, v);
+    B = vec_dot(v, u);
+    E = vec_dot(u, u);
+    C = vec_dot(v, v);
+    det = B * B - E * C;
+    if (det == 0) {
+	d1 = edg_point_distance2(a, b, p);
+	d2 = edg_point_distance2(b, c, p);
+	if (d1 < d2)
+	    return d1;
+	return d2;
+    }
+    vec_minus(a, p, q);
+    A = vec_dot(v, q);
+    D = vec_dot(u, q);
+    t1 = (D * C - A * B) / det;
+    t2 = (A * E - D * B) / det;
+    if (t1 < 0)
+	return edg_point_distance2(a, c, p);
+    if (t2 < 0)
+	return edg_point_distance2(a, b, p);
+    if (t1 + t2 > 1)
+	return edg_point_distance2(b, c, p);
+    x = q[X] + t1 * u[X] + t2 * v[X];
+    y = q[Y] + t1 * u[Y] + t2 * v[Y];
+    z = q[Z] + t1 * u[Z] + t2 * v[Z];
+    return x * x + y * y + z * z;
+}
+
 
 double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y);
@@ -18,9 +114,9 @@ double embed_interpolate3(Point point, scalar s, coord p) {
   if (cs[i] && cs[0,j] && cs[i,j] && cs[0,0,k] &&
       cs[i,0,k] && cs[0,j,k] && cs[i,j,k]) {
     return (((s[]*(1. - x) + s[i]*x)*(1. - y) +
-         (s[0,j]*(1. - x) + s[i,j]*x)*y)*(1. - z) +
-        ((s[0,0,k]*(1. - x) + s[i,0,k]*x)*(1. - y) +
-         (s[0,j,k]*(1. - x) + s[i,j,k]*x)*y)*z);
+	 (s[0,j]*(1. - x) + s[i,j]*x)*y)*(1. - z) +
+	((s[0,0,k]*(1. - x) + s[i,0,k]*x)*(1. - y) +
+	 (s[0,j,k]*(1. - x) + s[i,j,k]*x)*y)*z);
   }
   else {
     double val = s[];
@@ -66,6 +162,8 @@ face vector muv[];
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
+  uint32_t stl_i;
+  FILE *stl_file;
   ReynoldsFlag = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -74,6 +172,7 @@ int main(int argc, char **argv) {
   TendFlag = 0;
   output_prefix = NULL;
   force_path = NULL;
+  stl_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -95,6 +194,7 @@ int main(int argc, char **argv) {
 	  "  -e <end time>            end time of the simulation (decimal "
 	  "number)\n"
 	  "  -f <force file>          force file\n"
+	  "  -s <STL file>            geomtry file\n"
 	  "\n"
 	  "Example usage:\n"
 	  "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -179,6 +279,14 @@ int main(int argc, char **argv) {
       }
       force_path = *argv;
       break;
+    case 's':
+      argv++;
+      if (*argv == NULL) {
+	fprintf(stderr, "cylinder: error: -s needs an argument\n");
+	exit(1);
+      }
+      stl_path = *argv;
+      break;
     case 'o':
       argv++;
       if (*argv == NULL) {
@@ -211,6 +319,32 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
+  if (stl_path) {
+    if ((stl_file = fopen(stl_path, "r")) == NULL) {
+      fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
+      exit(1);
+    }
+    fseek(stl_file, 80, SEEK_SET);
+    if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+      fprintf(stderr, "cylinder: error: fail to doubled '%s'\n", stl_path);
+      exit(1);
+    }
+    stl_ver = malloc(9 * stl_nt * sizeof *stl_ver);
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
+    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+      fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
+      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+	fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
+	exit(1);
+      }
+      fseek(stl_file, 2, SEEK_CUR);
+    }
+    if (fclose(stl_file) != 0) {
+      fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
+      exit(1);
+    }
+  }
   size(5);
   origin(-2, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << minlevel);
@@ -219,16 +353,58 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
-  double eps;
-  int l;
   vertex scalar phi[];
-  for (l = minlevel + 1; l <= maxlevel; l++)
-    refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-	   sq(x) + sq(y) >= sq(0.95 * diameter / 2) &&
-	   level < l);
-  foreach_vertex() {
-    phi[] = sq(x) + sq(y) - sq(diameter / 2);
-  }
+  refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+	 sq(x) + sq(y) >= sq(0.75 * diameter / 2) &&
+	 level < maxlevel);
+  if (stl_path) {
+    predicate_ini();
+    foreach_vertex() {
+      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+	  sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
+	double minumum;
+	uint32_t intersect;
+	uint32_t stl_i, j;
+	double a[3], b[3], c[3], e[3], s[3], dist2;
+	intersect = 0;
+	minimum = DBL_MAX;
+	for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+	  j = 9 * stl_i;
+	  a[0] = stl_ver[j];
+	  a[1] = stl_ver[j + 1];
+	  a[2] = stl_ver[j + 2];
+	  
+	  b[0] = stl_ver[j + 3];
+	  b[1] = stl_ver[j + 4];
+	  b[2] = stl_ver[j + 5];
+	  
+	  c[0] = stl_ver[j + 6];
+	  c[1] = stl_ver[j + 7];
+	  c[2] = stl_ver[j + 8];
+	  
+	  s[0] = x;
+	  s[1] = y;
+	  s[2] = z;
+	
+	  e[0] = s[0];
+	  e[1] = s[1];
+	  e[2] = s[2] + 2 * L0;
+	  
+	  dist2 = tri_point_distance2(a, b, c, s);
+	  if (dist2 < mi) mi = dist2;
+	  intersect += predicate_ray(s, e, a, b, c);
+	}
+	phi[] = intersect % 2 ? -dist2 : dist2;
+      } else
+	phi[] = 0.25 * diameter / 2;
+    }
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "centered: exported geomtry\n");
+    free(stl_ver);
+  } else
+    foreach_vertex()
+      phi[] = sq(x) + sq(y) - sq(diameter / 2);
+
   fractions(phi, cs, fs);
   fractions_cleanup(cs, fs);
   foreach () {
@@ -278,10 +454,12 @@ event velocity(i++; t <= tend) {
       }
     }
   }
+  /*
   astats s = adapt_wavelet((scalar*){u}, (double[]){3e-3, 3e-3, 3e-3},
 			   maxlevel = maxlevel, minlevel = minlevel);
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
     s.nc);
+  */
   iframe++;
 }

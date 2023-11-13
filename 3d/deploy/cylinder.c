@@ -2020,6 +2020,12 @@ pfree (listf.z,__func__,__FILE__,0);
 #line 1 "/home/lisergey/basilisk/src/ast/std/stdint.h"
 #include <stdint.h>
 #line 3 "cylinder.c"
+#line 1 "/home/lisergey/basilisk/src/ast/std/stdlib.h"
+#include <stdlib.h>
+#line 4 "cylinder.c"
+#line 1 "/home/lisergey/basilisk/src/ast/std/math.h"
+#include <math.h>
+#line 5 "cylinder.c"
 #line 1 "grid/octree.h"
 #line 1 "/home/lisergey/basilisk/src/grid/octree.h"
 
@@ -9005,7 +9011,7 @@ void mpi_boundary_update (scalar * list) {
 void octree_methods() {
   tree_methods();
 }
-#line 4 "cylinder.c"
+#line 6 "cylinder.c"
 #line 1 "fractions.h"
 #line 1 "/home/lisergey/basilisk/src/fractions.h"
 #line 12 "/home/lisergey/basilisk/src/fractions.h"
@@ -11450,7 +11456,7 @@ foreach ()
 #line 559
 {end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);return area;}
 end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",0);}
-#line 5 "cylinder.c"
+#line 7 "cylinder.c"
 #line 1 "embed.h"
 #line 1 "/home/lisergey/basilisk/src/embed.h"
 #line 19 "/home/lisergey/basilisk/src/embed.h"
@@ -14243,7 +14249,7 @@ static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
     "fc = {0.5,0.5,0.5}, order = 2);"});
 }{end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);return 0;}end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",0);}
-#line 6 "cylinder.c"
+#line 8 "cylinder.c"
 #line 1 "navier-stokes/centered.h"
 #line 1 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 27 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
@@ -19301,7 +19307,7 @@ is_face_z(){
 
   event ("properties");
 }{end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
-#line 7 "cylinder.c"
+#line 9 "cylinder.c"
 #line 1 "output_htg.h"
 #line 1 "./output_htg.h"
 void output_htg(scalar *list, vector *vlist, const char *path);
@@ -19598,12 +19604,106 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
   fprintf(fp, "ENDBINARY\n\t</AppendedData>\n</VTKFile>\n");
   fflush(fp);
 }
-#line 8 "cylinder.c"
+#line 10 "cylinder.c"
+#include "predicate.inc"
+#include "predicate_c.inc"
 
-static const char *force_path, *output_prefix;
+static const char *force_path, *output_prefix, *stl_path;
 static const double diameter = 2;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
+static float *stl_ver;
+static uint32_t stl_nt;
+
+static double
+vec_dot(const double a[3], const double b[3])
+{
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+static double
+edg_sq(const double a[3], const double b[3])
+{
+    double u[3];
+    u[0] = a[0] - b[0];
+    u[1] = a[1] - b[1];
+    u[2] = a[2] - b[2];
+    return vec_dot(u, u);
+}
+
+static double
+edg_point_distance2(const double a[3], const double b[3], const double p[3])
+{
+  enum {X, Y, Z};
+    double t, s, x, y, z;
+
+    s = edg_sq(a, b);
+    if (s == 0)
+ return edg_sq(p, a);
+    t = ((b[X] - a[X]) * (p[X] - a[X]) + (b[Y] - a[Y]) * (p[Y] - a[Y]) +
+  (b[Z] - a[Z]) * (p[Z] - a[Z])) / s;
+    if (t > 1.0)
+ return edg_sq(p, b);
+    if (t < 0.0)
+ return edg_sq(p, a);
+    x = (1 - t) * a[X] + t * b[X] - p[X];
+    y = (1 - t) * a[Y] + t * b[Y] - p[Y];
+    z = (1 - t) * a[Z] + t * b[Z] - p[Z];
+    return x * x + y * y + z * z;
+}
+
+static void
+vec_minus(const double a[3], const double b[3], double c[3])
+{
+  enum {X, Y, Z};
+  c[X] = a[X] - b[X];
+  c[Y] = a[Y] - b[Y];
+  c[Z] = a[Z] - b[Z];
+}
+
+
+static double
+tri_point_distance2(const double a[3], const double b[3], const double c[3],
+      const double p[3])
+{
+  enum {X, Y, Z};
+
+    double u[3], v[3], q[3];
+    double A, B, C, D, E, det;
+    double t1, t2;
+    double x, y, z;
+    double d1, d2;
+
+    vec_minus(b, a, u);
+    vec_minus(c, a, v);
+    B = vec_dot(v, u);
+    E = vec_dot(u, u);
+    C = vec_dot(v, v);
+    det = B * B - E * C;
+    if (det == 0) {
+ d1 = edg_point_distance2(a, b, p);
+ d2 = edg_point_distance2(b, c, p);
+ if (d1 < d2)
+     return d1;
+ return d2;
+    }
+    vec_minus(a, p, q);
+    A = vec_dot(v, q);
+    D = vec_dot(u, q);
+    t1 = (D * C - A * B) / det;
+    t2 = (A * E - D * B) / det;
+    if (t1 < 0)
+ return edg_point_distance2(a, c, p);
+    if (t2 < 0)
+ return edg_point_distance2(a, b, p);
+    if (t1 + t2 > 1)
+ return edg_point_distance2(b, c, p);
+    x = q[X] + t1 * u[X] + t2 * v[X];
+    y = q[Y] + t1 * u[Y] + t2 * v[Y];
+    z = q[Z] + t1 * u[Z] + t2 * v[Z];
+    return x * x + y * y + z * z;
+}
+
 
 double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   int i = sign(p.x), j = sign(p.y);
@@ -19612,9 +19712,9 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
   if (val(cs,i,0,0) && val(cs,0,j,0) && val(cs,i,j,0) && val(cs,0,0,k) &&
       val(cs,i,0,k) && val(cs,0,j,k) && val(cs,i,j,k)) {
     return (((val(s,0,0,0)*(1. - x) + val(s,i,0,0)*x)*(1. - y) +
-         (val(s,0,j,0)*(1. - x) + val(s,i,j,0)*x)*y)*(1. - z) +
-        ((val(s,0,0,k)*(1. - x) + val(s,i,0,k)*x)*(1. - y) +
-         (val(s,0,j,k)*(1. - x) + val(s,i,j,k)*x)*y)*z);
+  (val(s,0,j,0)*(1. - x) + val(s,i,j,0)*x)*y)*(1. - z) +
+ ((val(s,0,0,k)*(1. - x) + val(s,i,0,k)*x)*(1. - y) +
+  (val(s,0,j,k)*(1. - x) + val(s,i,j,k)*x)*y)*z);
   }
   else {
     double val = val(s,0,0,0);
@@ -19625,7 +19725,7 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
       else if (val(cs,-i,0,0))
     val += fabs(p.x)*(val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 27
+#line 123
 {
       int i = sign(p.y);
       if (val(cs,0,i,0))
@@ -19633,7 +19733,7 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
       else if (val(cs,0,-i,0))
     val += fabs(p.y)*(val(s,0,0,0) - val(s,0,-i,0));
     } 
-#line 27
+#line 123
 {
       int i = sign(p.z);
       if (val(cs,0,0,i))
@@ -19646,29 +19746,30 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
 }
 
 
-#line 14
+
+#line 110
 static void _stencil_embed_interpolate3(Point point, scalar s,_stencil_undefined * p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
   
   
 
 _stencil_val(cs,
           
-#line 18
+#line 114
 o_stencil,0,0); _stencil_val(cs,0,o_stencil,0); _stencil_val(cs,o_stencil,o_stencil,0); _stencil_val(cs,0,0,o_stencil);
       _stencil_val(cs,o_stencil,0,o_stencil); _stencil_val(cs,0,o_stencil,o_stencil); _stencil_val(cs,o_stencil,o_stencil,o_stencil);
-#line 18
+#line 114
 { 
 {
 _stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);
 _stencil_val(s,0,o_stencil,0); _stencil_val(s,o_stencil,o_stencil,0);
 _stencil_val(s,0,0,o_stencil); _stencil_val(s,o_stencil,0,o_stencil);
 _stencil_val(s,0,o_stencil,o_stencil); _stencil_val(s,o_stencil,o_stencil,o_stencil);           
-                   
-         
-         
+            
+  
+  
     
   
-#line 24
+#line 120
 } 
 {  
      _stencil_val(s,0,0,0);
@@ -19681,9 +19782,9 @@ _stencil_val(cs,o_stencil,0,0);{
        
       
     
-#line 33
+#line 129
 } 
-#line 27
+#line 123
 {   
       
 _stencil_val(cs,0,o_stencil,0);{
@@ -19693,9 +19794,9 @@ _stencil_val(cs,0,o_stencil,0);{
        
       
     
-#line 33
+#line 129
 } 
-#line 27
+#line 123
 {   
       
 _stencil_val(cs,0,0,o_stencil);{
@@ -19705,14 +19806,14 @@ _stencil_val(cs,0,0,o_stencil);{
        
       
     
-#line 33
+#line 129
 } 
     
   }}
          
   
 
-#line 36
+#line 132
 }
 
      
@@ -19732,7 +19833,7 @@ void embed_force3(scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 42
+#line 138
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
       coord n, b;
@@ -19742,17 +19843,17 @@ foreach ()
       
  Fps.x += Fn*n.x;
  
-#line 49
+#line 145
 Fps.y += Fn*n.y;
  
-#line 49
+#line 145
 Fps.z += Fn*n.z;
     }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 51
+#line 147
 *Fp = Fps; *Fmu = Fmus;
 end_tracing("embed_force3","cylinder.c",0);}
 
@@ -19769,12 +19870,14 @@ static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int i
 
 vector  muv={{15},{16},{17}};
 int main(int argc, char **argv) {
-#line 219
+#line 353
 _init_solver();
   
-#line 67
+#line 163
 char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
+  uint32_t stl_i;
+  FILE *stl_file;
   ReynoldsFlag = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -19783,6 +19886,7 @@ char *end;
   TendFlag = 0;
   output_prefix = NULL;
   force_path = NULL;
+  stl_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -19804,6 +19908,7 @@ char *end;
    "  -e <end time>            end time of the simulation (decimal "
    "number)\n"
    "  -f <force file>          force file\n"
+   "  -s <STL file>            geomtry file\n"
    "\n"
    "Example usage:\n"
    "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -19888,6 +19993,14 @@ char *end;
       }
       force_path = *argv;
       break;
+    case 's':
+      argv++;
+      if (*argv == NULL) {
+ fprintf(ferr, "cylinder: error: -s needs an argument\n");
+ exit(1);
+      }
+      stl_path = *argv;
+      break;
     case 'o':
       argv++;
       if (*argv == NULL) {
@@ -19920,6 +20033,32 @@ char *end;
     fprintf(ferr, "cylinder: error: -e must be set\n");
     exit(1);
   }
+  if (stl_path) {
+    if ((stl_file = fopen(stl_path, "r")) == NULL) {
+      fprintf(ferr, "cylinder: error: fail to open '%s'\n", stl_path);
+      exit(1);
+    }
+    fseek(stl_file, 80, SEEK_SET);
+    if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+      fprintf(ferr, "cylinder: error: fail to doubled '%s'\n", stl_path);
+      exit(1);
+    }
+    stl_ver = pmalloc(9 * stl_nt * sizeof *stl_ver,__func__,__FILE__,0);
+    if (Verbose && pid() == 0)
+      fprintf(ferr, "cylinder: triangles in STL file: %d\n", stl_nt);
+    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+      fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
+      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+ fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
+ exit(1);
+      }
+      fseek(stl_file, 2, SEEK_CUR);
+    }
+    if (fclose(stl_file) != 0) {
+      fprintf(ferr, "cylinder: error: fail to close '%s'\n", stl_path);
+      exit(1);
+    }
+  }
   size(5);
   origin((struct _origin){-2, -L0 / 2.0, -L0 / 2.0});
   init_grid(1 << minlevel);
@@ -19927,31 +20066,119 @@ char *end;
   run();
 free_solver();
 
-#line 219
+#line 353
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 220
+#line 354
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
-#line 221
+#line 355
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
-  double eps;
-  int l;
   scalar  phi=new_vertex_scalar("phi");
-  for (l = minlevel + 1; l <= maxlevel; l++)
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) && sq(x) + sq(y) >= sq(0.95 * diameter / 2) && level < l) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 0); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) && sq(x) + sq(y) >= sq(0.75 * diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
 
-              ;
-  foreach_vertex_stencil() {
-    _stencil_val_a(phi,0,0,0);        
-  }end_foreach_vertex_stencil();
-  {
-#line 229
+                   ;
+  if (stl_path) {
+    predicate_ini();
+    foreach_vertex_stencil() {
+{ 
+{    
+ 
+ 
+              
+  
+  
+   
+    
+                             
+    
+    
+    
+
+    
+    
+    
+
+    
+    
+           
+
+    
+     
+     
+
+    
+     
+         
+
+       
+      
+        
+  
+ _stencil_val_a(phi,0,0,0);        
+      }
+ {_stencil_val_a(phi,0,0,0);      }}
+                
+            
+    
+#line 400
+}end_foreach_vertex_stencil();
+    {
+#line 362
 foreach_vertex() {
-    val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);
-  }end_foreach_vertex();}
+      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+   sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
+ double minumum;
+ uint32_t intersect;
+ uint32_t stl_i, j;
+ double a[3], b[3], c[3], e[3], s[3], dist2;
+ intersect = 0;
+ minimum = DBL_MAX;
+ for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+   j = 9 * stl_i;
+   a[0] = stl_ver[j];
+   a[1] = stl_ver[j + 1];
+   a[2] = stl_ver[j + 2];
+
+   b[0] = stl_ver[j + 3];
+   b[1] = stl_ver[j + 4];
+   b[2] = stl_ver[j + 5];
+
+   c[0] = stl_ver[j + 6];
+   c[1] = stl_ver[j + 7];
+   c[2] = stl_ver[j + 8];
+
+   s[0] = x;
+   s[1] = y;
+   s[2] = z;
+
+   e[0] = s[0];
+   e[1] = s[1];
+   e[2] = s[2] + 2 * L0;
+
+   dist2 = tri_point_distance2(a, b, c, s);
+   if (dist2 < mi) mi = dist2;
+   intersect += predicate_ray(s, e, a, b, c);
+ }
+ val(phi,0,0,0) = intersect % 2 ? -dist2 : dist2;
+      } else
+ val(phi,0,0,0) = 0.25 * diameter / 2;
+    }end_foreach_vertex();}
+    if (Verbose && pid() == 0)
+      fprintf(ferr, "centered: exported geomtry\n");
+    pfree(stl_ver,__func__,__FILE__,0);
+  } else
+    {
+    
+#line 405
+foreach_vertex_stencil()
+      {_stencil_val_a(phi,0,0,0);        }end_foreach_vertex_stencil();{
+#line 405
+foreach_vertex()
+      val(phi,0,0,0) = sq(x) + sq(y) - sq(diameter / 2);end_foreach_vertex();}}
+
   fractions((struct Fractions){phi, cs, fs});
   fractions_cleanup((struct Cleanup){cs, fs});
   foreach_stencil () {
@@ -19960,7 +20187,7 @@ foreach_vertex() {
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 234
+#line 410
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
@@ -19969,7 +20196,7 @@ foreach () {
 }{end_tracing("init_0","cylinder.c",0);return 0;}end_tracing("init_0","cylinder.c",0);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 240
+#line 416
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",0); {
   char htg[FILENAME_MAX];
   coord Fp, Fmu;
@@ -20011,6 +20238,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       }
     }
   }
+
 
 
 
@@ -20060,9 +20288,9 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
-#line 221 "cylinder.c"
+#line 355 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 240
+#line 416
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",0,"velocity"});
 	
 	
@@ -20130,7 +20358,7 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
-#line 220 "cylinder.c"
+#line 354 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});
   
 #line 24 "ast/init_solver.h"
