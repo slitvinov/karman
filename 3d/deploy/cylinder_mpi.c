@@ -20372,8 +20372,8 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
  
               
   
-  
    
+  
     
                              
     
@@ -20413,7 +20413,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 foreach_vertex() {
       if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
    sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
- double minumum;
+ double minimum;
  uint32_t intersect;
  uint32_t stl_i, j;
  double a[3], b[3], c[3], e[3], s[3], dist2;
@@ -20442,7 +20442,7 @@ foreach_vertex() {
    e[2] = s[2] + 2 * L0;
 
    dist2 = tri_point_distance2(a, b, c, s);
-   if (dist2 < mi) mi = dist2;
+   if (dist2 < minimum) minimum = dist2;
    intersect += predicate_ray(s, e, a, b, c);
  }
  val(phi,0,0,0) = intersect % 2 ? -dist2 : dist2;
