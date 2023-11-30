@@ -29,9 +29,9 @@ def write(path, ver, tri):
         out.seek(80)
         out.write(struct.pack('<I', nt))
             
-L = 6
+L = 5
 R = 1
-n = 10
+n = 30
 ver = []
 tri = []
 circle(-L/2, True)
@@ -43,5 +43,5 @@ for i in range(n):
     d = b + (n + 1)
     tri.append((a, b, c))
     tri.append((c, b, d))
-write("a.stl", ver, tri)
+write("center.stl", ver, tri)
 write("trans.stl", [(z, y, x) for x, y, z in ver], tri)
