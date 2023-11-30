@@ -389,8 +389,8 @@ event init(t = 0) {
 	  s[2] = z;
 	
 	  e[0] = s[0];
-	  e[1] = s[1];
-	  e[2] = s[2] + 2 * L0;
+	  e[1] = s[1] + 2 * L0;
+	  e[2] = s[2];
 	  
 	  dist2 = tri_point_distance2(a, b, c, s);
 	  if (dist2 < minimum) minimum = dist2;
