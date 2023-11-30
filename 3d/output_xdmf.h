@@ -23,7 +23,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
       if ((xyz = realloc(xyz, 8 * 3 * nsize * sizeof *xyz)) == NULL) {
-        fprintf(stderr, "%s:%d: realloc failed '%s'\n", __FILE__, __LINE__);
+        fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
         return 1;
       }
     }
@@ -50,7 +50,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
 
   nattr = list_len(list);
   if ((attr = malloc(nattr * ncell * sizeof *attr)) == NULL) {
-    fprintf(stderr, "%s:%d: malloc failed '%s'\n", __FILE__, __LINE__);
+    fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
     return 1;
   }
   j = 0;
