@@ -98,15 +98,11 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "      </Geometry>\n",
             ncell_total, ncell_total, nitter, ncell_total, 8 * ncell_total, xyz_path);
 
-    /*
-    int nattr;
-    char **names;
-    nattr = 0;
-    for (j = 0; j < nattr; j++)
+    j = 0;
+    for (scalar s in list)
       fprintf(file,
               "      <Attribute\n"
-              "          Name=\"%s\"\n"
-              "          Center=\"Node\">\n"
+              "          Name=\"%s\">\n"
               "        <DataItem\n"
               "            Dimensions=\"%d\"\n"
               "            Format=\"Binary\"\n"
@@ -114,8 +110,8 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          %s\n"
               "        </DataItem>\n"
               "      </Attribute>\n",
-              names[j], 8 * ncell, j * 8 * ncell * sizeof(float), attr_path);
-    */
+              s.name, ncell, j++ * sizeof *attr, attr_path);
+
     fprintf(file, "    </Grid>\n"
                   "  </Domain>\n"
                   "</Xdmf>\n");
