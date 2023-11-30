@@ -56,6 +56,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   j = 0;
   foreach_cell() if (is_local(cell) && is_leaf(cell)) for (scalar s in list)
       attr[j++] = val(s);
+  assert(j == nattr * ncell);
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, nattr * offset * sizeof *attr, attr,
@@ -77,41 +78,38 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "  <Domain>\n"
             "    <Grid>\n"
             "      <Topology\n"
-            "          Dimensions=\"%d\"\n"
-            "          TopologyType=\"Hexahedron\"/>\n"
+            "          TopologyType=\"Hexahedron\"\n"
+            "          Dimensions=\"%d\"/>\n"
             "      <Geometry>\n"
-            "         <DataItem\n"
-            "            ItemType=\"HyperSlab\"\n"
-	    "            Dimensions=\"%d\"\n"
-	    "            Type=\"HyperSlab\">\n"
-            "           <DataItem Dimensions=\"3 1\"\n"
-            "             0\n"
-            "             %d\n" 
-            "             %d\n"
-            "           </DataItem>\n"
-            "           <DataItem\n"
-            "              Dimensions=\"%d 3\"\n"
-            "              Format=\"Binary\">\n"
-            "            %s\n"
-            "           </DataItem>\n"
-            "         </DataItem>\n"
+            "        <DataItem\n"
+            "            Dimensions=\"%d 3\"\n"
+            "            Format=\"Binary\">\n"
+            "          %s\n"
+            "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, ncell_total, nitter, ncell_total, 8 * ncell_total, xyz_path);
-
+            ncell_total, 8 * ncell_total, xyz_path);
     j = 0;
     for (scalar s in list)
       fprintf(file,
               "      <Attribute\n"
-              "          Name=\"%s\">\n"
+              "          Name=\"%s\"\n"
+              "          Center=\"Cell\">\n"
               "        <DataItem\n"
+              "            ItemType=\"HyperSlab\"\n"
               "            Dimensions=\"%d\"\n"
-              "            Format=\"Binary\"\n"
-              "            Seek=\"%ld\">\n"
-              "          %s\n"
-              "        </DataItem>\n"
+              "            Type=\"HyperSlab\">\n"
+              "          <DataItem Dimensions=\"3 1\">\n"
+              "            %d %d %d\n"
+              "          </DataItem>\n"
+              "          <DataItem\n"
+              "              Dimensions=\"%d\"\n"
+              "              Format=\"Binary\">\n"
+              "            %s\n"
+              "          </DataItem>\n"
+              "         </DataItem>\n"
               "      </Attribute>\n",
-              s.name, ncell, j++ * sizeof *attr, attr_path);
-
+              s.name, ncell_total, j++, nattr, ncell_total, nattr * ncell_total,
+              attr_path);
     fprintf(file, "    </Grid>\n"
                   "  </Domain>\n"
                   "</Xdmf>\n");
@@ -121,6 +119,5 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
       return 1;
     }
   }
-
   return 0;
 }
