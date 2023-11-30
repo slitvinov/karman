@@ -80,13 +80,23 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "          Dimensions=\"%d\"\n"
             "          TopologyType=\"Hexahedron\"/>\n"
             "      <Geometry>\n"
-            "        <DataItem\n"
-            "            Dimensions=\"%d 3\"\n"
-            "            Format=\"Binary\">\n"
-            "          %s\n"
-            "        </DataItem>\n"
+            "         <DataItem\n"
+            "            ItemType=\"HyperSlab\"\n"
+	    "            Dimensions=\"%d\"\n"
+	    "            Type=\"HyperSlab\">\n"
+            "           <DataItem Dimensions=\"3 1\"\n"
+            "             0\n"
+            "             %d\n" 
+            "             %d\n"
+            "           </DataItem>\n"
+            "           <DataItem\n"
+            "              Dimensions=\"%d 3\"\n"
+            "              Format=\"Binary\">\n"
+            "            %s\n"
+            "           </DataItem>\n"
+            "         </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_path);
+            ncell_total, ncell_total, nitter, ncell_total, 8 * ncell_total, xyz_path);
 
     /*
     int nattr;
