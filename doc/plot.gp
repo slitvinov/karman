@@ -1,5 +1,5 @@
 set term pngcairo
-set output "smooth.800.png"
+set output "nohelix.2000.png"
 set macro
 u = 'u 2:($3/5) w l lw 2'
 set key center bottom
@@ -7,6 +7,6 @@ set xlabel "time"
 set ylabel "drag coeficient"
 
 plot [0.2:][0:] \
-"smooth/force.08.800.dat" @u title "level: 08", \
-"smooth/force.09.800.dat" @u title "level: 09", \
-"smooth/force.10.800.dat" @u title "level: 10"
+"nohelix/force.08.2000.dat" @u title "level: 08", \
+"nohelix/force.09.2000.dat" @u title "level: 09", \
+"nohelix/force.10.2000.dat" @u title "level: 10"
