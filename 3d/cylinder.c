@@ -6,7 +6,6 @@
 #include "fractions.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
-#include "output_htg.h"
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
@@ -422,7 +421,6 @@ event velocity(i++; t <= tend) {
     if (output_prefix != NULL) {
       sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
       vorticity(u, omega);
-      // output_htg({p, omega, cs}, {u}, htg);
       output_xdmf({p, omega, cs}, {u}, htg);
     }
     if (force_path) {
