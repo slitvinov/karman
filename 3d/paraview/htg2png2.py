@@ -36,18 +36,18 @@ stl.Representation = "Surface"
 htg = Show(hyperTreeGridToDualGrid1, render, "UnstructuredGridRepresentation")
 omegaLUT = GetColorTransferFunction("omega")
 omegaLUT.RGBPoints = [
-    -10.0,
-    1,
+    -1.0,
+    0.1,
     0,
     0,
     0.0,
-    1,
-    1,
-    1,
-    10.0,
+    0.1,
+    0.1,
+    0.1,
+    1.0,
     0,
     0,
-    1,
+    0.1,
 ]
 omegaPWF = GetOpacityTransferFunction("omega")
 omegaPWF.Points = [
