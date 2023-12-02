@@ -155,7 +155,7 @@ event init(t = 0) {
 
 event dump(i++; t <= tend) {
   static long iframe = 0;
-  char png[FILENAME_MAX], htg[FILENAME_MAX];
+  char png[FILENAME_MAX], xdmf[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
   long nx, ny;
@@ -169,8 +169,8 @@ event dump(i++; t <= tend) {
     }
 
     vorticity(u, omega);
-    sprintf(htg, "h.%09ld", iframe);
-    output_xdmf({p, omega}, {u}, htg);
+    sprintf(xdmf, "h.%09ld", iframe);
+    output_xdmf({p, omega}, {u}, xdmf);
     if (Image) {
       foreach ()
         m[] = cs[] - 0.5;
