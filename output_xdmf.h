@@ -4,9 +4,11 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX];
   FILE *file;
   MPI_File mpi_file;
-  const int shift[8][3] = {
-      {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
-      {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
+  const int shift[4][2] = {
+      {0, 0},
+      {0, 1},
+      {1, 0},
+      {1, 1},
   };
 
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
@@ -22,15 +24,14 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
-      if ((xyz = realloc(xyz, 8 * 3 * nsize * sizeof *xyz)) == NULL) {
+      if ((xyz = realloc(xyz, 4 * 2 * nsize * sizeof *xyz)) == NULL) {
         fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
         return 1;
       }
     }
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 4; i++) {
       xyz[j++] = x + Delta * (shift[i][0] - 0.5);
       xyz[j++] = y + Delta * (shift[i][1] - 0.5);
-      xyz[j++] = z + Delta * (shift[i][2] - 0.5);
     }
   }
 
@@ -42,8 +43,8 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, 3 * 8 * offset * sizeof *xyz, xyz,
-                        3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
+  MPI_File_write_at_all(mpi_file, 2 * 4 * offset * sizeof *xyz, xyz,
+                        2 * 4 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
   free(xyz);
   MPI_File_close(&mpi_file);
@@ -78,16 +79,16 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "  <Domain>\n"
             "    <Grid>\n"
             "      <Topology\n"
-            "          TopologyType=\"Hexahedron\"\n"
+            "          TopologyType=\"Quadrilateral\"\n"
             "          Dimensions=\"%d\"/>\n"
             "      <Geometry>\n"
             "        <DataItem\n"
-            "            Dimensions=\"%d 3\"\n"
+            "            Dimensions=\"%d 2\"\n"
             "            Format=\"Binary\">\n"
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_path);
+            ncell_total, 4 * ncell_total, xyz_path);
     j = 0;
     for (scalar s in list)
       fprintf(file,

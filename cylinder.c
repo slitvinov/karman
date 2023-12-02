@@ -2,11 +2,7 @@
 #include <stdint.h>
 #include "embed.h"
 #include "navier-stokes/centered.h"
-#if _MPI
 #include "output_xdmf.h"
-#else
-#include "output_htg.h"
-#endif
 static const double diameter = 0.125;
 static const int minlevel = 7;
 static double reynolds, tend;
@@ -36,61 +32,61 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(
-	  stderr,
-	  "Usage: cylinder [-h] [-i] [-v] -r <Reynolds "
-	  "number> -l <resolution level> -p <dump period> "
-	  "-e <end time>\n"
-	  "Options:\n"
-	  "  -h     Display this help message\n"
-	  "  -v     Verbose\n"
-	  "  -i     Enable PPM image dumping\n"
-	  "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-	  "  -l <resolution level>    the resolution level (positive integer)\n"
-	  "  -p <dump period>         the dump period (positive integer)\n"
-	  "  -e <end time>            end time of the simulation (decimal "
-	  "number)\n"
-	  "\n"
-	  "Example usage:\n"
-	  "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
+          stderr,
+          "Usage: cylinder [-h] [-i] [-v] -r <Reynolds "
+          "number> -l <resolution level> -p <dump period> "
+          "-e <end time>\n"
+          "Options:\n"
+          "  -h     Display this help message\n"
+          "  -v     Verbose\n"
+          "  -i     Enable PPM image dumping\n"
+          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -p <dump period>         the dump period (positive integer)\n"
+          "  -e <end time>            end time of the simulation (decimal "
+          "number)\n"
+          "\n"
+          "Example usage:\n"
+          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error:  -r needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error:  -r needs an argument\n");
+        exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -l needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || maxlevel <= 0) {
-	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-		*argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
       }
       LevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -p needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -p needs an argument\n");
+        exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-		*argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -103,13 +99,13 @@ int main(int argc, char **argv) {
     case 'e':
       argv++;
       if (*argv == NULL) {
-	fprintf(stderr, "cylinder: error: -e needs an argument\n");
-	exit(1);
+        fprintf(stderr, "cylinder: error: -e needs an argument\n");
+        exit(1);
       }
       tend = strtod(*argv, &end);
       if (*end != '\0') {
-	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-	exit(1);
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
       }
       TendFlag = 1;
       break;
@@ -169,29 +165,24 @@ event dump(i++; t <= tend) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-	fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
+        fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
 
     vorticity(u, omega);
-#if _MPI
     sprintf(htg, "h.%09ld", iframe);
     output_xdmf({p, omega}, {u}, htg);
-#else
-    sprintf(htg, "h.%09ld.htg", iframe);
-    output_htg({p, omega}, {u}, htg);
-#endif
     if (Image) {
       foreach ()
-	m[] = cs[] - 0.5;
+        m[] = cs[] - 0.5;
       sprintf(png, "%09ld.ppm", iframe);
       output_ppm(omega, file = png, n = 512,
-		 box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
-		 max = 2 / diameter, linear = false, mask = m);
+                 box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
+                 max = 2 / diameter, linear = false, mask = m);
     }
   }
   iframe++;
 }
 event adapt(i++) {
   adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = maxlevel,
-		minlevel = minlevel);
+                minlevel = minlevel);
 }
