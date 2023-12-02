@@ -15334,6 +15334,9 @@ is_face_y(){
   event ("properties");
 }{end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);return 0;}end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",0);}
 #line 5 "cylinder.c"
+
+
+
 #line 1 "output_htg.h"
 #line 1 "./output_htg.h"
 void output_htg(scalar *list, vector *vlist, const char *path);
@@ -15642,7 +15645,8 @@ fwrite(&write_cache[0], cell_size, vertices_local_pL[lvl], fp);
   fprintf(fp, "ENDBINARY\n\t</AppendedData>\n</VTKFile>\n");
   fflush(fp);
 }
-#line 6 "cylinder.c"
+#line 9 "cylinder.c"
+
 static const double diameter = 0.125;
 static const int minlevel = 7;
 static double reynolds, tend;
@@ -15657,10 +15661,10 @@ static double _boundary10(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann(0, point, neighbor, _s, data) : _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary11_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);POINT_VARIABLES;{return( fabs(y) > 0.45 ? _neumann_homogeneous(0, point, neighbor, _s, data) : _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 vector  muv={{11},{12}};
 int main(int argc, char **argv) {
-#line 137
+#line 141
 _init_solver();
   
-#line 20
+#line 24
 char *end;
   int ReynoldsFlag;
   int LevelFlag;
@@ -15780,17 +15784,17 @@ char *end;
   run();
 free_solver();
 
-#line 137
+#line 141
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 138
+#line 142
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",0); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",0);return 0;}end_tracing("properties_0","cylinder.c",0);}
 
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 140
+#line 144
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",0); {
   scalar  phi=new_vertex_scalar("phi");
   foreach_vertex_stencil() { 
@@ -15801,7 +15805,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     _stencil_val_a(phi,0,0,0);  
   }end_foreach_vertex_stencil();
   {
-#line 142
+#line 146
 foreach_vertex() {
     double p0;
     p0 = 0.5 - y;
@@ -15815,7 +15819,7 @@ foreach_vertex() {
     _stencil_val_a(u.y,0,0,0);  
   }end_foreach_stencil();
   {
-#line 150
+#line 154
 foreach () {
     val(u.x,0,0,0) = 0;
     val(u.y,0,0,0) = 0;
@@ -15825,7 +15829,7 @@ foreach () {
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 156
+#line 160
       static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",0); {
   static long iframe = 0;
   char png[FILENAME_MAX], htg[FILENAME_MAX];
@@ -15840,14 +15844,20 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       if (pid() == 0)
         fprintf(ferr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
-    sprintf(htg, "h.%09ld.htg", iframe);
+
     vorticity(u, omega);
+
+
+
+
+    sprintf(htg, "h.%09ld.htg", iframe);
     output_htg(((scalar[]){p, omega,{-1}}),((vector[]) {u,{{-1},{-1}}}), htg);
+
     if (Image) {
       foreach_stencil ()
         {_stencil_val_a(m,0,0,0); _stencil_val(cs,0,0,0);   }end_foreach_stencil();
       {
-#line 174
+#line 184
 foreach ()
         val(m,0,0,0) = val(cs,0,0,0) - 0.5;end_foreach();}
       sprintf(png, "%09ld.ppm", iframe);
@@ -15860,7 +15870,7 @@ foreach ()
 }{end_tracing("dump_0","cylinder.c",0);return 0;}end_tracing("dump_0","cylinder.c",0);}
 static int adapt_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 184
+#line 194
       static int adapt_0(const int i,const double t,Event *_ev){tracing("adapt_0","cylinder.c",0); {
   adapt_wavelet((struct Adapt){((scalar[]){cs, u.x, u.y,{-1}}), (double[]){1e-2, 3e-3, 3e-3}, .maxlevel = maxlevel,
                 .minlevel = minlevel});
@@ -15906,9 +15916,9 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"init"});  
-#line 140 "cylinder.c"
+#line 144 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"init"});  
-#line 156
+#line 160
 event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",0,"dump"});
 	
 	
@@ -15976,9 +15986,9 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",0,"adapt"});  
-#line 138 "cylinder.c"
+#line 142 "cylinder.c"
 event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"properties"});  
-#line 184
+#line 194
 event_register((Event){0,1,adapt_0,{adapt_0_expr0},((int *)0),((double *)0),"cylinder.c",0,"adapt"});
   
 #line 24 "ast/init_solver.h"
