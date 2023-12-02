@@ -3,20 +3,16 @@
 
 CC = gcc
 MPICC = mpicc
-MPICCFLAGS = -O2 -g
+MPICCFLAGS = -O2
 CFLAGS = -O2
 BASILISK = $(HOME)/basilisk/src
 M = \
 cylinder\
-cylinder_mpi \
 
-all: $M
-cylinder_mpi: cylinder_mpi.c
-	$(MPICC) $< -o $@ $(MPICCFLAGS) $(LDFLAGS) -I$(BASILISK) -lm
+all: cylinder
 cylinder: cylinder.c
-	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) -I$(BASILISK) -lm
-
-clean:; rm -f -- $M
+	$(MPICC) $< -o $@ $(MPICCFLAGS) $(LDFLAGS) -I$(BASILISK) -lm
+clean:; rm -f -- cylinder
 install: $B
 	mkdir -p $(HOME)/.local/bin && \
-	cp $B $(HOME)/.local/bin/
+	cp cylinder $(HOME)/.local/bin/

@@ -1,14 +1,14 @@
 int output_xdmf(scalar *list, vector *vlist, const char *path) {
   float *xyz, *attr;
-  int nattr, ncell, ncell_total, nsize, j, offset;
+  int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX];
   FILE *file;
   MPI_File mpi_file;
   const int shift[4][2] = {
       {0, 0},
       {0, 1},
-      {1, 0},
       {1, 1},
+      {1, 0},
   };
 
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
@@ -24,7 +24,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
-      if ((xyz = realloc(xyz, 4 * 2 * nsize * sizeof *xyz)) == NULL) {
+      if ((xyz = realloc(xyz, 4 * 3 * nsize * sizeof *xyz)) == NULL) {
         fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
         return 1;
       }
@@ -32,6 +32,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     for (i = 0; i < 4; i++) {
       xyz[j++] = x + Delta * (shift[i][0] - 0.5);
       xyz[j++] = y + Delta * (shift[i][1] - 0.5);
+      xyz[j++] = 0;
     }
   }
 
@@ -43,26 +44,34 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, 2 * 4 * offset * sizeof *xyz, xyz,
-                        2 * 4 * ncell * sizeof *xyz, MPI_BYTE,
+  MPI_File_write_at_all(mpi_file, 4 * 3 * offset * sizeof *xyz, xyz,
+                        4 * 3 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
   free(xyz);
   MPI_File_close(&mpi_file);
 
   nattr = list_len(list);
-  if ((attr = malloc(nattr * ncell * sizeof *attr)) == NULL) {
+  nvect = vectors_len(vlist);
+  if ((attr = malloc((nattr + 3 * nvect) * ncell * sizeof *attr)) == NULL) {
     fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
     return 1;
   }
   j = 0;
-  foreach_cell() if (is_local(cell) && is_leaf(cell)) for (scalar s in list)
+  foreach_cell() if (is_local(cell) && is_leaf(cell)) {
+    for (scalar s in list)
       attr[j++] = val(s);
-  assert(j == nattr * ncell);
+    for (vector v in vlist) {
+      attr[j++] = val(v.x);
+      attr[j++] = val(v.y);
+      attr[j++] = 0;
+    }
+  }
+  assert(j == (nattr + 3 * nvect) * ncell);
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, nattr * offset * sizeof *attr, attr,
-                        nattr * ncell * sizeof *attr, MPI_BYTE,
-                        MPI_STATUS_IGNORE);
+  MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
+                        attr, (nattr + 3 * nvect) * ncell * sizeof *attr,
+                        MPI_BYTE, MPI_STATUS_IGNORE);
   free(attr);
   MPI_File_close(&mpi_file);
 
@@ -83,7 +92,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "          Dimensions=\"%d\"/>\n"
             "      <Geometry>\n"
             "        <DataItem\n"
-            "            Dimensions=\"%d 2\"\n"
+            "            Dimensions=\"%d 3\"\n"
             "            Format=\"Binary\">\n"
             "          %s\n"
             "        </DataItem>\n"
@@ -109,8 +118,34 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          </DataItem>\n"
               "         </DataItem>\n"
               "      </Attribute>\n",
-              s.name, ncell_total, j++, nattr, ncell_total, nattr * ncell_total,
-              attr_path);
+              s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
+              (nattr + 3 * nvect) * ncell_total, attr_path);
+    for (vector v in vlist) {
+      fprintf(file,
+              "      <Attribute\n"
+              "          Name=\"%s\"\n"
+	      "          AttributeType=\"Vector\"\n"
+              "          Center=\"Cell\">\n"
+              "        <DataItem\n"
+              "            ItemType=\"HyperSlab\"\n"
+              "            Dimensions=\"%d 3\"\n"
+              "            Type=\"HyperSlab\">\n"
+              "          <DataItem Dimensions=\"3 2\">\n"
+              "            0 %d\n"
+              "            1 1\n"
+	      "            %d 3\n"
+              "          </DataItem>\n"
+              "          <DataItem\n"
+              "              Dimensions=\"%d %d\"\n"
+              "              Format=\"Binary\">\n"
+              "            %s\n"
+              "          </DataItem>\n"
+              "         </DataItem>\n"
+              "      </Attribute>\n",
+              v.x.name, ncell_total, j, ncell_total,
+	      ncell_total, nattr + 3 * nvect, attr_path);
+      j += 3;
+    }
     fprintf(file, "    </Grid>\n"
                   "  </Domain>\n"
                   "</Xdmf>\n");
