@@ -1,7 +1,8 @@
 int output_xdmf(scalar *list, vector *vlist, const char *path) {
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
-  char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX];
+  char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
+      *vname;
   FILE *file;
   MPI_File mpi_file;
   const int shift[4][2] = {
@@ -121,10 +122,12 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
               (nattr + 3 * nvect) * ncell_total, attr_path);
     for (vector v in vlist) {
+      vname = strdup(v.x.name);
+      *strrchr(vname, '.') = '\0';
       fprintf(file,
               "      <Attribute\n"
               "          Name=\"%s\"\n"
-	      "          AttributeType=\"Vector\"\n"
+              "          AttributeType=\"Vector\"\n"
               "          Center=\"Cell\">\n"
               "        <DataItem\n"
               "            ItemType=\"HyperSlab\"\n"
@@ -133,7 +136,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          <DataItem Dimensions=\"3 2\">\n"
               "            0 %d\n"
               "            1 1\n"
-	      "            %d 3\n"
+              "            %d 3\n"
               "          </DataItem>\n"
               "          <DataItem\n"
               "              Dimensions=\"%d %d\"\n"
@@ -142,8 +145,9 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          </DataItem>\n"
               "         </DataItem>\n"
               "      </Attribute>\n",
-              v.x.name, ncell_total, j, ncell_total,
-	      ncell_total, nattr + 3 * nvect, attr_path);
+              vname, ncell_total, j, ncell_total, ncell_total,
+              nattr + 3 * nvect, attr_path);
+      free(vname);
       j += 3;
     }
     fprintf(file, "    </Grid>\n"

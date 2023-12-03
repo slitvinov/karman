@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "grid/octree.h"
 #include "fractions.h"
@@ -407,7 +408,7 @@ event init(t = 0) {
   }
 }
 event velocity(i++; t <= tend) {
-  char htg[FILENAME_MAX];
+  char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
   scalar omega[], m[];
   static FILE *fp;
@@ -419,9 +420,9 @@ event velocity(i++; t <= tend) {
         fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      sprintf(htg, "%s.%09ld.htg", output_prefix, iframe);
+      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
       vorticity(u, omega);
-      output_xdmf({p, omega, cs}, {u}, htg);
+      output_xdmf({p, omega, cs}, {u}, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "output_xdmf.h"
