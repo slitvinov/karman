@@ -7,6 +7,7 @@
 #include "fractions.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
+#include "tracer.h"
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
@@ -141,9 +142,14 @@ trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   *Fmu = Fmus;
 }
 
+scalar f[];
+face vector muv[];
+scalar * tracers = {f};
+
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
+f[left]    = dirichlet(y < 0);
 
 u.n[right] = neumann(0);
 p[right] = dirichlet(0);
@@ -152,7 +158,6 @@ pf[right] = dirichlet(0);
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 
-face vector muv[];
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
@@ -422,7 +427,7 @@ event velocity(i++; t <= tend) {
     if (output_prefix != NULL) {
       sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
       vorticity(u, omega);
-      output_xdmf({p, omega, cs}, {u}, xdmf);
+      output_xdmf({p, omega, f}, {u}, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
