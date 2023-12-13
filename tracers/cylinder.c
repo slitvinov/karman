@@ -3,15 +3,9 @@
 #include <string.h>
 #include "embed.h"
 #include "navier-stokes/centered.h"
-<<<<<<< HEAD
-#include "output_htg.h"
-#include "tracer.h"
-
-static const double diameter = 0.5;
-=======
 #include "output_xdmf.h"
-static const double diameter = 0.125;
->>>>>>> 8e162cbfbb4faf0b040b5f183a55ea05851fafc4
+#include "tracer.h"
+static const double diameter = 0.5;
 static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Image, Surface, Verbose;
@@ -189,12 +183,8 @@ event dump(i++; t <= tend) {
     }
 
     vorticity(u, omega);
-<<<<<<< HEAD
-    // output_htg({p, omega, f}, {u}, htg);
-=======
     sprintf(xdmf, "h.%09ld", iframe);
-    output_xdmf({p, omega}, {u}, xdmf);
->>>>>>> 8e162cbfbb4faf0b040b5f183a55ea05851fafc4
+    output_xdmf({p, omega, f}, {u}, xdmf);
     if (Image) {
       foreach ()
         m[] = cs[] - 0.5;
