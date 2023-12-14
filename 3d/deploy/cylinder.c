@@ -19360,8 +19360,9 @@ static int tracer_diffusion_0(const int i,const double t,Event *_ev){;return 0;}
 #line 11 "cylinder.c"
 #line 1 "output_xdmf.h"
 #line 1 "./output_xdmf.h"
-int output_xdmf(scalar *list, vector *vlist, const char *path) {
-
+static int output_xdmf(scalar *list, vector *vlist,
+                       int cond(double, double, double, double),
+                       const char *path) {
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
@@ -19381,13 +19382,14 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   ncell = 0;
   j = 0;
   xyz = NULL;
-  {foreach_cell() if (is_local(cell) && is_leaf(cell) && (z <= 0 && z + Delta >= 0)) {
+  {foreach_cell() if (is_local(cell) && is_leaf(cell) &&
+                     (!cond || cond(x, y, z, Delta))) {
     int i, cx, cy, cz;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
       if ((xyz = prealloc(xyz, 8 * 3 * nsize * sizeof *xyz,__func__,__FILE__,__LINE__)) == NULL) {
-        fprintf(ferr, "%s:%d: realloc failed\n", "./output_xdmf.h", 28);
+        fprintf(ferr, "%s:%d: realloc failed\n", "./output_xdmf.h", 30);
         return 1;
       }
     }
@@ -19399,7 +19401,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   }end_foreach_cell();}
 
   if ((file = fopen(xyz_path, "w")) == NULL) {
-    fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 40, xyz_path);
+    fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 42, xyz_path);
     return 1;
   }
 
@@ -19415,11 +19417,12 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   nattr = list_len(list);
   nvect = vectors_len(vlist);
   if ((attr = pmalloc((nattr + 3 * nvect) * ncell * sizeof *attr,__func__,__FILE__,__LINE__)) == NULL) {
-    fprintf(ferr, "%s:%d: malloc failed\n", "./output_xdmf.h", 56);
+    fprintf(ferr, "%s:%d: malloc failed\n", "./output_xdmf.h", 58);
     return 1;
   }
   j = 0;
-  {foreach_cell() if (is_local(cell) && is_leaf(cell) && (z <= 0 && z + Delta >= 0)) {
+  {foreach_cell() if (is_local(cell) && is_leaf(cell) &&
+                     (!cond || cond(x, y, z, Delta))) {
     {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       attr[j++] = val(s,0,0,0);}}
     {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
@@ -19428,7 +19431,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
       attr[j++] = val(v.z,0,0,0);
     }}}
   }end_foreach_cell();}
-  if (!(j == (nattr + 3 * nvect) * ncell)) qassert ("./output_xdmf.h", 69, "j == (nattr + 3 * nvect) * ncell");
+  if (!(j == (nattr + 3 * nvect) * ncell)) qassert ("./output_xdmf.h", 72, "j == (nattr + 3 * nvect) * ncell");
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
@@ -19440,7 +19443,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   if (pid() == npe() - 1) {
     ncell_total = offset + ncell;
     if ((file = fopen(xdmf_path, "w")) == NULL) {
-      fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 81,
+      fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 84,
               xdmf_path);
       return 1;
     }
@@ -19515,7 +19518,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
                   "  </Domain>\n"
                   "</Xdmf>\n");
     if (fclose(file) != 0) {
-      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 156,
+      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 159,
               xdmf_path);
       return 1;
     }
@@ -20506,6 +20509,10 @@ static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
 static float *stl_ver;
 static uint32_t stl_nt;
+static int slice(double x, double y, double z, double Delta) {
+  return z <= 0 && z + Delta >= 0;
+}
+
 static double vec_dot(const double a[3], const double b[3]) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
@@ -20609,7 +20616,7 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
       else if (val(cs,-i,0,0))
         val += fabs(p.x) * (val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 117
+#line 121
 {
       int i = sign(p.y);
       if (val(cs,0,i,0))
@@ -20617,7 +20624,7 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
       else if (val(cs,0,-i,0))
         val += fabs(p.y) * (val(s,0,0,0) - val(s,0,-i,0));
     } 
-#line 117
+#line 121
 {
       int i = sign(p.z);
       if (val(cs,0,0,i))
@@ -20630,7 +20637,7 @@ double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(i
 }
 
 
-#line 101
+#line 105
 static void _stencil_embed_interpolate3(Point point, scalar s,_stencil_undefined * p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
   
   
@@ -20641,10 +20648,10 @@ _stencil_val(cs,
     
     
     
-#line 107
+#line 111
 o_stencil,0,0); _stencil_val(cs,0,o_stencil,0 ); _stencil_val(cs,o_stencil,o_stencil,0 ); _stencil_val(cs,0, 0,o_stencil ); _stencil_val(cs,o_stencil, 0,o_stencil );
       _stencil_val(cs,0,o_stencil, o_stencil ); _stencil_val(cs,o_stencil,o_stencil, o_stencil );
-#line 107
+#line 111
 { 
 {
 _stencil_val(s,0,0,0);_stencil_val(s, o_stencil,0,0);
@@ -20659,7 +20666,7 @@ _stencil_val(s,0,o_stencil, o_stencil ); _stencil_val(s,o_stencil,o_stencil, o_s
               
     
   
-#line 115
+#line 119
 } {  
      _stencil_val(s,0,0,0);
      {   
@@ -20671,9 +20678,9 @@ _stencil_val(cs,o_stencil,0,0);{
        
       
     
-#line 123
+#line 127
 } 
-#line 117
+#line 121
 {   
       
 _stencil_val(cs,0,o_stencil,0);{
@@ -20683,9 +20690,9 @@ _stencil_val(cs,0,o_stencil,0);{
        
       
     
-#line 123
+#line 127
 } 
-#line 117
+#line 121
 {   
       
 _stencil_val(cs,0,0,o_stencil);{
@@ -20695,17 +20702,17 @@ _stencil_val(cs,0,0,o_stencil);{
        
       
     
-#line 123
+#line 127
 } 
     
   }}
           
 
-#line 126
+#line 130
 }
 
       void embed_force3(scalar p, vector u, vector mu, coord *Fp,
-                        coord *Fmu) {tracing("embed_force3","cylinder.c",128);
+                        coord *Fmu) {tracing("embed_force3","cylinder.c",132);
   coord Fps = {0}, Fmus = {0};
   foreach_stencil ()
     {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
@@ -20719,7 +20726,7 @@ _stencil_val(cs,0,0,o_stencil);{
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : Fmus)reduction(+ : Fps)){
-#line 131
+#line 135
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
       coord n, b;
@@ -20732,10 +20739,10 @@ foreach ()
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 139
+#line 143
 *Fp = Fps;
   *Fmu = Fmus;
-end_tracing("embed_force3","cylinder.c",141);}
+end_tracing("embed_force3","cylinder.c",145);}
 
 scalar  f={15};
 vector  muv={{16},{17},{18}};
@@ -20754,10 +20761,10 @@ static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary14(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary14_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 
 int main(int argc, char **argv) {
-#line 351
+#line 355
 _init_solver();
   
-#line 160
+#line 164
 char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
   uint32_t stl_i;
@@ -20951,21 +20958,21 @@ char *end;
   run();
 free_solver();
 
-#line 351
+#line 355
 }
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 352
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",352); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",352);return 0;}end_tracing("properties_0","cylinder.c",352);}
+#line 356
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",356); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",356);return 0;}end_tracing("properties_0","cylinder.c",356);}
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
-#line 353
-      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",353); {
-  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 354); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.8 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
+#line 357
+      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",357); {
+  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 358); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.8 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
   if (stl_path) {
     scalar  phi=new_vertex_scalar("phi");
     _attribute[phi.i].refine = _attribute[phi.i].prolongation = fraction_refine;
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 358); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 362); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
                             ;
     predicate_ini();
     foreach_vertex_stencil() {
@@ -21010,10 +21017,10 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
                 
                    
     
-#line 400
+#line 404
 }end_foreach_vertex_stencil();
     {
-#line 361
+#line 365
 foreach_vertex() {
       if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
           sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
@@ -21067,7 +21074,7 @@ foreach_vertex() {
       if (s.nf == 0)
         break;
     }
-
+    fractions_cleanup((struct Cleanup){cs, fs});
   }
   foreach_stencil () {
     _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
@@ -21075,17 +21082,17 @@ foreach_vertex() {
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 416
+#line 420
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
     val(u.z,0,0,0) = 0;
   }end_foreach();}
-}{end_tracing("init_0","cylinder.c",421);return 0;}end_tracing("init_0","cylinder.c",421);}
+}{end_tracing("init_0","cylinder.c",425);return 0;}end_tracing("init_0","cylinder.c",425);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 422
-      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",422); {
+#line 426
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",426); {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
   scalar  omega=new_scalar("omega"),  m=new_scalar("m");
@@ -21098,9 +21105,11 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
         fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
       vorticity(u, omega);
-      output_xdmf(((scalar[]){p, omega, f, cs,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), xdmf);
+      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
+      output_xdmf(((scalar[]){p, omega, f, cs,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), NULL, xdmf);
+      sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
+      output_xdmf(((scalar[]){p, omega, f, cs,{-1}}),((vector[]) {u,{{-1},{-1},{-1}}}), slice, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
@@ -21128,11 +21137,12 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   astats s = adapt_wavelet((struct Adapt){(scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){3e-2, 3e-2, 3e-2},
                            .maxlevel = maxlevel, .minlevel = minlevel});
   do { static const int too_fine = 1 << user; {foreach_cell() { if (is_leaf(cell)) continue; if (is_local(cell) && (!(x < X0 + 0.8 * L0))) cell.flags |= too_fine; }end_foreach_cell();} for (int _l = depth(); _l >= 0; _l--) { {foreach_cell() { if (is_leaf(cell)) continue; if (level == _l) { if (is_local(cell) && (cell.flags & too_fine)) { coarsen_cell (point, all); cell.flags &= ~too_fine; } continue; } }end_foreach_cell();} mpi_boundary_coarsen (_l, too_fine); } mpi_boundary_update (all); } while (0);
+  fractions_cleanup((struct Cleanup){cs, fs});
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
   iframe++;delete((scalar*)((scalar[]){m,omega,{-1}}));
-}{end_tracing("velocity","cylinder.c",469);return 0;}end_tracing("velocity","cylinder.c",469);}
+}{end_tracing("velocity","cylinder.c",476);return 0;}end_tracing("velocity","cylinder.c",476);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -21176,10 +21186,10 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
 #line 25 "/home/lisergey/basilisk/src/tracer.h"
 event_register((Event){0,1,defaults_2,{defaults_2_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/tracer.h",25,"defaults"});  
-#line 353 "cylinder.c"
-event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",353,"init"});  
-#line 422
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",422,"velocity"});
+#line 357 "cylinder.c"
+event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",357,"init"});  
+#line 426
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",426,"velocity"});
 	
 	
 	
@@ -21255,8 +21265,8 @@ event_register((Event){0,1,tracer_advection_0,{tracer_advection_0_expr0},((int *
 
 
 event_register((Event){0,1,tracer_diffusion_0,{tracer_diffusion_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/tracer.h",50,"tracer_diffusion"});  
-#line 352 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",352,"properties"});
+#line 356 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",356,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
