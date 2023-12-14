@@ -344,8 +344,8 @@ int main(int argc, char **argv) {
       exit(1);
     }
   }
-  size(5);
-  origin(-2, -L0 / 2.0, -L0 / 2.0);
+  size(50);
+  origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << outlevel);
   mu = muv;
   periodic(top);
@@ -355,8 +355,9 @@ event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
   vertex scalar phi[];
   refine(x < X0 + 0.8 * L0 && level < minlevel);
-  refine(sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-         sq(x) + sq(y) >= sq(0.75 * diameter / 2) && level < maxlevel);
+  refine(sq(x) + sq(y) <= sq(diameter) &&
+	 sq(x) + sq(y) >= sq(diameter / 2) &&
+         level < maxlevel);
   if (stl_path) {
     predicate_ini();
     foreach_vertex() {
@@ -404,7 +405,6 @@ event init(t = 0) {
     free(stl_ver);
   } else
     foreach_vertex() phi[] = sq(x) + sq(y) - sq(diameter / 2);
-
   fractions(phi, cs, fs);
   fractions_cleanup(cs, fs);
   foreach () {
