@@ -13,7 +13,7 @@
 #include "predicate_c.h"
 
 static const char *force_path, *output_prefix, *stl_path;
-static const double diameter = 2;
+static const double diameter = 1;
 static const int outlevel = 2;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
@@ -348,6 +348,7 @@ int main(int argc, char **argv) {
   origin(-2, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << outlevel);
   mu = muv;
+  periodic(top);
   run();
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
