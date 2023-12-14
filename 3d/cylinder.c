@@ -440,7 +440,7 @@ event velocity(i++; t <= tend) {
       sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
       output_xdmf({p, omega, f, cs}, {u}, NULL, xdmf);
       sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
-      output_xdmf({p, omega, f, cs}, {u}, NULL, xdmf);
+      output_xdmf({p, omega, f, cs}, {u}, slice, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
