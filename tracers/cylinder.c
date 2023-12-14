@@ -3,18 +3,13 @@
 #include <string.h>
 #include "embed.h"
 #include "navier-stokes/centered.h"
-<<<<<<< HEAD
-#include "output_htg.h"
-#include "tracer.h"
-
-static const double diameter = 0.5;
-=======
 #include "output_xdmf.h"
-static const double diameter = 0.125;
->>>>>>> 8e162cbfbb4faf0b040b5f183a55ea05851fafc4
+#include "tracer.h"
+static const double diameter = 0.5;
 static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Image, Surface, Verbose;
+static const char *output_prefix;
 scalar f[];
 scalar * tracers = {f};
 u.n[left] = dirichlet(1);
@@ -39,6 +34,7 @@ int main(int argc, char **argv) {
   Image = 0;
   Verbose = 0;
   TendFlag = 0;
+  output_prefix = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -55,6 +51,7 @@ int main(int argc, char **argv) {
           "  -l <resolution level>    the resolution level (positive integer)\n"
           "  -p <dump period>         the dump period (positive integer)\n"
           "  -e <end time>            end time of the simulation (decimal "
+          "  -o <preifx>              a prefix for the .raw output files\n"
           "number)\n"
           "\n"
           "Example usage:\n"
@@ -119,6 +116,14 @@ int main(int argc, char **argv) {
         exit(1);
       }
       TendFlag = 1;
+      break;
+    case 'o':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -o needs an argument\n");
+        exit(1);
+      }
+      output_prefix = *argv;
       break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -189,12 +194,11 @@ event dump(i++; t <= tend) {
     }
 
     vorticity(u, omega);
-<<<<<<< HEAD
-    // output_htg({p, omega, f}, {u}, htg);
-=======
-    sprintf(xdmf, "h.%09ld", iframe);
-    output_xdmf({p, omega}, {u}, xdmf);
->>>>>>> 8e162cbfbb4faf0b040b5f183a55ea05851fafc4
+    if (output_prefix != NULL) {
+      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
+      vorticity(u, omega);
+      output_xdmf({p, omega, f}, {u}, xdmf);
+    }
     if (Image) {
       foreach ()
         m[] = cs[] - 0.5;
