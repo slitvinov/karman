@@ -7,6 +7,7 @@
 #include "fractions.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
+#include "lambda2.h"
 #include "tracer.h"
 #include "output_xdmf.h"
 #include "predicate.h"
@@ -426,7 +427,7 @@ event init(t = 0) {
 event velocity(i++; t <= tend) {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
-  scalar omega[], m[];
+  scalar omega[], l2[];
   static FILE *fp;
   static long iframe = 0;
   if (iframe % period == 0) {
@@ -437,10 +438,11 @@ event velocity(i++; t <= tend) {
     }
     if (output_prefix != NULL) {
       vorticity(u, omega);
+      lambda2(u, l2);
       sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
-      output_xdmf({p, omega, f, cs}, {u}, NULL, xdmf);
+      output_xdmf({p, omega, f, cs, l2}, {u}, NULL, xdmf);
       sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
-      output_xdmf({p, omega, f, cs}, {u}, slice, xdmf);
+      output_xdmf({p, omega, f, cs, l2}, {u}, slice, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
