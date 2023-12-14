@@ -18,6 +18,10 @@ static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
 static float *stl_ver;
 static uint32_t stl_nt;
+static int slice(double x, double y, double z, double Delta) {
+  return z <= 0 && z + Delta >= 0;
+}
+
 static double vec_dot(const double a[3], const double b[3]) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
@@ -432,9 +436,11 @@ event velocity(i++; t <= tend) {
         fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
       vorticity(u, omega);
-      output_xdmf({p, omega, f, cs}, {u}, xdmf);
+      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
+      output_xdmf({p, omega, f, cs}, {u}, NULL, xdmf);
+      sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
+      output_xdmf({p, omega, f, cs}, {u}, NULL, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);

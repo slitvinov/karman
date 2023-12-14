@@ -1,5 +1,6 @@
-int output_xdmf(scalar *list, vector *vlist, const char *path) {
-#define cond (z <= 0 && z + Delta >= 0)
+static int output_xdmf(scalar *list, vector *vlist,
+                       int cond(double, double, double, double),
+                       const char *path) {
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
@@ -19,7 +20,8 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   ncell = 0;
   j = 0;
   xyz = NULL;
-  foreach_cell() if (is_local(cell) && is_leaf(cell) && cond) {
+  foreach_cell() if (is_local(cell) && is_leaf(cell) &&
+                     (!cond || cond(x, y, z, Delta))) {
     int i, cx, cy, cz;
     ncell++;
     if (ncell >= nsize) {
@@ -57,7 +59,8 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     return 1;
   }
   j = 0;
-  foreach_cell() if (is_local(cell) && is_leaf(cell) && cond) {
+  foreach_cell() if (is_local(cell) && is_leaf(cell) &&
+                     (!cond || cond(x, y, z, Delta))) {
     for (scalar s in list)
       attr[j++] = val(s);
     for (vector v in vlist) {
