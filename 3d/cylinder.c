@@ -378,7 +378,8 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
-  refine(x < X0 + 0.8 * L0 && level < minlevel);
+  refine(level < minlevel);
+  unrefine(x >= X0 + 0.8 * L0);
   if (stl_path) {
     vertex scalar phi[];
     phi.refine = phi.prolongation = fraction_refine;
@@ -492,7 +493,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
-  unrefine(!(x < X0 + 0.8 * L0));
+  unrefine(x >= X0 + 0.8 * L0);
   fractions_cleanup(cs, fs);
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
