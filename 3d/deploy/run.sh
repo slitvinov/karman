@@ -6,8 +6,9 @@
 module load daint-mc
 module load cray-mpich
 
+set -x
 make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
-    r=2000
-    mkdir -p ${r}b
-    srun ./cylinder -v -r $r -l 8 -m 11 -p 100 -e 2600 -f ${r}b/force.dat -o ${r}b/h
+    r=$1
+    mkdir -p $r
+    srun ./cylinder -v -r $r -l 8 -m 12 -p 100 -e 2600 -f $r/force.dat -o $r/h
 }
