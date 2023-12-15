@@ -167,8 +167,9 @@ static void vorticity_vector(const vector u, vector omega) {
     omega.z[] = (dot3(fx, yx) - dot3(fy, xy))/delta;
   }
 }
-
-scalar f[];
+vertex scalar phi[];
+vector omega[];
+scalar l2[], f[];
 face vector muv[];
 scalar *tracers = {f};
 
@@ -378,10 +379,8 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
-  restriction({cs, fs});
   refine(x < X0 + 0.8 * L0 && level < minlevel);
   if (stl_path) {
-    vertex scalar phi[];
     phi.refine = phi.prolongation = fraction_refine;
     refine(sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) &&
            level < maxlevel);
@@ -450,8 +449,6 @@ event init(t = 0) {
 event velocity(i++; t <= tend) {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
-  vector omega[];
-  scalar l2[];
   static FILE *fp;
   static long iframe = 0;
   if (iframe % period == 0) {
