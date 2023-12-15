@@ -1,10 +1,11 @@
 #!/bin/sh
 . /etc/profile
-module load gcc mpich
+module load intel intelmpi
 
 set -x
-make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
-    r=$1
-    mkdir -p $r
-    srun ./cylinder -v -r $r -l 8 -m 12 -p 100 -e 2600 -f $r/force.dat -o $r/h
+r=$1
+d=$SCRATCH/koumoutsakos_lab/slitvinov/$r
+make 'MPICCFLAGS = -O2 -g' && {
+    mkdir -p $d
+    exec srun -n $SLURM_NTASKS --mpi=pmi2 ./cylinder -v -r $r -l 8 -m 12 -p 100 -e 2600 -f $d/force.dat -o $d/h
 }
