@@ -431,7 +431,7 @@ event init(t = 0) {
   } else {
     for (;;) {
       solid(cs, fs, sq(x) + sq(y) - sq(diameter / 2));
-      astats s = adapt_wavelet({cs}, (double[]){3e-3}, maxlevel = maxlevel,
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
                                minlevel = minlevel);
       if (Verbose && pid() == 0)
         fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
@@ -493,9 +493,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
-  fractions_cleanup(cs, fs);
   unrefine(!(x < X0 + 0.9 * L0));
-  fractions_cleanup(cs, fs);
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
