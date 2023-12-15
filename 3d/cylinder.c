@@ -373,13 +373,13 @@ int main(int argc, char **argv) {
   }
   size(50);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
-  init_grid(1 << outlevel);
+  init_grid(minlevel);
   mu = muv;
   run();
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
-  refine(x < X0 + 0.8 * L0 && level < minlevel);
+  //refine(x < X0 + 0.8 * L0 && level < minlevel);
   if (stl_path) {
     phi.refine = phi.prolongation = fraction_refine;
     refine(sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) &&

@@ -21227,7 +21227,7 @@ char *end;
   }
   size(50);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
-  init_grid(1 << outlevel);
+  init_grid(minlevel);
   mu = muv;
   run();
 free_solver();
@@ -21242,7 +21242,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
 #line 381
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",381); {
-  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 382); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.8 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
+
   if (stl_path) {
     _attribute[phi.i].refine = _attribute[phi.i].prolongation = fraction_refine;
     do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 385); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
