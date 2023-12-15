@@ -1,6 +1,6 @@
 static int output_xdmf(scalar *list, vector *vlist,
-                       int cond(double, double, double, double),
-                       const char *path) {
+		       int cond(double, double, double, double),
+		       const char *path) {
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
@@ -17,11 +17,11 @@ static int output_xdmf(scalar *list, vector *vlist,
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
 
   xyz_base = xyz_path;
-  attr_base = xyz_path;
+  attr_base = attr__path;
   for (j = 0; xyz_path[j] != '\0'; j++) {
     if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
       xyz_base = &xyz_path[j + 1];
-      attr_base = &xyz_path[j + 1];	
+      attr_base = &attr_path[j + 1];
     }
   }
 
@@ -30,14 +30,14 @@ static int output_xdmf(scalar *list, vector *vlist,
   j = 0;
   xyz = NULL;
   foreach_cell() if (is_local(cell) && is_leaf(cell) &&
-                     (!cond || cond(x, y, z, Delta))) {
+		     (!cond || cond(x, y, z, Delta))) {
     int i, cx, cy, cz;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
       if ((xyz = realloc(xyz, 8 * 3 * nsize * sizeof *xyz)) == NULL) {
-        fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
-        return 1;
+	fprintf(stderr, "%s:%d: realloc failed\n", __FILE__, __LINE__);
+	return 1;
       }
     }
     for (i = 0; i < 8; i++) {
@@ -54,10 +54,10 @@ static int output_xdmf(scalar *list, vector *vlist,
 
   MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
-                MPI_INFO_NULL, &mpi_file);
+		MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, 3 * 8 * offset * sizeof *xyz, xyz,
-                        3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
-                        MPI_STATUS_IGNORE);
+			3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
+			MPI_STATUS_IGNORE);
   free(xyz);
   MPI_File_close(&mpi_file);
 
@@ -69,7 +69,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   }
   j = 0;
   foreach_cell() if (is_local(cell) && is_leaf(cell) &&
-                     (!cond || cond(x, y, z, Delta))) {
+		     (!cond || cond(x, y, z, Delta))) {
     for (scalar s in list)
       attr[j++] = val(s);
     for (vector v in vlist) {
@@ -80,10 +80,10 @@ static int output_xdmf(scalar *list, vector *vlist,
   }
   assert(j == (nattr + 3 * nvect) * ncell);
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
-                MPI_INFO_NULL, &mpi_file);
+		MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
-                        attr, (nattr + 3 * nvect) * ncell * sizeof *attr,
-                        MPI_BYTE, MPI_STATUS_IGNORE);
+			attr, (nattr + 3 * nvect) * ncell * sizeof *attr,
+			MPI_BYTE, MPI_STATUS_IGNORE);
   free(attr);
   MPI_File_close(&mpi_file);
 
@@ -91,82 +91,82 @@ static int output_xdmf(scalar *list, vector *vlist,
     ncell_total = offset + ncell;
     if ((file = fopen(xdmf_path, "w")) == NULL) {
       fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
-              xdmf_path);
+	      xdmf_path);
       return 1;
     }
     fprintf(file,
-            "<Xdmf\n"
-            "    Version=\"2\">\n"
-            "  <Domain>\n"
-            "    <Grid>\n"
-            "      <Topology\n"
-            "          TopologyType=\"Hexahedron\"\n"
-            "          Dimensions=\"%d\"/>\n"
-            "      <Geometry>\n"
-            "        <DataItem\n"
-            "            Dimensions=\"%d 3\"\n"
-            "            Format=\"Binary\">\n"
-            "          %s\n"
-            "        </DataItem>\n"
-            "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_base);
+	    "<Xdmf\n"
+	    "    Version=\"2\">\n"
+	    "  <Domain>\n"
+	    "    <Grid>\n"
+	    "      <Topology\n"
+	    "          TopologyType=\"Hexahedron\"\n"
+	    "          Dimensions=\"%d\"/>\n"
+	    "      <Geometry>\n"
+	    "        <DataItem\n"
+	    "            Dimensions=\"%d 3\"\n"
+	    "            Format=\"Binary\">\n"
+	    "          %s\n"
+	    "        </DataItem>\n"
+	    "      </Geometry>\n",
+	    ncell_total, 8 * ncell_total, xyz_base);
     j = 0;
     for (scalar s in list)
       fprintf(file,
-              "      <Attribute\n"
-              "          Name=\"%s\"\n"
-              "          Center=\"Cell\">\n"
-              "        <DataItem\n"
-              "            ItemType=\"HyperSlab\"\n"
-              "            Dimensions=\"%d\"\n"
-              "            Type=\"HyperSlab\">\n"
-              "          <DataItem Dimensions=\"3 1\">\n"
-              "            %d %d %d\n"
-              "          </DataItem>\n"
-              "          <DataItem\n"
-              "              Dimensions=\"%d\"\n"
-              "              Format=\"Binary\">\n"
-              "            %s\n"
-              "          </DataItem>\n"
-              "         </DataItem>\n"
-              "      </Attribute>\n",
-              s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
-              (nattr + 3 * nvect) * ncell_total, attr_base);
+	      "      <Attribute\n"
+	      "          Name=\"%s\"\n"
+	      "          Center=\"Cell\">\n"
+	      "        <DataItem\n"
+	      "            ItemType=\"HyperSlab\"\n"
+	      "            Dimensions=\"%d\"\n"
+	      "            Type=\"HyperSlab\">\n"
+	      "          <DataItem Dimensions=\"3 1\">\n"
+	      "            %d %d %d\n"
+	      "          </DataItem>\n"
+	      "          <DataItem\n"
+	      "              Dimensions=\"%d\"\n"
+	      "              Format=\"Binary\">\n"
+	      "            %s\n"
+	      "          </DataItem>\n"
+	      "         </DataItem>\n"
+	      "      </Attribute>\n",
+	      s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
+	      (nattr + 3 * nvect) * ncell_total, attr_base);
     for (vector v in vlist) {
       vname = strdup(v.x.name);
       *strrchr(vname, '.') = '\0';
       fprintf(file,
-              "      <Attribute\n"
-              "          Name=\"%s\"\n"
-              "          AttributeType=\"Vector\"\n"
-              "          Center=\"Cell\">\n"
-              "        <DataItem\n"
-              "            ItemType=\"HyperSlab\"\n"
-              "            Dimensions=\"%d 3\"\n"
-              "            Type=\"HyperSlab\">\n"
-              "          <DataItem Dimensions=\"3 2\">\n"
-              "            0 %d\n"
-              "            1 1\n"
-              "            %d 3\n"
-              "          </DataItem>\n"
-              "          <DataItem\n"
-              "              Dimensions=\"%d %d\"\n"
-              "              Format=\"Binary\">\n"
-              "            %s\n"
-              "          </DataItem>\n"
-              "         </DataItem>\n"
-              "      </Attribute>\n",
-              vname, ncell_total, j, ncell_total, ncell_total,
-              nattr + 3 * nvect, attr_path);
+	      "      <Attribute\n"
+	      "          Name=\"%s\"\n"
+	      "          AttributeType=\"Vector\"\n"
+	      "          Center=\"Cell\">\n"
+	      "        <DataItem\n"
+	      "            ItemType=\"HyperSlab\"\n"
+	      "            Dimensions=\"%d 3\"\n"
+	      "            Type=\"HyperSlab\">\n"
+	      "          <DataItem Dimensions=\"3 2\">\n"
+	      "            0 %d\n"
+	      "            1 1\n"
+	      "            %d 3\n"
+	      "          </DataItem>\n"
+	      "          <DataItem\n"
+	      "              Dimensions=\"%d %d\"\n"
+	      "              Format=\"Binary\">\n"
+	      "            %s\n"
+	      "          </DataItem>\n"
+	      "         </DataItem>\n"
+	      "      </Attribute>\n",
+	      vname, ncell_total, j, ncell_total, ncell_total,
+	      nattr + 3 * nvect, attr_path);
       free(vname);
       j += 3;
     }
     fprintf(file, "    </Grid>\n"
-                  "  </Domain>\n"
-                  "</Xdmf>\n");
+		  "  </Domain>\n"
+		  "</Xdmf>\n");
     if (fclose(file) != 0) {
       fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
-              xdmf_path);
+	      xdmf_path);
       return 1;
     }
   }
