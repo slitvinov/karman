@@ -1,7 +1,5 @@
 #!/bin/sh
 #SBATCH --constraint gpu
-#SBATCH --ntasks 2
-#SBATCH --time 1
 #SBATCH --account s1160
 
 . /etc/profile
