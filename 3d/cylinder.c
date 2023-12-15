@@ -13,7 +13,7 @@
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
-static const char *force_path, *output_prefix, *stl_path;
+static const char *force_path, *output_prefix, *stl_path, *dump_path;
 static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
@@ -189,8 +189,6 @@ u.t[embed] = dirichlet(0);
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
-  uint32_t stl_i;
-  FILE *stl_file;
   ReynoldsFlag = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -199,6 +197,7 @@ int main(int argc, char **argv) {
   TendFlag = 0;
   output_prefix = NULL;
   force_path = NULL;
+  dump_path = NULL;
   stl_path = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -285,6 +284,14 @@ int main(int argc, char **argv) {
     case 'v':
       Verbose = 1;
       break;
+    case 'd':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -d needs an argument\n");
+        exit(1);
+      }
+      dump_path = *argv;
+      break;
     case 'e':
       argv++;
       if (*argv == NULL) {
@@ -346,105 +353,112 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  if (stl_path) {
-    if ((stl_file = fopen(stl_path, "r")) == NULL) {
-      fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
-      exit(1);
-    }
-    fseek(stl_file, 80, SEEK_SET);
-    if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
-      fprintf(stderr, "cylinder: error: fail to doubled '%s'\n", stl_path);
-      exit(1);
-    }
-    stl_ver = malloc(9 * stl_nt * sizeof *stl_ver);
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
-    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-      fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
-      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
-        fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
-        exit(1);
-      }
-      fseek(stl_file, 2, SEEK_CUR);
-    }
-    if (fclose(stl_file) != 0) {
-      fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
-      exit(1);
-    }
-  }
   size(50);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
-  init_grid(1 << outlevel);
   mu = muv;
   run();
 }
 
 event init(t = 0) {
-  refine(x < X0 + 0.9 * L0 && level < minlevel);
-  if (stl_path) {
-    phi.refine = phi.prolongation = fraction_refine;
-    refine(sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) &&
-           level < maxlevel);
-    predicate_ini();
-    foreach_vertex() {
-      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-          sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
-        double minimum;
-        uint32_t intersect;
-        uint32_t stl_i, j;
-        double a[3], b[3], c[3], e[3], s[3], dist2;
-        intersect = 0;
-        minimum = DBL_MAX;
-        for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-          j = 9 * stl_i;
-          a[0] = stl_ver[j];
-          a[1] = stl_ver[j + 1];
-          a[2] = stl_ver[j + 2];
+  uint32_t stl_i;
+  FILE *stl_file;
 
-          b[0] = stl_ver[j + 3];
-          b[1] = stl_ver[j + 4];
-          b[2] = stl_ver[j + 5];
-
-          c[0] = stl_ver[j + 6];
-          c[1] = stl_ver[j + 7];
-          c[2] = stl_ver[j + 8];
-
-          s[0] = x;
-          s[1] = y;
-          s[2] = z;
-
-          e[0] = s[0];
-          e[1] = s[1];
-          e[2] = s[2] + 2 * L0;
-
-          dist2 = tri_point_distance2(a, b, c, s);
-          if (dist2 < minimum)
-            minimum = dist2;
-          intersect += predicate_ray(s, e, a, b, c);
-        }
-        phi[] = intersect % 2 ? -dist2 : dist2;
-      } else
-        phi[] = 0.25 * diameter / 2;
-    }
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: exported geomtry\n");
-    free(stl_ver);
-  } else {
-    for (;;) {
-      solid(cs, fs, sq(x) + sq(y) - sq(diameter / 2));
-      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
-                               minlevel = minlevel);
+  if (dump_path == NULL) {
+    init_grid(1 << outlevel);
+    refine(x < X0 + 0.9 * L0 && level < minlevel);
+    if (stl_path) {
+      if ((stl_file = fopen(stl_path, "r")) == NULL) {
+        fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
+        exit(1);
+      }
+      fseek(stl_file, 80, SEEK_SET);
+      if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+        fprintf(stderr, "cylinder: error: fail to doubled '%s'\n", stl_path);
+        exit(1);
+      }
+      stl_ver = malloc(9 * stl_nt * sizeof *stl_ver);
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
-      if (s.nf == 0)
-        break;
+        fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
+      for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+        fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
+        if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+          fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
+          exit(1);
+        }
+        fseek(stl_file, 2, SEEK_CUR);
+      }
+      if (fclose(stl_file) != 0) {
+        fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
+        exit(1);
+      }
+      phi.refine = phi.prolongation = fraction_refine;
+      refine(sq(x) + sq(y) <= sq(diameter) &&
+             sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel);
+      predicate_ini();
+      foreach_vertex() {
+        if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+            sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
+          double minimum;
+          uint32_t intersect;
+          uint32_t stl_i, j;
+          double a[3], b[3], c[3], e[3], s[3], dist2;
+          intersect = 0;
+          minimum = DBL_MAX;
+          for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+            j = 9 * stl_i;
+            a[0] = stl_ver[j];
+            a[1] = stl_ver[j + 1];
+            a[2] = stl_ver[j + 2];
+
+            b[0] = stl_ver[j + 3];
+            b[1] = stl_ver[j + 4];
+            b[2] = stl_ver[j + 5];
+
+            c[0] = stl_ver[j + 6];
+            c[1] = stl_ver[j + 7];
+            c[2] = stl_ver[j + 8];
+
+            s[0] = x;
+            s[1] = y;
+            s[2] = z;
+
+            e[0] = s[0];
+            e[1] = s[1];
+            e[2] = s[2] + 2 * L0;
+
+            dist2 = tri_point_distance2(a, b, c, s);
+            if (dist2 < minimum)
+              minimum = dist2;
+            intersect += predicate_ray(s, e, a, b, c);
+          }
+          phi[] = intersect % 2 ? -dist2 : dist2;
+        } else
+          phi[] = 0.25 * diameter / 2;
+      }
+      if (Verbose && pid() == 0)
+        fprintf(stderr, "cylinder: exported geomtry\n");
+      free(stl_ver);
+    } else {
+      for (;;) {
+        solid(cs, fs, sq(x) + sq(y) - sq(diameter / 2));
+        astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+                                 minlevel = minlevel);
+        if (Verbose && pid() == 0)
+          fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+        if (s.nf == 0)
+          break;
+      }
+      fractions_cleanup(cs, fs);
     }
-    fractions_cleanup(cs, fs);
-  }
-  foreach () {
-    u.x[] = cs[];
-    u.y[] = 0;
-    u.z[] = 0;
+    foreach () {
+      u.x[] = cs[];
+      u.y[] = 0;
+      u.z[] = 0;
+    }
+  } else {
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: reading dump '%s'\n", dump_path);
+    restore(dump_path);
   }
 }
 
@@ -454,8 +468,7 @@ event velocity(i++; t <= tend) {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
-  static long iframe = 0;
-  if (iframe % period == 0) {
+  if (i % period == 0) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
@@ -464,9 +477,9 @@ event velocity(i++; t <= tend) {
     if (output_prefix != NULL) {
       vorticity_vector(u, omega);
       lambda2(u, l2);
-      sprintf(path, "%s.%09ld", output_prefix, iframe);
+      sprintf(path, "%s.%09d", output_prefix, i);
       output_xdmf({p, f, cs, l2}, {u, omega}, NULL, path);
-      sprintf(path, "%s.slice.%09ld", output_prefix, iframe);
+      sprintf(path, "%s.slice.%09d", output_prefix, i);
       output_xdmf({p, f, cs, l2}, {u, omega}, slice, path);
 
       sprintf(path, "%s.dump", output_prefix);
@@ -487,9 +500,9 @@ event velocity(i++; t <= tend) {
           }
         }
         fprintf(fp,
-                "%ld %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
+                "%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
                 "%.16e %.16e\n",
-                iframe, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
+                i, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
                 Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
         fflush(fp);
       }
@@ -498,8 +511,7 @@ event velocity(i++; t <= tend) {
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
   unrefine(!(x < X0 + 0.9 * L0));
-  if (Verbose && iframe % period == 0 && pid() == 0)
+  if (Verbose && i % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
-  iframe++;
 }
