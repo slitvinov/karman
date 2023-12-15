@@ -17,7 +17,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
 
   xyz_base = xyz_path;
-  attr_base = attr__path;
+  attr_base = attr_path;
   for (j = 0; xyz_path[j] != '\0'; j++) {
     if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
       xyz_base = &xyz_path[j + 1];

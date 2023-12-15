@@ -5,8 +5,9 @@
 . /etc/profile
 module load daint-mc
 module load cray-mpich
-make MPICC=cc 'MPICCFLAGS = -O2 -g'
 
-r=220
-mkdir -p $r
-srun ./cylinder -v -r $r -l 8 -m 11 -p 10 -e 2600 -f $r/force.dat -o $r/h
+make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
+    r=220
+    mkdir -p $r
+    srun ./cylinder -v -r $r -l 8 -m 11 -p 10 -e 2600 -f $r/force.dat -o $r/h
+}
