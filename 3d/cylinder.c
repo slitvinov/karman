@@ -1,8 +1,9 @@
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+@include <float.h>
+@include <math.h>
+@include <stdbool.h>
+@include <stdint.h>
+@include <stdlib.h>
+@include <string.h>
 #include "grid/octree.h"
 #include "fractions.h"
 #include "embed.h"
