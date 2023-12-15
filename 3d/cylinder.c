@@ -375,7 +375,6 @@ int main(int argc, char **argv) {
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << outlevel);
   mu = muv;
-  CFL = 0.125;
   run();
 }
 
@@ -494,6 +493,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
+  fractions_cleanup(cs, fs);
   unrefine(!(x < X0 + 0.9 * L0));
   fractions_cleanup(cs, fs);
   if (Verbose && iframe % period == 0 && pid() == 0)
