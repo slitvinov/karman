@@ -1,4 +1,7 @@
 #!/bin/sh
+#SBATCH --partition shared
+#SBATCH --ntasks 1024
+
 . /etc/profile
 module load intel intelmpi
 
