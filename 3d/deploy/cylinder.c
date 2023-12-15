@@ -21227,7 +21227,7 @@ char *end;
   }
   size(50);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
-  init_grid(minlevel);
+  init_grid(1 << minlevel);
   mu = muv;
   run();
 free_solver();
