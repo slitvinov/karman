@@ -375,6 +375,7 @@ int main(int argc, char **argv) {
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   init_grid(1 << outlevel);
   mu = muv;
+  CFL = 0.125;
   run();
 }
 
