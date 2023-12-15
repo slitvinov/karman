@@ -4,7 +4,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
-      *vname;
+    *vname, *xyz_base, *attr_base;
   FILE *file;
   MPI_File mpi_file;
   const int shift[8][3] = {
@@ -15,6 +15,15 @@ static int output_xdmf(scalar *list, vector *vlist,
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
+
+  xyz_base = xyz_path;
+  attr_base = xyz_path;
+  for (j = 0; xyz_path[j] != '\0'; j++) {
+    if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
+      xyz_base = &xyz_path[j + 1];
+      attr_base = &xyz_path[j + 1];	
+    }
+  }
 
   nsize = 0;
   ncell = 0;
@@ -100,7 +109,7 @@ static int output_xdmf(scalar *list, vector *vlist,
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_path);
+            ncell_total, 8 * ncell_total, xyz_base);
     j = 0;
     for (scalar s in list)
       fprintf(file,
@@ -122,7 +131,7 @@ static int output_xdmf(scalar *list, vector *vlist,
               "         </DataItem>\n"
               "      </Attribute>\n",
               s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
-              (nattr + 3 * nvect) * ncell_total, attr_path);
+              (nattr + 3 * nvect) * ncell_total, attr_base);
     for (vector v in vlist) {
       vname = strdup(v.x.name);
       *strrchr(vname, '.') = '\0';

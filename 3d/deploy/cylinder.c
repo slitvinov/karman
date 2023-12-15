@@ -19542,7 +19542,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   float *xyz, *attr;
   int nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
-      *vname;
+    *vname, *xyz_base, *attr_base;
   FILE *file;
   MPI_File mpi_file;
   const int shift[8][3] = {
@@ -19553,6 +19553,15 @@ static int output_xdmf(scalar *list, vector *vlist,
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
+
+  xyz_base = xyz_path;
+  attr_base = xyz_path;
+  for (j = 0; xyz_path[j] != '\0'; j++) {
+    if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
+      xyz_base = &xyz_path[j + 1];
+      attr_base = &xyz_path[j + 1];
+    }
+  }
 
   nsize = 0;
   ncell = 0;
@@ -19565,7 +19574,7 @@ static int output_xdmf(scalar *list, vector *vlist,
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
       if ((xyz = prealloc(xyz, 8 * 3 * nsize * sizeof *xyz,__func__,__FILE__,__LINE__)) == NULL) {
-        fprintf(ferr, "%s:%d: realloc failed\n", "./output_xdmf.h", 30);
+        fprintf(ferr, "%s:%d: realloc failed\n", "./output_xdmf.h", 39);
         return 1;
       }
     }
@@ -19577,7 +19586,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   }end_foreach_cell();}
 
   if ((file = fopen(xyz_path, "w")) == NULL) {
-    fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 42, xyz_path);
+    fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 51, xyz_path);
     return 1;
   }
 
@@ -19593,7 +19602,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   nattr = list_len(list);
   nvect = vectors_len(vlist);
   if ((attr = pmalloc((nattr + 3 * nvect) * ncell * sizeof *attr,__func__,__FILE__,__LINE__)) == NULL) {
-    fprintf(ferr, "%s:%d: malloc failed\n", "./output_xdmf.h", 58);
+    fprintf(ferr, "%s:%d: malloc failed\n", "./output_xdmf.h", 67);
     return 1;
   }
   j = 0;
@@ -19607,7 +19616,7 @@ static int output_xdmf(scalar *list, vector *vlist,
       attr[j++] = val(v.z,0,0,0);
     }}}
   }end_foreach_cell();}
-  if (!(j == (nattr + 3 * nvect) * ncell)) qassert ("./output_xdmf.h", 72, "j == (nattr + 3 * nvect) * ncell");
+  if (!(j == (nattr + 3 * nvect) * ncell)) qassert ("./output_xdmf.h", 81, "j == (nattr + 3 * nvect) * ncell");
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
@@ -19619,7 +19628,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   if (pid() == npe() - 1) {
     ncell_total = offset + ncell;
     if ((file = fopen(xdmf_path, "w")) == NULL) {
-      fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 84,
+      fprintf(ferr, "%s:%d: fail to open '%s'\n", "./output_xdmf.h", 93,
               xdmf_path);
       return 1;
     }
@@ -19638,7 +19647,7 @@ static int output_xdmf(scalar *list, vector *vlist,
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_path);
+            ncell_total, 8 * ncell_total, xyz_base);
     j = 0;
     {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       fprintf(file,
@@ -19660,7 +19669,7 @@ static int output_xdmf(scalar *list, vector *vlist,
               "         </DataItem>\n"
               "      </Attribute>\n",
               _attribute[s.i].name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
-              (nattr + 3 * nvect) * ncell_total, attr_path);}}
+              (nattr + 3 * nvect) * ncell_total, attr_base);}}
     {vector*_i=(vector*)( vlist);if(_i)for(vector v=*_i;(&v)->x.i>=0;v=*++_i){ {
       vname = pstrdup(_attribute[v.x.i].name,__func__,__FILE__,__LINE__);
       *strrchr(vname, '.') = '\0';
@@ -19694,7 +19703,7 @@ static int output_xdmf(scalar *list, vector *vlist,
                   "  </Domain>\n"
                   "</Xdmf>\n");
     if (fclose(file) != 0) {
-      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 159,
+      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 168,
               xdmf_path);
       return 1;
     }

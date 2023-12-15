@@ -9,4 +9,4 @@ make MPICC=cc 'MPICCFLAGS = -O2 -g'
 
 r=220
 mkdir -p $r
-srun ./cylinder -v -r $r -l 8 -m 12 -p 10 -e 2600 -f $r/force.dat -o $r/h
+srun ./cylinder -v -r $r -l 8 -m 11 -p 10 -e 2600 -f $r/force.dat -o $r/h
