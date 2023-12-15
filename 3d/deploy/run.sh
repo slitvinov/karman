@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --constraint daint-mc
+#SBATCH --constraint mc
 #SBATCH --ntasks 2
 #SBATCH --time 1
 #SBATCH --account s1160
