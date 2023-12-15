@@ -5,7 +5,7 @@
 . /etc/profile
 module load daint-mc
 module load cray-mpich
-make MPICC=cc
+make MPICC=cc 'MPICCFLAGS = -O2 -g'
 
 r=220
 mkdir -p $r
