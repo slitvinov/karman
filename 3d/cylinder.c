@@ -445,6 +445,7 @@ event init(t = 0) {
     u.y[] = 0;
     u.z[] = 0;
   }
+  dt = dtnext (timestep (u, DT));
 }
 event velocity(i++; t <= tend) {
   char xdmf[FILENAME_MAX];

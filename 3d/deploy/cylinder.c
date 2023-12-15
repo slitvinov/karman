@@ -21383,11 +21383,12 @@ foreach () {
     val(u.y,0,0,0) = 0;
     val(u.z,0,0,0) = 0;
   }end_foreach();}
-}{end_tracing("init_0","cylinder.c",448);return 0;}end_tracing("init_0","cylinder.c",448);}
+  dt = dtnext (timestep (u, DT));
+}{end_tracing("init_0","cylinder.c",449);return 0;}end_tracing("init_0","cylinder.c",449);}
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
-#line 449
-      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",449); {
+#line 450
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",450); {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -21434,20 +21435,20 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 #line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
 , 
 all
-#line 492 "cylinder.c"
+#line 493 "cylinder.c"
 );
   do { static const int too_fine = 1 << user; {foreach_cell() { if (is_leaf(cell)) continue; if (is_local(cell) && (!(x < X0 + 0.8 * L0))) cell.flags |= too_fine; }end_foreach_cell();} for (int _l = depth(); _l >= 0; _l--) { {foreach_cell() { if (is_leaf(cell)) continue; if (level == _l) { if (is_local(cell) && (cell.flags & too_fine)) { coarsen_cell (point, all); cell.flags &= ~too_fine; } continue; } }end_foreach_cell();} mpi_boundary_coarsen (_l, too_fine); } mpi_boundary_update (all); } while (0);
   fractions_cleanup(cs, fs
 #line 293 "/home/lisergey/basilisk/src/embed.h"
 , 
 0., false
-#line 494 "cylinder.c"
+#line 495 "cylinder.c"
 );
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
   iframe++;
-}{end_tracing("velocity","cylinder.c",499);return 0;}end_tracing("velocity","cylinder.c",499);}
+}{end_tracing("velocity","cylinder.c",500);return 0;}end_tracing("velocity","cylinder.c",500);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -21493,8 +21494,8 @@ event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lis
 event_register((Event){0,1,defaults_2,{defaults_2_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/tracer.h",25,"defaults"});  
 #line 381 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",381,"init"});  
-#line 449
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",449,"velocity"});
+#line 450
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",450,"velocity"});
 	
 	
 	
