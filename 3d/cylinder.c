@@ -438,7 +438,7 @@ event init(t = 0) {
       if (s.nf == 0)
         break;
     }
-    fractions_cleanup(cs, fs);
+    //fractions_cleanup(cs, fs);
   }
   foreach () {
     u.x[] = cs[];
