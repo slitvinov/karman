@@ -378,6 +378,7 @@ int main(int argc, char **argv) {
 }
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 event init(t = 0) {
+  restriction({cs, fs});
   refine(x < X0 + 0.8 * L0 && level < minlevel);
   if (stl_path) {
     vertex scalar phi[];
