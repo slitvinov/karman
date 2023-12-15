@@ -21362,12 +21362,7 @@ all
       if (s.nf == 0)
         break;
     }
-    fractions_cleanup(cs, fs
-#line 293 "/home/lisergey/basilisk/src/embed.h"
-, 
-0., false
-#line 441 "cylinder.c"
-);
+
   }
   foreach_stencil () {
     _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
