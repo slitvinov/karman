@@ -157,7 +157,7 @@ static int output_xdmf(scalar *list, vector *vlist,
 	      "         </DataItem>\n"
 	      "      </Attribute>\n",
 	      vname, ncell_total, j, ncell_total, ncell_total,
-	      nattr + 3 * nvect, attr_path);
+	      nattr + 3 * nvect, attr_base);
       free(vname);
       j += 3;
     }
