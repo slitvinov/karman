@@ -145,31 +145,26 @@ trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   *Fmu = Fmus;
 }
 
+static double dot3(const double *a, const double *b) {
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
 static void vorticity_vector(const vector u, vector omega) {
   foreach () {
     double delta;
     delta = (2. * cm[] * Delta + SEPS);
-    double fmx[3] = {fm.x[1] - fm.x[], fm.x[1], -fm.x[]};
-    double fmy[3] = {fm.y[0, 1] - fm.y[], fm.y[0, 1], -fm.y[]};
-    double fmz[3] = {-(fm.z[0, 0, 1] - fm.z[]), fm.z[], -fm.z[0, 0, 1]};
-    double zy[3] = {u.z[], u.z[0, 1], u.z[0, -1]};
-    double yz[3] = {u.y[], u.y[0, 0, -1], u.y[0, 0, 1]};
-    double xz[3] = {u.x[], u.x[0, 0, -1], u.x[0, 0, 1]};
-    double zx[3] = {u.z[], u.z[-1], u.z[1]};
-    double yx[3] = {u.y[], u.y[1], u.y[-1]};
+    double fx[3] = {fm.x[1] - fm.x[], fm.x[1], -fm.x[]};
+    double fy[3] = {fm.y[0, 1] - fm.y[], fm.y[0, 1], -fm.y[]};
+    double fz[3] = {fm.z[0, 0, 1] - fm.z[], fm.z[0, 0, 1], -fm.z[]};
     double xy[3] = {u.x[], u.x[0, 1], u.x[0, -1]};
-    omega.x[] = (fmy[0] * zy[0] + fmy[1] * zy[1] + fmy[2] * zy[2] +
-
-                 fmz[0] * yz[0] + fmz[1] * yz[1] + fmz[2] * yz[2]) /
-                delta;
-    omega.y[] = (fmz[0] * xz[0] + fmz[1] * xz[1] + fmz[2] * xz[2] +
-
-                 fmx[0] * zx[0] + fmx[1] * zx[1] + fmx[2] * zx[2]) /
-                delta;
-    omega.z[] = (fmx[0] * yx[0] + fmx[1] * yx[1] + fmx[2] * yx[2] +
-
-                 fmy[0] * xy[0] + fmy[1] * xy[1] + fmy[2] * xy[2]) /
-                delta;
+    double xz[3] = {u.x[], u.x[0, 0, 1], u.x[0, 0, -1]};
+    double yx[3] = {u.y[], u.y[1], u.y[-1]};
+    double yz[3] = {u.y[], u.y[0, 0, 1], u.y[0, 0, -1]};
+    double zx[3] = {u.z[], u.z[1], u.z[-1]};
+    double zy[3] = {u.z[], u.z[0, 1], u.z[0, -1]};
+    omega.x[] = (dot3(fy, zy) - dot3(fz, yz))/delta;
+    omega.y[] = (dot3(fz, xz) - dot3(fx, zx))/delta;
+    omega.z[] = (dot3(fx, yx) - dot3(fy, xy))/delta;
   }
 }
 
