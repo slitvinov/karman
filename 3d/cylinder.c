@@ -438,7 +438,7 @@ event init(t = 0) {
       if (s.nf == 0)
         break;
     }
-    //fractions_cleanup(cs, fs);
+    fractions_cleanup(cs, fs);
   }
   foreach () {
     u.x[] = cs[];
@@ -493,8 +493,8 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
-  unrefine(!(x < X0 + 0.9 * L0));
   fractions_cleanup(cs, fs);
+  unrefine(!(x < X0 + 0.9 * L0));
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
