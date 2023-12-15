@@ -451,7 +451,7 @@ event init(t = 0) {
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
 
 event velocity(i++; t <= tend) {
-  char xdmf[FILENAME_MAX];
+  char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
   static long iframe = 0;
@@ -464,10 +464,13 @@ event velocity(i++; t <= tend) {
     if (output_prefix != NULL) {
       vorticity_vector(u, omega);
       lambda2(u, l2);
-      sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
-      output_xdmf({p, f, cs, l2}, {u, omega}, NULL, xdmf);
-      sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
-      output_xdmf({p, f, cs, l2}, {u, omega}, slice, xdmf);
+      sprintf(path, "%s.%09ld", output_prefix, iframe);
+      output_xdmf({p, f, cs, l2}, {u, omega}, NULL, path);
+      sprintf(path, "%s.slice.%09ld", output_prefix, iframe);
+      output_xdmf({p, f, cs, l2}, {u, omega}, slice, path);
+
+      sprintf(path, "%s.dump", output_prefix);
+      dump(path);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
