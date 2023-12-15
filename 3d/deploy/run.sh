@@ -8,6 +8,6 @@ module load cray-mpich
 
 make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
     r=220
-    mkdir -p $r
+    mkdir -p ${r}b
     srun ./cylinder -v -r $r -l 8 -m 11 -p 100 -e 2600 -f ${r}b/force.dat -o ${r}b/h
 }
