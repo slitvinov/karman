@@ -18,8 +18,6 @@ static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose;
-static float *stl_ver;
-static uint32_t stl_nt;
 static int slice(double x, double y, double z, double Delta) {
   return z <= 0 && z + Delta >= 0;
 }
@@ -168,10 +166,8 @@ static void vorticity_vector(const vector u, vector omega) {
     omega.z[] = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }
 }
-vertex scalar phi[];
-vector omega[];
-scalar l2[], f[];
 face vector muv[];
+scalar f[];
 scalar *tracers = {f};
 
 u.n[left] = dirichlet(1);
@@ -360,8 +356,10 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
-  uint32_t stl_i;
+  uint32_t stl_i, stl_nt;
   FILE *stl_file;
+  float *stl_ver;
+  vertex scalar phi[];
 
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
@@ -459,6 +457,7 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: reading dump '%s'\n", dump_path);
     restore(dump_path);
+    fractions_cleanup(cs, fs);
   }
 }
 
@@ -468,6 +467,7 @@ event velocity(i++; t <= tend) {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
+
   if (i % period == 0) {
     if (Verbose) {
       fields_stats();
@@ -475,15 +475,17 @@ event velocity(i++; t <= tend) {
         fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
+      scalar l2[];
+      vector omega[];
       vorticity_vector(u, omega);
       lambda2(u, l2);
       sprintf(path, "%s.%09d", output_prefix, i);
       output_xdmf({p, f, cs, l2}, {u, omega}, NULL, path);
       sprintf(path, "%s.slice.%09d", output_prefix, i);
       output_xdmf({p, f, cs, l2}, {u, omega}, slice, path);
-
-      sprintf(path, "%s.dump", output_prefix);
-      dump(path);
+      sprintf(path, "%s.%09d.dump", output_prefix, i);
+      if (i % (10 * period) == 0)
+        dump(path, {cs, fs, p, u, f});
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
@@ -511,6 +513,7 @@ event velocity(i++; t <= tend) {
   astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
                            maxlevel = maxlevel, minlevel = minlevel);
   unrefine(!(x < X0 + 0.9 * L0));
+  fractions_cleanup(cs, fs);
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
