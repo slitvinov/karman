@@ -20744,6 +20744,84 @@ foreach ()
   *Fmu = Fmus;
 end_tracing("embed_force3","cylinder.c",146);}
 
+static void vorticity_z(const vector u, scalar omega) {
+  foreach_stencil ()
+    {_stencil_val_a(omega,0,0,0);_stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(u.y,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(u.y,1,0,0);
+               _stencil_val(fm.x,0,0,0); _stencil_val(u.y,-1,0,0);_stencil_val(fm.y,0, 1,0); _stencil_val(fm.y,0,0,0); _stencil_val(u.x,0,0,0);
+               _stencil_val(fm.y,0,0,0); _stencil_val(u.x,0, -1,0); _stencil_val(fm.y,0, 1,0); _stencil_val(u.x,0, 1,0); 
+_stencil_val(cm,0,0,0);                      
+              
+#line 153
+}end_foreach_stencil();
+  
+#line 149
+if(!is_constant(fm.x) && !is_constant(cm)){{foreach ()
+    val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0)) * val(u.y,0,0,0) + val(fm.x,1,0,0) * val(u.y,1,0,0) -
+               val(fm.x,0,0,0) * val(u.y,-1,0,0) - (val(fm.y,0, 1,0) - val(fm.y,0,0,0)) * val(u.x,0,0,0) +
+               val(fm.y,0,0,0) * val(u.x,0, -1,0) - val(fm.y,0, 1,0) * val(u.x,0, 1,0)) /
+              (2. * val(cm,0,0,0) * Delta + 1e-30);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  {
+#line 149
+foreach ()
+    val(omega,0,0,0) = ((_const_fm.x - _const_fm.x) * val(u.y,0,0,0) + _const_fm.x * val(u.y,1,0,0) -
+               _const_fm.x * val(u.y,-1,0,0) - (_const_fm.y - _const_fm.y) * val(u.x,0,0,0) +
+               _const_fm.y * val(u.x,0, -1,0) - _const_fm.y * val(u.x,0, 1,0)) /
+              (2. * val(cm,0,0,0) * Delta + 1e-30);end_foreach();}}else if(!is_constant(fm.x) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  {
+#line 149
+foreach ()
+    val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0)) * val(u.y,0,0,0) + val(fm.x,1,0,0) * val(u.y,1,0,0) -
+               val(fm.x,0,0,0) * val(u.y,-1,0,0) - (val(fm.y,0, 1,0) - val(fm.y,0,0,0)) * val(u.x,0,0,0) +
+               val(fm.y,0,0,0) * val(u.x,0, -1,0) - val(fm.y,0, 1,0) * val(u.x,0, 1,0)) /
+              (2. * _const_cm * Delta + 1e-30);end_foreach();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  {
+#line 149
+foreach ()
+    val(omega,0,0,0) = ((_const_fm.x - _const_fm.x) * val(u.y,0,0,0) + _const_fm.x * val(u.y,1,0,0) -
+               _const_fm.x * val(u.y,-1,0,0) - (_const_fm.y - _const_fm.y) * val(u.x,0,0,0) +
+               _const_fm.y * val(u.x,0, -1,0) - _const_fm.y * val(u.x,0, 1,0)) /
+              (2. * _const_cm * Delta + 1e-30);end_foreach();}}
+}
+
+static void vorticity_x(const vector u, scalar omega) {
+  foreach_stencil ()
+    {_stencil_val_a(omega,0,0,0);_stencil_val(fm.y,1,0,0); _stencil_val(fm.y,0,0,0); _stencil_val(u.z,0,0,0); _stencil_val(fm.y,1,0,0); _stencil_val(u.z,1,0,0);
+               _stencil_val(fm.y,0,0,0); _stencil_val(u.z,-1,0,0);_stencil_val(fm.z,0, 1,0); _stencil_val(fm.z,0,0,0); _stencil_val(u.y,0,0,0);
+               _stencil_val(fm.z,0,0,0); _stencil_val(u.y,0, -1,0); _stencil_val(fm.z,0, 1,0); _stencil_val(u.y,0, 1,0); 
+_stencil_val(cm,0,0,0);                      
+              
+#line 161
+}end_foreach_stencil();
+  
+#line 157
+if(!is_constant(fm.x) && !is_constant(cm)){{foreach ()
+    val(omega,0,0,0) = ((val(fm.y,1,0,0) - val(fm.y,0,0,0)) * val(u.z,0,0,0) + val(fm.y,1,0,0) * val(u.z,1,0,0) -
+               val(fm.y,0,0,0) * val(u.z,-1,0,0) - (val(fm.z,0, 1,0) - val(fm.z,0,0,0)) * val(u.y,0,0,0) +
+               val(fm.z,0,0,0) * val(u.y,0, -1,0) - val(fm.z,0, 1,0) * val(u.y,0, 1,0)) /
+              (2. * val(cm,0,0,0) * Delta + 1e-30);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  {
+#line 157
+foreach ()
+    val(omega,0,0,0) = ((_const_fm.y - _const_fm.y) * val(u.z,0,0,0) + _const_fm.y * val(u.z,1,0,0) -
+               _const_fm.y * val(u.z,-1,0,0) - (_const_fm.z - _const_fm.z) * val(u.y,0,0,0) +
+               _const_fm.z * val(u.y,0, -1,0) - _const_fm.z * val(u.y,0, 1,0)) /
+              (2. * val(cm,0,0,0) * Delta + 1e-30);end_foreach();}}else if(!is_constant(fm.x) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  {
+#line 157
+foreach ()
+    val(omega,0,0,0) = ((val(fm.y,1,0,0) - val(fm.y,0,0,0)) * val(u.z,0,0,0) + val(fm.y,1,0,0) * val(u.z,1,0,0) -
+               val(fm.y,0,0,0) * val(u.z,-1,0,0) - (val(fm.z,0, 1,0) - val(fm.z,0,0,0)) * val(u.y,0,0,0) +
+               val(fm.z,0,0,0) * val(u.y,0, -1,0) - val(fm.z,0, 1,0) * val(u.y,0, 1,0)) /
+              (2. * _const_cm * Delta + 1e-30);end_foreach();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  {
+#line 157
+foreach ()
+    val(omega,0,0,0) = ((_const_fm.y - _const_fm.y) * val(u.z,0,0,0) + _const_fm.y * val(u.z,1,0,0) -
+               _const_fm.y * val(u.z,-1,0,0) - (_const_fm.z - _const_fm.z) * val(u.y,0,0,0) +
+               _const_fm.z * val(u.y,0, -1,0) - _const_fm.z * val(u.y,0, 1,0)) /
+              (2. * _const_cm * Delta + 1e-30);end_foreach();}}
+}
+
 scalar  f={15};
 vector  muv={{16},{17},{18}};
 scalar *tracers = ((scalar[]){{15},{-1}});
@@ -20952,13 +21030,13 @@ int main(int argc, char **argv) {_init_solver();
   mu = muv;
   run();
 free_solver();}
-static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",356); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",356);return 0;}end_tracing("properties_0","cylinder.c",356);}
-static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0);*ip=i;*tp=t;return ret;}      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",357); {
-  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 358); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.8 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
+static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",372); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",372);return 0;}end_tracing("properties_0","cylinder.c",372);}
+static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0);*ip=i;*tp=t;return ret;}      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",373); {
+  do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 374); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.8 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
   if (stl_path) {
     scalar  phi=new_vertex_scalar("phi");
     _attribute[phi.i].refine = _attribute[phi.i].prolongation = fraction_refine;
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 362); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 378); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
                             ;
     predicate_ini();
     foreach_vertex_stencil() {
@@ -21003,10 +21081,10 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
                 
                    
     
-#line 404
+#line 420
 }end_foreach_vertex_stencil();
     {
-#line 365
+#line 381
 foreach_vertex() {
       if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
           sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
@@ -21068,17 +21146,17 @@ foreach_vertex() {
     _stencil_val_a(u.z,0,0,0);  
   }end_foreach_stencil();
   {
-#line 420
+#line 436
 foreach () {
     val(u.x,0,0,0) = val(cs,0,0,0);
     val(u.y,0,0,0) = 0;
     val(u.z,0,0,0) = 0;
   }end_foreach();}
-}{end_tracing("init_0","cylinder.c",425);return 0;}end_tracing("init_0","cylinder.c",425);}
-static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend);*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",426); {
+}{end_tracing("init_0","cylinder.c",441);return 0;}end_tracing("init_0","cylinder.c",441);}
+static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend);*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++);*ip=i;*tp=t;return ret;}      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",442); {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
-  scalar  omega=new_scalar("omega"),  l2=new_scalar("l2");
+  scalar  ox=new_scalar("ox"),  oz=new_scalar("oz"),  l2=new_scalar("l2");
   static FILE *fp;
   static long iframe = 0;
   if (iframe % period == 0) {
@@ -21088,12 +21166,13 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
         fprintf(ferr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      vorticity(u, omega);
+      vorticity_x(u, ox);
+      vorticity_z(u, oz);
       lambda2(u, l2);
       sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
-      output_xdmf(((scalar[]){p, omega, f, cs, l2,{-1}}), ((vector[]){u,{{-1},{-1},{-1}}}), NULL, xdmf);
+      output_xdmf(((scalar[]){p, ox, oz, f, cs, l2,{-1}}), ((vector[]){u,{{-1},{-1},{-1}}}), NULL, xdmf);
       sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
-      output_xdmf(((scalar[]){p, omega, f, cs, l2,{-1}}), ((vector[]){u,{{-1},{-1},{-1}}}), slice, xdmf);
+      output_xdmf(((scalar[]){p, ox, oz, f, cs, l2,{-1}}), ((vector[]){u,{{-1},{-1},{-1}}}), slice, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
@@ -21125,8 +21204,8 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   if (Verbose && iframe % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
-  iframe++;delete((scalar*)((scalar[]){l2,omega,{-1}}));
-}{end_tracing("velocity","cylinder.c",477);return 0;}end_tracing("velocity","cylinder.c",477);}
+  iframe++;delete((scalar*)((scalar[]){l2,oz,ox,{-1}}));
+}{end_tracing("velocity","cylinder.c",494);return 0;}end_tracing("velocity","cylinder.c",494);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -21140,8 +21219,8 @@ static void _init_solver (void)
   event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",180,"default_display"});
   event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",189,"init"});
   event_register((Event){0,1,defaults_2,{defaults_2_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/tracer.h",25,"defaults"});
-  event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",357,"init"});
-  event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",426,"velocity"});
+  event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",373,"init"});
+  event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",442,"velocity"});
 
 
     
@@ -21174,7 +21253,7 @@ static void _init_solver (void)
   event_register((Event){0,1,tracer_diffusion_0,{tracer_diffusion_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/tracer.h",50,"tracer_diffusion"});
   init_scalar((scalar){15},"f");
   init_face_vector((vector){{16},{17},{18}},"muv");
-  event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",356,"properties"});
+  event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",372,"properties"});
 
 #line 13
 }  _attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;

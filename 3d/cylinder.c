@@ -145,6 +145,22 @@ trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   *Fmu = Fmus;
 }
 
+static void vorticity_z(const vector u, scalar omega) {
+  foreach ()
+    omega[] = ((fm.x[1] - fm.x[]) * u.y[] + fm.x[1] * u.y[1] -
+               fm.x[] * u.y[-1] - (fm.y[0, 1] - fm.y[]) * u.x[] +
+               fm.y[] * u.x[0, -1] - fm.y[0, 1] * u.x[0, 1]) /
+              (2. * cm[] * Delta + SEPS);
+}
+
+static void vorticity_x(const vector u, scalar omega) {
+  foreach ()
+    omega[] = ((fm.y[1] - fm.y[]) * u.z[] + fm.y[1] * u.z[1] -
+               fm.y[] * u.z[-1] - (fm.z[0, 1] - fm.z[]) * u.y[] +
+               fm.z[] * u.y[0, -1] - fm.z[0, 1] * u.y[0, 1]) /
+              (2. * cm[] * Delta + SEPS);
+}
+
 scalar f[];
 face vector muv[];
 scalar *tracers = {f};
@@ -426,7 +442,7 @@ event init(t = 0) {
 event velocity(i++; t <= tend) {
   char xdmf[FILENAME_MAX];
   coord Fp, Fmu;
-  scalar omega[], l2[];
+  scalar ox[], oz[], l2[];
   static FILE *fp;
   static long iframe = 0;
   if (iframe % period == 0) {
@@ -436,12 +452,13 @@ event velocity(i++; t <= tend) {
         fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      vorticity(u, omega);
+      vorticity_x(u, ox);
+      vorticity_z(u, oz);
       lambda2(u, l2);
       sprintf(xdmf, "%s.%09ld", output_prefix, iframe);
-      output_xdmf({p, omega, f, cs, l2}, {u}, NULL, xdmf);
+      output_xdmf({p, ox, oz, f, cs, l2}, {u}, NULL, xdmf);
       sprintf(xdmf, "%s.slice.%09ld", output_prefix, iframe);
-      output_xdmf({p, omega, f, cs, l2}, {u}, slice, xdmf);
+      output_xdmf({p, ox, oz, f, cs, l2}, {u}, slice, xdmf);
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
