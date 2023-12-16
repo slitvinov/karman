@@ -16,7 +16,7 @@ static const char *force_path, *output_prefix, *stl_path, *dump_path;
 static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
-static int maxlevel, minlevel, period, Surface, Verbose;
+static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
   return z <= 0 && z + Delta >= 0;
 }
@@ -180,12 +180,13 @@ u.t[embed] = dirichlet(0);
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
-  ReynoldsFlag = 0;
+  FullOutput = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
   PeriodFlag = 0;
-  Verbose = 0;
+  ReynoldsFlag = 0;
   TendFlag = 0;
+  Verbose = 0;
   output_prefix = NULL;
   force_path = NULL;
   dump_path = NULL;
@@ -201,6 +202,7 @@ int main(int argc, char **argv) {
           "Options:\n"
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
+	  "  -F     Output the full field\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
           "  -l <resolution level>    the minimum resolution level (positive "
           "integer)\n"
@@ -212,6 +214,7 @@ int main(int argc, char **argv) {
           "number)\n"
           "  -f <force file>          force file\n"
           "  -s <STL file>            geomtry file\n"
+	  "  -d <dump file>           restart simulation\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -303,6 +306,9 @@ int main(int argc, char **argv) {
         exit(1);
       }
       force_path = *argv;
+      break;
+    case 'F':
+      FullOutput = 1;
       break;
     case 's':
       argv++;
@@ -477,8 +483,10 @@ event velocity(i++; t <= tend) {
       sprintf(path, "%s.%09d", output_prefix, i);
       output_xdmf({p, cs, l2}, {u, omega}, NULL, path);
       sprintf(path, "%s.slice.%09d", output_prefix, i);
-      output_xdmf({p, cs, l2}, {u, omega}, slice, path);
-      sprintf(path, "%s.%09d.dump", output_prefix, i);
+      if (FullOutput) {
+	output_xdmf({p, cs, l2}, {u, omega}, slice, path);
+	sprintf(path, "%s.%09d.dump", output_prefix, i);
+      }
       if (i % (10 * period) == 0)
         dump(path, {cs, fs, p, u});
     }
