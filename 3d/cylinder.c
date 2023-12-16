@@ -169,7 +169,6 @@ face vector muv[];
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
-f[left] = dirichlet(y < 0);
 
 u.n[right] = neumann(0);
 p[right] = dirichlet(0);
@@ -481,7 +480,7 @@ event velocity(i++; t <= tend) {
       output_xdmf({p, cs, l2}, {u, omega}, slice, path);
       sprintf(path, "%s.%09d.dump", output_prefix, i);
       if (i % (10 * period) == 0)
-        dump(path, {cs, fs, p, u, f});
+        dump(path, {cs, fs, p, u});
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
