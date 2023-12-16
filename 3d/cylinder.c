@@ -9,7 +9,6 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "lambda2.h"
-#include "tracer.h"
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
@@ -167,9 +166,6 @@ static void vorticity_vector(const vector u, vector omega) {
   }
 }
 face vector muv[];
-scalar f[];
-scalar *tracers = {f};
-
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -480,9 +476,9 @@ event velocity(i++; t <= tend) {
       vorticity_vector(u, omega);
       lambda2(u, l2);
       sprintf(path, "%s.%09d", output_prefix, i);
-      output_xdmf({p, f, cs, l2}, {u, omega}, NULL, path);
+      output_xdmf({p, cs, l2}, {u, omega}, NULL, path);
       sprintf(path, "%s.slice.%09d", output_prefix, i);
-      output_xdmf({p, f, cs, l2}, {u, omega}, slice, path);
+      output_xdmf({p, cs, l2}, {u, omega}, slice, path);
       sprintf(path, "%s.%09d.dump", output_prefix, i);
       if (i % (10 * period) == 0)
         dump(path, {cs, fs, p, u, f});
@@ -510,7 +506,7 @@ event velocity(i++; t <= tend) {
       }
     }
   }
-  astats s = adapt_wavelet((scalar *){u}, (double[]){3e-2, 3e-2, 3e-2},
+  astats s = adapt_wavelet((scalar *){u}, (double[]){0.1, 0.1, 0.1},
                            maxlevel = maxlevel, minlevel = minlevel);
   unrefine(!(x < X0 + 0.9 * L0));
   fractions_cleanup(cs, fs);
