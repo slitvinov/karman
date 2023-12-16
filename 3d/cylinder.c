@@ -485,7 +485,7 @@ event velocity(i++; t <= tend) {
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
-        if (fp == NULL) {
+        if (fp == NULL && dump_path == NULL) {
           if ((fp = fopen(force_path, "w")) == NULL) {
             fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
