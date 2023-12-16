@@ -21404,7 +21404,7 @@ false
       }
     }
   }
-  astats s = adapt_wavelet((scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (double[]){0.1, 0.1, 0.1}
+  astats s = adapt_wavelet((scalar *)((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){0, 0.01, 0.01, 0.01}
 , maxlevel, minlevel
 #line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
 , 
