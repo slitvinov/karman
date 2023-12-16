@@ -7,8 +7,9 @@ module load daint-mc
 module load cray-mpich
 
 set -x
-make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
-    r=$1
-    mkdir -p $r
-    srun ./cylinder -v -r $r -l 8 -m 11 -p 100 -e 2600 -f $r/force.dat -o $r/h
+r=$1
+d=$SCRATCH/$r
+make MPICC=mpicc 'MPICCFLAGS = -O2 -g' && {
+    mkdir -p $d
+    exec srun -n $SLURM_NTASKS --mpi=pmix ./cylinder -v -r $r -l 8 -m 12 -p 100 -e 2600 -f $d/force.dat -o $d/h
 }
