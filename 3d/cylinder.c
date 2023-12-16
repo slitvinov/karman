@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
           "Options:\n"
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
-	  "  -F     Output the full field\n"
+          "  -F     Output the full field\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
           "  -l <resolution level>    the minimum resolution level (positive "
           "integer)\n"
@@ -214,7 +214,7 @@ int main(int argc, char **argv) {
           "number)\n"
           "  -f <force file>          force file\n"
           "  -s <STL file>            geomtry file\n"
-	  "  -d <dump file>           restart simulation\n"
+          "  -d <dump file>           restart simulation\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -480,15 +480,16 @@ event velocity(i++; t <= tend) {
       vector omega[];
       vorticity_vector(u, omega);
       lambda2(u, l2);
-      sprintf(path, "%s.%09d", output_prefix, i);
-      output_xdmf({p, cs, l2}, {u, omega}, NULL, path);
-      sprintf(path, "%s.slice.%09d", output_prefix, i);
       if (FullOutput) {
-	output_xdmf({p, cs, l2}, {u, omega}, slice, path);
-	sprintf(path, "%s.%09d.dump", output_prefix, i);
+        sprintf(path, "%s.%09d", output_prefix, i);
+        output_xdmf({p, l2}, {u, omega}, NULL, path);
       }
-      if (i % (10 * period) == 0)
+      sprintf(path, "%s.slice.%09d", output_prefix, i);
+      output_xdmf({p, l2}, {u, omega}, slice, path);
+      if (i % (10 * period) == 0) {
+        sprintf(path, "%s.%09d.dump", output_prefix, i);
         dump(path, {cs, fs, p, u});
+      }
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
