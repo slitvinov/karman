@@ -505,7 +505,7 @@ event velocity(i++; t <= tend) {
       }
     }
   }
-  astats s = adapt_wavelet((scalar *){u}, (double[]){0.1, 0.1, 0.1},
+  astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
                            maxlevel = maxlevel, minlevel = minlevel);
   unrefine(!(x < X0 + 0.9 * L0));
   fractions_cleanup(cs, fs);
