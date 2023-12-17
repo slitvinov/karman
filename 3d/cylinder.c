@@ -177,6 +177,10 @@ pf[right] = dirichlet(0);
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 
+static scalar l2[];
+static vector omega[];
+static vertex scalar phi[];
+
 int main(int argc, char **argv) {
   char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
@@ -360,7 +364,6 @@ event init(t = 0) {
   uint32_t stl_i, stl_nt;
   FILE *stl_file;
   float *stl_ver;
-  vertex scalar phi[];
 
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
@@ -476,8 +479,6 @@ event velocity(i++; t <= tend) {
         fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
-      scalar l2[];
-      vector omega[];
       vorticity_vector(u, omega);
       lambda2(u, l2);
       if (FullOutput) {
