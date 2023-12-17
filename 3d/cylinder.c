@@ -488,7 +488,7 @@ event velocity(i++; t <= tend) {
       output_xdmf({p, l2}, {u, omega}, slice, path);
       if (i % (10 * period) == 0) {
         sprintf(path, "%s.%09d.dump", output_prefix, i);
-        dump(path, {cs, fs, p, u});
+        dump(path);
       }
     }
     if (force_path) {
