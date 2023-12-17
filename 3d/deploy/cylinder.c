@@ -21372,18 +21372,10 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       output_xdmf(((scalar[]){p, l2,{-1}}),((vector[]) {u, omega,{{-1},{-1},{-1}}}), slice, path);
       if (i % (10 * period) == 0) {
         sprintf(path, "%s.%09d.dump", output_prefix, i);
-        dump(path,
-#line 491 "/home/lisergey/basilisk/src/output.h"
-(
-    
-#line 1090
-scalar *
-#line 491
-)
-#line 491 "cylinder.c"
-((scalar[]) {cs, fs.x, fs.y, fs.z, p, u.x, u.y, u.z,{-1}})
-#line 1090 "/home/lisergey/basilisk/src/output.h"
+        dump(path
+#line 1089 "/home/lisergey/basilisk/src/output.h"
 , 
+all, 
 NULL, 
 false
 #line 491 "cylinder.c"
