@@ -8,6 +8,7 @@ static const double diameter = 0.125;
 static const int minlevel = 7;
 static double reynolds, tend;
 static int maxlevel, period, Image, Surface, Verbose;
+static const char *output_prefix;
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -43,12 +44,13 @@ int main(int argc, char **argv) {
           "  -i     Enable PPM image dumping\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
           "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -o <preifx>              a prefix for the output files\n"
           "  -p <dump period>         the dump period (positive integer)\n"
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2\n");
+          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2 -o h\n");
       exit(1);
     case 'r':
       argv++;
@@ -110,6 +112,14 @@ int main(int argc, char **argv) {
       }
       TendFlag = 1;
       break;
+    case 'o':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -o needs an argument\n");
+        exit(1);
+      }
+      output_prefix = *argv;
+      break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -155,33 +165,32 @@ event init(t = 0) {
 }
 
 event dump(i++; t <= tend) {
-  static long iframe = 0;
-  char png[FILENAME_MAX], xdmf[FILENAME_MAX];
+  char path[FILENAME_MAX];
   scalar omega[], m[];
   FILE *fp;
   long nx, ny;
   coord n, b;
 
-  if (iframe % period == 0) {
+  if (i % period == 0) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
         fprintf(stderr, "cylinder: %d: %09d %.16e\n", npe(), i, t);
     }
-
-    vorticity(u, omega);
-    sprintf(xdmf, "h.%09ld", iframe);
-    output_xdmf({p, omega}, {u}, xdmf);
-    if (Image) {
-      foreach ()
-        m[] = cs[] - 0.5;
-      sprintf(png, "%09ld.ppm", iframe);
-      output_ppm(omega, file = png, n = 512,
-                 box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
-                 max = 2 / diameter, linear = false, mask = m);
+    if (output_prefix != NULL) {
+      vorticity(u, omega);
+      sprintf(path, "%s.%09d", output_prefix, i);
+      output_xdmf({p, omega}, {u}, path);
+      if (Image) {
+        foreach ()
+          m[] = cs[] - 0.5;
+        sprintf(path, "%s.%09d.png", output_prefix, i);
+        output_ppm(omega, file = path, n = 512,
+                   box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
+                   max = 2 / diameter, linear = false, mask = m);
+      }
     }
   }
-  iframe++;
 }
 event adapt(i++) {
   adapt_wavelet({cs, u}, (double[]){1e-2, 3e-3, 3e-3}, maxlevel = maxlevel,
