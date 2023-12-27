@@ -102,27 +102,27 @@ static double tri_point_distance2(const double a[3], const double b[3],
   return x * x + y * y + z * z;
 }
 
-double embed_interpolate3(Point point, scalar s, coord p) {
+trace
+double embed_interpolate3(Point point, scalar s, coord p)
+{
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
-  x = fabs(p.x);
-  y = fabs(p.y);
-  z = fabs(p.z);
-  if (cs[i] && cs[0, j] && cs[i, j] && cs[0, 0, k] && cs[i, 0, k] &&
-      cs[0, j, k] && cs[i, j, k]) {
-    return (((s[] * (1. - x) + s[i] * x) * (1. - y) +
-             (s[0, j] * (1. - x) + s[i, j] * x) * y) *
-                (1. - z) +
-            ((s[0, 0, k] * (1. - x) + s[i, 0, k] * x) * (1. - y) +
-             (s[0, j, k] * (1. - x) + s[i, j, k] * x) * y) *
-                z);
-  } else {
+  if (cs[i,0,0] && cs[0,j,0] && cs[i,j,0] &&
+      cs[0,0,k] && cs[i,0,k] && cs[0,j,k] && cs[i,j,k] ) {
+    double val_0, val_k;
+    val_0 = (s[0,0,0]*(1. - fabs(p.x)) + s[i,0,0]*fabs(p.x))*(1. - fabs(p.y)) +
+      (s[0,j,0]*(1. - fabs(p.x)) + s[i,j,0]*fabs(p.x))*fabs(p.y);
+    val_k = (s[0,0,k]*(1. - fabs(p.x)) + s[i,0,k]*fabs(p.x))*(1. - fabs(p.y)) +
+      (s[0,j,k]*(1. - fabs(p.x)) + s[i,j,k]*fabs(p.x))*fabs(p.y);
+    return (val_0*(1. - fabs(p.z)) + val_k*fabs(p.z));
+  }
+  else {
     double val = s[];
     foreach_dimension() {
       int i = sign(p.x);
-      if (cs[i])
-        val += fabs(p.x) * (s[i] - s[]);
-      else if (cs[-i])
-        val += fabs(p.x) * (s[] - s[-i]);
+      if (cs[i] )
+	val += fabs(p.x)*(s[i] - s[]);
+      else if (cs[-i] )
+	val += fabs(p.x)*(s[] - s[-i]);
     }
     return val;
   }
