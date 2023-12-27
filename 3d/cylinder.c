@@ -103,8 +103,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
 }
 
 double embed_interpolate3(Point point, scalar s, coord p) {
-  int i = sign(p.x), j = sign(p.y);
-  int k = sign(p.z);
+  int i = sign(p.x), j = sign(p.y), k = sign(p.z);
   x = fabs(p.x);
   y = fabs(p.y);
   z = fabs(p.z);
@@ -129,19 +128,39 @@ double embed_interpolate3(Point point, scalar s, coord p) {
   }
 }
 
-trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
-                        coord *Fmu) {
+trace
+void embed_force3(scalar p, vector u, face vector mu, coord * Fp, coord * Fmu)
+{
   coord Fps = {0}, Fmus = {0};
-  foreach (reduction(+ : Fps) reduction(+ : Fmus), nowarning)
+  foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
     if (cs[] > 0. && cs[] < 1.) {
       coord n, b;
       double area = embed_geometry(point, &b, &n);
-      area *= pow(Delta, dimension - 1);
+      area *= pow (Delta, dimension - 1);
       double Fn = area * embed_interpolate3(point, p, b);
-      foreach_dimension() Fps.x += Fn * n.x;
+      foreach_dimension()
+	Fps.x += Fn*n.x;
+      if (constant(mu.x) != 0.) {
+	double mua = 0., fa = 0.;
+	foreach_dimension() {
+	  mua += mu.x[] + mu.x[1];
+	  fa  += fs.x[] + fs.x[1];
+	}
+	mua /= fa;
+	coord dudn = embed_gradient (point, u, b, n);
+	foreach_dimension()
+	  Fmus.x -= area*mua*(dudn.x*(sq (n.x) + 1.) + dudn.y*n.x*n.y + dudn.z*n.x*n.z);
+      }
     }
-  *Fp = Fps;
-  *Fmu = Fmus;
+  }
+
+  Fp->x = Fps.x;
+  Fp->y = Fps.y;
+  Fp->z = Fps.z;
+  
+  Fmu->x = Fmus.x;
+  Fmu->y = Fmus.y;
+  Fmu->z = Fmus.z;
 }
 
 static double dot3(const double *a, const double *b) {
