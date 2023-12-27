@@ -2,7 +2,7 @@ static int output_xdmf(scalar *list, vector *vlist,
 		       int cond(double, double, double, double),
 		       const char *path) {
   float *xyz, *attr;
-  int nattr, nvect, ncell, ncell_total, nsize, j, offset;
+  long nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
     *vname, *xyz_base, *attr_base;
   FILE *file;
@@ -101,10 +101,10 @@ static int output_xdmf(scalar *list, vector *vlist,
 	    "    <Grid>\n"
 	    "      <Topology\n"
 	    "          TopologyType=\"Hexahedron\"\n"
-	    "          Dimensions=\"%d\"/>\n"
+	    "          Dimensions=\"%ld\"/>\n"
 	    "      <Geometry>\n"
 	    "        <DataItem\n"
-	    "            Dimensions=\"%d 3\"\n"
+	    "            Dimensions=\"%ld 3\"\n"
 	    "            Format=\"Binary\">\n"
 	    "          %s\n"
 	    "        </DataItem>\n"
@@ -118,13 +118,13 @@ static int output_xdmf(scalar *list, vector *vlist,
 	      "          Center=\"Cell\">\n"
 	      "        <DataItem\n"
 	      "            ItemType=\"HyperSlab\"\n"
-	      "            Dimensions=\"%d\"\n"
+	      "            Dimensions=\"%ld\"\n"
 	      "            Type=\"HyperSlab\">\n"
 	      "          <DataItem Dimensions=\"3 1\">\n"
-	      "            %d %d %d\n"
+	      "            %ld %ld %ld\n"
 	      "          </DataItem>\n"
 	      "          <DataItem\n"
-	      "              Dimensions=\"%d\"\n"
+	      "              Dimensions=\"%ld\"\n"
 	      "              Format=\"Binary\">\n"
 	      "            %s\n"
 	      "          </DataItem>\n"
@@ -142,15 +142,15 @@ static int output_xdmf(scalar *list, vector *vlist,
 	      "          Center=\"Cell\">\n"
 	      "        <DataItem\n"
 	      "            ItemType=\"HyperSlab\"\n"
-	      "            Dimensions=\"%d 3\"\n"
+	      "            Dimensions=\"%ld 3\"\n"
 	      "            Type=\"HyperSlab\">\n"
 	      "          <DataItem Dimensions=\"3 2\">\n"
-	      "            0 %d\n"
+	      "            0 %ld\n"
 	      "            1 1\n"
-	      "            %d 3\n"
+	      "            %ld 3\n"
 	      "          </DataItem>\n"
 	      "          <DataItem\n"
-	      "              Dimensions=\"%d %d\"\n"
+	      "              Dimensions=\"%ld %ld\"\n"
 	      "              Format=\"Binary\">\n"
 	      "            %s\n"
 	      "          </DataItem>\n"
