@@ -21,6 +21,15 @@ static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
   return z <= 0 && z + Delta >= 0;
 }
+static double shape_cylinder(double x, double y, double z) {
+  return sq(x) + sq(y) - sq(diameter / 2);
+}
+static double shape_sphere(double x, double y, double z) {
+  return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
+}
+static const double (*Shape[])(double, double, double) = {shape_cylinder, shape_sphere};
+static const char *shape_names[] = {"cylinder", "sphere"};
+static const double (*shape)(double, double, double);
 
 static double vec_dot(const double a[3], const double b[3]) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -203,7 +212,7 @@ static vertex scalar phi[];
 
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
+  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag, i;
   FullOutput = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -215,6 +224,7 @@ int main(int argc, char **argv) {
   force_path = NULL;
   dump_path = NULL;
   stl_path = NULL;
+  shape = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -237,7 +247,8 @@ int main(int argc, char **argv) {
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
           "  -f <force file>          force file\n"
-          "  -s <STL file>            geomtry file\n"
+          "  -s <STL file>            geometry file\n"
+	  "  -S cylinder|sphere       shape\n"
           "  -d <dump file>           restart simulation\n"
           "\n"
           "Example usage:\n"
@@ -342,6 +353,23 @@ int main(int argc, char **argv) {
       }
       stl_path = *argv;
       break;
+    case 'S':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -S needs an argument\n");
+        exit(1);
+      }
+      for (i = 0; /**/ ; i++) {
+	if (i == sizeof shape_names / sizeof *shape_names) {
+	  fprintf(stderr, "cylinder: error: unknown shape '%s'\n", *argv);
+	  exit(1);
+	}
+	if (strcmp(shape_names[i], *argv) == 0) {
+	  shape = Shape[i];
+	  break;
+	}
+      }
+      break;
     case 'o':
       argv++;
       if (*argv == NULL) {
@@ -374,6 +402,10 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
+  if (shape == NULL && stl_path == NULL) {
+    fprintf(stderr, "cylinder: error: either -S or -s should be set\n");
+    exit(1);
+  }
   size(50);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
@@ -395,10 +427,13 @@ event init(t = 0) {
       }
       fseek(stl_file, 80, SEEK_SET);
       if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
-        fprintf(stderr, "cylinder: error: fail to doubled '%s'\n", stl_path);
+        fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
         exit(1);
       }
-      stl_ver = malloc(9 * stl_nt * sizeof *stl_ver);
+      if ((stl_ver = malloc(9 * stl_nt * sizeof *stl_ver)) == NULL) {
+        fprintf(stderr, "cylinder: error: malloc failed\n");
+        exit(1);
+      }
       if (Verbose && pid() == 0)
         fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
       for (stl_i = 0; stl_i < stl_nt; stl_i++) {
@@ -462,7 +497,7 @@ event init(t = 0) {
       free(stl_ver);
     } else {
       for (;;) {
-        solid(cs, fs, sq(x) + sq(y) - sq(diameter / 2));
+        solid(cs, fs, shape(x, y, z));
         astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
                                  minlevel = minlevel);
         if (Verbose && pid() == 0)
