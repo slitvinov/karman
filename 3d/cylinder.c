@@ -12,7 +12,8 @@
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
-static const char *force_path, *output_prefix, *stl_path, *dump_path;
+static const char *force_path, *output_prefix, *stl_path;
+static char *dump_path;
 static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
