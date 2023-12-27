@@ -20,10 +20,7 @@ u.t[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
 face vector muv[];
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag;
-  int LevelFlag;
-  int PeriodFlag;
-  int TendFlag;
+  int LevelFlag, PeriodFlag, ReynoldsFlag, TendFlag;
   ReynoldsFlag = 0;
   LevelFlag = 0;
   PeriodFlag = 0;
