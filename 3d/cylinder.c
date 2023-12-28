@@ -438,6 +438,8 @@ int main(int argc, char **argv) {
   size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
+  periodic(front);
+  periodic(top);
   run();
 }
 
