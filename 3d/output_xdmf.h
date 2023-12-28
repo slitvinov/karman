@@ -31,7 +31,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   xyz = NULL;
   foreach_cell() if (is_local(cell) && is_leaf(cell) &&
                      (!cond || cond(x, y, z, Delta))) {
-    long i, cx, cy, cz;
+    long i;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
@@ -53,11 +53,14 @@ static int output_xdmf(scalar *list, vector *vlist,
   }
 
   MPI_Exscan(&ncell, &offset, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+  if (pid() == 0)
+    offset = 0;
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, 3 * 8 * offset * sizeof *xyz, xyz,
                         3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
+  fprintf(systderr, "pid, ncell: %d %ld %ld\n", pid(), ncell, offset);
   free(xyz);
   MPI_File_close(&mpi_file);
 

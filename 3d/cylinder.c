@@ -19,7 +19,8 @@ static const int outlevel = 6;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
-  return z <= 0 && z + Delta >= 0;
+  double epsilon = Delta / 10;
+  return z <= - epsilon && z + Delta + epsilon >= 0;
 }
 static double shape_cylinder(double x, double y, double z) {
   return sq(x) + sq(y) - sq(diameter / 2);
@@ -27,10 +28,10 @@ static double shape_cylinder(double x, double y, double z) {
 static double shape_sphere(double x, double y, double z) {
   return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
 }
-static const double (*Shape[])(double, double, double) = {shape_cylinder,
+static double (*Shape[])(double, double, double) = {shape_cylinder,
                                                           shape_sphere};
 static const char *shape_names[] = {"cylinder", "sphere"};
-static const double (*shape)(double, double, double);
+static double (*shape)(double, double, double);
 
 static double vec_dot(const double a[3], const double b[3]) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -568,10 +569,10 @@ event velocity(i++; t <= tend) {
         sprintf(path, "%s.%09d", output_prefix, i);
         output_xdmf({p, l2}, {u, omega}, NULL, path);
       }
-      sprintf(path, "%s.slice.%09d", output_prefix, i);
+      snprintf(path, sizeof path, "%s.slice.%09d", output_prefix, i);
       output_xdmf({p, l2}, {u, omega}, slice, path);
       if (i % (10 * period) == 0) {
-        sprintf(path, "%s.%09d.dump", output_prefix, i);
+        snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
         dump(path);
       }
     }
