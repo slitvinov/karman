@@ -196,7 +196,6 @@ static void vorticity_vector(const vector u, vector omega) {
     omega.z[] = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }
 }
-face vector muv[];
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -208,6 +207,7 @@ pf[right] = dirichlet(0);
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 
+face vector muv[];
 static scalar l2[];
 static vector omega[];
 static vertex scalar phi[];
@@ -524,7 +524,7 @@ event init(t = 0) {
           phi[] = 0.25 * diameter / 2;
       }
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: exported geomtry\n");
+        fprintf(stderr, "cylinder: exported geometry\n");
       free(stl_ver);
     } else {
       for (;;) {
