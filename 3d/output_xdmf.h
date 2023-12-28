@@ -60,7 +60,6 @@ static int output_xdmf(scalar *list, vector *vlist,
   MPI_File_write_at_all(mpi_file, 3 * 8 * offset * sizeof *xyz, xyz,
                         3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
-  fprintf(systderr, "pid, ncell: %d %ld %ld\n", pid(), ncell, offset);
   free(xyz);
   MPI_File_close(&mpi_file);
 
