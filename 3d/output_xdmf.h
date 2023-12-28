@@ -2,7 +2,7 @@ static int output_xdmf(scalar *list, vector *vlist,
                        int cond(double, double, double, double),
                        const char *path) {
   float *xyz, *attr;
-  long nattr, nvect, ncell, ncell_total, nsize, j, offset;
+  long j, nattr, nvect, ncell, ncell_total, nsize, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
       *vname, *xyz_base, *attr_base;
   FILE *file;
@@ -52,10 +52,10 @@ static int output_xdmf(scalar *list, vector *vlist,
     return 1;
   }
 
-  MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Exscan(&ncell, &offset, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(mpi_file, (MPI_Offset)3 * 8 * offset * sizeof *xyz, xyz,
+  MPI_File_write_at_all(mpi_file, 3 * 8 * offset * sizeof *xyz, xyz,
                         3 * 8 * ncell * sizeof *xyz, MPI_BYTE,
                         MPI_STATUS_IGNORE);
   free(xyz);
@@ -81,9 +81,9 @@ static int output_xdmf(scalar *list, vector *vlist,
   assert(j == (nattr + 3 * nvect) * ncell);
   MPI_File_open(MPI_COMM_WORLD, attr_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
-  MPI_File_write_at_all(
-      mpi_file, (MPI_Offset)(nattr + 3 * nvect) * offset * sizeof *attr, attr,
-      (nattr + 3 * nvect) * ncell * sizeof *attr, MPI_BYTE, MPI_STATUS_IGNORE);
+  MPI_File_write_at_all(mpi_file, (nattr + 3 * nvect) * offset * sizeof *attr,
+                        attr, (nattr + 3 * nvect) * ncell * sizeof *attr,
+                        MPI_BYTE, MPI_STATUS_IGNORE);
   free(attr);
   MPI_File_close(&mpi_file);
 

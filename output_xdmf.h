@@ -51,7 +51,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     return 1;
   }
 
-  MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Exscan(&ncell, &offset, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, 4 * 3 * offset * sizeof *xyz, xyz,
