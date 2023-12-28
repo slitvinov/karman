@@ -30,7 +30,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   j = 0;
   xyz = NULL;
   foreach_cell() if (is_local(cell) && is_leaf(cell)) {
-    int i, cx, cy, cz;
+    long i, cx, cy, cz;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;

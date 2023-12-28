@@ -31,7 +31,7 @@ static int output_xdmf(scalar *list, vector *vlist,
   xyz = NULL;
   foreach_cell() if (is_local(cell) && is_leaf(cell) &&
                      (!cond || cond(x, y, z, Delta))) {
-    int i, cx, cy, cz;
+    long i, cx, cy, cz;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
