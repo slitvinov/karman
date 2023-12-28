@@ -213,7 +213,10 @@ static vertex scalar phi[];
 
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag, i;
+  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
+      DomainFlag, i;
+  double domain;
+  DomainFlag = 0;
   FullOutput = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -238,7 +241,7 @@ int main(int argc, char **argv) {
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
           "  -F     Output the full field\n"
-          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -r <Reynolds number>     the Reynolds number\n"
           "  -l <resolution level>    the minimum resolution level (positive "
           "integer)\n"
           "  -m <resolution level>    the maximum resolution level (positive "
@@ -251,6 +254,7 @@ int main(int argc, char **argv) {
           "  -s <STL file>            geometry file\n"
           "  -S cylinder|sphere       shape\n"
           "  -d <dump file>           restart simulation\n"
+          "  -z <domain size>         domain size\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -259,7 +263,7 @@ int main(int argc, char **argv) {
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error:  -r needs an argument\n");
+        fprintf(stderr, "cylinder: error: -r needs an argument\n");
         exit(1);
       }
       reynolds = strtod(*argv, &end);
@@ -379,6 +383,25 @@ int main(int argc, char **argv) {
       }
       output_prefix = *argv;
       break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -z needs an argument\n");
+        exit(1);
+      }
+      domain = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      if (domain < 1) {
+        fprintf(stderr,
+                "cylinder: error: '%s': domain size (-z) is less then one\n",
+                *argv);
+        exit(1);
+      }
+      DomainFlag = 1;
+      break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -403,11 +426,15 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
+  if (!DomainFlag) {
+    fprintf(stderr, "cylinder: error: -z must be set\n");
+    exit(1);
+  }
   if (shape == NULL && stl_path == NULL) {
     fprintf(stderr, "cylinder: error: either -S or -s should be set\n");
     exit(1);
   }
-  size(50);
+  size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
   run();
