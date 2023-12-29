@@ -20,7 +20,7 @@ static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
-  return z <= - epsilon && z + Delta + epsilon >= 0;
+  return z <= -epsilon && z + Delta + epsilon >= 0;
 }
 static double shape_cylinder(double x, double y, double z) {
   return sq(x) + sq(y) - sq(diameter / 2);
@@ -29,7 +29,7 @@ static double shape_sphere(double x, double y, double z) {
   return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
 }
 static double (*Shape[])(double, double, double) = {shape_cylinder,
-                                                          shape_sphere};
+                                                    shape_sphere};
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
@@ -447,108 +447,110 @@ event init(t = 0) {
   uint32_t stl_i, stl_nt;
   FILE *stl_file;
   float *stl_ver;
-
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
     refine(x < X0 + 0.9 * L0 && level < minlevel);
-    if (stl_path) {
-      if ((stl_file = fopen(stl_path, "r")) == NULL) {
-        fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
-        exit(1);
-      }
-      fseek(stl_file, 80, SEEK_SET);
-      if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
-        fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
-        exit(1);
-      }
-      if ((stl_ver = malloc(9 * stl_nt * sizeof *stl_ver)) == NULL) {
-        fprintf(stderr, "cylinder: error: malloc failed\n");
-        exit(1);
-      }
-      if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
-      for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-        fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
-        if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
-          fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
-          exit(1);
-        }
-        fseek(stl_file, 2, SEEK_CUR);
-      }
-      if (fclose(stl_file) != 0) {
-        fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
-        exit(1);
-      }
-      phi.refine = phi.prolongation = fraction_refine;
-      refine(sq(x) + sq(y) <= sq(diameter) &&
-             sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel);
-      predicate_ini();
-      foreach_vertex() {
-        if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-            sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
-          double minimum;
-          uint32_t intersect;
-          uint32_t stl_i, j;
-          double a[3], b[3], c[3], e[3], s[3], dist2;
-          intersect = 0;
-          minimum = DBL_MAX;
-          for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-            j = 9 * stl_i;
-            a[0] = stl_ver[j];
-            a[1] = stl_ver[j + 1];
-            a[2] = stl_ver[j + 2];
-
-            b[0] = stl_ver[j + 3];
-            b[1] = stl_ver[j + 4];
-            b[2] = stl_ver[j + 5];
-
-            c[0] = stl_ver[j + 6];
-            c[1] = stl_ver[j + 7];
-            c[2] = stl_ver[j + 8];
-
-            s[0] = x;
-            s[1] = y;
-            s[2] = z;
-
-            e[0] = s[0];
-            e[1] = s[1];
-            e[2] = s[2] + 2 * L0;
-
-            dist2 = tri_point_distance2(a, b, c, s);
-            if (dist2 < minimum)
-              minimum = dist2;
-            intersect += predicate_ray(s, e, a, b, c);
-          }
-          phi[] = intersect % 2 ? -dist2 : dist2;
-        } else
-          phi[] = 0.25 * diameter / 2;
-      }
-      if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: exported geometry\n");
-      free(stl_ver);
-    } else {
-      for (;;) {
-        solid(cs, fs, shape(x, y, z));
-        astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
-                                 minlevel = minlevel);
-        if (Verbose && pid() == 0)
-          fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
-        if (s.nf == 0)
-          break;
-      }
-      fractions_cleanup(cs, fs);
-    }
-    foreach () {
-      u.x[] = cs[];
-      u.y[] = 0;
-      u.z[] = 0;
-    }
   } else {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: reading dump '%s'\n", dump_path);
     restore(dump_path);
     fractions_cleanup(cs, fs);
   }
+
+  if (stl_path) {
+    if ((stl_file = fopen(stl_path, "r")) == NULL) {
+      fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
+      exit(1);
+    }
+    fseek(stl_file, 80, SEEK_SET);
+    if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+      fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
+      exit(1);
+    }
+    if ((stl_ver = malloc(9 * stl_nt * sizeof *stl_ver)) == NULL) {
+      fprintf(stderr, "cylinder: error: malloc failed\n");
+      exit(1);
+    }
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
+    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+      fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
+      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+        fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
+        exit(1);
+      }
+      fseek(stl_file, 2, SEEK_CUR);
+    }
+    if (fclose(stl_file) != 0) {
+      fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
+      exit(1);
+    }
+    phi.refine = phi.prolongation = fraction_refine;
+    refine(sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) &&
+           level < maxlevel);
+    predicate_ini();
+    foreach_vertex() {
+      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+          sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
+        double minimum;
+        uint32_t intersect;
+        uint32_t stl_i, j;
+        double a[3], b[3], c[3], e[3], s[3], dist2;
+        intersect = 0;
+        minimum = DBL_MAX;
+        for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+          j = 9 * stl_i;
+          a[0] = stl_ver[j];
+          a[1] = stl_ver[j + 1];
+          a[2] = stl_ver[j + 2];
+
+          b[0] = stl_ver[j + 3];
+          b[1] = stl_ver[j + 4];
+          b[2] = stl_ver[j + 5];
+
+          c[0] = stl_ver[j + 6];
+          c[1] = stl_ver[j + 7];
+          c[2] = stl_ver[j + 8];
+
+          s[0] = x;
+          s[1] = y;
+          s[2] = z;
+
+          e[0] = s[0];
+          e[1] = s[1];
+          e[2] = s[2] + 2 * L0;
+
+          dist2 = tri_point_distance2(a, b, c, s);
+          if (dist2 < minimum)
+            minimum = dist2;
+          intersect += predicate_ray(s, e, a, b, c);
+        }
+        phi[] = intersect % 2 ? -dist2 : dist2;
+      } else
+        phi[] = 0.25 * diameter / 2;
+    }
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: exported geometry\n");
+    free(stl_ver);
+  } else {
+    for (;;) {
+      solid(cs, fs, shape(x, y, z));
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+                               minlevel = minlevel);
+      if (Verbose && pid() == 0)
+        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+        break;
+    }
+    fractions_cleanup(cs, fs);
+  }
+
+  if (dump_path == NULL)
+    foreach () {
+      u.x[] = cs[];
+      u.y[] = 0;
+      u.z[] = 0;
+    }
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
