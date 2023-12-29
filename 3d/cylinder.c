@@ -548,6 +548,8 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: reading dump '%s'\n", dump_path);
     restore(dump_path);
     fractions_cleanup(cs, fs);
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: number of grid points: %ld\n", grid->n);
   }
 }
 
