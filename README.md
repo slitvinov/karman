@@ -22,7 +22,7 @@ $ cp config.osx config
 </pre>
 
 <pre>
-$ make
+$ make qcc
 $ cp qcc $HOME/.local/bin/
 </pre>
 
