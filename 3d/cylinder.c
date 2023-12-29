@@ -457,7 +457,18 @@ event init(t = 0) {
     fractions_cleanup(cs, fs);
   }
 
-  if (stl_path) {
+  if (stl_path == NULL) {
+    for (;;) {
+      solid(cs, fs, shape(x, y, z));
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+                               minlevel = minlevel);
+      if (Verbose && pid() == 0)
+        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+        break;
+    }
+    fractions_cleanup(cs, fs);
+  } else {
     if ((stl_file = fopen(stl_path, "r")) == NULL) {
       fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
       exit(1);
@@ -532,17 +543,6 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: exported geometry\n");
     free(stl_ver);
-  } else {
-    for (;;) {
-      solid(cs, fs, shape(x, y, z));
-      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
-                               minlevel = minlevel);
-      if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
-      if (s.nf == 0)
-        break;
-    }
-    fractions_cleanup(cs, fs);
   }
 
   if (dump_path == NULL)
