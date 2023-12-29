@@ -12,14 +12,26 @@
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
-static const char *force_path, *output_prefix, *stl_path, *dump_path;
+static const char *force_path, *output_prefix, *stl_path;
+static char *dump_path;
 static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
-  return z <= 0 && z + Delta >= 0;
+  double epsilon = Delta / 10;
+  return z <= - epsilon && z + Delta + epsilon >= 0;
 }
+static double shape_cylinder(double x, double y, double z) {
+  return sq(x) + sq(y) - sq(diameter / 2);
+}
+static double shape_sphere(double x, double y, double z) {
+  return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
+}
+static double (*Shape[])(double, double, double) = {shape_cylinder,
+                                                          shape_sphere};
+static const char *shape_names[] = {"cylinder", "sphere"};
+static double (*shape)(double, double, double);
 
 static double vec_dot(const double a[3], const double b[3]) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -101,20 +113,20 @@ static double tri_point_distance2(const double a[3], const double b[3],
   return x * x + y * y + z * z;
 }
 
-double embed_interpolate3(Point point, scalar s, coord p) {
-  int i = sign(p.x), j = sign(p.y);
-  int k = sign(p.z);
-  x = fabs(p.x);
-  y = fabs(p.y);
-  z = fabs(p.z);
-  if (cs[i] && cs[0, j] && cs[i, j] && cs[0, 0, k] && cs[i, 0, k] &&
+trace double embed_interpolate3(Point point, scalar s, coord p) {
+  int i = sign(p.x), j = sign(p.y), k = sign(p.z);
+  if (cs[i, 0, 0] && cs[0, j, 0] && cs[i, j, 0] && cs[0, 0, k] && cs[i, 0, k] &&
       cs[0, j, k] && cs[i, j, k]) {
-    return (((s[] * (1. - x) + s[i] * x) * (1. - y) +
-             (s[0, j] * (1. - x) + s[i, j] * x) * y) *
-                (1. - z) +
-            ((s[0, 0, k] * (1. - x) + s[i, 0, k] * x) * (1. - y) +
-             (s[0, j, k] * (1. - x) + s[i, j, k] * x) * y) *
-                z);
+    double val_0, val_k;
+    val_0 =
+        (s[0, 0, 0] * (1. - fabs(p.x)) + s[i, 0, 0] * fabs(p.x)) *
+            (1. - fabs(p.y)) +
+        (s[0, j, 0] * (1. - fabs(p.x)) + s[i, j, 0] * fabs(p.x)) * fabs(p.y);
+    val_k =
+        (s[0, 0, k] * (1. - fabs(p.x)) + s[i, 0, k] * fabs(p.x)) *
+            (1. - fabs(p.y)) +
+        (s[0, j, k] * (1. - fabs(p.x)) + s[i, j, k] * fabs(p.x)) * fabs(p.y);
+    return (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));
   } else {
     double val = s[];
     foreach_dimension() {
@@ -131,16 +143,35 @@ double embed_interpolate3(Point point, scalar s, coord p) {
 trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
                         coord *Fmu) {
   coord Fps = {0}, Fmus = {0};
-  foreach (reduction(+ : Fps) reduction(+ : Fmus), nowarning)
+  foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
     if (cs[] > 0. && cs[] < 1.) {
       coord n, b;
       double area = embed_geometry(point, &b, &n);
       area *= pow(Delta, dimension - 1);
       double Fn = area * embed_interpolate3(point, p, b);
       foreach_dimension() Fps.x += Fn * n.x;
+      if (constant(mu.x) != 0.) {
+        double mua = 0., fa = 0.;
+        foreach_dimension() {
+          mua += mu.x[] + mu.x[1];
+          fa += fs.x[] + fs.x[1];
+        }
+        mua /= fa;
+        coord dudn = embed_gradient(point, u, b, n);
+        foreach_dimension() Fmus.x -=
+            area * mua *
+            (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z);
+      }
     }
-  *Fp = Fps;
-  *Fmu = Fmus;
+  }
+
+  Fp->x = Fps.x;
+  Fp->y = Fps.y;
+  Fp->z = Fps.z;
+
+  Fmu->x = Fmus.x;
+  Fmu->y = Fmus.y;
+  Fmu->z = Fmus.z;
 }
 
 static double dot3(const double *a, const double *b) {
@@ -165,7 +196,6 @@ static void vorticity_vector(const vector u, vector omega) {
     omega.z[] = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }
 }
-face vector muv[];
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -177,13 +207,17 @@ pf[right] = dirichlet(0);
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 
+face vector muv[];
 static scalar l2[];
 static vector omega[];
 static vertex scalar phi[];
 
 int main(int argc, char **argv) {
   char *end;
-  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag;
+  int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
+      DomainFlag, i;
+  double domain;
+  DomainFlag = 0;
   FullOutput = 0;
   MaxLevelFlag = 0;
   MinLevelFlag = 0;
@@ -195,6 +229,7 @@ int main(int argc, char **argv) {
   force_path = NULL;
   dump_path = NULL;
   stl_path = NULL;
+  shape = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -207,7 +242,7 @@ int main(int argc, char **argv) {
           "  -h     Display this help message\n"
           "  -v     Verbose\n"
           "  -F     Output the full field\n"
-          "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
+          "  -r <Reynolds number>     the Reynolds number\n"
           "  -l <resolution level>    the minimum resolution level (positive "
           "integer)\n"
           "  -m <resolution level>    the maximum resolution level (positive "
@@ -217,8 +252,10 @@ int main(int argc, char **argv) {
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
           "  -f <force file>          force file\n"
-          "  -s <STL file>            geomtry file\n"
+          "  -s <STL file>            geometry file\n"
+          "  -S cylinder|sphere       shape\n"
           "  -d <dump file>           restart simulation\n"
+          "  -z <domain size>         domain size\n"
           "\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
@@ -227,7 +264,7 @@ int main(int argc, char **argv) {
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error:  -r needs an argument\n");
+        fprintf(stderr, "cylinder: error: -r needs an argument\n");
         exit(1);
       }
       reynolds = strtod(*argv, &end);
@@ -322,6 +359,23 @@ int main(int argc, char **argv) {
       }
       stl_path = *argv;
       break;
+    case 'S':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -S needs an argument\n");
+        exit(1);
+      }
+      for (i = 0; /**/; i++) {
+        if (i == sizeof shape_names / sizeof *shape_names) {
+          fprintf(stderr, "cylinder: error: unknown shape '%s'\n", *argv);
+          exit(1);
+        }
+        if (strcmp(shape_names[i], *argv) == 0) {
+          shape = Shape[i];
+          break;
+        }
+      }
+      break;
     case 'o':
       argv++;
       if (*argv == NULL) {
@@ -329,6 +383,25 @@ int main(int argc, char **argv) {
         exit(1);
       }
       output_prefix = *argv;
+      break;
+    case 'z':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -z needs an argument\n");
+        exit(1);
+      }
+      domain = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      if (domain < 1) {
+        fprintf(stderr,
+                "cylinder: error: '%s': domain size (-z) is less then one\n",
+                *argv);
+        exit(1);
+      }
+      DomainFlag = 1;
       break;
     default:
       fprintf(stderr, "cylinder: error: unknown option '%s'\n", *argv);
@@ -354,9 +427,19 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  size(50);
+  if (!DomainFlag) {
+    fprintf(stderr, "cylinder: error: -z must be set\n");
+    exit(1);
+  }
+  if (shape == NULL && stl_path == NULL) {
+    fprintf(stderr, "cylinder: error: either -S or -s should be set\n");
+    exit(1);
+  }
+  size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
+  periodic(front);
+  periodic(top);
   run();
 }
 
@@ -375,10 +458,13 @@ event init(t = 0) {
       }
       fseek(stl_file, 80, SEEK_SET);
       if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
-        fprintf(stderr, "cylinder: error: fail to doubled '%s'\n", stl_path);
+        fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
         exit(1);
       }
-      stl_ver = malloc(9 * stl_nt * sizeof *stl_ver);
+      if ((stl_ver = malloc(9 * stl_nt * sizeof *stl_ver)) == NULL) {
+        fprintf(stderr, "cylinder: error: malloc failed\n");
+        exit(1);
+      }
       if (Verbose && pid() == 0)
         fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
       for (stl_i = 0; stl_i < stl_nt; stl_i++) {
@@ -438,11 +524,11 @@ event init(t = 0) {
           phi[] = 0.25 * diameter / 2;
       }
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: exported geomtry\n");
+        fprintf(stderr, "cylinder: exported geometry\n");
       free(stl_ver);
     } else {
       for (;;) {
-        solid(cs, fs, sq(x) + sq(y) - sq(diameter / 2));
+        solid(cs, fs, shape(x, y, z));
         astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
                                  minlevel = minlevel);
         if (Verbose && pid() == 0)
@@ -485,10 +571,10 @@ event velocity(i++; t <= tend) {
         sprintf(path, "%s.%09d", output_prefix, i);
         output_xdmf({p, l2}, {u, omega}, NULL, path);
       }
-      sprintf(path, "%s.slice.%09d", output_prefix, i);
+      snprintf(path, sizeof path, "%s.slice.%09d", output_prefix, i);
       output_xdmf({p, l2}, {u, omega}, slice, path);
       if (i % (10 * period) == 0) {
-        sprintf(path, "%s.%09d.dump", output_prefix, i);
+        snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
         dump(path);
       }
     }

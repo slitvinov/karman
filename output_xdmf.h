@@ -1,8 +1,8 @@
 int output_xdmf(scalar *list, vector *vlist, const char *path) {
   float *xyz, *attr;
-  int nattr, nvect, ncell, ncell_total, nsize, j, offset;
+  long nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
-      *vname;
+      *vname, *xyz_base, *attr_base;
   FILE *file;
   MPI_File mpi_file;
   const int shift[4][2] = {
@@ -16,12 +16,21 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
 
+  xyz_base = xyz_path;
+  attr_base = attr_path;
+  for (j = 0; xyz_path[j] != '\0'; j++) {
+    if (xyz_path[j] == '/' && xyz_path[j + 1] != '\0') {
+      xyz_base = &xyz_path[j + 1];
+      attr_base = &attr_path[j + 1];
+    }
+  }
+
   nsize = 0;
   ncell = 0;
   j = 0;
   xyz = NULL;
   foreach_cell() if (is_local(cell) && is_leaf(cell)) {
-    int i, cx, cy, cz;
+    long i;
     ncell++;
     if (ncell >= nsize) {
       nsize = 2 * nsize + 1;
@@ -42,7 +51,9 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
     return 1;
   }
 
-  MPI_Exscan(&ncell, &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Exscan(&ncell, &offset, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+  if (pid() == 0)
+    offset = 0;
   MPI_File_open(MPI_COMM_WORLD, xyz_path, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                 MPI_INFO_NULL, &mpi_file);
   MPI_File_write_at_all(mpi_file, 4 * 3 * offset * sizeof *xyz, xyz,
@@ -90,15 +101,15 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "    <Grid>\n"
             "      <Topology\n"
             "          TopologyType=\"Quadrilateral\"\n"
-            "          Dimensions=\"%d\"/>\n"
+            "          Dimensions=\"%ld\"/>\n"
             "      <Geometry>\n"
             "        <DataItem\n"
-            "            Dimensions=\"%d 3\"\n"
+            "            Dimensions=\"%ld 3\"\n"
             "            Format=\"Binary\">\n"
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 4 * ncell_total, xyz_path);
+            ncell_total, 4 * ncell_total, xyz_base);
     j = 0;
     for (scalar s in list)
       fprintf(file,
@@ -107,20 +118,20 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          Center=\"Cell\">\n"
               "        <DataItem\n"
               "            ItemType=\"HyperSlab\"\n"
-              "            Dimensions=\"%d\"\n"
+              "            Dimensions=\"%ld\"\n"
               "            Type=\"HyperSlab\">\n"
               "          <DataItem Dimensions=\"3 1\">\n"
-              "            %d %d %d\n"
+              "            %ld %ld %ld\n"
               "          </DataItem>\n"
               "          <DataItem\n"
-              "              Dimensions=\"%d\"\n"
+              "              Dimensions=\"%ld\"\n"
               "              Format=\"Binary\">\n"
               "            %s\n"
               "          </DataItem>\n"
               "         </DataItem>\n"
               "      </Attribute>\n",
               s.name, ncell_total, j++, nattr + 3 * nvect, ncell_total,
-              (nattr + 3 * nvect) * ncell_total, attr_path);
+              (nattr + 3 * nvect) * ncell_total, attr_base);
     for (vector v in vlist) {
       vname = strdup(v.x.name);
       *strrchr(vname, '.') = '\0';
@@ -131,22 +142,22 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
               "          Center=\"Cell\">\n"
               "        <DataItem\n"
               "            ItemType=\"HyperSlab\"\n"
-              "            Dimensions=\"%d 3\"\n"
+              "            Dimensions=\"%ld 3\"\n"
               "            Type=\"HyperSlab\">\n"
               "          <DataItem Dimensions=\"3 2\">\n"
-              "            0 %d\n"
+              "            0 %ld\n"
               "            1 1\n"
-              "            %d 3\n"
+              "            %ld 3\n"
               "          </DataItem>\n"
               "          <DataItem\n"
-              "              Dimensions=\"%d %d\"\n"
+              "              Dimensions=\"%ld %ld\"\n"
               "              Format=\"Binary\">\n"
               "            %s\n"
               "          </DataItem>\n"
               "         </DataItem>\n"
               "      </Attribute>\n",
               vname, ncell_total, j, ncell_total, ncell_total,
-              nattr + 3 * nvect, attr_path);
+              nattr + 3 * nvect, attr_base);
       free(vname);
       j += 3;
     }
