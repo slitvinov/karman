@@ -258,7 +258,7 @@ int main(int argc, char **argv) {
           "  -z <domain size>         domain size\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
       exit(1);
     case 'r':
@@ -435,12 +435,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: either -S or -s\n");
     exit(1);
   }
+  if (Verbose && pid() == 0)
+    fprintf(stderr, "cylinder: starting on %d ranks\n", npe());
   size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
   periodic(front);
   periodic(top);
   run();
+  if (Verbose && pid() == 0)
+    fprintf(stderr, "cylinder: done\n");
 }
 
 event init(t = 0) {
