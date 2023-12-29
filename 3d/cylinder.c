@@ -233,34 +233,32 @@ int main(int argc, char **argv) {
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(
-          stderr,
-          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
-          "number> -m <maximum resolution level> -p <dump period> "
-          "-e <end time>\n"
-          "Options:\n"
-          "  -h     Display this help message\n"
-          "  -v     Verbose\n"
-          "  -F     Output the full field\n"
-          "  -r <Reynolds number>     the Reynolds number\n"
-          "  -l <resolution level>    the minimum resolution level (positive "
-          "integer)\n"
-          "  -m <resolution level>    the maximum resolution level (positive "
-          "integer)\n"
-          "  -o <preifx>              a prefix for the output files\n"
-          "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal "
-          "number)\n"
-          "  -f <force file>          force file\n"
-          "  -s <STL file>            geometry file\n"
-          "  -S cylinder|sphere       shape\n"
-          "  -d <dump file>           restart simulation\n"
-          "  -z <domain size>         domain size\n"
-          "\n"
-          "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
-      exit(1);
+    fprintf(stderr,
+	    "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
+	    "-l <resolution level> -m <maximum resolution level> "
+	    "-o <prefix> -p <dump period> -e <end time> "
+	    "-f <force file> -s <STL file> -S cylinder|sphere "
+	    "-z <domain size> [-d <dump file>]\n\n"
+	    "Options:\n"
+	    "  -h         Display this help message\n"
+	    "  -v         Verbose\n"
+	    "  -F         Output the full field\n"
+	    "  -r <num>   Reynolds number\n"
+	    "  -l <num>   Minimum resolution level (positive integer)\n"
+	    "  -m <num>   Maximum resolution level (positive integer)\n"
+	    "  -o <pref>  Prefix for the output files\n"
+	    "  -p <num>   Dump period (positive integer)\n"
+	    "  -e <num>   End time of the simulation (decimal number)\n"
+	    "  -f <file>  Output force file\n"
+	    "  -s <file>  Geometry file (binary STL format)\n"
+	    "  -S <shape> Specify shape (cylinder|sphere)\n"
+	    "  -d <file>  Restart simulation from the dump file\n"
+	    "  -z <num>   Domain size\n\n"
+	    "Example usage:\n"
+	    "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
+	    "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
+	    "-S cylinder -o h\n");
+    exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
@@ -435,12 +433,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: either -S or -s\n");
     exit(1);
   }
+  if (Verbose && pid() == 0)
+    fprintf(stderr, "cylinder: starting on %d ranks\n", npe());
   size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
   periodic(front);
   periodic(top);
   run();
+  if (Verbose && pid() == 0)
+    fprintf(stderr, "cylinder: done\n");
 }
 
 event init(t = 0) {
