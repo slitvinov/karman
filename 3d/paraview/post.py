@@ -16,26 +16,33 @@ attr_path = path + ".attr.raw"
 xyz = np.memmap(xyz_path, dtype)
 ncell = xyz.size // (3 * 8)
 assert ncell * 3 * 8 == xyz.size
-patches = []
 
 attr = np.memmap(attr_path, dtype)
 attr = attr.reshape((ncell, -1))
 u = attr[:, 2:2 + 3]
-
+vel = np.sqrt(u[:, 0]**2 + u[:, 1]**2 + u[:, 2]**2)
+patches = []
+colors = []
 for i in range(ncell):
     j = 8 * 3 * i
     x = xyz[j]
     y = xyz[j + 1]
-
     k = j + 3 * 7
-
-    u = xyz[k] - x
-    v = xyz[k + 1] - y
-    patches.append(matplotlib.patches.Rectangle((x, y), u, v, fill=None))
+    lx = xyz[k] - x
+    ly = xyz[k + 1] - y
+    cx = x + lx / 2
+    cy = y + ly / 2
+    if cx**2 + cy**2 > 1/2**2:
+        patches.append(matplotlib.patches.Rectangle((x, y), lx, ly))
+        colors.append(vel[i])
 
 L = 2.5
 plt.axis((-L / 2 + L / 10, L / 2 + L / 10, -L / 2, L / 2))
 plt.axis('scaled')
-plt.gca().add_collection(
-    matplotlib.collections.PatchCollection(patches, match_original=True))
-plt.show()
+p = matplotlib.collections.PatchCollection(patches, cmap=matplotlib.cm.jet)
+p.set_array(colors)
+p.set_clim(0, 2.7)
+plt.gca().add_collection(p)
+plt.colorbar(p)
+plt.tight_layout()
+plt.savefig("a.png")
