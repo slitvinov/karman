@@ -473,7 +473,10 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: error: fail to open '%s'\n", stl_path);
       exit(1);
     }
-    fseek(stl_file, 80, SEEK_SET);
+    if (fseek(stl_file, 80, SEEK_SET) != 0) {
+      fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
+      exit(1);
+    }
     if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
       fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
       exit(1);
