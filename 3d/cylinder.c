@@ -431,8 +431,8 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -z must be set\n");
     exit(1);
   }
-  if (shape == NULL && stl_path == NULL) {
-    fprintf(stderr, "cylinder: error: either -S or -s should be set\n");
+  if (shape == NULL && stl_path == NULL && dump_path == NULL) {
+    fprintf(stderr, "cylinder: error: either -S, -s, or -d should be set\n");
     exit(1);
   }
   size(domain);
