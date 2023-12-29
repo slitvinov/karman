@@ -432,7 +432,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if (shape == NULL && stl_path == NULL) {
-    fprintf(stderr, "cylinder: error: either -S or -s should be set\n");
+    fprintf(stderr, "cylinder: error: either -S or -s\n");
     exit(1);
   }
   size(domain);
@@ -583,7 +583,7 @@ event velocity(i++; t <= tend) {
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
-        if (fp == NULL && dump_path == NULL) {
+        if (fp == NULL) {
           if ((fp = fopen(force_path, "w")) == NULL) {
             fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
