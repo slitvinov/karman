@@ -1,11 +1,14 @@
-import sys
-import re
-import numpy as np
 import matplotlib.patches
 import matplotlib.pyplot as plt
+import multiprocessing
+import numpy as np
+import os
+import re
+import sys
 
-dtype = np.dtype("float32")
-for path in sys.argv[1:]:
+
+def do(path):
+    dtype = np.dtype("float32")
     path = re.sub("\.xdmf2$", "", path)
     path = re.sub("\.attr\.raw$", "", path)
     path = re.sub("\.xyz\.raw$", "", path)
@@ -47,4 +50,8 @@ for path in sys.argv[1:]:
     plt.tight_layout()
     plt.savefig(png_path)
     plt.close()
-    sys.stderr.write("post.sh: %s\n" % png_path)
+    sys.stderr.write("post.sh: %ld %s\n" % (os.getpid(), png_path))
+
+
+with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
+    pool.map(do, sys.argv[1:])
