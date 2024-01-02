@@ -20640,9 +20640,10 @@ static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
+static long seed;
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
-  return z <= - epsilon && z + Delta + epsilon >= 0;
+  return z <= -epsilon && z + Delta + epsilon >= 0;
 }
 static double shape_cylinder(double x, double y, double z) {
   return sq(x) + sq(y) - sq(diameter / 2);
@@ -20651,7 +20652,7 @@ static double shape_sphere(double x, double y, double z) {
   return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
 }
 static double (*Shape[])(double, double, double) = {shape_cylinder,
-                                                          shape_sphere};
+                                                    shape_sphere};
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
@@ -20735,7 +20736,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
   return x * x + y * y + z * z;
 }
 
-      double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;tracing("embed_interpolate3","cylinder.c",116);
+      double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;tracing("embed_interpolate3","cylinder.c",117);
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
   if (val(cs,i, 0, 0) && val(cs,0, j, 0) && val(cs,i, j, 0) && val(cs,0, 0, k) && val(cs,i, 0, k) &&
       val(cs,0, j, k) && val(cs,i, j, k)) {
@@ -20748,7 +20749,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
         (val(s,0, 0, k) * (1. - fabs(p.x)) + val(s,i, 0, k) * fabs(p.x)) *
             (1. - fabs(p.y)) +
         (val(s,0, j, k) * (1. - fabs(p.x)) + val(s,i, j, k) * fabs(p.x)) * fabs(p.y);
-    { double _ret= (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));end_tracing("embed_interpolate3","cylinder.c",129);return _ret;}
+    { double _ret= (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));end_tracing("embed_interpolate3","cylinder.c",130);return _ret;}
   } else {
     double val = val(s,0,0,0);
      {
@@ -20758,7 +20759,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
       else if (val(cs,-i,0,0))
         val += fabs(p.x) * (val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 132
+#line 133
 {
       int i = sign(p.y);
       if (val(cs,0,i,0))
@@ -20766,7 +20767,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
       else if (val(cs,0,-i,0))
         val += fabs(p.y) * (val(s,0,0,0) - val(s,0,-i,0));
     } 
-#line 132
+#line 133
 {
       int i = sign(p.z);
       if (val(cs,0,0,i))
@@ -20774,17 +20775,17 @@ static double tri_point_distance2(const double a[3], const double b[3],
       else if (val(cs,0,0,-i))
         val += fabs(p.z) * (val(s,0,0,0) - val(s,0,0,-i));
     }
-    {end_tracing("embed_interpolate3","cylinder.c",139);return val;}
+    {end_tracing("embed_interpolate3","cylinder.c",140);return val;}
   }
-end_tracing("embed_interpolate3","cylinder.c",141);}
+end_tracing("embed_interpolate3","cylinder.c",142);}
 
 
-#line 116
+#line 117
 static void _stencil_embed_interpolate3(Point point, scalar s,_stencil_undefined * p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
   
 _stencil_val(cs,o_stencil, 0, 0); _stencil_val(cs,0,o_stencil , 0); _stencil_val(cs,o_stencil,o_stencil , 0); _stencil_val(cs,0, 0,o_stencil ); _stencil_val(cs,o_stencil, 0,o_stencil );
       _stencil_val(cs,0,o_stencil, o_stencil ); _stencil_val(cs,o_stencil,o_stencil, o_stencil );
-#line 118
+#line 119
 { 
 {  
     
@@ -20796,7 +20797,7 @@ _stencil_val(s,0,o_stencil , 0); _stencil_val(s,o_stencil,o_stencil , 0);
            
                     
           
-#line 126
+#line 127
 _stencil_val(s,0, 0,o_stencil ); _stencil_val(s,o_stencil, 0,o_stencil );
 
 _stencil_val(s,0,o_stencil, o_stencil ); _stencil_val(s,o_stencil,o_stencil, o_stencil );         
@@ -20812,9 +20813,9 @@ _stencil_val(cs,o_stencil,0,0);{
        
       
     
-#line 138
+#line 139
 } 
-#line 132
+#line 133
 {   
       
 _stencil_val(cs,0,o_stencil,0);{
@@ -20824,9 +20825,9 @@ _stencil_val(cs,0,o_stencil,0);{
        
       
     
-#line 138
+#line 139
 } 
-#line 132
+#line 133
 {   
       
 _stencil_val(cs,0,0,o_stencil);{
@@ -20836,17 +20837,17 @@ _stencil_val(cs,0,0,o_stencil);{
        
       
     
-#line 138
+#line 139
 } 
     
   }}
           
 
-#line 141
+#line 142
 }
 
       void embed_force3(scalar p, vector u, vector mu, coord *Fp,
-                        coord *Fmu) {tracing("embed_force3","cylinder.c",143);
+                        coord *Fmu) {tracing("embed_force3","cylinder.c",144);
   coord Fps = {0}, Fmus = {0};
   foreach_stencil () {
 _stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
@@ -20862,23 +20863,23 @@ _stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0);
             _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
            
         
-#line 158
+#line 159
 } 
-#line 155
+#line 156
 { 
 _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
             _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
            
         
-#line 158
+#line 159
 } 
-#line 155
+#line 156
 { 
 _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
             _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
            
         
-#line 158
+#line 159
 }  
           
          _stencil_embed_gradient(point, u,NULL ,NULL );
@@ -20889,13 +20890,13 @@ _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1);
     }
           
   
-#line 166
+#line 167
 }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : Fmus)reduction(+ : Fps)){
-#line 146
+#line 147
 foreach () {
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
       coord n, b;
@@ -20909,12 +20910,12 @@ foreach () {
           mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
           fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
         } 
-#line 155
+#line 156
 {
           mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
           fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
         } 
-#line 155
+#line 156
 {
           mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
           fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
@@ -20924,11 +20925,11 @@ foreach () {
          Fmus.x -=
             area * mua *
             (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z); 
-#line 161
+#line 162
 Fmus.y -=
             area * mua *
             (dudn.y * (sq(n.y) + 1.) + dudn.z * n.y * n.z + dudn.x * n.y * n.x); 
-#line 161
+#line 162
 Fmus.z -=
             area * mua *
             (dudn.z * (sq(n.z) + 1.) + dudn.x * n.z * n.x + dudn.y * n.z * n.y);
@@ -20940,7 +20941,7 @@ Fmus.z -=
 }
 
   
-#line 168
+#line 169
 Fp->x = Fps.x;
   Fp->y = Fps.y;
   Fp->z = Fps.z;
@@ -20948,7 +20949,7 @@ Fp->x = Fps.x;
   Fmu->x = Fmus.x;
   Fmu->y = Fmus.y;
   Fmu->z = Fmus.z;
-end_tracing("embed_force3","cylinder.c",175);}
+end_tracing("embed_force3","cylinder.c",176);}
 
 static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -20960,7 +20961,7 @@ static void vorticity_vector(const vector u, vector omega) {
 _stencil_val(cm,0,0,0);      
           
     
-#line 185
+#line 186
 _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(fm.x,1,0,0);     
     _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0, 1,0); _stencil_val(fm.y,0,0,0);_stencil_val(fm.y,0, 1,0);     
     _stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0, 0, 1); _stencil_val(fm.z,0,0,0);_stencil_val(fm.z,0, 0, 1);   
@@ -20975,7 +20976,7 @@ _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_st
     _stencil_val_a(omega.z,0,0,0);        
   }end_foreach_stencil();
   
-#line 182
+#line 183
 if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
     double delta;
     delta = (2. * val(cm,0,0,0) * Delta + 1e-30);
@@ -20993,7 +20994,7 @@ if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else if(is_constant(cm) && !is_constant(fm.x)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
   {
-#line 182
+#line 183
 foreach () {
     double delta;
     delta = (2. * _const_cm * Delta + 1e-30);
@@ -21011,7 +21012,7 @@ foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else if(!is_constant(cm) && is_constant(fm.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 182
+#line 183
 foreach () {
     double delta;
     delta = (2. * val(cm,0,0,0) * Delta + 1e-30);
@@ -21029,7 +21030,7 @@ foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 182
+#line 183
 foreach () {
     double delta;
     delta = (2. * _const_cm * Delta + 1e-30);
@@ -21064,10 +21065,10 @@ static vector  omega={{19},{20},{21}};
 static scalar  phi={22};
 
 int main(int argc, char **argv) {
-#line 444
+#line 463
 _init_solver();
   
-#line 216
+#line 217
 char *end;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
       DomainFlag, i;
@@ -21080,6 +21081,7 @@ char *end;
   ReynoldsFlag = 0;
   TendFlag = 0;
   Verbose = 0;
+  seed = -1;
   output_prefix = NULL;
   force_path = NULL;
   dump_path = NULL;
@@ -21090,31 +21092,31 @@ char *end;
     case 'h':
       fprintf(
           ferr,
-          "Usage: cylinder [-h] [-i] [-v] [-f force file] -r <Reynolds "
-          "number> -m <maximum resolution level> -p <dump period> "
-          "-e <end time>\n"
+          "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
+          "-l <resolution level> -m <maximum resolution level> "
+          "-o <prefix> -p <dump period> -e <end time> "
+          "-f <force file> -s <STL file> -S cylinder|sphere "
+          "-z <domain size> [-d <dump file>]\n\n"
           "Options:\n"
-          "  -h     Display this help message\n"
-          "  -v     Verbose\n"
-          "  -F     Output the full field\n"
-          "  -r <Reynolds number>     the Reynolds number\n"
-          "  -l <resolution level>    the minimum resolution level (positive "
-          "integer)\n"
-          "  -m <resolution level>    the maximum resolution level (positive "
-          "integer)\n"
-          "  -o <preifx>              a prefix for the output files\n"
-          "  -p <dump period>         the dump period (positive integer)\n"
-          "  -e <end time>            end time of the simulation (decimal "
-          "number)\n"
-          "  -f <force file>          force file\n"
-          "  -s <STL file>            geometry file\n"
-          "  -S cylinder|sphere       shape\n"
-          "  -d <dump file>           restart simulation\n"
-          "  -z <domain size>         domain size\n"
-          "\n"
+          "  -h         Display this help message\n"
+          "  -v         Verbose\n"
+          "  -F         Output the full field\n"
+          "  -R <num>   Add random perturbation (positive integer)\n"
+          "  -r <num>   Reynolds number\n"
+          "  -l <num>   Minimum resolution level (positive integer)\n"
+          "  -m <num>   Maximum resolution level (positive integer)\n"
+          "  -o <pref>  Prefix for the output files\n"
+          "  -p <num>   Dump period (positive integer)\n"
+          "  -e <num>   End time of the simulation (decimal number)\n"
+          "  -f <file>  Output force file\n"
+          "  -s <file>  Geometry file (binary STL format)\n"
+          "  -S <shape> Specify shape (cylinder|sphere)\n"
+          "  -d <file>  Restart simulation from the dump file\n"
+          "  -z <num>   Domain size\n\n"
           "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat\n");
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
+          "-S cylinder -o h\n");
       exit(1);
     case 'r':
       argv++;
@@ -21156,6 +21158,19 @@ char *end;
         exit(1);
       }
       MinLevelFlag = 1;
+      break;
+    case 'R':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(ferr, "cylinder: error: -R needs an argument\n");
+        exit(1);
+      }
+      seed = strtol(*argv, &end, 10);
+      if (*end != '\0' || minlevel <= 0) {
+        fprintf(ferr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
+      }
       break;
     case 'p':
       argv++;
@@ -21287,196 +21302,227 @@ char *end;
     exit(1);
   }
   if (shape == NULL && stl_path == NULL) {
-    fprintf(ferr, "cylinder: error: either -S or -s should be set\n");
+    fprintf(ferr, "cylinder: error: either -S or -s\n");
     exit(1);
   }
+  if (Verbose && pid() == 0)
+    fprintf(ferr, "cylinder: starting on %d ranks\n", npe());
   size(domain);
   origin((struct _origin){-L0 / 2.5, -L0 / 2.0, -L0 / 2.0});
   mu = muv;
   tree_periodic(front);
   tree_periodic(top);
   run();
+  if (Verbose && pid() == 0)
+    fprintf(ferr, "cylinder: done\n");
 free_solver();
 
-#line 444
+#line 463
 }
 
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 446
-      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",446); {
+#line 465
+      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",465); {
   uint32_t stl_i, stl_nt;
   FILE *stl_file;
   float *stl_ver;
-
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 453); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
-    if (stl_path) {
-      if ((stl_file = fopen(stl_path, "r")) == NULL) {
-        fprintf(ferr, "cylinder: error: fail to open '%s'\n", stl_path);
-        exit(1);
-      }
-      fseek(stl_file, 80, SEEK_SET);
-      if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
-        fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
-        exit(1);
-      }
-      if ((stl_ver = pmalloc(9 * stl_nt * sizeof *stl_ver,__func__,__FILE__,__LINE__)) == NULL) {
-        fprintf(ferr, "cylinder: error: malloc failed\n");
-        exit(1);
-      }
-      if (Verbose && pid() == 0)
-        fprintf(ferr, "cylinder: triangles in STL file: %d\n", stl_nt);
-      for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-        fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
-        if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
-          fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
-          exit(1);
-        }
-        fseek(stl_file, 2, SEEK_CUR);
-      }
-      if (fclose(stl_file) != 0) {
-        fprintf(ferr, "cylinder: error: fail to close '%s'\n", stl_path);
-        exit(1);
-      }
-      _attribute[phi.i].refine = _attribute[phi.i].prolongation = fraction_refine;
-      do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 483); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
-                                                                   ;
-      predicate_ini();
-      foreach_vertex_stencil() {
-{ 
-{    
-          
-          
-                       
-           
-            
-           
-             
-                                      
-             
-             
-             
-
-             
-             
-             
-
-             
-             
-                    
-
-             
-              
-              
-
-             
-              
-                  
-
-                
-            
-                
-                 
-           
-          _stencil_val_a(phi,0,0,0);        
-        }
-          {_stencil_val_a(phi,0,0,0);      }}
-                  
-                     
-      
-#line 525
-}end_foreach_vertex_stencil();
-      {
-#line 486
-foreach_vertex() {
-        if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-            sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
-          double minimum;
-          uint32_t intersect;
-          uint32_t stl_i, j;
-          double a[3], b[3], c[3], e[3], s[3], dist2;
-          intersect = 0;
-          minimum = DBL_MAX;
-          for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-            j = 9 * stl_i;
-            a[0] = stl_ver[j];
-            a[1] = stl_ver[j + 1];
-            a[2] = stl_ver[j + 2];
-
-            b[0] = stl_ver[j + 3];
-            b[1] = stl_ver[j + 4];
-            b[2] = stl_ver[j + 5];
-
-            c[0] = stl_ver[j + 6];
-            c[1] = stl_ver[j + 7];
-            c[2] = stl_ver[j + 8];
-
-            s[0] = x;
-            s[1] = y;
-            s[2] = z;
-
-            e[0] = s[0];
-            e[1] = s[1];
-            e[2] = s[2] + 2 * L0;
-
-            dist2 = tri_point_distance2(a, b, c, s);
-            if (dist2 < minimum)
-              minimum = dist2;
-            intersect += predicate_ray(s, e, a, b, c);
-          }
-          val(phi,0,0,0) = intersect % 2 ? -dist2 : dist2;
-        } else
-          val(phi,0,0,0) = 0.25 * diameter / 2;
-      }end_foreach_vertex();}
-      if (Verbose && pid() == 0)
-        fprintf(ferr, "cylinder: exported geometry\n");
-      pfree(stl_ver,__func__,__FILE__,__LINE__);
-    } else {
-      for (;;) {
-        do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions ((struct Fractions){phi, cs, fs});delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
-        astats s = adapt_wavelet((struct Adapt){((scalar[]){cs,{-1}}), (double[]){0}, .maxlevel = maxlevel,
-                                 .minlevel = minlevel});
-        if (Verbose && pid() == 0)
-          fprintf(ferr, "cylinder: refined %d cells\n", s.nf);
-        if (s.nf == 0)
-          break;
-      }
-      fractions_cleanup((struct Cleanup){cs, fs});
-    }
-    foreach_stencil () {
-      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
-      _stencil_val_a(u.y,0,0,0);  
-      _stencil_val_a(u.z,0,0,0);  
-    }end_foreach_stencil();
-    {
-#line 541
-foreach () {
-      val(u.x,0,0,0) = val(cs,0,0,0);
-      val(u.y,0,0,0) = 0;
-      val(u.z,0,0,0) = 0;
-    }end_foreach();}
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 471); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
   } else {
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: reading dump '%s'\n", dump_path);
     restore((struct Dump){dump_path});
     fractions_cleanup((struct Cleanup){cs, fs});
   }
-}{end_tracing("init_0","cylinder.c",552);return 0;}end_tracing("init_0","cylinder.c",552);}
+
+  if (stl_path == NULL) {
+    for (;;) {
+      do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions ((struct Fractions){phi, cs, fs});delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
+      astats s = adapt_wavelet((struct Adapt){((scalar[]){cs,{-1}}), (double[]){0}, .maxlevel = maxlevel,
+                               .minlevel = minlevel});
+      if (Verbose && pid() == 0)
+        fprintf(ferr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+        break;
+    }
+    fractions_cleanup((struct Cleanup){cs, fs});
+  } else {
+    if ((stl_file = fopen(stl_path, "r")) == NULL) {
+      fprintf(ferr, "cylinder: error: fail to open '%s'\n", stl_path);
+      exit(1);
+    }
+    if (fseek(stl_file, 80, SEEK_SET) != 0) {
+      fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
+      exit(1);
+    }
+    if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+      fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
+      exit(1);
+    }
+    if ((stl_ver = pmalloc(9 * stl_nt * sizeof *stl_ver,__func__,__FILE__,__LINE__)) == NULL) {
+      fprintf(ferr, "cylinder: error: malloc failed\n");
+      exit(1);
+    }
+    if (Verbose && pid() == 0)
+      fprintf(ferr, "cylinder: triangles in STL file: %d\n", stl_nt);
+    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+      fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
+      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+        fprintf(ferr, "cylinder: error: fail to read '%s'\n", stl_path);
+        exit(1);
+      }
+      fseek(stl_file, 2, SEEK_CUR);
+    }
+    if (fclose(stl_file) != 0) {
+      fprintf(ferr, "cylinder: error: fail to close '%s'\n", stl_path);
+      exit(1);
+    }
+    _attribute[phi.i].refine = _attribute[phi.i].prolongation = fraction_refine;
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 522); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) && level < maxlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0)
+                            ;
+    predicate_ini();
+    foreach_vertex_stencil() {
+{ 
+{    
+        
+        
+                     
+         
+          
+         
+           
+                                    
+           
+           
+           
+
+           
+           
+           
+
+           
+           
+                  
+
+           
+            
+            
+
+           
+            
+                
+
+              
+          
+              
+               
+         
+        _stencil_val_a(phi,0,0,0);        
+      }
+        {_stencil_val_a(phi,0,0,0);      }}
+                
+                   
+    
+#line 564
+}end_foreach_vertex_stencil();
+    {
+#line 525
+foreach_vertex() {
+      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
+          sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
+        double minimum;
+        uint32_t intersect;
+        uint32_t stl_i, j;
+        double a[3], b[3], c[3], e[3], s[3], dist2;
+        intersect = 0;
+        minimum = DBL_MAX;
+        for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+          j = 9 * stl_i;
+          a[0] = stl_ver[j];
+          a[1] = stl_ver[j + 1];
+          a[2] = stl_ver[j + 2];
+
+          b[0] = stl_ver[j + 3];
+          b[1] = stl_ver[j + 4];
+          b[2] = stl_ver[j + 5];
+
+          c[0] = stl_ver[j + 6];
+          c[1] = stl_ver[j + 7];
+          c[2] = stl_ver[j + 8];
+
+          s[0] = x;
+          s[1] = y;
+          s[2] = z;
+
+          e[0] = s[0];
+          e[1] = s[1];
+          e[2] = s[2] + 2 * L0;
+
+          dist2 = tri_point_distance2(a, b, c, s);
+          if (dist2 < minimum)
+            minimum = dist2;
+          intersect += predicate_ray(s, e, a, b, c);
+        }
+        val(phi,0,0,0) = intersect % 2 ? -dist2 : dist2;
+      } else
+        val(phi,0,0,0) = 0.25 * diameter / 2;
+    }end_foreach_vertex();}
+    if (Verbose && pid() == 0)
+      fprintf(ferr, "cylinder: exported geometry\n");
+    pfree(stl_ver,__func__,__FILE__,__LINE__);
+  }
+
+  if (dump_path == NULL)
+    {
+    
+#line 571
+foreach_stencil () {
+      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
+      _stencil_val_a(u.y,0,0,0);  
+      _stencil_val_a(u.z,0,0,0);  
+    }end_foreach_stencil();{
+#line 571
+foreach () {
+      val(u.x,0,0,0) = val(cs,0,0,0);
+      val(u.y,0,0,0) = 0;
+      val(u.z,0,0,0) = 0;
+    }end_foreach();}}
+
+  if (seed != -1) {
+    srand(npe() + seed);
+    foreach_stencil ()
+      {_stencil_val(cs,0,0,0); { 
+            
+        _stencil_val_r(u.x,0,0,0);          
+        _stencil_val_r(u.y,0,0,0);          
+        _stencil_val_r(u.z,0,0,0);          
+      }   }end_foreach_stencil();
+    {
+#line 579
+foreach ()
+      if (val(cs,0,0,0) == 1) {
+        if (!(0)) qassert ("cylinder.c", 581, "0");
+        val(u.x,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        val(u.y,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        val(u.z,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+      }end_foreach();}
+  }
+}{end_tracing("init_0","cylinder.c",587);return 0;}end_tracing("init_0","cylinder.c",587);}
 
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 554
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",554); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",554);return 0;}end_tracing("properties_0","cylinder.c",554);}
+#line 589
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",589); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",589);return 0;}end_tracing("properties_0","cylinder.c",589);}
 
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 556
-      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",556); {
+#line 591
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",591); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -21504,7 +21550,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
-        if (fp == NULL && dump_path == NULL) {
+        if (fp == NULL) {
           if ((fp = fopen(force_path, "w")) == NULL) {
             fprintf(ferr, "cylinder: error: fail to open '%s'\n", force_path);
             exit(1);
@@ -21531,7 +21577,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
-}{end_tracing("velocity","cylinder.c",611);return 0;}end_tracing("velocity","cylinder.c",611);}
+}{end_tracing("velocity","cylinder.c",646);return 0;}end_tracing("velocity","cylinder.c",646);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -21573,10 +21619,10 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
-#line 446 "cylinder.c"
-event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",446,"init"});  
-#line 556
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",556,"velocity"});
+#line 465 "cylinder.c"
+event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",465,"init"});  
+#line 591
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",591,"velocity"});
 	
 	
 	
@@ -21643,8 +21689,8 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",446,"adapt"});  
-#line 554 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",554,"properties"});
+#line 589 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",589,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
