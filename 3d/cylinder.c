@@ -575,6 +575,8 @@ event init(t = 0) {
     }
 
   if (seed != -1) {
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: add random noise with seed %ld\n", seed);
     srand(npe() + seed);
     foreach ()
       if (cs[] == 1) {
