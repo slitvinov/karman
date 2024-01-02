@@ -4,12 +4,11 @@
 @include <stdint.h>
 @include <stdlib.h>
 @include <string.h>
-@include <stdlib.h>
-#include "embed.h"
-#include "fractions.h"
 #include "grid/octree.h"
-#include "lambda2.h"
+#include "fractions.h"
+#include "embed.h"
 #include "navier-stokes/centered.h"
+#include "lambda2.h"
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
