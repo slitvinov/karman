@@ -581,9 +581,9 @@ event init(t = 0) {
     foreach ()
       if (cs[] == 1) {
         assert(0);
-        u.x[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.y[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.z[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.x[] += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.y[] += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.z[] += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
       }
   }
 }
