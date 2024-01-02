@@ -15,7 +15,7 @@
 static const char *force_path, *output_prefix, *stl_path;
 static char *dump_path;
 static const double diameter = 1;
-static const int outlevel = 6;
+static const int outlevel = 7;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static long seed;
