@@ -21507,9 +21507,9 @@ foreach () {
 foreach ()
       if (val(cs,0,0,0) == 1) {
         if (!(0)) qassert ("cylinder.c", 583, "0");
-        val(u.x,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
-        val(u.y,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
-        val(u.z,0,0,0) += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        val(u.x,0,0,0) += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
+        val(u.y,0,0,0) += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
+        val(u.z,0,0,0) += 1e-8 * (1 - 2 * rand() / (double)RAND_MAX);
       }end_foreach();}
   }
 }{end_tracing("init_0","cylinder.c",589);return 0;}end_tracing("init_0","cylinder.c",589);}
