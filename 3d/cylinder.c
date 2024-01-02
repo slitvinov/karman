@@ -4,11 +4,12 @@
 @include <stdint.h>
 @include <stdlib.h>
 @include <string.h>
-#include "grid/octree.h"
-#include "fractions.h"
+@include <stdlib.h>
 #include "embed.h"
-#include "navier-stokes/centered.h"
+#include "fractions.h"
+#include "grid/octree.h"
 #include "lambda2.h"
+#include "navier-stokes/centered.h"
 #include "output_xdmf.h"
 #include "predicate.h"
 #include "predicate_c.h"
@@ -18,6 +19,7 @@ static const double diameter = 1;
 static const int outlevel = 6;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
+static long seed;
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
@@ -225,6 +227,7 @@ int main(int argc, char **argv) {
   ReynoldsFlag = 0;
   TendFlag = 0;
   Verbose = 0;
+  seed = -1;
   output_prefix = NULL;
   force_path = NULL;
   dump_path = NULL;
@@ -233,32 +236,34 @@ int main(int argc, char **argv) {
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-    fprintf(stderr,
-	    "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
-	    "-l <resolution level> -m <maximum resolution level> "
-	    "-o <prefix> -p <dump period> -e <end time> "
-	    "-f <force file> -s <STL file> -S cylinder|sphere "
-	    "-z <domain size> [-d <dump file>]\n\n"
-	    "Options:\n"
-	    "  -h         Display this help message\n"
-	    "  -v         Verbose\n"
-	    "  -F         Output the full field\n"
-	    "  -r <num>   Reynolds number\n"
-	    "  -l <num>   Minimum resolution level (positive integer)\n"
-	    "  -m <num>   Maximum resolution level (positive integer)\n"
-	    "  -o <pref>  Prefix for the output files\n"
-	    "  -p <num>   Dump period (positive integer)\n"
-	    "  -e <num>   End time of the simulation (decimal number)\n"
-	    "  -f <file>  Output force file\n"
-	    "  -s <file>  Geometry file (binary STL format)\n"
-	    "  -S <shape> Specify shape (cylinder|sphere)\n"
-	    "  -d <file>  Restart simulation from the dump file\n"
-	    "  -z <num>   Domain size\n\n"
-	    "Example usage:\n"
-	    "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
-	    "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
-	    "-S cylinder -o h\n");
-    exit(1);
+      fprintf(
+          stderr,
+          "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
+          "-l <resolution level> -m <maximum resolution level> "
+          "-o <prefix> -p <dump period> -e <end time> "
+          "-f <force file> -s <STL file> -S cylinder|sphere "
+          "-z <domain size> [-d <dump file>]\n\n"
+          "Options:\n"
+          "  -h         Display this help message\n"
+          "  -v         Verbose\n"
+          "  -F         Output the full field\n"
+          "  -R <num>   Add random perturbation (positive integer)\n"
+          "  -r <num>   Reynolds number\n"
+          "  -l <num>   Minimum resolution level (positive integer)\n"
+          "  -m <num>   Maximum resolution level (positive integer)\n"
+          "  -o <pref>  Prefix for the output files\n"
+          "  -p <num>   Dump period (positive integer)\n"
+          "  -e <num>   End time of the simulation (decimal number)\n"
+          "  -f <file>  Output force file\n"
+          "  -s <file>  Geometry file (binary STL format)\n"
+          "  -S <shape> Specify shape (cylinder|sphere)\n"
+          "  -d <file>  Restart simulation from the dump file\n"
+          "  -z <num>   Domain size\n\n"
+          "Example usage:\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
+          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
+          "-S cylinder -o h\n");
+      exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
@@ -299,6 +304,19 @@ int main(int argc, char **argv) {
         exit(1);
       }
       MinLevelFlag = 1;
+      break;
+    case 'R':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -R needs an argument\n");
+        exit(1);
+      }
+      seed = strtol(*argv, &end, 10);
+      if (*end != '\0' || minlevel <= 0) {
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
+      }
       break;
     case 'p':
       argv++;
@@ -556,6 +574,17 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
+
+  if (seed != -1) {
+    srand(npe() + seed);
+    foreach ()
+      if (cs[] == 1) {
+        assert(0);
+        u.x[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.y[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.z[] += 1e-6 * (1 - 2 * rand() / (double)RAND_MAX);
+      }
+  }
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
