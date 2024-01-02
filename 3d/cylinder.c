@@ -580,9 +580,9 @@ event init(t = 0) {
     srand(npe() + seed);
     foreach ()
       if (cs[] == 1) {
-        u.x[] += 1e-3 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.y[] += 1e-3 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.z[] += 1e-3 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.x[] += (1 - 2 * rand() / (double)RAND_MAX);
+        u.y[] += (1 - 2 * rand() / (double)RAND_MAX);
+        u.z[] += (1 - 2 * rand() / (double)RAND_MAX);
       }
   }
 }
