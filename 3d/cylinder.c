@@ -580,9 +580,9 @@ event init(t = 0) {
     srand(npe() + seed);
     foreach ()
       if (cs[] == 1) {
-        u.x[] = u.x[] + 0.1 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.y[] = u.y[] + 0.1 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.z[] = u.z[] + 0.1 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.x[] = u.x[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.y[] = u.y[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
+        u.z[] = u.z[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
       }
   }
 }
@@ -639,7 +639,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
                            maxlevel = maxlevel, minlevel = minlevel);
-  unrefine(!(x < X0 + 0.9 * L0));
+  unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
   fractions_cleanup(cs, fs);
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
