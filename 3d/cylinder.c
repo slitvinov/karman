@@ -215,6 +215,7 @@ static vertex scalar phi[];
 
 int main(int argc, char **argv) {
   char *end;
+  const char *periodic_boundaries;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
       DomainFlag, i;
   double domain;
@@ -232,6 +233,7 @@ int main(int argc, char **argv) {
   dump_path = NULL;
   stl_path = NULL;
   shape = NULL;
+  periodic_boundaries = NULL;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -241,23 +243,25 @@ int main(int argc, char **argv) {
           "-l <resolution level> -m <maximum resolution level> "
           "-o <prefix> -p <dump period> -e <end time> "
           "-f <force file> -s <STL file> -S cylinder|sphere "
-          "-z <domain size> [-d <dump file>]\n\n"
+          "-z <domain size> [-b <boundaries>] [-d <dump file>]\n\n"
           "Options:\n"
-          "  -h         Display this help message\n"
-          "  -v         Verbose\n"
-          "  -F         Output the full field\n"
-          "  -R <num>   Add random perturbation (positive integer)\n"
-          "  -r <num>   Reynolds number\n"
-          "  -l <num>   Minimum resolution level (positive integer)\n"
-          "  -m <num>   Maximum resolution level (positive integer)\n"
-          "  -o <pref>  Prefix for the output files\n"
-          "  -p <num>   Dump period (positive integer)\n"
-          "  -e <num>   End time of the simulation (decimal number)\n"
-          "  -f <file>  Output force file\n"
-          "  -s <file>  Geometry file (binary STL format)\n"
-          "  -S <shape> Specify shape (cylinder|sphere)\n"
-          "  -d <file>  Restart simulation from the dump file\n"
-          "  -z <num>   Domain size\n\n"
+          "  -h          Display this help message\n"
+          "  -v          Verbose\n"
+          "  -F          Output the full field\n"
+          "  -b <string> Periodic boundary (ft|f|t: front (f), top (t) or both,"
+          "default is symmetric boundary)\n"
+          "  -R <num>    Add random perturbation (positive integer)\n"
+          "  -r <num>    Reynolds number\n"
+          "  -l <num>    Minimum resolution level (positive integer)\n"
+          "  -m <num>    Maximum resolution level (positive integer)\n"
+          "  -o <pref>   Prefix for the output files\n"
+          "  -p <num>    Dump period (positive integer)\n"
+          "  -e <num>    End time of the simulation (decimal number)\n"
+          "  -f <file>   Output force file\n"
+          "  -s <file>   Geometry file (binary STL format)\n"
+          "  -S <string> Specify shape (cylinder|sphere)\n"
+          "  -d <file>   Restart simulation from the dump file\n"
+          "  -z <num>    Domain size\n\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
@@ -391,6 +395,14 @@ int main(int argc, char **argv) {
         }
       }
       break;
+    case 'b':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -b needs an argument\n");
+        exit(1);
+      }
+      periodic_boundaries = *argv;
+      break;
     case 'o':
       argv++;
       if (*argv == NULL) {
@@ -455,8 +467,26 @@ int main(int argc, char **argv) {
   size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
-  periodic(front);
-  periodic(top);
+
+  if (periodic_boundaries != NULL)
+    for (i = 0; periodic_boundaries[i] != '\0'; i++)
+      switch (periodic_boundaries[i]) {
+      case 'f':
+        periodic(front);
+        if (Verbose && pid() == 0)
+          fprintf(stderr, "cylinder: front boundary is periodic\n");
+        break;
+      case 't':
+        periodic(top);
+        if (Verbose && pid() == 0)
+          fprintf(stderr, "cylinder: top boundary is periodic\n");
+        break;
+      default:
+        fprintf(stderr, "cylinder: unknown boundary in '%s'\n",
+                periodic_boundaries);
+        exit(1);
+        break;
+      }
   run();
   if (Verbose && pid() == 0)
     fprintf(stderr, "cylinder: done\n");
