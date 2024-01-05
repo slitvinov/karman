@@ -15,7 +15,7 @@
 static const char *force_path, *output_prefix, *stl_path;
 static char *dump_path;
 static const double diameter = 1;
-static const int outlevel = 6;
+static const int outlevel = 7;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
 static long seed;
@@ -639,7 +639,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
                            maxlevel = maxlevel, minlevel = minlevel);
-  unrefine(!(x < X0 + 0.9 * L0));
+  unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
   fractions_cleanup(cs, fs);
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,

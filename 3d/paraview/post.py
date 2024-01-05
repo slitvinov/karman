@@ -50,7 +50,7 @@ def do(path):
     plt.tight_layout()
     plt.savefig(png_path)
     plt.close()
-    sys.stderr.write("post.sh: %ld %s\n" % (os.getpid(), png_path))
+    sys.stderr.write("post.sh: %ld: %ld %s\n" % (os.getpid(), ncell, png_path))
 
 
 with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
