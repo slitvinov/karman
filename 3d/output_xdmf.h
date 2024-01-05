@@ -1,4 +1,4 @@
-static int output_xdmf(scalar *list, vector *vlist,
+static int output_xdmf(double t, scalar *list, vector *vlist,
                        int cond(double, double, double, double),
                        const char *path) {
   float *xyz, *attr;
@@ -101,6 +101,8 @@ static int output_xdmf(scalar *list, vector *vlist,
             "    Version=\"2\">\n"
             "  <Domain>\n"
             "    <Grid>\n"
+            "      <Time\n"
+            "          Value=\"%.16e\"/>\n"
             "      <Topology\n"
             "          TopologyType=\"Hexahedron\"\n"
             "          Dimensions=\"%ld\"/>\n"
@@ -111,7 +113,7 @@ static int output_xdmf(scalar *list, vector *vlist,
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_base);
+            t, ncell_total, 8 * ncell_total, xyz_base);
     j = 0;
     for (scalar s in list)
       fprintf(file,

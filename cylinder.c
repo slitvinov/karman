@@ -177,7 +177,7 @@ event dump(i++; t <= tend) {
     if (output_prefix != NULL) {
       vorticity(u, omega);
       sprintf(path, "%s.%09d", output_prefix, i);
-      output_xdmf({p, omega}, {u}, path);
+      output_xdmf(t, {p, omega}, {u}, path);
       if (Image) {
         foreach ()
           m[] = cs[] - 0.5;

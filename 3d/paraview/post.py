@@ -19,7 +19,6 @@ def do(path):
     xyz = np.memmap(xyz_path, dtype)
     ncell = xyz.size // (3 * 8)
     assert ncell * 3 * 8 == xyz.size
-
     attr = np.memmap(attr_path, dtype)
     attr = attr.reshape((ncell, -1))
     u = attr[:, 2:2 + 3]
@@ -44,7 +43,7 @@ def do(path):
     plt.axis('scaled')
     p = matplotlib.collections.PatchCollection(patches, cmap=matplotlib.cm.jet)
     p.set_array(colors)
-    p.set_clim(0, 2.7)
+    p.set_clim(0, 2.6)
     plt.gca().add_collection(p)
     plt.colorbar(p)
     plt.tight_layout()
