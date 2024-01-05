@@ -40,14 +40,15 @@ def do(path):
 
     L = 2.5
     plt.axis((-L / 2 + L / 10, L / 2 + L / 10, -L / 2, L / 2))
-    plt.axis('scaled')
+    plt.axis("scaled")
+    plt.axis("off")
     p = matplotlib.collections.PatchCollection(patches, cmap=matplotlib.cm.jet)
     p.set_array(colors)
     p.set_clim(0, 2.6)
     plt.gca().add_collection(p)
-    plt.colorbar(p)
+    # plt.colorbar(p)
     plt.tight_layout()
-    plt.savefig(png_path)
+    plt.savefig(png_path, dpi=75, bbox_inches='tight', pad_inches=0)
     plt.close()
     sys.stderr.write("post.sh: %ld: %ld %s\n" % (os.getpid(), ncell, png_path))
 
