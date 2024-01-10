@@ -1,8 +1,8 @@
-#line 1 "cylinder-cpp.c"
-#line 1 "<built-in>"
-#line 1 "<command-line>"
+#line 0 "cylinder-cpp.c"
+#line 0 "<built-in>"
+#line 0 "<command-line>"
 #line 1 "/usr/include/stdc-predef.h"
-#line 1 "<command-line>"
+#line 0 "<command-line>"
 #line 1 "cylinder-cpp.c"
 #if _XOPEN_SOURCE < 700
   #undef _XOPEN_SOURCE
@@ -82,6 +82,7 @@ static int mpi_rank, mpi_npe;
 #define sq(x) ((x)*(x))
 #define cube(x) ((x)*(x)*(x))
 #define sign(x) ((x) > 0 ? 1 : -1)
+#define sign2(x) ((x) > 0 ? 1 : (x) < 0 ? -1 : 0)
 #define noise() (1. - 2.*rand()/(double)RAND_MAX)
 #define clamp(x,a,b) ((x) < (a) ? (a) : (x) > (b) ? (b) : (x))
 
@@ -105,7 +106,7 @@ do {\
   }\
 } while(0)\
 
-#line 80
+#line 81
 
 # define system(command) (pid() == 0 ? system(command) : 0)
 #else
@@ -122,7 +123,7 @@ static inline void qassert (const char * file, int line, const char * cond) {
   fprintf (ferr, "%s:%d: Assertion `%s' failed.\n", file, line, cond);
   abort();
 }
-#line 104 "/home/lisergey/basilisk/src/common.h"
+#line 105 "/home/lisergey/basilisk/src/common.h"
 #define sysmalloc malloc
 #define syscalloc calloc
 #define sysrealloc realloc
@@ -198,7 +199,7 @@ static void * pmfunc_alloc (pmdata * d, size_t size,
        const char * func, const char * file, int line,
        char c)
 {
-  if (!(d != NULL)) qassert ("/home/lisergey/basilisk/src/common.h", 179, "d != NULL");
+  if (!(d != NULL)) qassert ("/home/lisergey/basilisk/src/common.h", 180, "d != NULL");
   OMP (omp critical)
   {
     d->id = pmfunc_index(func, file, line);
@@ -470,7 +471,7 @@ static void trace_push (Trace * t, const char * func)
 
 static void trace_pop (Trace * t, const char * func)
 {
-  if (!(t->stack.len > 0)) qassert ("/home/lisergey/basilisk/src/common.h", 451, "t->stack.len > 0");
+  if (!(t->stack.len > 0)) qassert ("/home/lisergey/basilisk/src/common.h", 452, "t->stack.len > 0");
   t->stack.len -= sizeof(int);
   int value = t->stack.len > 0 ?
     ((int *)t->stack.p)[t->stack.len/sizeof(int) - 1] : 0;
@@ -574,7 +575,7 @@ static void end_tracing (const char * func, const char * file, int line)
   gettimeofday (&tv, NULL);
   double te = (tv.tv_sec - Trace.t0) + tv.tv_usec/1e6;
   double * t = (double *) Trace.stack.p;
-  if (!(Trace.stack.len >= 2*sizeof(double))) qassert ("/home/lisergey/basilisk/src/common.h", 555, "Trace.stack.len >= 2*sizeof(double)");
+  if (!(Trace.stack.len >= 2*sizeof(double))) qassert ("/home/lisergey/basilisk/src/common.h", 556, "Trace.stack.len >= 2*sizeof(double)");
   t += Trace.stack.len/sizeof(double) - 2;
   Trace.stack.len -= 2*sizeof(double);
   double dt = te - t[0];
@@ -684,17 +685,17 @@ static void trace_off()
 static bool in_prof = false;
 static double prof_start, _prof;
 #define prof_start(name)\
-  if (!(!in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 665, "!in_prof"); in_prof = true;\
+  if (!(!in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 666, "!in_prof"); in_prof = true;\
   prof_start = MPI_Wtime();\
 
-#line 667
+#line 668
 
 #define prof_stop()\
-  if (!(in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 669, "in_prof"); in_prof = false;\
+  if (!(in_prof)) qassert ("/home/lisergey/basilisk/src/common.h", 670, "in_prof"); in_prof = false;\
   _prof = MPI_Wtime();\
   mpi_time += _prof - prof_start;\
 
-#line 672
+#line 673
 
 
 #if FAKE_MPI
@@ -704,9 +705,9 @@ static double prof_start, _prof;
      
 int mpi_all_reduce0 (void *sendbuf, void *recvbuf, int count,
        MPI_Datatype datatype, MPI_Op op, MPI_Comm comm)
-{tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",679);
-  { int _ret= MPI_Allreduce (sendbuf, recvbuf, count, datatype, op, comm);end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",682);return _ret;}
-end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",683);}
+{tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",680);
+  { int _ret= MPI_Allreduce (sendbuf, recvbuf, count, datatype, op, comm);end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",683);return _ret;}
+end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",684);}
 #define mpi_all_reduce(v,type,op) {\
   prof_start ("mpi_all_reduce");\
   union { int a; float b; double c;} global;\
@@ -715,7 +716,7 @@ end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",683);}
   prof_stop();\
 }\
 
-#line 691
+#line 692
 
 #define mpi_all_reduce_array(v,type,op,elem) {\
   prof_start ("mpi_all_reduce");\
@@ -738,7 +739,7 @@ end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",683);}
   prof_stop();\
 }\
 
-#line 712
+#line 713
 
 
 #endif
@@ -842,7 +843,7 @@ void mpi_init()
 #define val(a,k,l,m) data(k,l,m)[_index(a,m)]
 
 double _val_higher_dimension = 0.;
-#line 823 "/home/lisergey/basilisk/src/common.h"
+#line 824 "/home/lisergey/basilisk/src/common.h"
 #if (_GNU_SOURCE || __APPLE__) && !_OPENMP && !_CADNA
 double undefined;
 # if __APPLE__
@@ -853,7 +854,7 @@ double undefined;
 # define disable_fpe(flags) fedisableexcept (flags)
 static void set_fpe (void) {
   int64_t lnan = 0x7ff0000000000001;
-  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/home/lisergey/basilisk/src/common.h", 833, "sizeof (int64_t) == sizeof (double)");
+  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/home/lisergey/basilisk/src/common.h", 834, "sizeof (int64_t) == sizeof (double)");
   memcpy (&undefined, &lnan, sizeof (double));
   enable_fpe (FE_DIVBYZERO|FE_INVALID);
 }
@@ -925,33 +926,31 @@ OMP(omp declare reduction (+ : coord :
       omp_out.x += omp_in.x,
       omp_out.y += omp_in.y,
       omp_out.z += omp_in.z))
-#line 917 "/home/lisergey/basilisk/src/common.h"
+#line 918 "/home/lisergey/basilisk/src/common.h"
 void normalize (coord * n)
 {
   double norm = 0.;
   
     norm += sq(n->x);
     
-#line 921
+#line 922
 norm += sq(n->y);
     
-#line 921
+#line 922
 norm += sq(n->z);
   norm = sqrt(norm);
   
     n->x /= norm;
     
-#line 924
+#line 925
 n->y /= norm;
     
-#line 924
+#line 925
 n->z /= norm;
 }
 
-struct _origin { double x, y, z; };
-
-void origin (struct _origin p) {
-  X0 = p.x; Y0 = p.y; Z0 = p.z;
+void origin (double x, double y, double z) {
+  X0 = x; Y0 = y; Z0 = z;
 }
 
 void size (double L) {
@@ -959,7 +958,7 @@ void size (double L) {
 }
 
 double zero (double s0, double s1, double s2) { return 0.; }
-#line 946 "/home/lisergey/basilisk/src/common.h"
+#line 945 "/home/lisergey/basilisk/src/common.h"
   enum { right, left, top, bottom, front, back };
 
 int nboundary = 2*3;
@@ -1019,7 +1018,7 @@ typedef struct {
   Boundary parent;
   int d;
 } BoxBoundary;
-#line 964 "/home/lisergey/basilisk/src/common.h"
+#line 963 "/home/lisergey/basilisk/src/common.h"
 
 
 
@@ -1060,7 +1059,7 @@ void (* refine) (Point, scalar);
 #line 97
 void (* coarsen) (Point, scalar);
   
-#line 82 "/home/lisergey/basilisk/src/fractions.h"
+#line 81 "/home/lisergey/basilisk/src/fractions.h"
 vector n;
   
 #line 207 "/home/lisergey/basilisk/src/embed-tree.h"
@@ -1069,7 +1068,7 @@ void (* embed_gradient) (Point, scalar, coord *);
 #line 178 "/home/lisergey/basilisk/src/embed.h"
 bool third;
 
-#line 987 "/home/lisergey/basilisk/src/common.h"
+#line 986 "/home/lisergey/basilisk/src/common.h"
 } _Attributes;
 
 static _Attributes * _attribute = NULL;
@@ -1174,11 +1173,11 @@ vector * vectors_add (vector * list, vector v)
       if (w.x.i != v.x.i)
  id = false;
       
-#line 1088
+#line 1087
 if (w.y.i != v.y.i)
  id = false;
       
-#line 1088
+#line 1087
 if (w.z.i != v.z.i)
  id = false;
     if (id)
@@ -1202,17 +1201,17 @@ vector * vectors_from_scalars (scalar * s)
   while (s->i >= 0) {
     vector v;
      {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1111, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
       v.x = *s++;
     } 
-#line 1110
+#line 1109
 {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1111, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
       v.y = *s++;
     } 
-#line 1110
+#line 1109
 {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1111, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
       v.z = *s++;
     }
     list = vectors_append (list, v);
@@ -1243,17 +1242,17 @@ tensor * tensors_from_vectors (vector * v)
   while (v->x.i >= 0) {
     tensor t;
      {
-      if (!(v->x.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1142, "v->x.i >= 0");
+      if (!(v->x.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
       t.x = *v++;
     } 
-#line 1141
+#line 1140
 {
-      if (!(v->y.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1142, "v->x.i >= 0");
+      if (!(v->y.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
       t.y = *v++;
     } 
-#line 1141
+#line 1140
 {
-      if (!(v->z.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1142, "v->x.i >= 0");
+      if (!(v->z.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
       t.z = *v++;
     }
     list = tensors_append (list, t);
@@ -1267,11 +1266,11 @@ static inline bool is_vertex_scalar (scalar s)
     if (_attribute[s.i].d.x != -1)
       return false;
     
-#line 1153
+#line 1152
 if (_attribute[s.i].d.y != -1)
       return false;
     
-#line 1153
+#line 1152
 if (_attribute[s.i].d.z != -1)
       return false;
   return true;
@@ -1385,7 +1384,7 @@ const vector unityf0 = {{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}};
 const scalar unity0 = {_NVARMAX+11};
         vector fm = {{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}};
         scalar cm = {_NVARMAX+11};
-#line 1279 "/home/lisergey/basilisk/src/common.h"
+#line 1278 "/home/lisergey/basilisk/src/common.h"
 static FILE ** qpopen_pipes = NULL;
 
 FILE * qpopen (const char * command, const char * type)
@@ -1526,32 +1525,27 @@ void free_solver_func_add (free_solver_func func)
 
 static char * display_defaults = NULL;
 
-struct _display {
-  const char * commands;
-  bool overwrite;
-};
-
 static void free_display_defaults() {
   pfree (display_defaults,__func__,__FILE__,__LINE__);
 }
 
-void display (struct _display p)
+void display (const char * commands, bool overwrite)
 {
   if (display_defaults == NULL)
     free_solver_func_add (free_display_defaults);
-  if (p.overwrite) {
+  if (overwrite) {
     pfree (display_defaults,__func__,__FILE__,__LINE__);
-    display_defaults = pmalloc (strlen(p.commands) + 2,__func__,__FILE__,__LINE__);
+    display_defaults = pmalloc (strlen(commands) + 2,__func__,__FILE__,__LINE__);
     strcpy (display_defaults, "@");
-    strcat (display_defaults, p.commands);
+    strcat (display_defaults, commands);
   }
   else {
     if (!display_defaults)
       display_defaults = pstrdup ("@",__func__,__FILE__,__LINE__);
     display_defaults =
       prealloc (display_defaults,
-        strlen(display_defaults) + strlen(p.commands) + 1,__func__,__FILE__,__LINE__);
-    strcat (display_defaults, p.commands);
+        strlen(display_defaults) + strlen(commands) + 1,__func__,__FILE__,__LINE__);
+    strcat (display_defaults, commands);
   }
 }
 
@@ -2011,7 +2005,7 @@ pfree (listf.z,__func__,__FILE__,__LINE__);
     pfree (dirty,__func__,__FILE__,__LINE__);
   }
 }
-#line 1455 "/home/lisergey/basilisk/src/common.h"
+#line 1449 "/home/lisergey/basilisk/src/common.h"
 #line 14 "cylinder-cpp.c"
 #line 1 "cylinder.c"
 #include <float.h>
@@ -4228,20 +4222,18 @@ void init_grid (int n)
   { if (((Tree *)grid)->dirty) update_cache_f(); };
 end_tracing("init_grid","/home/lisergey/basilisk/src/grid/tree.h",1593);}
 #line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
-struct _locate { double x, y, z; };
-
-Point locate (struct _locate p)
+Point locate (double xp, double yp, double zp)
 {
   for (int l = depth(); l >= 0; l--) {
     Point point = {0};int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
     point.level = l;
     int n = 1 << point.level;
-    point.i = (p.x - X0)/L0*n + 2;
+    point.i = (xp - X0)/L0*n + 2;
 
-    point.j = (p.y - Y0)/L0*n + 2;
+    point.j = (yp - Y0)/L0*n + 2;
 
 
-    point.k = (p.z - Z0)/L0*n + 2;
+    point.k = (zp - Z0)/L0*n + 2;
 
     if (point.i >= 0 && point.i < n + 2*2
 
@@ -5355,57 +5347,54 @@ tensor cartesian_init_tensor (tensor t, const char * name)
   return t;
 }
 
-struct OutputCells {
-  FILE * fp;
-  coord c;
-  double size;
-};
-
-void output_cells (struct OutputCells p)
+void output_cells (FILE * fp, coord c, double size)
 {
-  if (!p.fp) p.fp = fout;
   {foreach() {
     bool inside = true;
     coord o = {x,y,z};
     
-      if (inside && p.size > 0. &&
-   (o.x > p.c.x + p.size || o.x < p.c.x - p.size))
+      if (inside && size > 0. &&
+   (o.x > c.x + size || o.x < c.x - size))
  inside = false;
       
-#line 608
-if (inside && p.size > 0. &&
-   (o.y > p.c.y + p.size || o.y < p.c.y - p.size))
+#line 601
+if (inside && size > 0. &&
+   (o.y > c.y + size || o.y < c.y - size))
  inside = false;
       
-#line 608
-if (inside && p.size > 0. &&
-   (o.z > p.c.z + p.size || o.z < p.c.z - p.size))
+#line 601
+if (inside && size > 0. &&
+   (o.z > c.z + size || o.z < c.z - size))
  inside = false;
     if (inside) {
       Delta /= 2.;
-#line 623 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 616 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
       for (int i = -1; i <= 1; i += 2) {
- fprintf (p.fp, "%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n\n",
+ fprintf (fp, "%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n\n",
    x - Delta, y - Delta, z + i*Delta,
    x - Delta, y + Delta, z + i*Delta,
    x + Delta, y + Delta, z + i*Delta,
    x + Delta, y - Delta, z + i*Delta,
    x - Delta, y - Delta, z + i*Delta);
  for (int j = -1; j <= 1; j += 2)
-   fprintf (p.fp, "%g %g %g\n%g %g %g\n\n",
+   fprintf (fp, "%g %g %g\n%g %g %g\n\n",
      x + i*Delta, y + j*Delta, z - Delta,
      x + i*Delta, y + j*Delta, z + Delta);
       }
 
     }
   }end_foreach();}
-  fflush (p.fp);
+  fflush (fp);
 }
 
 
 static void output_cells_internal (FILE * fp)
 {
-  output_cells ((struct OutputCells){fp});
+  output_cells (fp
+#line 595
+,( coord) {0}, 0.
+#line 637
+);
 }
 
 
@@ -5448,7 +5437,7 @@ void cartesian_debug (Point point)
   if (pid() > 0)
     sprintf (name, "cells-%d", pid());
   FILE * fp = fopen (name, "w");
-  output_cells ((struct OutputCells){fp, (coord){x,y,z}, 4.*Delta});
+  output_cells (fp, (coord){x,y,z}, 4.*Delta);
   fclose (fp);
 
   char stencil[80] = "stencil";
@@ -5464,7 +5453,7 @@ void cartesian_debug (Point point)
     fprintf (fp, "x y z %s ", _attribute[v.i].name);}}
 
   fputc ('\n', fp);
-#line 729 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 722 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
     for (int k = -2; k <= 2; k++)
       for (int l = -2; l <= 2; l++)
  for (int m = -2; m <= 2; m++) {
@@ -5521,18 +5510,13 @@ tensor init_symmetric_tensor (tensor t, const char * name)
   return init_tensor (t, name);
 }
 
-struct _interpolate {
-  scalar v;
-  double x, y, z;
-};
-
-static double interpolate_linear (Point point, struct _interpolate p)
+static double interpolate_linear (Point point, scalar v,
+      double xp, double yp, double zp)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  scalar v = p.v;
-#line 808 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
-  x = (p.x - x)/Delta - _attribute[v.i].d.x/2.;
-  y = (p.y - y)/Delta - _attribute[v.i].d.y/2.;
-  z = (p.z - z)/Delta - _attribute[v.i].d.z/2.;
+#line 796 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+  x = (xp - x)/Delta - _attribute[v.i].d.x/2.;
+  y = (yp - y)/Delta - _attribute[v.i].d.y/2.;
+  z = (zp - z)/Delta - _attribute[v.i].d.z/2.;
   int i = sign(x), j = sign(y), k = sign(z);
   x = fabs(x); y = fabs(y); z = fabs(z);
 
@@ -5544,28 +5528,27 @@ static double interpolate_linear (Point point, struct _interpolate p)
 }
 
      
-double interpolate (struct _interpolate p)
-{tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",822);
-  scalar v = p.v;
-  boundary_internal ((scalar *)((scalar[]){v,{-1}}), "/home/lisergey/basilisk/src/grid/cartesian-common.h", 825);
-  Point point = locate ((struct _locate){p.x, p.y, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+double interpolate (scalar v, double xp, double yp, double zp)
+{tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",810);
+  boundary_internal ((scalar *)((scalar[]){v,{-1}}), "/home/lisergey/basilisk/src/grid/cartesian-common.h", 812);
+  Point point = locate (xp, yp, zp);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (point.level < 0)
-    {end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",828);return 1e30;}
-  { double _ret= interpolate_linear (point, p);end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",829);return _ret;}
-end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",830);}
+    {end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",815);return 1e30;}
+  { double _ret= interpolate_linear (point, v, xp, yp, zp);end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",816);return _ret;}
+end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",817);}
 
      
-void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear)
-{tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",833);
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/cartesian-common.h", 835);
+void interpolate_array (scalar * list, coord * a, int n, double * v,
+   bool linear)
+{tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",820);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/cartesian-common.h", 823);
   int j = 0;
   for (int i = 0; i < n; i++) {
-    Point point = locate ((struct _locate){a[i].x, a[i].y, a[i].z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+    Point point = locate (a[i].x, a[i].y, a[i].z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
     if (point.level >= 0) {
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  v[j++] = !linear ? val(s,0,0,0) :
-   interpolate_linear (point,
-         (struct _interpolate){s, a[i].x, a[i].y, a[i].z});}}
+   interpolate_linear (point, s, a[i].x, a[i].y, a[i].z);}}
     }
     else
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
@@ -5579,7 +5562,7 @@ void interpolate_array (scalar * list, coord * a, int n, double * v, bool linear
     MPI_Reduce (v, v, n*list_len(list), MPI_DOUBLE,
   MPI_MIN, 0, MPI_COMM_WORLD);
 #endif
-end_tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",857);}
+end_tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",844);}
 
 
 
@@ -5602,10 +5585,10 @@ bid new_bid()
       
  _attribute[v.y.i].boundary[b] = _attribute[v.y.i].boundary_homogeneous[b] = symmetry;
  
-#line 878
+#line 865
 _attribute[v.z.i].boundary[b] = _attribute[v.z.i].boundary_homogeneous[b] = symmetry;
  
-#line 878
+#line 865
 _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] = symmetry;
       _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] =
  _attribute[v.x.i].face ? NULL : antisymmetry;
@@ -5647,7 +5630,7 @@ void periodic (int dir)
 
 
 
-    if (!(dir <= back)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 919, "dir <= back");
+    if (!(dir <= back)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 906, "dir <= back");
 
 
   int c = dir/2;
@@ -5712,13 +5695,13 @@ void stencil_val (Point p, scalar s, int i, int j, int k,
  _attribute[s.i].width = abs(index[d]);
       d++;
     } 
-#line 979
+#line 966
 {
       if ((!_attribute[s.i].face || _attribute[s.i].v.y.i != s.i) && abs(index[d]) > _attribute[s.i].width)
  _attribute[s.i].width = abs(index[d]);
       d++;
     } 
-#line 979
+#line 966
 {
       if ((!_attribute[s.i].face || _attribute[s.i].v.z.i != s.i) && abs(index[d]) > _attribute[s.i].width)
  _attribute[s.i].width = abs(index[d]);
@@ -6400,28 +6383,37 @@ void mpi_boundary_refine (scalar *);
 void mpi_boundary_coarsen (int, int);
 void mpi_boundary_update (scalar *);
 
+static
+scalar * list_add_depend (scalar * list, scalar s)
+{
+  if (is_constant(s) || _attribute[s.i].restriction == no_restriction)
+    return list;
+  {scalar*_i=(scalar*)( list);if(_i)for(scalar t=*_i;(&t)->i>=0;t=*++_i){
+    if (t.i == s.i)
+      return list;}}
+  {scalar*_i=(scalar*)( _attribute[s.i].depends);if(_i)for(scalar d=*_i;(&d)->i>=0;d=*++_i){
+    list = list_add_depend (list, d);}}
+  return list_append (list, s);
+}
+
 typedef struct {
   int nc, nf;
 } astats;
 
-struct Adapt {
-  scalar * slist;
-  double * max;
-  int maxlevel;
-  int minlevel;
-  scalar * list;
-};
-
      
-astats adapt_wavelet (struct Adapt p)
-{tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",168);
-  scalar * list = p.list;
+astats adapt_wavelet (scalar * slist,
+        double * max,
+        int maxlevel,
+        int minlevel,
+        scalar * list)
+{tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",173);
+  scalar * ilist = list;
 
   if (is_constant(cm)) {
     if (list == NULL || list == all)
       list = list_copy (all);
-    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 175);
-    restriction (p.slist);
+    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 184);
+    restriction (slist);
   }
   else {
     if (list == NULL || list == all) {
@@ -6429,8 +6421,8 @@ astats adapt_wavelet (struct Adapt p)
       {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  list = list_add (list, s);}}
     }
-    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 184);
-    scalar * listr = list_concat (p.slist,((scalar[]) {cm,{-1}}));
+    boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 193);
+    scalar * listr = list_concat (slist,((scalar[]) {cm,{-1}}));
     restriction (listr);
     pfree (listr,__func__,__FILE__,__LINE__);
   }
@@ -6438,12 +6430,11 @@ astats adapt_wavelet (struct Adapt p)
   astats st = {0, 0};
   scalar * listc = NULL;
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-    if (!is_constant(s) && _attribute[s.i].restriction != no_restriction)
-      listc = list_add (listc, s);}}
+    listc = list_add_depend (listc, s);}}
 
 
-  if (p.minlevel < 1)
-    p.minlevel = 1;
+  if (minlevel < 1)
+    minlevel = 1;
   ((Tree *)grid)->refined.n = 0;
   static const int refined = 1 << user, too_fine = 1 << (user + 1);
   {foreach_cell() {
@@ -6473,8 +6464,8 @@ astats adapt_wavelet (struct Adapt p)
  if (local) {
    int i = 0;
    static const int just_fine = 1 << (user + 3);
-   {scalar*_i=(scalar*)( p.slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
-     double max = p.max[i++], sc[1 << 3];
+   {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+     double emax = max[i++], sc[1 << 3];
      int c = 0;
      {foreach_child()
        sc[c++] = val(s,0,0,0);end_foreach_child()}
@@ -6482,13 +6473,13 @@ astats adapt_wavelet (struct Adapt p)
      c = 0;
      {foreach_child() {
        double e = fabs(sc[c] - val(s,0,0,0));
-       if (e > max && level < p.maxlevel) {
+       if (e > emax && level < maxlevel) {
   cell.flags &= ~too_fine;
   cell.flags |= too_coarse;
        }
-       else if ((e <= max/1.5 || level > p.maxlevel) &&
+       else if ((e <= emax/1.5 || level > maxlevel) &&
          !(cell.flags & (too_coarse|just_fine))) {
-  if (level >= p.minlevel)
+  if (level >= minlevel)
     cell.flags |= too_fine;
        }
        else if (!(cell.flags & too_coarse)) {
@@ -6502,7 +6493,7 @@ astats adapt_wavelet (struct Adapt p)
      cell.flags &= ~just_fine;
      if (!is_leaf(cell)) {
        cell.flags &= ~too_coarse;
-       if (level >= p.maxlevel)
+       if (level >= maxlevel)
   cell.flags |= too_fine;
      }
      else if (!is_active(cell))
@@ -6550,12 +6541,12 @@ astats adapt_wavelet (struct Adapt p)
   if (st.nc || st.nf)
     mpi_boundary_update (list);
 
-  if (list != p.list)
+  if (list != ilist)
     pfree (list,__func__,__FILE__,__LINE__);
 
-  {end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",308);return st;}
-end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",309);}
-#line 331 "/home/lisergey/basilisk/src/grid/tree-common.h"
+  {end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",316);return st;}
+end_tracing("adapt_wavelet","/home/lisergey/basilisk/src/grid/tree-common.h",317);}
+#line 339 "/home/lisergey/basilisk/src/grid/tree-common.h"
 static void refine_level (int depth)
 {
   int refined;
@@ -6575,19 +6566,19 @@ static void refine_level (int depth)
     }
   } while (refined);
 }
-#line 376 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 384 "/home/lisergey/basilisk/src/grid/tree-common.h"
      
 static void halo_face (vectorl vl)
-{tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",377);
+{tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",385);
   
     {scalar*_i=(scalar*)( vl.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
     
-#line 380
+#line 388
 {scalar*_i=(scalar*)( vl.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
     
-#line 380
+#line 388
 {scalar*_i=(scalar*)( vl.z);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
 
@@ -6595,7 +6586,7 @@ static void halo_face (vectorl vl)
     {foreach_halo (prolongation, l)
       {
         if (vl.x) {
-#line 402 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 410 "/home/lisergey/basilisk/src/grid/tree-common.h"
    if ((!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = (fine(s,0,0,0) + fine(s,0,1,0) +
@@ -6607,9 +6598,9 @@ static void halo_face (vectorl vl)
 
  }
         
-#line 386
+#line 394
 if (vl.y) {
-#line 402 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 410 "/home/lisergey/basilisk/src/grid/tree-common.h"
    if ((!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0))
      {scalar*_i=(scalar*)( vl.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = (fine(s,0,0,0) + fine(s,0,0,1) +
@@ -6621,9 +6612,9 @@ if (vl.y) {
 
  }
         
-#line 386
+#line 394
 if (vl.z) {
-#line 402 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 410 "/home/lisergey/basilisk/src/grid/tree-common.h"
    if ((!is_leaf (neighbor(0,0,-1)) && neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0))
      {scalar*_i=(scalar*)( vl.z);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
        val(s,0,0,0) = (fine(s,0,0,0) + fine(s,1,0,0) +
@@ -6634,7 +6625,7 @@ if (vl.z) {
         fine(s,0,1,2) + fine(s,1,1,2))/4.;}}
 
  }}end_foreach_halo();}
-end_tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",412);}
+end_tracing("halo_face","/home/lisergey/basilisk/src/grid/tree-common.h",420);}
 
 
 
@@ -6680,7 +6671,7 @@ static void prolongation_vertex (Point point, scalar s)
 
       }
       
-#line 444
+#line 452
 if (neighbor(0,i,0).neighbors) {
 
 
@@ -6695,7 +6686,7 @@ if (neighbor(0,i,0).neighbors) {
 
       }
       
-#line 444
+#line 452
 if (neighbor(0,0,i).neighbors) {
 
 
@@ -6723,7 +6714,7 @@ static scalar tree_init_vertex_scalar (scalar s, const char * name)
 static void refine_face_x (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 490 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(-1,0,0)))) {
     double g1 = (val(v.x,0,+1,0) - val(v.x,0,-1,0))/8.;
@@ -6750,11 +6741,11 @@ static void refine_face_x (Point point, scalar s)
 
 }
 
-#line 468
+#line 476
 static void refine_face_y (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 490 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(0,-1,0)))) {
     double g1 = (val(v.y,0,0,+1) - val(v.y,0,0,-1))/8.;
@@ -6781,11 +6772,11 @@ static void refine_face_y (Point point, scalar s)
 
 }
 
-#line 468
+#line 476
 static void refine_face_z (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 490 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(0,0,-1)) && neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(0,0,-1)))) {
     double g1 = (val(v.z,+1,0,0) - val(v.z,-1,0,0))/8.;
@@ -6818,10 +6809,10 @@ void refine_face (Point point, scalar s)
   
     _attribute[v.x.i].prolongation (point, v.x);
     
-#line 520
+#line 528
 _attribute[v.y.i].prolongation (point, v.y);
     
-#line 520
+#line 528
 _attribute[v.z.i].prolongation (point, v.z);
 }
 
@@ -6839,14 +6830,14 @@ void refine_face_solenoidal (Point point, scalar s)
       
  d[i] += val(v.x,1,0,0) - val(v.x,0,0,0);
  
-#line 535
+#line 543
 d[i] += val(v.y,0,1,0) - val(v.y,0,0,0);
  
-#line 535
+#line 543
 d[i] += val(v.z,0,0,1) - val(v.z,0,0,0);
       i++;
     }end_foreach_child()}
-#line 548 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 556 "/home/lisergey/basilisk/src/grid/tree-common.h"
     static double m[7][7] = {
       {7./12,5./24,3./8,5./24,3./8,1./4,1./3},
       {5./24,7./12,3./8,5./24,1./4,3./8,1./3},
@@ -6883,32 +6874,32 @@ vector tree_init_face_vector (vector v, const char * name)
   
     _attribute[v.x.i].restriction = _attribute[v.x.i].refine = no_restriction;
     
-#line 582
+#line 590
 _attribute[v.y.i].restriction = _attribute[v.y.i].refine = no_restriction;
     
-#line 582
+#line 590
 _attribute[v.z.i].restriction = _attribute[v.z.i].refine = no_restriction;
   _attribute[v.x.i].restriction = restriction_face;
   _attribute[v.x.i].refine = refine_face;
   
     _attribute[v.x.i].prolongation = refine_face_x;
     
-#line 586
+#line 594
 _attribute[v.y.i].prolongation = refine_face_y;
     
-#line 586
+#line 594
 _attribute[v.z.i].prolongation = refine_face_z;
   return v;
 }
 
      
 static void tree_boundary_level (scalar * list, int l)
-{tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",591);
+{tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",599);
   int depth = l < 0 ? depth() : l;
 
   if (tree_is_full()) {
     { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, list, depth); };
-    {end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",597);return;}
+    {end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",605);return;}
   }
 
   scalar * listdef = NULL, * listc = NULL, * list2 = NULL, * vlist = NULL;
@@ -6924,10 +6915,10 @@ static void tree_boundary_level (scalar * list, int l)
    {
      list2 = list_add (list2, _attribute[s.i].v.x);
      
-#line 611
+#line 619
 list2 = list_add (list2, _attribute[s.i].v.y);
      
-#line 611
+#line 619
 list2 = list_add (list2, _attribute[s.i].v.z);}
  else {
    list2 = list_add (list2, s);
@@ -6938,7 +6929,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
     }}}
 
   if (vlist)
-#line 645 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 653 "/home/lisergey/basilisk/src/grid/tree-common.h"
     {foreach_vertex () {
       if ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0) || (!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0) ||
    (!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) || (!is_leaf (neighbor(-1,-1,0)) && neighbor(-1,-1,0).neighbors && neighbor(-1,-1,0).pid >= 0) ||
@@ -6968,7 +6959,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
   (val(s,0,-1,0) + val(s,0,1,0))/2. : 1e30;}}
    }
  } 
-#line 655
+#line 663
 {
    if (child.z == 1 && child.x == 1 &&
        ((!is_leaf(cell) && !cell.neighbors && cell.pid >= 0) || (!is_leaf(neighbor(0,-1,0)) && !neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0))) {
@@ -6988,7 +6979,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
   (val(s,0,0,-1) + val(s,0,0,1))/2. : 1e30;}}
    }
  } 
-#line 655
+#line 663
 {
    if (child.x == 1 && child.y == 1 &&
        ((!is_leaf(cell) && !cell.neighbors && cell.pid >= 0) || (!is_leaf(neighbor(0,0,-1)) && !neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0))) {
@@ -7048,10 +7039,10 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
    {
      _attribute[v.x.i].prolongation (point, v.x);
      
-#line 712
+#line 720
 _attribute[v.y.i].prolongation (point, v.y);
      
-#line 712
+#line 720
 _attribute[v.z.i].prolongation (point, v.z);}}}
       }end_foreach_halo();}
       { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, list, i + 1); };
@@ -7059,7 +7050,7 @@ _attribute[v.z.i].prolongation (point, v.z);}}}
     pfree (listr,__func__,__FILE__,__LINE__);
     pfree (listf,__func__,__FILE__,__LINE__);
   }
-end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",719);}
+end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",727);}
 
 double treex (Point point) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (level == 0)
@@ -7068,7 +7059,7 @@ double treex (Point point) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int 
 
 
 
-  if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 728, "false");
+  if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 736, "false");
   double i = 0;
 
   return treex(parent) + i/(1 << 2*(level - 1));
@@ -7092,17 +7083,17 @@ void output_tree (FILE * fp)
 
      
 void tree_check()
-{tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",751);
+{tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",759);
 
 
   long nleaves = 0, nactive = 0;
   {foreach_cell_all() {
     if (is_leaf(cell)) {
-      if (!(cell.pid >= 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 758, "cell.pid >= 0");
+      if (!(cell.pid >= 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 766, "cell.pid >= 0");
       nleaves++;
     }
     if (is_local(cell))
-      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 762, "is_active(cell) || is_prolongation(cell)");
+      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 770, "is_active(cell) || is_prolongation(cell)");
     if (is_active(cell))
       nactive++;
 
@@ -7110,11 +7101,11 @@ void tree_check()
     {foreach_neighbor(1)
       if (allocated(0,0,0) && (!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
  neighbors++;end_foreach_neighbor()}
-    if (!(cell.neighbors == neighbors)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 770, "cell.neighbors == neighbors");
+    if (!(cell.neighbors == neighbors)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 778, "cell.neighbors == neighbors");
 
 
     if (!cell.neighbors)
-      if (!(!allocated_child(0,0,0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 774, "!allocated_child(0)");
+      if (!(!allocated_child(0,0,0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 782, "!allocated_child(0)");
   }end_foreach_cell_all();}
 
 
@@ -7125,7 +7116,7 @@ void tree_check()
     else
       continue;
   }end_foreach_cell();}
-  if (!(nactive == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 785, "nactive == reachable");
+  if (!(nactive == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 793, "nactive == reachable");
 
 
   reachable = 0;
@@ -7134,15 +7125,15 @@ void tree_check()
       reachable++;
       continue;
     }end_foreach_cell();}
-  if (!(nleaves == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 794, "nleaves == reachable");
-end_tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",795);}
+  if (!(nleaves == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 802, "nleaves == reachable");
+end_tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",803);}
 
      
-static void tree_restriction (scalar * list) {tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",798);
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 799);
+static void tree_restriction (scalar * list) {tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",806);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 807);
   if (tree_is_full())
     multigrid_restriction (list);
-end_tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",802);}
+end_tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",810);}
 
 void tree_methods()
 {
@@ -7154,7 +7145,7 @@ void tree_methods()
   boundary_face = halo_face;
   restriction = tree_restriction;
 }
-#line 1672 "/home/lisergey/basilisk/src/grid/tree.h"
+#line 1670 "/home/lisergey/basilisk/src/grid/tree.h"
 
 
 void tree_periodic (int dir)
@@ -7418,10 +7409,7 @@ static void mpi_recv_check (void * buf, int count, MPI_Datatype datatype,
       name, count, source, tag, string);
     fflush (ferr);
     debug_mpi (NULL);
-
-    MPI_Abort (MPI_COMM_WORLD, 1);
-
-    exit (1);
+    MPI_Abort (MPI_COMM_WORLD, -1);
   }
 
 
@@ -7433,9 +7421,9 @@ static void mpi_recv_check (void * buf, int count, MPI_Datatype datatype,
      
 static int mpi_waitany (int count, MPI_Request array_of_requests[], int *indx,
    MPI_Status *status)
-{tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",294);
-  { int _ret= MPI_Waitany (count, array_of_requests, indx, status);end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",297);return _ret;}
-end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",298);}
+{tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",291);
+  { int _ret= MPI_Waitany (count, array_of_requests, indx, status);end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",294);return _ret;}
+end_tracing("mpi_waitany","/home/lisergey/basilisk/src/grid/tree-mpi.h",295);}
 
 static int list_lenb (scalar * list) {
   int len = 0;
@@ -7468,7 +7456,7 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
   for (int i = 0; i < m->npid; i++) {
     Rcv * rcv = &m->rcv[i];
     if (l <= rcv->depth && rcv->halo[l].n > 0) {
-      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 331, "!rcv->buf");
+      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 328, "!rcv->buf");
       rcv->buf = pmalloc (sizeof (double)*rcv->halo[l].n*len,__func__,__FILE__,__LINE__);
 
 
@@ -7495,8 +7483,8 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
     mpi_waitany (nr, r, &i, &s);
     while (i != MPI_UNDEFINED) {
       Rcv * rcv = rrcv[i];
-      if (!(l <= rcv->depth && rcv->halo[l].n > 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 358, "l <= rcv->depth && rcv->halo[l].n > 0");
-      if (!(rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 359, "rcv->buf");
+      if (!(l <= rcv->depth && rcv->halo[l].n > 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 355, "l <= rcv->depth && rcv->halo[l].n > 0");
+      if (!(rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 356, "rcv->buf");
       apply_bc (rcv, list, listv, listf, l, s);
       mpi_waitany (nr, r, &i, &s);
     }
@@ -7507,11 +7495,11 @@ static void rcv_pid_receive (RcvPid * m, scalar * list, scalar * listv,
 
      
 static void rcv_pid_wait (RcvPid * m)
-{tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",369);
+{tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",366);
 
   for (int i = 0; i < m->npid; i++)
     rcv_free_buf (&m->rcv[i]);
-end_tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",374);}
+end_tracing("rcv_pid_wait","/home/lisergey/basilisk/src/grid/tree-mpi.h",371);}
 
 static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
      vector * listf, int l)
@@ -7528,7 +7516,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
   for (int i = 0; i < m->npid; i++) {
     Rcv * rcv = &m->rcv[i];
     if (l <= rcv->depth && rcv->halo[l].n > 0) {
-      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 391, "!rcv->buf");
+      if (!(!rcv->buf)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 388, "!rcv->buf");
       rcv->buf = pmalloc (sizeof (double)*rcv->halo[l].n*len,__func__,__FILE__,__LINE__);
       double * b = rcv->buf;
       {foreach_cache_level(rcv->halo[l], l) {
@@ -7546,7 +7534,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
        *b = 1e30;
      b += _attribute[v.x.i].block;
    } 
-#line 400
+#line 397
 {
      memcpy (b, &val(v.y,0,0,0), sizeof(double)*_attribute[v.y.i].block);
      b += _attribute[v.y.i].block;
@@ -7556,7 +7544,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
        *b = 1e30;
      b += _attribute[v.y.i].block;
    } 
-#line 400
+#line 397
 {
      memcpy (b, &val(v.z,0,0,0), sizeof(double)*_attribute[v.z.i].block);
      b += _attribute[v.z.i].block;
@@ -7577,7 +7565,7 @@ static void rcv_pid_send (RcvPid * m, scalar * list, scalar * listv,
     *b = 1e30;
   b += _attribute[s.i].block;
        }
-#line 429 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
+#line 426 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
  }}}
       }end_foreach_cache_level();}
 
@@ -7645,18 +7633,18 @@ static void mpi_boundary_destroy (Boundary * b)
 
      
 static void mpi_boundary_level (const Boundary * b, scalar * list, int l)
-{tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",495);
+{tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",492);
   MpiBoundary * m = (MpiBoundary *) b;
   rcv_pid_sync (&m->mpi_level, list, l);
   rcv_pid_sync (&m->mpi_level_root, list, l);
-end_tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",500);}
+end_tracing("mpi_boundary_level","/home/lisergey/basilisk/src/grid/tree-mpi.h",497);}
 
      
 static void mpi_boundary_restriction (const Boundary * b, scalar * list, int l)
-{tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",503);
+{tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",500);
   MpiBoundary * m = (MpiBoundary *) b;
   rcv_pid_sync (&m->restriction, list, l);
-end_tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",507);}
+end_tracing("mpi_boundary_restriction","/home/lisergey/basilisk/src/grid/tree-mpi.h",504);}
 
 void mpi_boundary_new()
 {
@@ -7735,10 +7723,10 @@ void debug_mpi (FILE * fp1)
   fp = fopen_prefix (fp1, "faces", prefix);
   {foreach_face_generic(){is_face_x(){
     fprintf (fp, "%s%g %g %g %d\n", prefix, x, y, z, level);}end_is_face_x()
-#line 584
+#line 581
 is_face_y(){
     fprintf (fp, "%s%g %g %g %d\n", prefix, x, y, z, level);}end_is_face_y()
-#line 584
+#line 581
 is_face_z(){
     fprintf (fp, "%s%g %g %g %d\n", prefix, x, y, z, level);}end_is_face_z()}end_foreach_face_generic();}
   if (!fp1)
@@ -7757,7 +7745,7 @@ is_face_z(){
       if ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
  n++;end_foreach_neighbor()}
     fprintf (fp, "%s%g %g %g %d\n", prefix, x, y, z, cell.neighbors);
-    if (!(cell.neighbors == n)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 602, "cell.neighbors == n");
+    if (!(cell.neighbors == n)) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 599, "cell.neighbors == n");
   }end_foreach();}
   if (!fp1)
     fclose (fp);
@@ -7877,14 +7865,14 @@ static bool is_local_prolongation (Point point, Point p)
     if ((!is_leaf (neighbor(dp.x,0,0)) && neighbor(dp.x,0,0).neighbors && neighbor(dp.x,0,0).pid >= 0))
       return true;
   } 
-#line 716
+#line 713
 {
     if (dp.y == 0 && ((!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) || (!is_leaf (neighbor(0,1,0)) && neighbor(0,1,0).neighbors && neighbor(0,1,0).pid >= 0)))
       return true;
     if ((!is_leaf (neighbor(0,dp.y,0)) && neighbor(0,dp.y,0).neighbors && neighbor(0,dp.y,0).pid >= 0))
       return true;
   } 
-#line 716
+#line 713
 {
     if (dp.z == 0 && ((!is_leaf (neighbor(0,0,-1)) && neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0) || (!is_leaf (neighbor(0,0,1)) && neighbor(0,0,1).neighbors && neighbor(0,0,1).pid >= 0)))
       return true;
@@ -8031,9 +8019,9 @@ static bool has_local_child (Point point)
 
      
 void mpi_boundary_update_buffers()
-{tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",861);
+{tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",858);
   if (npe() == 1)
-    {end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",864);return;}
+    {end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",861);return;}
 
   prof_start ("mpi_boundary_update_buffers");
 
@@ -8173,12 +8161,12 @@ void mpi_boundary_update_buffers()
   rcv_pid_append_pids (mpi_level_root->rcv, m->receive);
 
   prof_stop();
-#line 1018 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
-end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",1018);}
+#line 1015 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
+end_tracing("mpi_boundary_update_buffers","/home/lisergey/basilisk/src/grid/tree-mpi.h",1015);}
 
      
 void mpi_boundary_refine (scalar * list)
-{tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",1021);
+{tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",1018);
   prof_start ("mpi_boundary_refine");
 
   MpiBoundary * mpi = (MpiBoundary *) mpi_boundary;
@@ -8245,11 +8233,11 @@ void mpi_boundary_refine (scalar * list)
     mpi_boundary_refine (list);
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].dirty = true;}}
-end_tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",1089);}
+end_tracing("mpi_boundary_refine","/home/lisergey/basilisk/src/grid/tree-mpi.h",1086);}
 
 static void check_depth()
 {
-#line 1124 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
+#line 1121 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
 }
 
 typedef struct {
@@ -8260,13 +8248,13 @@ typedef struct {
 
      
 void mpi_boundary_coarsen (int l, int too_fine)
-{tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1133);
+{tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1130);
   if (npe() == 1)
-    {end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1136);return;}
+    {end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1133);return;}
 
   check_depth();
 
-  if (!(sizeof(Remote) == sizeof(double))) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 1140, "sizeof(Remote) == sizeof(double)");
+  if (!(sizeof(Remote) == sizeof(double))) qassert ("/home/lisergey/basilisk/src/grid/tree-mpi.h", 1137, "sizeof(Remote) == sizeof(double)");
 
   scalar  remote=new_scalar("remote");
   {foreach_cell() {
@@ -8325,7 +8313,7 @@ void mpi_boundary_coarsen (int l, int too_fine)
  continue;
     }end_foreach_cell();}
   }delete((scalar*)((scalar[]){remote,{-1}}));
-end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1199);}
+end_tracing("mpi_boundary_coarsen","/home/lisergey/basilisk/src/grid/tree-mpi.h",1196);}
 
 static void flag_border_cells()
 {
@@ -8383,7 +8371,7 @@ static int balanced_pid (long index, long nt, int nproc)
 
      
 void mpi_partitioning()
-{tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",1256);
+{tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",1253);
   prof_start ("mpi_partitioning");
 
   long nt = 0;
@@ -8393,7 +8381,7 @@ void mpi_partitioning()
   #define OMP(x)
 #endif
 {
-#line 1261
+#line 1258
 foreach ()
     nt++;end_foreach();}
 #if _OPENMP
@@ -8404,7 +8392,7 @@ foreach ()
 
 
   
-#line 1265
+#line 1262
 long i = 0;
   ((Tree *)grid)->dirty = true;
   {foreach_cell_post (is_active (cell))
@@ -8436,7 +8424,7 @@ long i = 0;
   prof_stop();
 
   mpi_boundary_update_buffers();
-end_tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",1296);}
+end_tracing("mpi_partitioning","/home/lisergey/basilisk/src/grid/tree-mpi.h",1293);}
 
 void restore_mpi (FILE * fp, scalar * list1)
 {
@@ -8557,10 +8545,10 @@ void restore_mpi (FILE * fp, scalar * list1)
   mpi_boundary_update (list);
   pfree (list,__func__,__FILE__,__LINE__);delete((scalar*)((scalar[]){size,{-1}}));
 }
-#line 1438 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
+#line 1435 "/home/lisergey/basilisk/src/grid/tree-mpi.h"
      
 double z_indexing (scalar index, bool leaves)
-{tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1439);
+{tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1436);
 
 
 
@@ -8616,9 +8604,9 @@ double z_indexing (scalar index, bool leaves)
   }
   { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->restriction) _b->restriction (_b,((scalar[]) {index,{-1}}), depth()); };
 
-  {delete((scalar*)((scalar[]){size,{-1}}));{end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1496);return maxi;}}delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1497);}
-#line 1687 "/home/lisergey/basilisk/src/grid/tree.h"
+  {delete((scalar*)((scalar[]){size,{-1}}));{end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1493);return maxi;}}delete((scalar*)((scalar[]){size,{-1}}));
+end_tracing("z_indexing","/home/lisergey/basilisk/src/grid/tree-mpi.h",1494);}
+#line 1685 "/home/lisergey/basilisk/src/grid/tree.h"
 #line 1 "grid/balance.h"
 #line 1 "/home/lisergey/basilisk/src/grid/balance.h"
 
@@ -8997,14 +8985,14 @@ void mpi_boundary_update (scalar * list)
   boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/balance.h", 401);
   while (balance());
 }
-#line 1688 "/home/lisergey/basilisk/src/grid/tree.h"
+#line 1686 "/home/lisergey/basilisk/src/grid/tree.h"
 #else
 void mpi_boundary_refine (scalar * list){}
 void mpi_boundary_coarsen (int a, int b){}
 void mpi_boundary_update (scalar * list) {
   {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     _attribute[s.i].dirty = true;}}
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree.h", 1694);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree.h", 1692);
 }
 #endif
 #line 4 "/home/lisergey/basilisk/src/grid/octree.h"
@@ -9018,7 +9006,7 @@ void octree_methods() {
 #line 12 "/home/lisergey/basilisk/src/fractions.h"
 #line 1 "geometry.h"
 #line 1 "/home/lisergey/basilisk/src/geometry.h"
-#line 28 "/home/lisergey/basilisk/src/geometry.h"
+#line 35 "/home/lisergey/basilisk/src/geometry.h"
 double line_alpha (double c, coord n)
 {
   double alpha, n1, n2;
@@ -9114,7 +9102,7 @@ double plane_alpha (double c, coord n)
 
   return alpha - (n.x + n.y + n.z)/2.;;
 }
-#line 133 "/home/lisergey/basilisk/src/geometry.h"
+#line 163 "/home/lisergey/basilisk/src/geometry.h"
 double line_area (double nx, double ny, double alpha)
 {
   double a, v, area;
@@ -9206,7 +9194,7 @@ double plane_volume (coord n, double alpha)
   double volume = al <= 0.5 ? tmp : 1. - tmp;
   return clamp (volume, 0., 1.);
 }
-#line 237 "/home/lisergey/basilisk/src/geometry.h"
+#line 267 "/home/lisergey/basilisk/src/geometry.h"
 double rectangle_fraction (coord n, double alpha, coord a, coord b)
 {
   coord n1;
@@ -9214,19 +9202,19 @@ double rectangle_fraction (coord n, double alpha, coord a, coord b)
     alpha -= n.x*(b.x + a.x)/2.;
     n1.x = n.x*(b.x - a.x);
   } 
-#line 240
+#line 270
 {
     alpha -= n.y*(b.y + a.y)/2.;
     n1.y = n.y*(b.y - a.y);
   } 
-#line 240
+#line 270
 {
     alpha -= n.z*(b.z + a.z)/2.;
     n1.z = n.z*(b.z - a.z);
   }
   return plane_volume (n1, alpha);
 }
-#line 277 "/home/lisergey/basilisk/src/geometry.h"
+#line 307 "/home/lisergey/basilisk/src/geometry.h"
 static coord cube_edge[12][2] = {
   {{0.,0.,0.},{1.,0.,0.}},{{0.,0.,1.},{1.,0.,1.}},
   {{0.,1.,1.},{1.,1.,1.}},{{0.,1.,0.},{1.,1.,0.}},
@@ -9268,14 +9256,14 @@ int facets (coord n, double alpha, coord v[12], double h)
       den += n.x*(e.x - d.x);
       t -= n.x*d.x;
     } 
-#line 312
+#line 342
 {
       d.y = h*(cube_edge[i][0].y - 0.5);
       e.y = h*(cube_edge[i][1].y - 0.5);
       den += n.y*(e.y - d.y);
       t -= n.y*d.y;
     } 
-#line 312
+#line 342
 {
       d.z = h*(cube_edge[i][0].z - 0.5);
       e.z = h*(cube_edge[i][1].z - 0.5);
@@ -9291,12 +9279,12 @@ int facets (coord n, double alpha, coord v[12], double h)
    a[i].x = d.x + t*(e.x - d.x);
    s += n.x*e.x;
  } 
-#line 323
+#line 353
 {
    a[i].y = d.y + t*(e.y - d.y);
    s += n.y*e.y;
  } 
-#line 323
+#line 353
 {
    a[i].z = d.z + t*(e.z - d.z);
    s += n.z*e.z;
@@ -9337,7 +9325,7 @@ double line_length_center (coord m, double alpha, coord * p)
       n.x = - n.x;
     }
     
-#line 358
+#line 388
 if (n.y < 0.) {
       alpha -= n.y;
       n.y = - n.y;
@@ -9355,7 +9343,7 @@ if (n.y < 0.) {
       return 1.;
     }
     
-#line 369
+#line 399
 if (n.y < 1e-4) {
       p->y = 0.;
       p->x = (m.x < 0. ? 1. - alpha : alpha) - 0.5;
@@ -9388,7 +9376,7 @@ if (n.y < 1e-4) {
       p->x = 1. - p->x;
     p->x -= 0.5;
   } 
-#line 394
+#line 424
 {
     p->y /= 2.;
     p->y = clamp (p->y, 0., 1.);
@@ -9417,7 +9405,7 @@ double plane_area_center (coord m, double alpha, coord * p)
       return length;
     }
     
-#line 411
+#line 441
 if (fabs (m.y) < 1e-4) {
       coord n, q;
       ((double *)&n)[0] = m.z;
@@ -9429,7 +9417,7 @@ if (fabs (m.y) < 1e-4) {
       return length;
     }
     
-#line 411
+#line 441
 if (fabs (m.z) < 1e-4) {
       coord n, q;
       ((double *)&n)[0] = m.x;
@@ -9449,13 +9437,13 @@ if (fabs (m.z) < 1e-4) {
       n.x = - n.x;
     }
     
-#line 425
+#line 455
 if (n.y < 0.) {
       alpha -= n.y;
       n.y = - n.y;
     }
     
-#line 425
+#line 455
 if (n.z < 0.) {
       alpha -= n.z;
       n.z = - n.z;
@@ -9479,7 +9467,7 @@ if (n.z < 0.) {
       p->z -= b*b*b;
     }
   } 
-#line 439
+#line 469
 {
     double b = alpha - n.y;
     if (b > 0.) {
@@ -9489,7 +9477,7 @@ if (n.z < 0.) {
       p->x -= b*b*b;
     }
   } 
-#line 439
+#line 469
 {
     double b = alpha - n.z;
     if (b > 0.) {
@@ -9510,7 +9498,7 @@ if (n.z < 0.) {
       p->x += b*b*b;
     }
   } 
-#line 450
+#line 480
 {
     double b = amax + n.y;
     if (b > 0.) {
@@ -9520,7 +9508,7 @@ if (n.z < 0.) {
       p->y += b*b*b;
     }
   } 
-#line 450
+#line 480
 {
     double b = amax + n.z;
     if (b > 0.) {
@@ -9542,7 +9530,7 @@ if (n.z < 0.) {
     if (m.x < 0.) p->x = 1. - p->x;
     p->x -= 0.5;
   } 
-#line 461
+#line 491
 {
     if (area) {
       p->y /= area*n.y;
@@ -9553,7 +9541,7 @@ if (n.z < 0.) {
     if (m.y < 0.) p->y = 1. - p->y;
     p->y -= 0.5;
   } 
-#line 461
+#line 491
 {
     if (area) {
       p->z /= area*n.z;
@@ -9586,7 +9574,7 @@ void line_center (coord m, double alpha, double a, coord * p)
       n.x = - n.x;
     }
     
-#line 488
+#line 518
 if (n.y < 0.) {
       alpha -= n.y;
       n.y = - n.y;
@@ -9610,7 +9598,7 @@ if (n.y < 0.) {
       return;
     }
     
-#line 505
+#line 535
 if (n.y < 1e-4) {
       p->y = 0.;
       p->x = sign(m.x)*(a/2. - 0.5);
@@ -9626,7 +9614,7 @@ if (n.y < 1e-4) {
       p->y -= cube(b);
     }
   } 
-#line 513
+#line 543
 {
     double b = alpha - n.y;
     if (b > 0.) {
@@ -9639,13 +9627,13 @@ if (n.y < 1e-4) {
     p->x /= 6.*sq(n.x)*n.y*a;
     p->x = sign(m.x)*(p->x - 0.5);
   } 
-#line 521
+#line 551
 {
     p->y /= 6.*sq(n.y)*n.x*a;
     p->y = sign(m.y)*(p->y - 0.5);
   }
 }
-#line 534 "/home/lisergey/basilisk/src/geometry.h"
+#line 564 "/home/lisergey/basilisk/src/geometry.h"
 void plane_center (coord m, double alpha, double a, coord * p)
 {
   
@@ -9660,7 +9648,7 @@ void plane_center (coord m, double alpha, double a, coord * p)
       return;
     }
     
-#line 537
+#line 567
 if (fabs (m.y) < 1e-4) {
       coord n, q;
       ((double *)&n)[0] = m.z;
@@ -9672,7 +9660,7 @@ if (fabs (m.y) < 1e-4) {
       return;
     }
     
-#line 537
+#line 567
 if (fabs (m.z) < 1e-4) {
       coord n, q;
       ((double *)&n)[0] = m.x;
@@ -9692,13 +9680,13 @@ if (fabs (m.z) < 1e-4) {
       n.x = - n.x;
     }
     
-#line 551
+#line 581
 if (n.y < 0.) {
       alpha -= n.y;
       n.y = - n.y;
     }
     
-#line 551
+#line 581
 if (n.z < 0.) {
       alpha -= n.z;
       n.z = - n.z;
@@ -9723,7 +9711,7 @@ if (n.z < 0.) {
       p->z -= sq(sq(b));
     }
   } 
-#line 567
+#line 597
 {
     double b = alpha - n.y;
     if (b > 0.) {
@@ -9732,7 +9720,7 @@ if (n.z < 0.) {
       p->x -= sq(sq(b));
     }
   } 
-#line 567
+#line 597
 {
     double b = alpha - n.z;
     if (b > 0.) {
@@ -9751,7 +9739,7 @@ if (n.z < 0.) {
       p->z += sq(sq(b));
     }
   } 
-#line 577
+#line 607
 {
     double b = amax + n.x;
     if (b > 0.) {
@@ -9760,7 +9748,7 @@ if (n.z < 0.) {
       p->x += sq(sq(b));
     }
   } 
-#line 577
+#line 607
 {
     double b = amax + n.y;
     if (b > 0.) {
@@ -9775,19 +9763,25 @@ if (n.z < 0.) {
     p->x /= b*n.x;
     p->x = sign(m.x)*(p->x - 0.5);
   } 
-#line 587
+#line 617
 {
     p->y /= b*n.y;
     p->y = sign(m.y)*(p->y - 0.5);
   } 
-#line 587
+#line 617
 {
     p->z /= b*n.z;
     p->z = sign(m.z)*(p->z - 0.5);
   }
 }
 #line 13 "/home/lisergey/basilisk/src/fractions.h"
-#line 21 "/home/lisergey/basilisk/src/fractions.h"
+
+
+
+
+
+
+
 #line 1 "myc.h"
 #line 1 "/home/lisergey/basilisk/src/myc.h"
 #line 16 "/home/lisergey/basilisk/src/myc.h"
@@ -9927,7 +9921,13 @@ coord mycs (Point point, scalar c)
   return mxyz;
 }
 #line 13 "/home/lisergey/basilisk/src/fractions.h"
-#line 21 "/home/lisergey/basilisk/src/fractions.h"
+
+
+
+
+
+
+
 #line 1 "myc.h"
 #line 1 "/home/lisergey/basilisk/src/myc.h"
 #line 16 "/home/lisergey/basilisk/src/myc.h"
@@ -10127,8 +10127,8 @@ _stencil_val(c,0,0,1);
 #line 149
 return ;
 }
-#line 22 "/home/lisergey/basilisk/src/fractions.h"
-#line 41 "/home/lisergey/basilisk/src/fractions.h"
+#line 21 "/home/lisergey/basilisk/src/fractions.h"
+#line 40 "/home/lisergey/basilisk/src/fractions.h"
 void fraction_refine (Point point, scalar c)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
@@ -10159,10 +10159,10 @@ void fraction_refine (Point point, scalar c)
       
  nc.x = child.x*n.x;
  
-#line 69
+#line 68
 nc.y = child.y*n.y;
  
-#line 69
+#line 68
 nc.z = child.z*n.z;
       val(c,0,0,0) = rectangle_fraction (nc, alpha, a, b);
     }end_foreach_child()}
@@ -10187,41 +10187,35 @@ static void alpha_refine (Point point, scalar alpha)
   
     m.x = val(n.x,0,0,0);
     
-#line 91
+#line 90
 m.y = val(n.y,0,0,0);
     
-#line 91
+#line 90
 m.z = val(n.z,0,0,0);
   {foreach_child() {
     val(alpha,0,0,0) = alphac;
     
       val(alpha,0,0,0) -= child.x*m.x/2.;
       
-#line 95
+#line 94
 val(alpha,0,0,0) -= child.y*m.y/2.;
       
-#line 95
+#line 94
 val(alpha,0,0,0) -= child.z*m.z/2.;
   }end_foreach_child()}
 }
-#line 121 "/home/lisergey/basilisk/src/fractions.h"
-struct Fractions {
-  scalar Phi;
-  scalar c;
-  vector s;
-  double val;
-};
-
+#line 120 "/home/lisergey/basilisk/src/fractions.h"
      
-void fractions (struct Fractions a)
-{tracing("fractions","/home/lisergey/basilisk/src/fractions.h",129);
-  scalar Phi = a.Phi;
-  scalar c = a.c;
-  vector   s=(a.s).x.i?(a.s):new_face_vector("s");
-  double val = a.val;
-#line 143 "/home/lisergey/basilisk/src/fractions.h"
+void fractions (scalar Phi, scalar c,
+  vector s, double val)
+{tracing("fractions","/home/lisergey/basilisk/src/fractions.h",121);
+
+
+
+  vector   as=(s).x.i>0?(s):new_face_vector("as");
+#line 136 "/home/lisergey/basilisk/src/fractions.h"
   vector  p=new_vector("p");
-#line 155 "/home/lisergey/basilisk/src/fractions.h"
+#line 148 "/home/lisergey/basilisk/src/fractions.h"
   foreach_vertex_stencil() { {_stencil_neighbor(1,0,0); {
 
 
@@ -10240,7 +10234,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.x,0,0,0); _stencil_val(p.x,0,0,0);   }     
          
     
-#line 171
+#line 164
 }
       
 
@@ -10258,11 +10252,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } } 
-#line 155
+#line 148
 {_stencil_neighbor(1,0,0); {
 
 
@@ -10281,7 +10275,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.y,0,0,0); _stencil_val(p.y,0,0,0);   }     
          
     
-#line 171
+#line 164
 }
       
 
@@ -10299,11 +10293,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } } 
-#line 155
+#line 148
 {_stencil_neighbor(1,0,0); {
 
 
@@ -10322,7 +10316,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.z,0,0,0); _stencil_val(p.z,0,0,0);   }     
          
     
-#line 171
+#line 164
 }
       
 
@@ -10340,11 +10334,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } }}end_foreach_vertex_stencil();
-#line 155 "/home/lisergey/basilisk/src/fractions.h"
+#line 148 "/home/lisergey/basilisk/src/fractions.h"
   {foreach_vertex() { if (is_vertex(neighbor(1,0,0))) {
 
 
@@ -10362,11 +10356,11 @@ _stencil_val(Phi,0,0,0);
       if (val(Phi,0,0,0) < val)
  val(p.x,0,0,0) = 1. - val(p.x,0,0,0);
     }
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.x,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,1,0,0) > val);
   } 
-#line 155
+#line 148
 if (is_vertex(neighbor(0,1,0))) {
 
 
@@ -10384,11 +10378,11 @@ if (is_vertex(neighbor(0,1,0))) {
       if (val(Phi,0,0,0) < val)
  val(p.y,0,0,0) = 1. - val(p.y,0,0,0);
     }
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.y,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,1,0) > val);
   } 
-#line 155
+#line 148
 if (is_vertex(neighbor(0,0,1))) {
 
 
@@ -10406,28 +10400,28 @@ if (is_vertex(neighbor(0,0,1))) {
       if (val(Phi,0,0,0) < val)
  val(p.z,0,0,0) = 1. - val(p.z,0,0,0);
     }
-#line 180 "/home/lisergey/basilisk/src/fractions.h"
+#line 173 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.z,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,0,1) > val);
   }}end_foreach_vertex();}
-#line 199 "/home/lisergey/basilisk/src/fractions.h"
+#line 192 "/home/lisergey/basilisk/src/fractions.h"
   
     _attribute[p.x.i].dirty = false;
     
-#line 200
+#line 193
 _attribute[p.y.i].dirty = false;
     
-#line 200
+#line 193
 _attribute[p.z.i].dirty = false;
 
-  scalar s_x = s.x, s_y = s.y, s_z = s.z;
+  scalar s_x = as.x, s_y = as.y, s_z = as.z;
   foreach_face_stencil(){_stencil_is_face_z(){
 
 
 
 
   {    
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10435,15 +10429,15 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,1,0,0);
        
        
     
-#line 245
+#line 238
 } 
-#line 242
+#line 235
 { 
 _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);  
        
        
     
-#line 245
+#line 238
 }
 
 
@@ -10475,7 +10469,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
      
    }      }
    
-#line 270
+#line 263
 {_stencil_val(p.y,i,0,0); _stencil_val(p.y,i,0,0); {       
      _stencil_val(p.y,i,0,0);_stencil_val(Phi,i,0,0); 
           
@@ -10500,7 +10494,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
 
 
       }}}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10521,16 +10515,16 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
        
     
   
-#line 295
+#line 288
 }}end__stencil_is_face_z()
-#line 203
+#line 196
 _stencil_is_face_x(){
 
 
 
 
   {    
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10538,15 +10532,15 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,0,1,0);
        
        
     
-#line 245
+#line 238
 } 
-#line 242
+#line 235
 { 
 _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);  
        
        
     
-#line 245
+#line 238
 }
 
 
@@ -10578,7 +10572,7 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
      
    }      }
    
-#line 270
+#line 263
 {_stencil_val(p.z,0,i,0); _stencil_val(p.z,0,i,0); {       
      _stencil_val(p.z,0,i,0);_stencil_val(Phi,0,i,0); 
           
@@ -10603,7 +10597,7 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
 
 
       }}}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10624,16 +10618,16 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
        
     
   
-#line 295
+#line 288
 }}end__stencil_is_face_x()
-#line 203
+#line 196
 _stencil_is_face_y(){
 
 
 
 
   {    
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10641,15 +10635,15 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,0,1);
        
        
     
-#line 245
+#line 238
 } 
-#line 242
+#line 235
 { 
 _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);  
        
        
     
-#line 245
+#line 238
 }
 
 
@@ -10681,7 +10675,7 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
      
    }      }
    
-#line 270
+#line 263
 {_stencil_val(p.x,0,0,i); _stencil_val(p.x,0,0,i); {       
      _stencil_val(p.x,0,0,i);_stencil_val(Phi,0,0,i); 
           
@@ -10706,7 +10700,7 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
 
 
       }}}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10727,24 +10721,24 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
        
     
   
-#line 295
+#line 288
 }}end__stencil_is_face_y()}end_foreach_face_stencil();
   {
-#line 203
+#line 196
 foreach_face_generic(){is_face_z(){
 
 
 
 
   {
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.x = val(p.y,0,0,0) - val(p.y,1,0,0);
       nn += fabs(n.x);
     } 
-#line 242
+#line 235
 {
       n.y = val(p.x,0,0,0) - val(p.x,0,1,0);
       nn += fabs(n.y);
@@ -10765,7 +10759,7 @@ foreach_face_generic(){is_face_z(){
       
  n.x /= nn;
  
-#line 260
+#line 253
 n.y /= nn;
 
 
@@ -10782,13 +10776,13 @@ n.y /= nn;
      ni++;
    }
    
-#line 270
+#line 263
 if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
      double a = sign(val(Phi,i,0,0) - val)*(val(p.y,i,0,0) - 0.5);
      alpha += n.y*a + n.x*(i - 0.5);
      ni++;
    }}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_z,0,0,0) = max (val(p.x,0,0,0), val(p.y,0,0,0));
       else if (ni != 4)
@@ -10802,21 +10796,21 @@ if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
       }
     }
   }}end_is_face_z()
-#line 203
+#line 196
 is_face_x(){
 
 
 
 
   {
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.y = val(p.z,0,0,0) - val(p.z,0,1,0);
       nn += fabs(n.y);
     } 
-#line 242
+#line 235
 {
       n.z = val(p.y,0,0,0) - val(p.y,0,0,1);
       nn += fabs(n.z);
@@ -10837,7 +10831,7 @@ is_face_x(){
       
  n.y /= nn;
  
-#line 260
+#line 253
 n.z /= nn;
 
 
@@ -10854,13 +10848,13 @@ n.z /= nn;
      ni++;
    }
    
-#line 270
+#line 263
 if (val(p.z,0,i,0) > 0. && val(p.z,0,i,0) < 1.) {
      double a = sign(val(Phi,0,i,0) - val)*(val(p.z,0,i,0) - 0.5);
      alpha += n.z*a + n.y*(i - 0.5);
      ni++;
    }}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_x,0,0,0) = max (val(p.y,0,0,0), val(p.z,0,0,0));
       else if (ni != 4)
@@ -10874,21 +10868,21 @@ if (val(p.z,0,i,0) > 0. && val(p.z,0,i,0) < 1.) {
       }
     }
   }}end_is_face_x()
-#line 203
+#line 196
 is_face_y(){
 
 
 
 
   {
-#line 240 "/home/lisergey/basilisk/src/fractions.h"
+#line 233 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.z = val(p.x,0,0,0) - val(p.x,0,0,1);
       nn += fabs(n.z);
     } 
-#line 242
+#line 235
 {
       n.x = val(p.z,0,0,0) - val(p.z,1,0,0);
       nn += fabs(n.x);
@@ -10909,7 +10903,7 @@ is_face_y(){
       
  n.z /= nn;
  
-#line 260
+#line 253
 n.x /= nn;
 
 
@@ -10926,13 +10920,13 @@ n.x /= nn;
      ni++;
    }
    
-#line 270
+#line 263
 if (val(p.x,0,0,i) > 0. && val(p.x,0,0,i) < 1.) {
      double a = sign(val(Phi,0,0,i) - val)*(val(p.x,0,0,i) - 0.5);
      alpha += n.x*a + n.z*(i - 0.5);
      ni++;
    }}
-#line 283 "/home/lisergey/basilisk/src/fractions.h"
+#line 276 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_y,0,0,0) = max (val(p.z,0,0,0), val(p.x,0,0,0));
       else if (ni != 4)
@@ -10961,30 +10955,30 @@ if (val(p.x,0,0,i) > 0. && val(p.x,0,0,i) < 1.) {
     
     
      { 
-_stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);  
+_stencil_val(as.x,0,0,0); _stencil_val(as.x,1,0,0);  
        
        
     
-#line 313
+#line 306
 } 
-#line 310
+#line 303
 { 
-_stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);  
+_stencil_val(as.y,0,0,0); _stencil_val(as.y,0,1,0);  
        
        
     
-#line 313
+#line 306
 } 
-#line 310
+#line 303
 { 
-_stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);  
+_stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);  
        
        
     
-#line 313
+#line 306
 }
 {
-      {_stencil_val_a(c,0,0,0); _stencil_val(s.x,0,0,0); } 
+      {_stencil_val_a(c,0,0,0); _stencil_val(as.x,0,0,0); } 
 {      
       
    
@@ -11004,14 +10998,14 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
        
      }      }
      
-#line 329
+#line 322
 {_stencil_val(p.y,j,0,i); _stencil_val(p.y,j,0,i); {       
        _stencil_val(p.y,j,0,i);_stencil_val(Phi,j,0,i); 
                 
        
      }      }
      
-#line 329
+#line 322
 {_stencil_val(p.z,i,j,0); _stencil_val(p.z,i,j,0); {       
        _stencil_val(p.z,i,j,0);_stencil_val(Phi,i,j,0); 
                 
@@ -11022,7 +11016,7 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
 
 
 {
- {_stencil_val_a(c,0,0,0); _stencil_val(s.x,0,0,0); }
+ {_stencil_val_a(c,0,0,0); _stencil_val(as.x,0,0,0); }
 {
  {_stencil_val_a(c,0,0,0);  }
  
@@ -11035,12 +11029,12 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
               
       
     
-#line 344
+#line 337
 }}
        
     
   
-#line 345
+#line 338
 }end_foreach_stencil();
 
 
@@ -11050,7 +11044,7 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
 
 
   {
-#line 303
+#line 296
 foreach() {
 
 
@@ -11059,29 +11053,29 @@ foreach() {
     coord n;
     double nn = 0.;
      {
-      n.x = val(s.x,0,0,0) - val(s.x,1,0,0);
+      n.x = val(as.x,0,0,0) - val(as.x,1,0,0);
       nn += fabs(n.x);
     } 
-#line 310
+#line 303
 {
-      n.y = val(s.y,0,0,0) - val(s.y,0,1,0);
+      n.y = val(as.y,0,0,0) - val(as.y,0,1,0);
       nn += fabs(n.y);
     } 
-#line 310
+#line 303
 {
-      n.z = val(s.z,0,0,0) - val(s.z,0,0,1);
+      n.z = val(as.z,0,0,0) - val(as.z,0,0,1);
       nn += fabs(n.z);
     }
     if (nn == 0.)
-      val(c,0,0,0) = val(s.x,0,0,0);
+      val(c,0,0,0) = val(as.x,0,0,0);
     else {
       
  n.x /= nn;
  
-#line 318
+#line 311
 n.y /= nn;
  
-#line 318
+#line 311
 n.z /= nn;
 
 
@@ -11099,14 +11093,14 @@ n.z /= nn;
        ni++;
      }
      
-#line 329
+#line 322
 if (val(p.y,j,0,i) > 0. && val(p.y,j,0,i) < 1.) {
        double a = sign(val(Phi,j,0,i) - val)*(val(p.y,j,0,i) - 0.5);
        alpha += n.y*a + n.z*(i - 0.5) + n.x*(j - 0.5);
        ni++;
      }
      
-#line 329
+#line 322
 if (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {
        double a = sign(val(Phi,i,j,0) - val)*(val(p.z,i,j,0) - 0.5);
        alpha += n.z*a + n.x*(i - 0.5) + n.y*(j - 0.5);
@@ -11117,7 +11111,7 @@ if (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {
 
 
       if (ni == 0)
- val(c,0,0,0) = val(s.x,0,0,0);
+ val(c,0,0,0) = val(as.x,0,0,0);
       else if (ni < 3 || ni > 6)
  val(c,0,0,0) = 0.;
       else
@@ -11125,25 +11119,26 @@ if (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {
     }
   }end_foreach();}delete((scalar*)((vector[]){p,{{-1},{-1},{-1}}}));
 
-end_tracing("fractions","/home/lisergey/basilisk/src/fractions.h",347);}
-#line 391 "/home/lisergey/basilisk/src/fractions.h"
+
+end_tracing("fractions","/home/lisergey/basilisk/src/fractions.h",341);}
+#line 385 "/home/lisergey/basilisk/src/fractions.h"
 coord youngs_normal (Point point, scalar c)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   coord n;
   double nn = 0.;
-  if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/fractions.h", 395, "dimension == 2");
+  if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/fractions.h", 389, "dimension == 2");
    {
     n.x = (val(c,-1,1,0) + 2.*val(c,-1,0,0) + val(c,-1,-1,0) -
     val(c,+1,1,0) - 2.*val(c,+1,0,0) - val(c,+1,-1,0));
     nn += fabs(n.x);
   } 
-#line 396
+#line 390
 {
     n.y = (val(c,0,-1,1) + 2.*val(c,0,-1,0) + val(c,0,-1,-1) -
     val(c,0,+1,1) - 2.*val(c,0,+1,0) - val(c,0,+1,-1));
     nn += fabs(n.y);
   } 
-#line 396
+#line 390
 {
     n.z = (val(c,1,0,-1) + 2.*val(c,0,0,-1) + val(c,-1,0,-1) -
     val(c,1,0,+1) - 2.*val(c,0,0,+1) - val(c,-1,0,+1));
@@ -11154,10 +11149,10 @@ coord youngs_normal (Point point, scalar c)
     {
       n.x /= nn;
       
-#line 404
+#line 398
 n.y /= nn;
       
-#line 404
+#line 398
 n.z /= nn;}
   else
     n.x = 1.;
@@ -11177,12 +11172,12 @@ coord facet_normal (Point point, scalar c, vector s)
       n.x = val(s.x,0,0,0) - val(s.x,1,0,0);
       nn += fabs(n.x);
     } 
-#line 419
+#line 413
 {
       n.y = val(s.y,0,0,0) - val(s.y,0,1,0);
       nn += fabs(n.y);
     } 
-#line 419
+#line 413
 {
       n.z = val(s.z,0,0,0) - val(s.z,0,0,1);
       nn += fabs(n.z);
@@ -11191,19 +11186,19 @@ coord facet_normal (Point point, scalar c, vector s)
       {
  n.x /= nn;
  
-#line 425
+#line 419
 n.y /= nn;
  
-#line 425
+#line 419
 n.z /= nn;}
     else
       {
  n.x = 1./3;
  
-#line 428
+#line 422
 n.y = 1./3;
  
-#line 428
+#line 422
 n.z = 1./3;}
     return n;
   }
@@ -11215,7 +11210,7 @@ n.z = 1./3;}
 
 
 
-#line 414
+#line 408
 static void _stencil_facet_normal (Point point, scalar c, vector s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (s.x.i >= 0) {    
@@ -11226,23 +11221,23 @@ _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
        
        
     
-#line 422
+#line 416
 } 
-#line 419
+#line 413
 { 
 _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);  
        
        
     
-#line 422
+#line 416
 } 
-#line 419
+#line 413
 { 
 _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);  
        
        
     
-#line 422
+#line 416
 }
       
    
@@ -11254,13 +11249,13 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
   } 
 _stencil_mycs (point, c);
   
-#line 431
+#line 425
 return;
 }
-#line 441 "/home/lisergey/basilisk/src/fractions.h"
+#line 435 "/home/lisergey/basilisk/src/fractions.h"
      
 void reconstruction (const scalar c, vector n, scalar alpha)
-{tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",442);
+{tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",436);
   foreach_stencil() {
 
 
@@ -11272,10 +11267,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
       
  {_stencil_val_a(n.x,0,0,0);  }
  
-#line 453
+#line 447
 {_stencil_val_a(n.y,0,0,0);  }
  
-#line 453
+#line 447
 {_stencil_val_a(n.z,0,0,0);  }
     } 
 {  
@@ -11289,10 +11284,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
       
  {_stencil_val_a(n.x,0,0,0);  }
  
-#line 464
+#line 458
 {_stencil_val_a(n.y,0,0,0);  }
  
-#line 464
+#line 458
 {_stencil_val_a(n.z,0,0,0);  }
       _stencil_val_a(alpha,0,0,0);_stencil_val(c,0,0,0);    
     }}
@@ -11304,10 +11299,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
           
     
   
-#line 467
+#line 461
 }end_foreach_stencil();
   {
-#line 444
+#line 438
 foreach() {
 
 
@@ -11319,10 +11314,10 @@ foreach() {
       
  val(n.x,0,0,0) = 0.;
  
-#line 453
+#line 447
 val(n.y,0,0,0) = 0.;
  
-#line 453
+#line 447
 val(n.z,0,0,0) = 0.;
     }
     else {
@@ -11336,22 +11331,22 @@ val(n.z,0,0,0) = 0.;
       
  val(n.x,0,0,0) = m.x;
  
-#line 464
+#line 458
 val(n.y,0,0,0) = m.y;
  
-#line 464
+#line 458
 val(n.z,0,0,0) = m.z;
       val(alpha,0,0,0) = plane_alpha (val(c,0,0,0), m);
     }
   }end_foreach();}
-#line 476 "/home/lisergey/basilisk/src/fractions.h"
+#line 470 "/home/lisergey/basilisk/src/fractions.h"
   
     _attribute[n.x.i].refine = _attribute[n.x.i].prolongation = refine_injection;
     
-#line 477
+#line 471
 _attribute[n.y.i].refine = _attribute[n.y.i].prolongation = refine_injection;
     
-#line 477
+#line 471
 _attribute[n.z.i].refine = _attribute[n.z.i].prolongation = refine_injection;
 
 
@@ -11360,33 +11355,16 @@ _attribute[n.z.i].refine = _attribute[n.z.i].prolongation = refine_injection;
   _attribute[alpha.i].n = n;
   _attribute[alpha.i].refine = _attribute[alpha.i].prolongation = alpha_refine;
 
-end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",485);}
-#line 505 "/home/lisergey/basilisk/src/fractions.h"
-struct OutputFacets {
-  scalar c;
-  FILE * fp;
-  vector s;
-};
-
+end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",479);}
+#line 499 "/home/lisergey/basilisk/src/fractions.h"
      
-void output_facets (struct OutputFacets p)
-{tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",512);
-  scalar c = p.c;
-  vector s = p.s;
-  if (!p.fp) p.fp = fout;
-  if (!s.x.i) s.x.i = -1;
-
+void output_facets (scalar c, FILE * fp, vector s)
+{tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",500);
   foreach_stencil()
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {  
        _stencil_facet_normal (point, c, s);     
       _stencil_val(c,0,0,0);        
-
-
-
-
-
-
-
+#line 515 "/home/lisergey/basilisk/src/fractions.h"
       
                  
               
@@ -11396,32 +11374,25 @@ void output_facets (struct OutputFacets p)
  
 
     }        }end_foreach_stencil();
-
   {
-#line 519
+#line 502
 foreach()
     if (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {
       coord n = facet_normal (point, c, s);
       double alpha = plane_alpha (val(c,0,0,0), n);
-
-
-
-
-
-
-
+#line 515 "/home/lisergey/basilisk/src/fractions.h"
       coord v[12];
       int m = facets (n, alpha, v, 1.);
       for (int i = 0; i < m; i++)
- fprintf (p.fp, "%g %g %g\n",
+ fprintf (fp, "%g %g %g\n",
    x + v[i].x*Delta, y + v[i].y*Delta, z + v[i].z*Delta);
       if (m > 0)
- fputc ('\n', p.fp);
+ fputc ('\n', fp);
 
     }end_foreach();}
 
-  fflush (p.fp);
-end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",541);}
+  fflush (fp);
+end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",526);}
 
 
 
@@ -11431,7 +11402,7 @@ end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",541);}
 
      
 double interface_area (scalar c)
-{tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",550);
+{tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",535);
   double area = 0.;
   foreach_stencil ()
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {   
@@ -11443,7 +11414,7 @@ double interface_area (scalar c)
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:area)){
-#line 553
+#line 538
 foreach ()
     if (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {
       coord n = mycs (point, c), p;
@@ -11454,9 +11425,9 @@ foreach ()
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 559
-{end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",559);return area;}
-end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",560);}
+#line 544
+{end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",544);return area;}
+end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",545);}
 #line 9 "cylinder.c"
 #line 1 "embed.h"
 #line 1 "/home/lisergey/basilisk/src/embed.h"
@@ -12624,10 +12595,9 @@ struct Cleanup {
 };
 
      
-int fractions_cleanup (struct Cleanup p)
+int fractions_cleanup (scalar c, vector s,
+         double smin, bool opposite)
 {tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",293);
-  scalar c = p.c;
-  vector s = p.s;
 
 
 
@@ -12644,11 +12614,11 @@ int fractions_cleanup (struct Cleanup p)
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val(s.x,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,-1,0,0); _stencil_val(s.x,0,0,0);
  {_stencil_val_a(s.x,0,0,0);  }        }}end__stencil_is_face_x()
-#line 310
+#line 309
 _stencil_is_face_y(){
       {_stencil_val(s.y,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,0,-1,0); _stencil_val(s.y,0,0,0);
  {_stencil_val_a(s.y,0,0,0);  }        }}end__stencil_is_face_y()
-#line 310
+#line 309
 _stencil_is_face_z(){
       {_stencil_val(s.z,0,0,0);_stencil_val(c,0,0,0);_stencil_val(c,0,0,-1); _stencil_val(s.z,0,0,0);
  {_stencil_val_a(s.z,0,0,0);  }        }}end__stencil_is_face_z()}end_foreach_face_stencil();
@@ -12657,17 +12627,17 @@ _stencil_is_face_z(){
 
 
     {
-#line 310
+#line 309
 foreach_face_generic(){is_face_x(){
-      if (val(s.x,0,0,0) && ((!val(c,0,0,0) || !val(c,-1,0,0)) || val(s.x,0,0,0) < p.smin))
+      if (val(s.x,0,0,0) && ((!val(c,0,0,0) || !val(c,-1,0,0)) || val(s.x,0,0,0) < smin))
  val(s.x,0,0,0) = 0.;}end_is_face_x()
-#line 310
+#line 309
 is_face_y(){
-      if (val(s.y,0,0,0) && ((!val(c,0,0,0) || !val(c,0,-1,0)) || val(s.y,0,0,0) < p.smin))
+      if (val(s.y,0,0,0) && ((!val(c,0,0,0) || !val(c,0,-1,0)) || val(s.y,0,0,0) < smin))
  val(s.y,0,0,0) = 0.;}end_is_face_y()
-#line 310
+#line 309
 is_face_z(){
-      if (val(s.z,0,0,0) && ((!val(c,0,0,0) || !val(c,0,0,-1)) || val(s.z,0,0,0) < p.smin))
+      if (val(s.z,0,0,0) && ((!val(c,0,0,0) || !val(c,0,0,-1)) || val(s.z,0,0,0) < smin))
  val(s.z,0,0,0) = 0.;}end_is_face_z()}end_foreach_face_generic();}
 
     changed = 0;
@@ -12689,11 +12659,11 @@ is_face_z(){
 
 _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
+#line 330 "/home/lisergey/basilisk/src/embed.h"
           
  
 } 
-#line 318
+#line 317
 {
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.y,0,i,0);
@@ -12709,11 +12679,11 @@ _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
 
 _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
+#line 330 "/home/lisergey/basilisk/src/embed.h"
           
  
 } 
-#line 318
+#line 317
 {
    for (int i = 0; i <= 1; i++)
      {_stencil_val(s.z,0,0,i);
@@ -12729,7 +12699,7 @@ _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);
 
 _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
      {_stencil_val_a(c,0,0,0);   }
-#line 331 "/home/lisergey/basilisk/src/embed.h"
+#line 330 "/home/lisergey/basilisk/src/embed.h"
           
  
 }
@@ -12751,13 +12721,13 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
 
     
       
-#line 343
+#line 342
 }      }end_foreach_stencil();
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:changed)){
-#line 315
+#line 314
 foreach()
       if (val(c,0,0,0) > 0. && val(c,0,0,0) < 1.) {
  int n = 0;
@@ -12765,26 +12735,26 @@ foreach()
    for (int i = 0; i <= 1; i++)
      if (val(s.x,i,0,0) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.x,0,0,0) == 0. && val(s.x,1,0,0) == 0.)
+#line 330 "/home/lisergey/basilisk/src/embed.h"
+   if (opposite && val(s.x,0,0,0) == 0. && val(s.x,1,0,0) == 0.)
      val(c,0,0,0) = 0., changed++;
  } 
-#line 318
+#line 317
 {
    for (int i = 0; i <= 1; i++)
      if (val(s.y,0,i,0) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.y,0,0,0) == 0. && val(s.y,0,1,0) == 0.)
+#line 330 "/home/lisergey/basilisk/src/embed.h"
+   if (opposite && val(s.y,0,0,0) == 0. && val(s.y,0,1,0) == 0.)
      val(c,0,0,0) = 0., changed++;
  } 
-#line 318
+#line 317
 {
    for (int i = 0; i <= 1; i++)
      if (val(s.z,0,0,i) > 0.)
        n++;
-#line 331 "/home/lisergey/basilisk/src/embed.h"
-   if (p.opposite && val(s.z,0,0,0) == 0. && val(s.z,0,0,1) == 0.)
+#line 330 "/home/lisergey/basilisk/src/embed.h"
+   if (opposite && val(s.z,0,0,0) == 0. && val(s.z,0,0,1) == 0.)
      val(c,0,0,0) = 0., changed++;
  }
 
@@ -12802,15 +12772,15 @@ foreach()
 }
 
     
-#line 345
+#line 344
 schanged += changed;
   }
   if (changed)
     fprintf (ferr, "WARNING: fractions_cleanup() did not converge after "
       "%d iterations\n", i);
-  {end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",350);return schanged;}
-end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",351);}
-#line 375 "/home/lisergey/basilisk/src/embed.h"
+  {end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",349);return schanged;}
+end_tracing("fractions_cleanup","/home/lisergey/basilisk/src/embed.h",350);}
+#line 374 "/home/lisergey/basilisk/src/embed.h"
 
 static inline double dirichlet_gradient_x (Point point, scalar s, scalar cs,
         coord n, coord p, double bc,
@@ -12819,10 +12789,10 @@ static inline double dirichlet_gradient_x (Point point, scalar s, scalar cs,
   
     n.x = - n.x;
     
-#line 381
+#line 380
 n.y = - n.y;
     
-#line 381
+#line 380
 n.z = - n.z;
   double d[2], v[2] = {1e30,1e30};
   bool defined = true;
@@ -12830,11 +12800,11 @@ n.z = - n.z;
     if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
   if (defined)
@@ -12893,7 +12863,7 @@ if (defined && !val(fs.z,0,0,(n.z > 0.)))
   return (bc - v[0])/(d[0]*Delta);
 }
 
-#line 376
+#line 375
 static inline double dirichlet_gradient_y (Point point, scalar s, scalar cs,
         coord n, coord p, double bc,
         double * coef)
@@ -12901,10 +12871,10 @@ static inline double dirichlet_gradient_y (Point point, scalar s, scalar cs,
   
     n.y = - n.y;
     
-#line 381
+#line 380
 n.z = - n.z;
     
-#line 381
+#line 380
 n.x = - n.x;
   double d[2], v[2] = {1e30,1e30};
   bool defined = true;
@@ -12912,11 +12882,11 @@ n.x = - n.x;
     if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
   if (defined)
@@ -12975,7 +12945,7 @@ if (defined && !val(fs.x,(n.x > 0.),0,0))
   return (bc - v[0])/(d[0]*Delta);
 }
 
-#line 376
+#line 375
 static inline double dirichlet_gradient_z (Point point, scalar s, scalar cs,
         coord n, coord p, double bc,
         double * coef)
@@ -12983,10 +12953,10 @@ static inline double dirichlet_gradient_z (Point point, scalar s, scalar cs,
   
     n.z = - n.z;
     
-#line 381
+#line 380
 n.x = - n.x;
     
-#line 381
+#line 380
 n.y = - n.y;
   double d[2], v[2] = {1e30,1e30};
   bool defined = true;
@@ -12994,11 +12964,11 @@ n.y = - n.y;
     if (defined && !val(fs.z,0,0,(n.z > 0.)))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.x,(n.x > 0.),0,0))
       defined = false;
     
-#line 385
+#line 384
 if (defined && !val(fs.y,0,(n.y > 0.),0))
       defined = false;
   if (defined)
@@ -13056,16 +13026,16 @@ if (defined && !val(fs.y,0,(n.y > 0.),0))
     return (d[1]*(bc - v[0])/d[0] - d[0]*(bc - v[1])/d[1])/((d[1] - d[0])*Delta);
   return (bc - v[0])/(d[0]*Delta);
 }
-#line 375 "/home/lisergey/basilisk/src/embed.h"
+#line 374 "/home/lisergey/basilisk/src/embed.h"
 
 static void _stencil_dirichlet_gradient_x (Point point, scalar s, scalar cs,
 _stencil_undefined *
         
-#line 377
+#line 376
 n,_stencil_undefined * p,_stencil_undefined * bc,
 _stencil_undefined 
         
-#line 378
+#line 377
 * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
   
@@ -13076,11 +13046,11 @@ _stencil_undefined
     {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
@@ -13106,7 +13076,7 @@ _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stenc
          
         
          
-#line 407
+#line 406
 }
 {
 
@@ -13119,7 +13089,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 416
 }
  
 
@@ -13128,7 +13098,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
+#line 420
 }         
      
    
@@ -13151,15 +13121,15 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 return   ;
 }
 
-#line 376
+#line 375
 static void _stencil_dirichlet_gradient_y (Point point, scalar s, scalar cs,
 _stencil_undefined *
         
-#line 377
+#line 376
 n,_stencil_undefined * p,_stencil_undefined * bc,
 _stencil_undefined 
         
-#line 378
+#line 377
 * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
   
@@ -13170,11 +13140,11 @@ _stencil_undefined
     {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
@@ -13200,7 +13170,7 @@ _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stenc
          
         
          
-#line 407
+#line 406
 }
 {
 
@@ -13213,7 +13183,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 416
 }
  
 
@@ -13222,7 +13192,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
+#line 420
 }         
      
    
@@ -13245,15 +13215,15 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 return   ;
 }
 
-#line 376
+#line 375
 static void _stencil_dirichlet_gradient_z (Point point, scalar s, scalar cs,
 _stencil_undefined *
         
-#line 377
+#line 376
 n,_stencil_undefined * p,_stencil_undefined * bc,
 _stencil_undefined 
         
-#line 378
+#line 377
 * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;       
   
@@ -13264,11 +13234,11 @@ _stencil_undefined
     {_stencil_val(fs.z,0,0,o_stencil  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.x,o_stencil,0,0  ); 
           }
     
-#line 385
+#line 384
 {_stencil_val(fs.y,0,o_stencil,0  ); 
           }
     
@@ -13294,7 +13264,7 @@ _stencil_val(cs,o_stencil,o_stencil,o_stencil);_stencil_val(cs,o_stencil,o_stenc
          
         
          
-#line 407
+#line 406
 }
 {
 
@@ -13307,7 +13277,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
 
                                                   
-#line 417
+#line 416
 }
  
 
@@ -13316,7 +13286,7 @@ _stencil_val(s,o_stencil,o_stencil,o_stencil);_stencil_val(s,o_stencil,o_stencil
 
       
     
-#line 421
+#line 420
 }         
      
    
@@ -13359,11 +13329,11 @@ double dirichlet_gradient (Point point, scalar s, scalar cs,
 }
 
 
-#line 443
+#line 442
 static void _stencil_dirichlet_gradient (Point point, scalar s, scalar cs,
 _stencil_undefined *
       
-#line 444
+#line 443
 n,_stencil_undefined * p,_stencil_undefined * bc,_stencil_undefined  * coef)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
@@ -13376,7 +13346,7 @@ n,_stencil_undefined * p,_stencil_undefined * bc,_stencil_undefined  * coef)
 { _stencil_dirichlet_gradient_x (point, s, cs,NULL ,NULL ,NULL ,NULL );}
        
   
-#line 454
+#line 453
 }
     
 { _stencil_dirichlet_gradient_y (point, s, cs,NULL ,NULL ,NULL ,NULL );}} 
@@ -13389,14 +13359,14 @@ _stencil_dirichlet_gradient_z (point, s, cs,NULL ,NULL ,NULL ,NULL );
      
       
   
-#line 457
+#line 456
 return;
 
   return ;
 }
 
 bid embed;
-#line 471 "/home/lisergey/basilisk/src/embed.h"
+#line 470 "/home/lisergey/basilisk/src/embed.h"
 static inline
 coord embed_gradient (Point point, vector u, coord p, coord n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
@@ -13413,7 +13383,7 @@ coord embed_gradient (Point point, vector u, coord p, coord n)
     if (dudn.x == 1e30)
       dudn.x = 0.;
   } 
-#line 475
+#line 474
 {
     bool dirichlet = false;
     double vb = _attribute[u.y.i].boundary[embed] (point, point, u.y, &dirichlet);
@@ -13426,7 +13396,7 @@ coord embed_gradient (Point point, vector u, coord p, coord n)
     if (dudn.y == 1e30)
       dudn.y = 0.;
   } 
-#line 475
+#line 474
 {
     bool dirichlet = false;
     double vb = _attribute[u.z.i].boundary[embed] (point, point, u.z, &dirichlet);
@@ -13441,7 +13411,7 @@ coord embed_gradient (Point point, vector u, coord p, coord n)
   }
   return dudn;
 }
-#line 471 "/home/lisergey/basilisk/src/embed.h"
+#line 470 "/home/lisergey/basilisk/src/embed.h"
 static void 
 _stencil_embed_gradient (Point point, vector u,_stencil_undefined * p,_stencil_undefined * n)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES; 
@@ -13454,7 +13424,7 @@ _stencil_embed_gradient (Point point, vector u,_stencil_undefined * p,_stencil_u
 _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL ); 
       
     
-#line 481
+#line 480
 }   
      
     
@@ -13462,9 +13432,9 @@ _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL );
      
        
   
-#line 486
+#line 485
 } 
-#line 475
+#line 474
 {     
     
     default_stencil ( point,((scalar[]){ u.y,{-1}}) ); 
@@ -13473,7 +13443,7 @@ _stencil_dirichlet_gradient (point, u.x, cs,NULL ,NULL ,NULL ,NULL );
 _stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL ); 
       
     
-#line 481
+#line 480
 }   
      
     
@@ -13481,9 +13451,9 @@ _stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL );
      
        
   
-#line 486
+#line 485
 } 
-#line 475
+#line 474
 {     
     
     default_stencil ( point,((scalar[]){ u.z,{-1}}) ); 
@@ -13492,7 +13462,7 @@ _stencil_dirichlet_gradient (point, u.y, cs,NULL ,NULL ,NULL ,NULL );
 _stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL ); 
       
     
-#line 481
+#line 480
 }   
      
     
@@ -13500,14 +13470,14 @@ _stencil_dirichlet_gradient (point, u.z, cs,NULL ,NULL ,NULL ,NULL );
      
        
   
-#line 486
+#line 485
 }
   return ;
 }
-#line 509 "/home/lisergey/basilisk/src/embed.h"
+#line 508 "/home/lisergey/basilisk/src/embed.h"
      
 void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
-{tracing("embed_force","/home/lisergey/basilisk/src/embed.h",510);
+{tracing("embed_force","/home/lisergey/basilisk/src/embed.h",509);
   coord Fps = {0}, Fmus = {0};
   foreach_stencil ()
     {_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
@@ -13523,7 +13493,7 @@ void embed_force (scalar p, vector u, vector mu, coord * Fp, coord * Fmu)
       _stencil_embed_interpolate (point, p,NULL );
        
   
-#line 535 "/home/lisergey/basilisk/src/embed.h"
+#line 534 "/home/lisergey/basilisk/src/embed.h"
       if (constant(mu.x) != 0.) {      
  
   { 
@@ -13531,26 +13501,26 @@ _stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0);
      _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); 
     
  
-#line 540
+#line 539
 } 
-#line 537
+#line 536
 { 
 _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
      _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0); 
     
  
-#line 540
+#line 539
 } 
-#line 537
+#line 536
 { 
 _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
      _stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0,0,1); 
     
  
-#line 540
+#line 539
 }  
       
-#line 600 "/home/lisergey/basilisk/src/embed.h"
+#line 599 "/home/lisergey/basilisk/src/embed.h"
      
   _stencil_embed_gradient (point, u,NULL ,NULL );
   
@@ -13558,12 +13528,12 @@ _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1);
       }
     }      }end_foreach_stencil();
   
-#line 513
+#line 512
 if(!is_constant(fm.x)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 513
+#line 512
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
 
@@ -13579,52 +13549,52 @@ foreach ()
       
  Fps.x += Fn*n.x;
  
-#line 526
+#line 525
 Fps.y += Fn*n.y;
  
-#line 526
+#line 525
 Fps.z += Fn*n.z;
-#line 535 "/home/lisergey/basilisk/src/embed.h"
+#line 534 "/home/lisergey/basilisk/src/embed.h"
       if (constant(mu.x) != 0.) {
  double mua = 0., fa = 0.;
   {
    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
    fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
  } 
-#line 537
+#line 536
 {
    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
    fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
  } 
-#line 537
+#line 536
 {
    mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
    fa += val(fm.z,0,0,0) + val(fm.z,0,0,1);
  }
  mua /= fa;
-#line 600 "/home/lisergey/basilisk/src/embed.h"
- if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 600, "dimension == 2");
+#line 599 "/home/lisergey/basilisk/src/embed.h"
+ if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 599, "dimension == 2");
  coord dudn = embed_gradient (point, u, b, n);
  
    Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
    
-#line 603
+#line 602
 Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.z*n.y*n.z);
    
-#line 603
+#line 602
 Fmus.z -= area*mua*(dudn.z*(sq(n.z) + 1.) + dudn.x*n.z*n.x);
       }
     }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 605
+#line 604
 }else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:Fmus)reduction(+:Fps)){
-#line 513
+#line 512
 foreach ()
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
 
@@ -13640,55 +13610,55 @@ foreach ()
       
  Fps.x += Fn*n.x;
  
-#line 526
+#line 525
 Fps.y += Fn*n.y;
  
-#line 526
+#line 525
 Fps.z += Fn*n.z;
-#line 535 "/home/lisergey/basilisk/src/embed.h"
+#line 534 "/home/lisergey/basilisk/src/embed.h"
       if (constant(mu.x) != 0.) {
  double mua = 0., fa = 0.;
   {
    mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
    fa += _const_fm.x + _const_fm.x;
  } 
-#line 537
+#line 536
 {
    mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
    fa += _const_fm.y + _const_fm.y;
  } 
-#line 537
+#line 536
 {
    mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
    fa += _const_fm.z + _const_fm.z;
  }
  mua /= fa;
-#line 600 "/home/lisergey/basilisk/src/embed.h"
- if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 600, "dimension == 2");
+#line 599 "/home/lisergey/basilisk/src/embed.h"
+ if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/embed.h", 599, "dimension == 2");
  coord dudn = embed_gradient (point, u, b, n);
  
    Fmus.x -= area*mua*(dudn.x*(sq(n.x) + 1.) + dudn.y*n.x*n.y);
    
-#line 603
+#line 602
 Fmus.y -= area*mua*(dudn.y*(sq(n.y) + 1.) + dudn.z*n.y*n.z);
    
-#line 603
+#line 602
 Fmus.z -= area*mua*(dudn.z*(sq(n.z) + 1.) + dudn.x*n.z*n.x);
       }
     }end_foreach();mpi_all_reduce_array(&Fmus.x,double,MPI_SUM,3);mpi_all_reduce_array(&Fps.x,double,MPI_SUM,3);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 605
+#line 604
 }
 
   *Fp = Fps; *Fmu = Fmus;
-end_tracing("embed_force","/home/lisergey/basilisk/src/embed.h",608);}
-#line 656 "/home/lisergey/basilisk/src/embed.h"
+end_tracing("embed_force","/home/lisergey/basilisk/src/embed.h",607);}
+#line 655 "/home/lisergey/basilisk/src/embed.h"
 double embed_flux (Point point, scalar s, vector mu, double * val)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
 
-#line 657
+#line 656
 if(!is_constant(fm.x)){{
 
 
@@ -13736,12 +13706,12 @@ if(!is_constant(fm.x)){{
     mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
     fa += val(fm.x,0,0,0) + val(fm.x,1,0,0);
   } 
-#line 700
+#line 699
 {
     mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
     fa += val(fm.y,0,0,0) + val(fm.y,0,1,0);
   } 
-#line 700
+#line 699
 {
     mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
     fa += val(fm.z,0,0,0) + val(fm.z,0,0,1);
@@ -13750,7 +13720,7 @@ if(!is_constant(fm.x)){{
   return - mua/(fa + 1e-30)*coef*area/Delta;
 }}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
 
-#line 657
+#line 656
 {
 
 
@@ -13798,12 +13768,12 @@ if(!is_constant(fm.x)){{
     mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
     fa += _const_fm.x + _const_fm.x;
   } 
-#line 700
+#line 699
 {
     mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
     fa += _const_fm.y + _const_fm.y;
   } 
-#line 700
+#line 699
 {
     mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
     fa += _const_fm.z + _const_fm.z;
@@ -13812,36 +13782,36 @@ if(!is_constant(fm.x)){{
   return - mua/(fa + 1e-30)*coef*area/Delta;
 }}
 
-#line 706
+#line 705
 }
-#line 715 "/home/lisergey/basilisk/src/embed.h"
+#line 714 "/home/lisergey/basilisk/src/embed.h"
 #undef _neumann
 #define _neumann(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
        *((bool *)data) = false, (expr) :\
        Delta*(expr) + val(_s,0,0,0))\
 
-#line 719
+#line 718
 
 #undef _neumann_homogeneous
 #define _neumann_homogeneous(...) (data ? *((bool *)data) = false, (0) :\
     val(_s,0,0,0))\
 
-#line 723
+#line 722
 
 #undef _dirichlet
 #define _dirichlet(expr, ...) (data ? embed_area_center (point, &x, &y, &z),\
        *((bool *)data) = true, (expr) :\
        2.*(expr) - val(_s,0,0,0))\
 
-#line 728
+#line 727
 
 #undef _dirichlet_homogeneous
 #define _dirichlet_homogeneous(...) (data ? *((bool *)data) = true, (0) :\
       - val(_s,0,0,0))\
 
-#line 732
+#line 731
 
-#line 743 "/home/lisergey/basilisk/src/embed.h"
+#line 742 "/home/lisergey/basilisk/src/embed.h"
 static inline double bilinear_embed (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (!coarse(cs,0,0,0) || !coarse(cs,child.x,0,0))
@@ -13858,11 +13828,11 @@ static inline double bilinear_embed (Point point, scalar s)
 
   return bilinear (point, s);
 }
-#line 790 "/home/lisergey/basilisk/src/embed.h"
+#line 789 "/home/lisergey/basilisk/src/embed.h"
      
 void update_tracer (scalar f, vector uf, vector flux, double dt)
-{tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",791);
-#line 802 "/home/lisergey/basilisk/src/embed.h"
+{tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",790);
+#line 801 "/home/lisergey/basilisk/src/embed.h"
   scalar  e=new_scalar("e");
   foreach_stencil() {
 
@@ -13881,14 +13851,14 @@ _stencil_val(cs,0,0,0);{
       
  {_stencil_val_r(f,0,0,0);_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);   }
  
-#line 818
+#line 817
 {_stencil_val_r(f,0,0,0);_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);   }
  
-#line 818
+#line 817
 {_stencil_val_r(f,0,0,0);_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);   }
       _stencil_val_a(e,0,0,0);  
     } 
-#line 831
+#line 830
 {   
       
       for (int i = 0; i <= 1; i++)
@@ -13896,11 +13866,11 @@ _stencil_val(cs,0,0,0);{
    {_stencil_val(uf.x,i,0,0);
      {_stencil_val(uf.x,i,0,0);  }   }
    
-#line 835
+#line 834
 {_stencil_val(uf.y,0,i,0);
      {_stencil_val(uf.y,0,i,0);  }   }
    
-#line 835
+#line 834
 {_stencil_val(uf.z,0,0,i);
      {_stencil_val(uf.z,0,0,i);  }   }}     
       _stencil_val(cm,0,0,0);   
@@ -13912,10 +13882,10 @@ _stencil_val(cs,0,0,0);{
       
  { _stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);  }
  
-#line 844
+#line 843
 { _stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);  }
  
-#line 844
+#line 843
 { _stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);  }
 _stencil_val(cm,0,0,0);
 
@@ -13959,11 +13929,11 @@ _stencil_val(cm,0,0,0);
 
       
     
-#line 870
+#line 869
 }}   
-#line 831 "/home/lisergey/basilisk/src/embed.h"
+#line 830 "/home/lisergey/basilisk/src/embed.h"
     
-#line 870
+#line 869
 }}
 
 
@@ -13978,10 +13948,10 @@ _stencil_val(cm,0,0,0);
 
     
   
-#line 871
+#line 870
 }end_foreach_stencil();
   
-#line 803
+#line 802
 if(!is_constant(cm)){{foreach() {
 
 
@@ -13999,14 +13969,14 @@ if(!is_constant(cm)){{foreach() {
       
  val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
  
-#line 818
+#line 817
 val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
  
-#line 818
+#line 817
 val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
       val(e,0,0,0) = 0.;
     }
-#line 831 "/home/lisergey/basilisk/src/embed.h"
+#line 830 "/home/lisergey/basilisk/src/embed.h"
     else {
       double umax = 0.;
       for (int i = 0; i <= 1; i++)
@@ -14014,11 +13984,11 @@ val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
    if (fabs(val(uf.x,i,0,0)) > umax)
      umax = fabs(val(uf.x,i,0,0));
    
-#line 835
+#line 834
 if (fabs(val(uf.y,0,i,0)) > umax)
      umax = fabs(val(uf.y,0,i,0));
    
-#line 835
+#line 834
 if (fabs(val(uf.z,0,0,i)) > umax)
      umax = fabs(val(uf.z,0,0,i));}
       double dtmax = Delta*val(cm,0,0,0)/(umax + 1e-30);
@@ -14030,10 +14000,10 @@ if (fabs(val(uf.z,0,0,i)) > umax)
       
  F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
  
-#line 844
+#line 843
 F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
  
-#line 844
+#line 843
 F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
       F /= Delta*val(cm,0,0,0);
 
@@ -14063,7 +14033,7 @@ F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
     }
   }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
   {
-#line 803
+#line 802
 foreach() {
 
 
@@ -14081,14 +14051,14 @@ foreach() {
       
  val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/Delta;
  
-#line 818
+#line 817
 val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/Delta;
  
-#line 818
+#line 817
 val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
       val(e,0,0,0) = 0.;
     }
-#line 831 "/home/lisergey/basilisk/src/embed.h"
+#line 830 "/home/lisergey/basilisk/src/embed.h"
     else {
       double umax = 0.;
       for (int i = 0; i <= 1; i++)
@@ -14096,11 +14066,11 @@ val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/Delta;
    if (fabs(val(uf.x,i,0,0)) > umax)
      umax = fabs(val(uf.x,i,0,0));
    
-#line 835
+#line 834
 if (fabs(val(uf.y,0,i,0)) > umax)
      umax = fabs(val(uf.y,0,i,0));
    
-#line 835
+#line 834
 if (fabs(val(uf.z,0,0,i)) > umax)
      umax = fabs(val(uf.z,0,0,i));}
       double dtmax = Delta*_const_cm/(umax + 1e-30);
@@ -14112,10 +14082,10 @@ if (fabs(val(uf.z,0,0,i)) > umax)
       
  F += val(flux.x,0,0,0) - val(flux.x,1,0,0);
  
-#line 844
+#line 843
 F += val(flux.y,0,0,0) - val(flux.y,0,1,0);
  
-#line 844
+#line 843
 F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
       F /= Delta*_const_cm;
 
@@ -14161,70 +14131,70 @@ F += val(flux.z,0,0,0) - val(flux.z,0,0,1);
 
 
   {
-#line 877
+#line 876
 foreach() {
     double se = 0.;
     {foreach_neighbor(1)
       se += val(e,0,0,0);end_foreach_neighbor()}
     val(f,0,0,0) += val(cs,0,0,0)*se;
   }end_foreach();}delete((scalar*)((scalar[]){e,{-1}}));
-end_tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",883);}
-#line 896
+end_tracing("update_tracer","/home/lisergey/basilisk/src/embed.h",882);}
+#line 895
 static int metric_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
-#line 896 "/home/lisergey/basilisk/src/embed.h"
-      static int metric(const int i,const double t,Event *_ev){tracing("metric","/home/lisergey/basilisk/src/embed.h",896);
+#line 895 "/home/lisergey/basilisk/src/embed.h"
+      static int metric(const int i,const double t,Event *_ev){tracing("metric","/home/lisergey/basilisk/src/embed.h",895);
 {
   if (is_constant (fm.x)) {
     
-      if (!(constant (fm.x) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 900, "constant (fm.x) == 1.");
+      if (!(constant (fm.x) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 899, "constant (fm.x) == 1.");
       
-#line 900
-if (!(constant (fm.y) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 900, "constant (fm.x) == 1.");
+#line 899
+if (!(constant (fm.y) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 899, "constant (fm.x) == 1.");
       
-#line 900
-if (!(constant (fm.z) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 900, "constant (fm.x) == 1.");
+#line 899
+if (!(constant (fm.z) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 899, "constant (fm.x) == 1.");
     fm = fs;
   }
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(fs.x,0,0,0);  }}end__stencil_is_face_x()
-#line 903
+#line 902
 _stencil_is_face_y(){
     {_stencil_val_a(fs.y,0,0,0);  }}end__stencil_is_face_y()
-#line 903
+#line 902
 _stencil_is_face_z(){
     {_stencil_val_a(fs.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
-#line 903
+#line 902
 foreach_face_generic(){is_face_x(){
     val(fs.x,0,0,0) = 1.;}end_is_face_x()
-#line 903
+#line 902
 is_face_y(){
     val(fs.y,0,0,0) = 1.;}end_is_face_y()
-#line 903
+#line 902
 is_face_z(){
     val(fs.z,0,0,0) = 1.;}end_is_face_z()}end_foreach_face_generic();}
   if (is_constant (cm)) {
-    if (!(constant (cm) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 906, "constant (cm) == 1.");
+    if (!(constant (cm) == 1.)) qassert ("/home/lisergey/basilisk/src/embed.h", 905, "constant (cm) == 1.");
     cm = cs;
   }
   foreach_stencil()
     {_stencil_val_a(cs,0,0,0);  }end_foreach_stencil();
   {
-#line 909
+#line 908
 foreach()
     val(cs,0,0,0) = 1.;end_foreach();}
 
 
   _attribute[cs.i].refine = embed_fraction_refine;
-#line 923 "/home/lisergey/basilisk/src/embed.h"
+#line 922 "/home/lisergey/basilisk/src/embed.h"
   _attribute[cs.i].prolongation = fraction_refine;
   
     _attribute[fs.x.i].prolongation = embed_face_fraction_refine_x;
     
-#line 925
+#line 924
 _attribute[fs.y.i].prolongation = embed_face_fraction_refine_y;
     
-#line 925
+#line 924
 _attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
 
 
@@ -14234,7 +14204,7 @@ _attribute[fs.z.i].prolongation = embed_face_fraction_refine_z;
 
 
   restriction (((scalar[]){cs, fs.x, fs.y, fs.z,{-1}}));
-}{end_tracing("metric","/home/lisergey/basilisk/src/embed.h",934);return 0;}end_tracing("metric","/home/lisergey/basilisk/src/embed.h",934);}
+}{end_tracing("metric","/home/lisergey/basilisk/src/embed.h",933);return 0;}end_tracing("metric","/home/lisergey/basilisk/src/embed.h",933);}
 
 
 
@@ -14245,11 +14215,15 @@ static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 
 
 
-#line 939
-      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/home/lisergey/basilisk/src/embed.h",939); {
-  display ((struct _display){"draw_vof (c = 'cs', s = 'fs', filled = -1, "
-    "fc = {0.5,0.5,0.5}, order = 2);"});
-}{end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",942);return 0;}end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",942);}
+#line 938
+      static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/home/lisergey/basilisk/src/embed.h",938); {
+  display ("draw_vof (c = 'cs', s = 'fs', filled = -1, "
+    "fc = {0.5,0.5,0.5}, order = 2);"
+#line 1422 "/home/lisergey/basilisk/src/common.h"
+, false
+#line 940 "/home/lisergey/basilisk/src/embed.h"
+);
+}{end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",941);return 0;}end_tracing("defaults","/home/lisergey/basilisk/src/embed.h",941);}
 #line 10 "cylinder.c"
 #line 1 "navier-stokes/centered.h"
 #line 1 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
@@ -14924,45 +14898,40 @@ void fields_stats()
 #line 1 "./output.h"
 #line 1 "/home/lisergey/basilisk/src/output.h"
 #line 37 "/home/lisergey/basilisk/src/output.h"
-struct OutputField {
-  scalar * list;
-  FILE * fp;
-  int n;
-  bool linear;
-  double box[2][2];
-};
-
      
-void output_field (struct OutputField p)
-{tracing("output_field","/home/lisergey/basilisk/src/output.h",46);
-  if (!p.list) p.list = all;
-  if (p.n == 0) p.n = N;
-  if (!p.fp) p.fp = fout;
-  p.n++;
-  if (p.box[0][0] == 0. && p.box[0][1] == 0. &&
-      p.box[1][0] == 0. && p.box[1][1] == 0.) {
-    p.box[0][0] = X0; p.box[0][1] = Y0;
-    p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
-  }
-
-  boundary_internal ((scalar *)p.list, "/home/lisergey/basilisk/src/output.h", 58);
-  int len = list_len(p.list);
-  double Delta = 0.999999*(p.box[1][0] - p.box[0][0])/(p.n - 1);
-  int ny = (p.box[1][1] - p.box[0][1])/Delta + 1;
-  double ** field = (double **) matrix_new (p.n, ny, len*sizeof(double));
-  for (int i = 0; i < p.n; i++) {
-    double x = Delta*i + p.box[0][0];
+void output_field (scalar * list,
+     FILE * fp,
+     int n,
+     bool linear,
+     double box[2][2])
+{tracing("output_field","/home/lisergey/basilisk/src/output.h",38);
+  n++;
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/output.h", 45);
+  int len = list_len(list);
+  double Delta = 0.999999*(box[1][0] - box[0][0])/(n - 1);
+  int ny = (box[1][1] - box[0][1])/Delta + 1;
+  double ** field = (double **) matrix_new (n, ny, len*sizeof(double));
+  for (int i = 0; i < n; i++) {
+    double x = Delta*i + box[0][0];
     for (int j = 0; j < ny; j++) {
-      double y = Delta*j + p.box[0][1];
-      if (p.linear) {
+      double y = Delta*j + box[0][1];
+      if (linear) {
  int k = 0;
- {scalar*_i=(scalar*)( p.list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   field[i][len*j + k++] = interpolate ((struct _interpolate){s, x, y});}}
+ {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+   field[i][len*j + k++] = interpolate (s, x, y
+#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+, 0.
+#line 57 "/home/lisergey/basilisk/src/output.h"
+);}}
       }
       else {
- Point point = locate ((struct _locate){x, y});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+ Point point = locate (x, y
+#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
+, 0.
+#line 60 "/home/lisergey/basilisk/src/output.h"
+);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
  int k = 0;
- {scalar*_i=(scalar*)( p.list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+ {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
    field[i][len*j + k++] = point.level >= 0 ? val(s,0,0,0) : 1e30;}}
       }
     }
@@ -14970,80 +14939,77 @@ void output_field (struct OutputField p)
 
   if (pid() == 0) {
 #if 1
-    MPI_Reduce (MPI_IN_PLACE, field[0], len*p.n*ny, MPI_DOUBLE, MPI_MIN, 0,
+    MPI_Reduce (MPI_IN_PLACE, field[0], len*n*ny, MPI_DOUBLE, MPI_MIN, 0,
   MPI_COMM_WORLD);
 #endif
-    fprintf (p.fp, "# 1:x 2:y");
+    fprintf (fp, "# 1:x 2:y");
     int i = 3;
-    {scalar*_i=(scalar*)( p.list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-      fprintf (p.fp, " %d:%s", i++, _attribute[s.i].name);}}
-    fputc('\n', p.fp);
-    for (int i = 0; i < p.n; i++) {
-      double x = Delta*i + p.box[0][0];
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      fprintf (fp, " %d:%s", i++, _attribute[s.i].name);}}
+    fputc('\n', fp);
+    for (int i = 0; i < n; i++) {
+      double x = Delta*i + box[0][0];
       for (int j = 0; j < ny; j++) {
- double y = Delta*j + p.box[0][1];
+ double y = Delta*j + box[0][1];
 
- fprintf (p.fp, "%g %g", x, y);
+ fprintf (fp, "%g %g", x, y);
  int k = 0;
- {scalar*_i=(scalar*)( p.list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   fprintf (p.fp, " %g", field[i][len*j + k++]);}}
- fputc ('\n', p.fp);
+ {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+   fprintf (fp, " %g", field[i][len*j + k++]);}}
+ fputc ('\n', fp);
       }
-      fputc ('\n', p.fp);
+      fputc ('\n', fp);
     }
-    fflush (p.fp);
+    fflush (fp);
   }
 #if 1
   else
-    MPI_Reduce (field[0], NULL, len*p.n*ny, MPI_DOUBLE, MPI_MIN, 0,
+    MPI_Reduce (field[0], NULL, len*n*ny, MPI_DOUBLE, MPI_MIN, 0,
   MPI_COMM_WORLD);
 #endif
 
   matrix_free (field);
-end_tracing("output_field","/home/lisergey/basilisk/src/output.h",113);}
-#line 141 "/home/lisergey/basilisk/src/output.h"
-struct OutputMatrix {
-  scalar f;
-  FILE * fp;
-  int n;
-  bool linear;
-};
-
+end_tracing("output_field","/home/lisergey/basilisk/src/output.h",100);}
+#line 128 "/home/lisergey/basilisk/src/output.h"
      
-void output_matrix (struct OutputMatrix p)
-{tracing("output_matrix","/home/lisergey/basilisk/src/output.h",149);
-  if (p.n == 0) p.n = N;
-  if (!p.fp) p.fp = fout;
-  if (p.linear) {
-    scalar f = p.f;
-    boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 155);
-  }
-  float fn = p.n;
+void output_matrix (scalar f, FILE * fp, int n, bool linear)
+{tracing("output_matrix","/home/lisergey/basilisk/src/output.h",129);
+  if (linear)
+    boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 132);
+  float fn = n;
   float Delta = (float) L0/fn;
-  fwrite (&fn, sizeof(float), 1, p.fp);
-  for (int j = 0; j < p.n; j++) {
+  fwrite (&fn, sizeof(float), 1, fp);
+  for (int j = 0; j < n; j++) {
     float yp = (float) (Delta*j + X0 + Delta/2.);
-    fwrite (&yp, sizeof(float), 1, p.fp);
+    fwrite (&yp, sizeof(float), 1, fp);
   }
-  for (int i = 0; i < p.n; i++) {
+  for (int i = 0; i < n; i++) {
     float xp = (float) (Delta*i + X0 + Delta/2.);
-    fwrite (&xp, sizeof(float), 1, p.fp);
-    for (int j = 0; j < p.n; j++) {
+    fwrite (&xp, sizeof(float), 1, fp);
+    for (int j = 0; j < n; j++) {
       float yp = (float)(Delta*j + Y0 + Delta/2.), v;
-      if (p.linear)
- v = interpolate ((struct _interpolate){p.f, xp, yp});
+      if (linear)
+ v = interpolate (f, xp, yp
+#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+, 0.
+#line 146 "/home/lisergey/basilisk/src/output.h"
+);
       else {
- Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
- if (!(point.level >= 0)) qassert ("/home/lisergey/basilisk/src/output.h", 173, "point.level >= 0");
- v = val(p.f,0,0,0);
+ Point point = locate (xp, yp
+#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
+, 0.
+#line 148 "/home/lisergey/basilisk/src/output.h"
+);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+ if (!(point.level >= 0)) qassert ("/home/lisergey/basilisk/src/output.h", 149, "point.level >= 0");
+ v = val(f,0,0,0);
       }
-      fwrite (&v, sizeof(float), 1, p.fp);
+      fwrite (&v, sizeof(float), 1, fp);
     }
   }
-  fflush (p.fp);
-end_tracing("output_matrix","/home/lisergey/basilisk/src/output.h",180);}
-#line 189 "/home/lisergey/basilisk/src/output.h"
-typedef void (* colormap) (double cmap[127][3]);
+  fflush (fp);
+end_tracing("output_matrix","/home/lisergey/basilisk/src/output.h",156);}
+#line 165 "/home/lisergey/basilisk/src/output.h"
+typedef void (* Colormap) (double cmap[127][3]);
 
 void jet (double cmap[127][3])
 {
@@ -15153,12 +15119,12 @@ void blue_white_red (double cmap[127][3])
 
 typedef struct {
   unsigned char r, g, b;
-} color;
+} Color;
 
-color colormap_color (double cmap[127][3],
+Color colormap_color (double cmap[127][3],
         double val, double min, double max)
 {
-  color c;
+  Color c;
   if (val == 1e30) {
     c.r = c.g = c.b = 0;
     return c;
@@ -15175,13 +15141,13 @@ color colormap_color (double cmap[127][3],
     i = val*(127 - 1);
     coef = val*(127 - 1) - i;
   }
-  if (!(i < 127 - 1)) qassert ("/home/lisergey/basilisk/src/output.h", 321, "i < NCMAP - 1");
+  if (!(i >= 0 && i < 127 - 1)) qassert ("/home/lisergey/basilisk/src/output.h", 297, "i >= 0 && i < NCMAP - 1");
   unsigned char * c1 = (unsigned char *) &c;
   for (int j = 0; j < 3; j++)
     c1[j] = 255*(cmap[i][j]*(1. - coef) + cmap[i + 1][j]*coef);
   return c;
 }
-#line 340 "/home/lisergey/basilisk/src/output.h"
+#line 316 "/home/lisergey/basilisk/src/output.h"
 static const char * extension (const char * file, const char * ext) {
   int len = strlen(file);
   return len > 4 && !strcmp (file + len - 4, ext) ? file + len - 4 : NULL;
@@ -15264,7 +15230,7 @@ static FILE * ppm_fallback (const char * file, const char * mode)
 
 FILE * open_image (const char * file, const char * options)
 {
-  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 422, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 398, "pid() == 0");
   const char * ext;
   if ((ext = is_animation (file))) {
     FILE * fp = open_image_lookup (file);
@@ -15338,7 +15304,7 @@ FILE * open_image (const char * file, const char * options)
 
 void close_image (const char * file, FILE * fp)
 {
-  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 496, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 472, "pid() == 0");
   if (is_animation (file)) {
     if (!open_image_lookup (file))
       fclose (fp);
@@ -15348,202 +15314,188 @@ void close_image (const char * file, FILE * fp)
   else
     fclose (fp);
 }
-#line 571 "/home/lisergey/basilisk/src/output.h"
-struct OutputPPM {
-  scalar f;
-  FILE * fp;
-  int n;
-  char * file;
-  double min, max, spread, z;
-  bool linear;
-  double box[2][2];
-  scalar mask;
-  colormap map;
-  char * opt;
-};
-
+#line 550 "/home/lisergey/basilisk/src/output.h"
      
-void output_ppm (struct OutputPPM p)
-{tracing("output_ppm","/home/lisergey/basilisk/src/output.h",585);
+void output_ppm (scalar f,
+   FILE * fp,
+   int n,
+   char * file,
+   double min, double max, double spread,
+   double z,
+   bool linear,
+   double box[2][2],
+   scalar mask,
+   Colormap map,
+   char * opt)
+{tracing("output_ppm","/home/lisergey/basilisk/src/output.h",551);
 
-  if (!p.n) p.n = N;
-  if (!p.min && !p.max) {
-    stats s = statsf (p.f);
-    if (p.spread < 0.)
-      p.min = s.min, p.max = s.max;
+  if (!min && !max) {
+    stats s = statsf (f);
+    if (spread < 0.)
+      min = s.min, max = s.max;
     else {
-      double avg = s.sum/s.volume, spread = (p.spread ? p.spread : 5.)*s.stddev;
-      p.min = avg - spread; p.max = avg + spread;
+      double avg = s.sum/s.volume;
+      min = avg - spread*s.stddev; max = avg + spread*s.stddev;
     }
   }
-  if (!p.box[0][0] && !p.box[0][1] &&
-      !p.box[1][0] && !p.box[1][1]) {
-    p.box[0][0] = X0; p.box[0][1] = Y0;
-    p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
-  }
-  if (!p.map)
-    p.map = jet;
-  if (p.linear) {
-    scalar f = p.f, mask = p.mask;
-    if (mask.i)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 608);
+  if (linear) {
+    scalar f = f, mask = mask;
+    if (mask.i >= 0)
+      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 576);
     else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 610);
+      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 578);
   }
 
-  double fn = p.n;
-  double Delta = (p.box[1][0] - p.box[0][0])/fn;
-  int ny = (p.box[1][1] - p.box[0][1])/Delta;
+  double fn = n;
+  double Delta = (box[1][0] - box[0][0])/fn;
+  int ny = (box[1][1] - box[0][1])/Delta;
   if (ny % 2) ny++;
 
-  color ** ppm = (color **) matrix_new (ny, p.n, sizeof(color));
+  Color ** ppm = (Color **) matrix_new (ny, n, sizeof(Color));
   double cmap[127][3];
-  p.map (cmap);
+  (* map) (cmap);
   OMP_PARALLEL() {
     OMP(omp for schedule(static))
       for (int j = 0; j < ny; j++) {
- double yp = Delta*j + p.box[0][1] + Delta/2.;
- for (int i = 0; i < p.n; i++) {
-   double xp = Delta*i + p.box[0][0] + Delta/2., v;
-   if (p.mask.i) {
-     if (p.linear) {
-       double m = interpolate ((struct _interpolate){p.mask, xp, yp, p.z});
+ double yp = Delta*j + box[0][1] + Delta/2.;
+ for (int i = 0; i < n; i++) {
+   double xp = Delta*i + box[0][0] + Delta/2., v;
+   if (mask.i >= 0) {
+     if (linear) {
+       double m = interpolate (mask, xp, yp, z);
        if (m < 0.)
   v = 1e30;
        else
-  v = interpolate ((struct _interpolate){p.f, xp, yp, p.z});
+  v = interpolate (f, xp, yp, z);
      }
      else {
-       Point point = locate ((struct _locate){xp, yp, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-       if (point.level < 0 || val(p.mask,0,0,0) < 0.)
+       Point point = locate (xp, yp, z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+       if (point.level < 0 || val(mask,0,0,0) < 0.)
   v = 1e30;
        else
-  v = val(p.f,0,0,0);
+  v = val(f,0,0,0);
      }
    }
-   else if (p.linear)
-     v = interpolate ((struct _interpolate){p.f, xp, yp, p.z});
+   else if (linear)
+     v = interpolate (f, xp, yp, z);
    else {
-     Point point = locate ((struct _locate){xp, yp, p.z});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-     v = point.level >= 0 ? val(p.f,0,0,0) : 1e30;
+     Point point = locate (xp, yp, z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+     v = point.level >= 0 ? val(f,0,0,0) : 1e30;
    }
-   ppm[ny - 1 - j][i] = colormap_color (cmap, v, p.min, p.max);
+   ppm[ny - 1 - j][i] = colormap_color (cmap, v, min, max);
  }
       }
   }
 
   if (pid() == 0) {
 #if 1
-    MPI_Reduce (MPI_IN_PLACE, ppm[0], 3*ny*p.n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
+    MPI_Reduce (MPI_IN_PLACE, ppm[0], 3*ny*n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
   MPI_COMM_WORLD);
 #endif
-    if (!p.fp) p.fp = fout;
-    if (p.file)
-      p.fp = open_image (p.file, p.opt);
+    if (file)
+      fp = open_image (file, opt);
 
-    fprintf (p.fp, "P6\n%u %u 255\n", p.n, ny);
-    fwrite (((void **) ppm)[0], sizeof(color), ny*p.n, p.fp);
+    fprintf (fp, "P6\n%u %u 255\n", n, ny);
+    fwrite (((void **) ppm)[0], sizeof(Color), ny*n, fp);
 
-    if (p.file)
-      close_image (p.file, p.fp);
+    if (file)
+      close_image (file, fp);
     else
-      fflush (p.fp);
+      fflush (fp);
   }
 #if 1
   else
-    MPI_Reduce (ppm[0], NULL, 3*ny*p.n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
+    MPI_Reduce (ppm[0], NULL, 3*ny*n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
   MPI_COMM_WORLD);
 #endif
 
   matrix_free (ppm);
-end_tracing("output_ppm","/home/lisergey/basilisk/src/output.h",678);}
-#line 710 "/home/lisergey/basilisk/src/output.h"
-struct OutputGRD {
-  scalar f;
-  FILE * fp;
-  double Delta;
-  bool linear;
-  double box[2][2];
-  scalar mask;
-};
-
+end_tracing("output_ppm","/home/lisergey/basilisk/src/output.h",645);}
+#line 677 "/home/lisergey/basilisk/src/output.h"
      
-void output_grd (struct OutputGRD p)
-{tracing("output_grd","/home/lisergey/basilisk/src/output.h",720);
-
-  if (!p.fp) p.fp = fout;
-  if (p.box[0][0] == 0. && p.box[0][1] == 0. &&
-      p.box[1][0] == 0. && p.box[1][1] == 0.) {
-    p.box[0][0] = X0; p.box[0][1] = Y0;
-    p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
-    if (p.Delta == 0) p.Delta = L0/N;
-  }
-  if (p.linear) {
-    scalar f = p.f, mask = p.mask;
-    if (mask.i)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 733);
+void output_grd (scalar f,
+   FILE * fp,
+   double Delta,
+   bool linear,
+   double box[2][2],
+   scalar mask)
+{tracing("output_grd","/home/lisergey/basilisk/src/output.h",678);
+  if (linear) {
+    if (mask.i >= 0)
+      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 687);
     else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 735);
+      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 689);
   }
 
-  double Delta = p.Delta;
-  int nx = (p.box[1][0] - p.box[0][0])/Delta;
-  int ny = (p.box[1][1] - p.box[0][1])/Delta;
+  int nx = (box[1][0] - box[0][0])/Delta;
+  int ny = (box[1][1] - box[0][1])/Delta;
 
 
-  fprintf (p.fp, "ncols          %d\n", nx);
-  fprintf (p.fp, "nrows          %d\n", ny);
-  fprintf (p.fp, "xllcorner      %g\n", p.box[0][0]);
-  fprintf (p.fp, "yllcorner      %g\n", p.box[0][1]);
-  fprintf (p.fp, "cellsize       %g\n", Delta);
-  fprintf (p.fp, "nodata_value   -9999\n");
+  fprintf (fp, "ncols          %d\n", nx);
+  fprintf (fp, "nrows          %d\n", ny);
+  fprintf (fp, "xllcorner      %g\n", box[0][0]);
+  fprintf (fp, "yllcorner      %g\n", box[0][1]);
+  fprintf (fp, "cellsize       %g\n", Delta);
+  fprintf (fp, "nodata_value   -9999\n");
 
 
   for (int j = ny-1; j >= 0; j--) {
-    double yp = Delta*j + p.box[0][1] + Delta/2.;
+    double yp = Delta*j + box[0][1] + Delta/2.;
     for (int i = 0; i < nx; i++) {
-      double xp = Delta*i + p.box[0][0] + Delta/2., v;
-      if (p.mask.i) {
- if (p.linear) {
-   double m = interpolate ((struct _interpolate){p.mask, xp, yp});
+      double xp = Delta*i + box[0][0] + Delta/2., v;
+      if (mask.i >= 0) {
+ if (linear) {
+   double m = interpolate (mask, xp, yp
+#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+, 0.
+#line 710 "/home/lisergey/basilisk/src/output.h"
+);
    if (m < 0.)
      v = 1e30;
    else
-     v = interpolate ((struct _interpolate){p.f, xp, yp});
+     v = interpolate (f, xp, yp
+#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+, 0.
+#line 714 "/home/lisergey/basilisk/src/output.h"
+);
  }
  else {
-   Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-   if (point.level < 0 || val(p.mask,0,0,0) < 0.)
+   Point point = locate (xp, yp
+#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
+, 0.
+#line 717 "/home/lisergey/basilisk/src/output.h"
+);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+   if (point.level < 0 || val(mask,0,0,0) < 0.)
      v = 1e30;
    else
-     v = val(p.f,0,0,0);
+     v = val(f,0,0,0);
  }
       }
-      else if (p.linear)
- v = interpolate ((struct _interpolate){p.f, xp, yp});
+      else if (linear)
+ v = interpolate (f, xp, yp
+#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+, 0.
+#line 725 "/home/lisergey/basilisk/src/output.h"
+);
       else {
- Point point = locate ((struct _locate){xp, yp});int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
- v = point.level >= 0 ? val(p.f,0,0,0) : 1e30;
+ Point point = locate (xp, yp
+#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
+, 0.
+#line 727 "/home/lisergey/basilisk/src/output.h"
+);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
+ v = point.level >= 0 ? val(f,0,0,0) : 1e30;
       }
       if (v == 1e30)
- fprintf (p.fp, "-9999 ");
+ fprintf (fp, "-9999 ");
       else
- fprintf (p.fp, "%f ", v);
+ fprintf (fp, "%f ", v);
     }
-    fprintf (p.fp, "\n");
+    fprintf (fp, "\n");
   }
 
-  fflush (p.fp);
-end_tracing("output_grd","/home/lisergey/basilisk/src/output.h",786);}
-#line 813 "/home/lisergey/basilisk/src/output.h"
-struct OutputGfs {
-  FILE * fp;
-  scalar * list;
-  double t;
-  char * file;
-  bool translate;
-};
-
+  fflush (fp);
+end_tracing("output_grd","/home/lisergey/basilisk/src/output.h",739);}
+#line 766 "/home/lisergey/basilisk/src/output.h"
 static char * replace (const char * input, int target, int with,
          bool translate)
 {
@@ -15565,29 +15517,32 @@ static char * replace (const char * input, int target, int with,
 }
 
      
-void output_gfs (struct OutputGfs p)
-{tracing("output_gfs","/home/lisergey/basilisk/src/output.h",842);
-  char * fname = p.file;
+void output_gfs (FILE * fp,
+   scalar * list,
+   char * file,
+   bool translate)
+{tracing("output_gfs","/home/lisergey/basilisk/src/output.h",787);
+  char * fname = file;
 
 #if 1
 
 
 
-  FILE * fp = p.fp;
-  if (p.file == NULL) {
+  FILE * sfp = fp;
+  if (file == NULL) {
     long pid = getpid();
     MPI_Bcast (&pid, 1, MPI_LONG, 0, MPI_COMM_WORLD);
     fname = ((char *) pmalloc ((80)*sizeof(char),__func__,__FILE__,__LINE__));
     snprintf (fname, 80, ".output-%ld", pid);
-    p.fp = NULL;
+    fp = NULL;
   }
 #endif
 
   bool opened = false;
-  if (p.fp == NULL) {
+  if (fp == NULL) {
     if (fname == NULL)
-      p.fp = fout;
-    else if (!(p.fp = fopen (fname, "w"))) {
+      fp = fout;
+    else if (!(fp = fopen (fname, "w"))) {
       perror (fname);
       exit (1);
     }
@@ -15595,47 +15550,47 @@ void output_gfs (struct OutputGfs p)
       opened = true;
   }
 
-  scalar * list = p.list ? p.list : list_copy (all);
+  scalar * slist = list ? list : list_copy (all);
 
-  restriction (list);
-  fprintf (p.fp,
+  restriction (slist);
+  fprintf (fp,
     "1 0 GfsSimulation GfsBox GfsGEdge { binary = 1"
     " x = %g y = %g ",
     0.5 + X0/L0, 0.5 + Y0/L0);
 
-  fprintf (p.fp, "z = %g ", 0.5 + Z0/L0);
+  fprintf (fp, "z = %g ", 0.5 + Z0/L0);
 
 
-  if (list != NULL && list[0].i != -1) {
-    scalar s = list[0];
-    char * name = replace (_attribute[s.i].name, '.', '_', p.translate);
-    fprintf (p.fp, "variables = %s", name);
+  if (slist != NULL && slist[0].i != -1) {
+    scalar s = slist[0];
+    char * name = replace (_attribute[s.i].name, '.', '_', translate);
+    fprintf (fp, "variables = %s", name);
     pfree (name,__func__,__FILE__,__LINE__);
-    for (int i = 1; i < list_len(list); i++) {
-      scalar s = list[i];
+    for (int i = 1; i < list_len(slist); i++) {
+      scalar s = slist[i];
       if (_attribute[s.i].name) {
- char * name = replace (_attribute[s.i].name, '.', '_', p.translate);
- fprintf (p.fp, ",%s", name);
+ char * name = replace (_attribute[s.i].name, '.', '_', translate);
+ fprintf (fp, ",%s", name);
  pfree (name,__func__,__FILE__,__LINE__);
       }
     }
-    fprintf (p.fp, " ");
+    fprintf (fp, " ");
   }
-  fprintf (p.fp, "} {\n");
-  fprintf (p.fp, "  Time { t = %g }\n", t);
+  fprintf (fp, "} {\n");
+  fprintf (fp, "  Time { t = %g }\n", t);
   if (L0 != 1.)
-    fprintf (p.fp, "  PhysicalParams { L = %g }\n", L0);
-  fprintf (p.fp, "  VariableTracerVOF f\n");
-  fprintf (p.fp, "}\nGfsBox { x = 0 y = 0 z = 0 } {\n");
+    fprintf (fp, "  PhysicalParams { L = %g }\n", L0);
+  fprintf (fp, "  VariableTracerVOF f\n");
+  fprintf (fp, "}\nGfsBox { x = 0 y = 0 z = 0 } {\n");
 
 #if 1
   long header;
-  if ((header = ftell (p.fp)) < 0) {
+  if ((header = ftell (fp)) < 0) {
     perror ("output_gfs(): error in header");
     exit (1);
   }
   int cell_size = sizeof(unsigned) + sizeof(double);
-  {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+  {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     if (_attribute[s.i].name)
       cell_size += sizeof(double);}}
   scalar index = new_scalar("index");
@@ -15650,14 +15605,14 @@ void output_gfs (struct OutputGfs p)
 #endif
     {
 #if 1
-      if (fseek (p.fp, header + val(index,0,0,0)*cell_size, SEEK_SET) < 0) {
+      if (fseek (fp, header + val(index,0,0,0)*cell_size, SEEK_SET) < 0) {
  perror ("output_gfs(): error while seeking");
  exit (1);
       }
 #endif
       unsigned flags =
  level == 0 ? 0 :
-#line 942 "/home/lisergey/basilisk/src/output.h"
+#line 890 "/home/lisergey/basilisk/src/output.h"
       child.x == -1 && child.y == -1 && child.z == -1 ? 0 :
  child.x == -1 && child.y == -1 && child.z == 1 ? 1 :
  child.x == -1 && child.y == 1 && child.z == -1 ? 2 :
@@ -15669,10 +15624,10 @@ void output_gfs (struct OutputGfs p)
 
       if (is_leaf(cell))
  flags |= (1 << 4);
-      fwrite (&flags, sizeof (unsigned), 1, p.fp);
+      fwrite (&flags, sizeof (unsigned), 1, fp);
       double a = -1;
-      fwrite (&a, sizeof (double), 1, p.fp);
-      {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      fwrite (&a, sizeof (double), 1, fp);
+      {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  if (_attribute[s.i].name) {
    if (_attribute[s.i].v.x.i >= 0) {
 
@@ -15695,7 +15650,7 @@ void output_gfs (struct OutputGfs p)
    }
    else
      a = is_local(cell) && val(s,0,0,0) != 1e30 ? val(s,0,0,0) : (double) DBL_MAX;
-   fwrite (&a, sizeof (double), 1, p.fp);
+   fwrite (&a, sizeof (double), 1, fp);
  }}}
     }
     if (is_leaf(cell))
@@ -15704,46 +15659,39 @@ void output_gfs (struct OutputGfs p)
 
 #if 1
   delete (((scalar[]){index,{-1}}));
-  if (!pid() && fseek (p.fp, total_size, SEEK_SET) < 0) {
+  if (!pid() && fseek (fp, total_size, SEEK_SET) < 0) {
     perror ("output_gfs(): error while finishing");
     exit (1);
   }
   if (!pid())
 #endif
-    fputs ("}\n", p.fp);
-  fflush (p.fp);
+    fputs ("}\n", fp);
+  fflush (fp);
 
-  if (!p.list)
-    pfree (list,__func__,__FILE__,__LINE__);
+  if (!list)
+    pfree (slist,__func__,__FILE__,__LINE__);
   if (opened)
-    fclose (p.fp);
+    fclose (fp);
 
 #if 1
-  if (p.file == NULL) {
+  if (file == NULL) {
     MPI_Barrier (MPI_COMM_WORLD);
     if (pid() == 0) {
-      if (fp == NULL)
- fp = fout;
-      p.fp = fopen (fname, "r");
+      if (sfp == NULL)
+ sfp = fout;
+      fp = fopen (fname, "r");
       size_t l;
       unsigned char buffer[8192];
-      while ((l = fread (buffer, 1, 8192, p.fp)) > 0)
- fwrite (buffer, 1, l, fp);
-      fflush (fp);
+      while ((l = fread (buffer, 1, 8192, fp)) > 0)
+ fwrite (buffer, 1, l, sfp);
+      fflush (sfp);
       remove (fname);
     }
     pfree (fname,__func__,__FILE__,__LINE__);
   }
 #endif
-end_tracing("output_gfs","/home/lisergey/basilisk/src/output.h",1019);}
-#line 1043 "/home/lisergey/basilisk/src/output.h"
-struct Dump {
-  char * file;
-  scalar * list;
-  FILE * fp;
-  bool unbuffered;
-};
-
+end_tracing("output_gfs","/home/lisergey/basilisk/src/output.h",967);}
+#line 991 "/home/lisergey/basilisk/src/output.h"
 struct DumpHeader {
   double t;
   long len;
@@ -15790,30 +15738,30 @@ static void dump_header (FILE * fp, struct DumpHeader * header, scalar * list)
 
 #if !1
      
-void dump (struct Dump p)
-{tracing("dump","/home/lisergey/basilisk/src/output.h",1096);
-  FILE * fp = p.fp;
-  char def[] = "dump", * file = p.file ? p.file : p.fp ? NULL : def;
-
+void dump (const char * file,
+    scalar * list,
+    FILE * fp,
+    bool unbuffered)
+{tracing("dump","/home/lisergey/basilisk/src/output.h",1037);
   char * name = NULL;
-  if (file) {
+  if (!fp) {
     name = (char *) pmalloc (strlen(file) + 2,__func__,__FILE__,__LINE__);
     strcpy (name, file);
-    if (!p.unbuffered)
+    if (!unbuffered)
       strcat (name, "~");
     if ((fp = fopen (name, "w")) == NULL) {
       perror (name);
       exit (1);
     }
   }
-  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1112, "fp");
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1053, "fp");
 
-  scalar * dlist = dump_list (p.list ? p.list : all);
+  scalar * dlist = dump_list (list);
   scalar  size=new_scalar("size");
-  scalar * list = list_concat (((scalar[]){size,{-1}}), dlist); pfree (dlist,__func__,__FILE__,__LINE__);
-  struct DumpHeader header = { t, list_len(list), iter, depth(), npe(),
+  scalar * slist = list_concat (((scalar[]){size,{-1}}), dlist); pfree (dlist,__func__,__FILE__,__LINE__);
+  struct DumpHeader header = { t, list_len(slist), iter, depth(), npe(),
           dump_version };
-  dump_header (fp, &header, list);
+  dump_header (fp, &header, slist);
 
   subtree_size (size, false);
 
@@ -15823,7 +15771,7 @@ void dump (struct Dump p)
       perror ("dump(): error while writing flags");
       exit (1);
     }
-    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+    {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       if (fwrite (&val(s,0,0,0), sizeof(double), 1, fp) < 1) {
  perror ("dump(): error while writing scalars");
  exit (1);
@@ -15832,21 +15780,21 @@ void dump (struct Dump p)
       continue;
   }end_foreach_cell();}
 
-  pfree (list,__func__,__FILE__,__LINE__);
+  pfree (slist,__func__,__FILE__,__LINE__);
   if (file) {
     fclose (fp);
-    if (!p.unbuffered)
+    if (!unbuffered)
       rename (name, file);
     pfree (name,__func__,__FILE__,__LINE__);
   }delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/home/lisergey/basilisk/src/output.h",1145);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",1086);}
 #else
      
-void dump (struct Dump p)
-{tracing("dump","/home/lisergey/basilisk/src/output.h",1148);
-  FILE * fp = p.fp;
-  char def[] = "dump", * file = p.file ? p.file : p.fp ? NULL : def;
-
+void dump (const char * file,
+    scalar * list,
+    FILE * fp,
+    bool unbuffered)
+{tracing("dump","/home/lisergey/basilisk/src/output.h",1089);
   if (fp != NULL || file == NULL) {
     fprintf (ferr, "dump(): must specify a file name when using MPI\n");
     exit(1);
@@ -15854,7 +15802,7 @@ void dump (struct Dump p)
 
   char name[strlen(file) + 2];
   strcpy (name, file);
-  if (!p.unbuffered)
+  if (!unbuffered)
     strcat (name, "~");
   FILE * fh = fopen (name, "w");
   if (fh == NULL) {
@@ -15862,10 +15810,10 @@ void dump (struct Dump p)
     exit (1);
   }
 
-  scalar * dlist = dump_list (p.list ? p.list : all);
+  scalar * dlist = dump_list (list);
   scalar  size=new_scalar("size");
-  scalar * list = list_concat (((scalar[]){size,{-1}}), dlist); pfree (dlist,__func__,__FILE__,__LINE__);
-  struct DumpHeader header = { t, list_len(list), iter, depth(), npe(),
+  scalar * slist = list_concat (((scalar[]){size,{-1}}), dlist); pfree (dlist,__func__,__FILE__,__LINE__);
+  struct DumpHeader header = { t, list_len(slist), iter, depth(), npe(),
           dump_version };
 
 
@@ -15875,7 +15823,7 @@ void dump (struct Dump p)
 
 
   if (pid() == 0)
-    dump_header (fh, &header, list);
+    dump_header (fh, &header, slist);
 
   scalar index = {-1};
 
@@ -15883,7 +15831,7 @@ void dump (struct Dump p)
   z_indexing (index, false);
   int cell_size = sizeof(unsigned) + header.len*sizeof(double);
   int sizeofheader = sizeof(header) + 4*sizeof(double);
-  {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+  {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     sizeofheader += sizeof(unsigned) + sizeof(char)*strlen(_attribute[s.i].name);}}
   long pos = pid() ? 0 : sizeofheader;
 
@@ -15899,7 +15847,7 @@ void dump (struct Dump p)
       }
       unsigned flags = is_leaf(cell) ? leaf : 0;
       fwrite (&flags, 1, sizeof(unsigned), fh);
-      {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
  fwrite (&val(s,0,0,0), 1, sizeof(double), fh);}}
       pos += cell_size;
     }
@@ -15909,21 +15857,21 @@ void dump (struct Dump p)
 
   delete (((scalar[]){index,{-1}}));
 
-  pfree (list,__func__,__FILE__,__LINE__);
+  pfree (slist,__func__,__FILE__,__LINE__);
   fclose (fh);
-  if (!p.unbuffered && pid() == 0)
+  if (!unbuffered && pid() == 0)
     rename (name, file);delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/home/lisergey/basilisk/src/output.h",1219);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",1160);}
 #endif
 
      
-bool restore (struct Dump p)
-{tracing("restore","/home/lisergey/basilisk/src/output.h",1223);
-  FILE * fp = p.fp;
-  char * file = p.file;
-  if (file && (fp = fopen (file, "r")) == NULL)
-    {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1228);return false;}
-  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1229, "fp");
+bool restore (const char * file,
+       scalar * list,
+       FILE * fp)
+{tracing("restore","/home/lisergey/basilisk/src/output.h",1164);
+  if (!fp && (fp = fopen (file, "r")) == NULL)
+    {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1169);return false;}
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1170, "fp");
 
   struct DumpHeader header = {0};
   if (fread (&header, sizeof(header), 1, fp) < 1) {
@@ -15938,15 +15886,15 @@ bool restore (struct Dump p)
     cell.flags |= active;
   }end_foreach_cell();}
   ((Tree *)grid)->dirty = true;
-#line 1264 "/home/lisergey/basilisk/src/output.h"
-  bool restore_all = (p.list == all);
-  scalar * list = dump_list (p.list ? p.list : all);
+#line 1205 "/home/lisergey/basilisk/src/output.h"
+  bool restore_all = (list == all);
+  scalar * slist = dump_list (list ? list : all);
   if (header.version == 161020) {
-    if (header.len - 1 != list_len (list)) {
+    if (header.len - 1 != list_len (slist)) {
       fprintf (ferr,
         "restore(): error: the list lengths don't match: "
         "%ld (file) != %d (code)\n",
-        header.len - 1, list_len (list));
+        header.len - 1, list_len (slist));
       exit (1);
     }
   }
@@ -15975,7 +15923,7 @@ bool restore (struct Dump p)
 
       if (i > 0) {
  bool found = false;
- {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+ {scalar*_i=(scalar*)( slist);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
    if (!strcmp (_attribute[s.i].name, name)) {
      input = list_append (input, s);
      found = true; break;
@@ -15992,30 +15940,30 @@ bool restore (struct Dump p)
  }
       }
     }
-    pfree (list,__func__,__FILE__,__LINE__);
-    list = input;
+    pfree (slist,__func__,__FILE__,__LINE__);
+    slist = input;
 
     double o[4];
     if (fread (o, sizeof(double), 4, fp) < 4) {
       fprintf (ferr, "restore(): error: expecting coordinates\n");
       exit (1);
     }
-    origin ((struct _origin){o[0], o[1], o[2]});
+    origin (o[0], o[1], o[2]);
     size (o[3]);
   }
-#line 1339 "/home/lisergey/basilisk/src/output.h"
+#line 1280 "/home/lisergey/basilisk/src/output.h"
   scalar * listm = is_constant(cm) ? NULL : (scalar *)((vector[]){fm,{{-1},{-1},{-1}}});
 
-  restore_mpi (fp, list);
-#line 1369 "/home/lisergey/basilisk/src/output.h"
+  restore_mpi (fp, slist);
+#line 1310 "/home/lisergey/basilisk/src/output.h"
   scalar * other = NULL;
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-    if (!list_lookup (list, s) && !list_lookup (listm, s))
+    if (!list_lookup (slist, s) && !list_lookup (listm, s))
       other = list_append (other, s);}}
   reset (other, 0.);
   pfree (other,__func__,__FILE__,__LINE__);
 
-  pfree (list,__func__,__FILE__,__LINE__);
+  pfree (slist,__func__,__FILE__,__LINE__);
   if (file)
     fclose (fp);
 
@@ -16028,8 +15976,8 @@ bool restore (struct Dump p)
   t = header.t;
   events (false);
 
-  {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1389);return true;}
-end_tracing("restore","/home/lisergey/basilisk/src/output.h",1390);}
+  {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1330);return true;}
+end_tracing("restore","/home/lisergey/basilisk/src/output.h",1331);}
 #line 431 "/home/lisergey/basilisk/src/utils.h"
 #line 12 "/home/lisergey/basilisk/src/run.h"
 
@@ -16070,7 +16018,11 @@ static int defaults_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
 
 #line 42
       static int defaults_0(const int i,const double t,Event *_ev){tracing("defaults_0","/home/lisergey/basilisk/src/run.h",42); {
-  display ((struct _display){"box();"});
+  display ("box();"
+#line 1422 "/home/lisergey/basilisk/src/common.h"
+, false
+#line 43 "/home/lisergey/basilisk/src/run.h"
+);
 }{end_tracing("defaults_0","/home/lisergey/basilisk/src/run.h",44);return 0;}end_tracing("defaults_0","/home/lisergey/basilisk/src/run.h",44);}
 
 
@@ -16086,7 +16038,7 @@ static int cleanup_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;i
 
 #line 50
       static int cleanup(const int i,const double t,Event *_ev){tracing("cleanup","/home/lisergey/basilisk/src/run.h",50); {
-  display ((struct _display){"", true});
+  display ("", true);
 }{end_tracing("cleanup","/home/lisergey/basilisk/src/run.h",52);return 0;}end_tracing("cleanup","/home/lisergey/basilisk/src/run.h",52);}
 #line 28 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 1 "./timestep.h"
@@ -16819,42 +16771,36 @@ is_face_z(){ {
 
 
 
-struct Advection {
-  scalar * tracers;
-  vector u;
-  double dt;
-  scalar * src;
-};
-
-void advection (struct Advection p)
+void advection (scalar * tracers, vector u, double dt,
+  scalar * src)
 {
 
 
 
 
-  scalar * lsrc = p.src;
-  if (!lsrc)
-    {scalar*_i=(scalar*)( p.tracers);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
+  scalar * psrc = src;
+  if (!src)
+    {scalar*_i=(scalar*)( tracers);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
       const scalar zero = new_const_scalar("zero",12, 0.);
-      lsrc = list_append (lsrc, zero);
+      src = list_append (src, zero);
     }}}
-  if (!(list_len(p.tracers) == list_len(lsrc))) qassert ("/home/lisergey/basilisk/src/bcg.h", 86, "list_len(p.tracers) == list_len(lsrc)");
+  if (!(list_len (tracers) == list_len (src))) qassert ("/home/lisergey/basilisk/src/bcg.h", 80, "list_len (tracers) == list_len (src)");
 
-  scalar f, src;
-  {scalar*_i0=lsrc;scalar*_i1= p.tracers;if(_i0)for(src=*_i0,f=*_i1;_i0->i>= 0;src=*++_i0,f=*++_i1){ {
+  scalar f, source;
+  {scalar*_i0=src;scalar*_i1= tracers;if(_i0)for(source=*_i0,f=*_i1;_i0->i>= 0;source=*++_i0,f=*++_i1){ {
     vector  flux=new_face_vector("flux");
-    tracer_fluxes (f, p.u, flux, p.dt, src);
+    tracer_fluxes (f, u, flux, dt, source);
 
 
 
 
 
-    update_tracer (f, p.u, flux, p.dt);delete((scalar*)((vector[]){flux,{{-1},{-1},{-1}}}));
+    update_tracer (f, u, flux, dt);delete((scalar*)((vector[]){flux,{{-1},{-1},{-1}}}));
 
   }}}
 
-  if (!p.src)
-    pfree (lsrc,__func__,__FILE__,__LINE__);
+  if (!psrc)
+    pfree (src,__func__,__FILE__,__LINE__);
 }
 #line 30 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 
@@ -16950,30 +16896,25 @@ typedef struct {
   int minlevel;
 } mgstats;
 #line 125 "/home/lisergey/basilisk/src/poisson.h"
-struct MGSolve {
-  scalar * a, * b;
-  double (* residual) (scalar * a, scalar * b, scalar * res,
-         void * data);
-  void (* relax) (scalar * da, scalar * res, int depth,
-    void * data);
-  void * data;
-
-  int nrelax;
-  scalar * res;
-  int minlevel;
-  double tolerance;
-};
-
-mgstats mg_solve (struct MGSolve p)
+mgstats mg_solve (scalar * a, scalar * b,
+    double (* residual) (scalar * a, scalar * b, scalar * res,
+           void * data),
+    void (* relax) (scalar * da, scalar * res, int depth,
+      void * data),
+    void * data,
+    int nrelax,
+    scalar * res,
+    int minlevel,
+    double tolerance)
 {
 
 
 
 
 
-  scalar * da = list_clone (p.a), * res = p.res;
+  scalar * da = list_clone (a), * pres = res;
   if (!res)
-    res = list_clone (p.b);
+    res = list_clone (b);
 
 
 
@@ -16989,47 +16930,45 @@ mgstats mg_solve (struct MGSolve p)
 
   mgstats s = {0};
   double sum = 0.;
-  scalar rhs = p.b[0];
+  scalar rhs = b[0];
   foreach_stencil ()
     { _stencil_val(rhs,0,0,0); }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:sum)){
-#line 165
+#line 160
 foreach ()
     sum += val(rhs,0,0,0);end_foreach();mpi_all_reduce_array(&sum,double,MPI_SUM,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 167
+#line 162
 s.sum = sum;
-  s.nrelax = p.nrelax > 0 ? p.nrelax : 4;
+  s.nrelax = nrelax > 0 ? nrelax : 4;
 
 
 
 
   double resb;
-  resb = s.resb = s.resa = p.residual (p.a, p.b, res, p.data);
+  resb = s.resb = s.resa = (* residual) (a, b, res, data);
 
 
 
 
 
 
-  if (p.tolerance == 0.)
-    p.tolerance = TOLERANCE;
   for (s.i = 0;
-       s.i < NITERMAX && (s.i < NITERMIN || s.resa > p.tolerance);
+       s.i < NITERMAX && (s.i < NITERMIN || s.resa > tolerance);
        s.i++) {
-    mg_cycle (p.a, res, da, p.relax, p.data,
+    mg_cycle (a, res, da, relax, data,
        s.nrelax,
-       p.minlevel,
+       minlevel,
        grid->maxdepth);
-    s.resa = p.residual (p.a, p.b, res, p.data);
-#line 199 "/home/lisergey/basilisk/src/poisson.h"
-    if (s.resa > p.tolerance) {
+    s.resa = (* residual) (a, b, res, data);
+#line 192 "/home/lisergey/basilisk/src/poisson.h"
+    if (s.resa > tolerance) {
       if (resb/s.resa < 1.2 && s.nrelax < 100)
  s.nrelax++;
       else if (resb/s.resa > 10 && s.nrelax > 2)
@@ -17044,29 +16983,29 @@ s.sum = sum;
 
     resb = s.resa;
   }
-  s.minlevel = p.minlevel;
+  s.minlevel = minlevel;
 
 
 
 
-  if (s.resa > p.tolerance) {
-    scalar v = p.a[0];
+  if (s.resa > tolerance) {
+    scalar v = a[0];
     fprintf (ferr,
       "WARNING: convergence for %s not reached after %d iterations\n"
-      "  res: %g sum: %g nrelax: %d\n", _attribute[v.i].name,
-      s.i, s.resa, s.sum, s.nrelax), fflush (ferr);
+      "  res: %g sum: %g nrelax: %d tolerance: %g\n", _attribute[v.i].name,
+      s.i, s.resa, s.sum, s.nrelax, tolerance), fflush (ferr);
   }
 
 
 
 
-  if (!p.res)
+  if (!pres)
     delete (res), pfree (res,__func__,__FILE__,__LINE__);
   delete (da), pfree (da,__func__,__FILE__,__LINE__);
 
   return s;
 }
-#line 258 "/home/lisergey/basilisk/src/poisson.h"
+#line 251 "/home/lisergey/basilisk/src/poisson.h"
 struct Poisson {
   scalar a, b;
           vector alpha;
@@ -17089,7 +17028,7 @@ static void relax (scalar * al, scalar * bl, int l, void * data)
   struct Poisson * p = (struct Poisson *) data;
           vector alpha = p->alpha;
           scalar lambda = p->lambda;
-#line 296 "/home/lisergey/basilisk/src/poisson.h"
+#line 289 "/home/lisergey/basilisk/src/poisson.h"
   scalar c = a;
 
 
@@ -17103,12 +17042,12 @@ static void relax (scalar * al, scalar * bl, int l, void * data)
       n += val(alpha.x,1,0,0)*val(a,1,0,0) + val(alpha.x,0,0,0)*val(a,-1,0,0);
       d += val(alpha.x,1,0,0) + val(alpha.x,0,0,0);
     } 
-#line 305
+#line 298
 {
       n += val(alpha.y,0,1,0)*val(a,0,1,0) + val(alpha.y,0,0,0)*val(a,0,-1,0);
       d += val(alpha.y,0,1,0) + val(alpha.y,0,0,0);
     } 
-#line 305
+#line 298
 {
       n += val(alpha.z,0,0,1)*val(a,0,0,1) + val(alpha.z,0,0,0)*val(a,0,0,-1);
       d += val(alpha.z,0,0,1) + val(alpha.z,0,0,0);
@@ -17132,19 +17071,19 @@ static void relax (scalar * al, scalar * bl, int l, void * data)
 
 
   {
-#line 303
+#line 296
 foreach_level_or_leaf (l) {
     double n = - sq(Delta)*val(b,0,0,0), d = - _const_lambda*sq(Delta);
      {
       n += val(alpha.x,1,0,0)*val(a,1,0,0) + val(alpha.x,0,0,0)*val(a,-1,0,0);
       d += val(alpha.x,1,0,0) + val(alpha.x,0,0,0);
     } 
-#line 305
+#line 298
 {
       n += val(alpha.y,0,1,0)*val(a,0,1,0) + val(alpha.y,0,0,0)*val(a,0,-1,0);
       d += val(alpha.y,0,1,0) + val(alpha.y,0,0,0);
     } 
-#line 305
+#line 298
 {
       n += val(alpha.z,0,0,1)*val(a,0,0,1) + val(alpha.z,0,0,0)*val(a,0,0,-1);
       d += val(alpha.z,0,0,1) + val(alpha.z,0,0,0);
@@ -17168,19 +17107,19 @@ foreach_level_or_leaf (l) {
 
 
   {
-#line 303
+#line 296
 foreach_level_or_leaf (l) {
     double n = - sq(Delta)*val(b,0,0,0), d = - val(lambda,0,0,0)*sq(Delta);
      {
       n += _const_alpha.x*val(a,1,0,0) + _const_alpha.x*val(a,-1,0,0);
       d += _const_alpha.x + _const_alpha.x;
     } 
-#line 305
+#line 298
 {
       n += _const_alpha.y*val(a,0,1,0) + _const_alpha.y*val(a,0,-1,0);
       d += _const_alpha.y + _const_alpha.y;
     } 
-#line 305
+#line 298
 {
       n += _const_alpha.z*val(a,0,0,1) + _const_alpha.z*val(a,0,0,-1);
       d += _const_alpha.z + _const_alpha.z;
@@ -17204,19 +17143,19 @@ foreach_level_or_leaf (l) {
 
 
   {
-#line 303
+#line 296
 foreach_level_or_leaf (l) {
     double n = - sq(Delta)*val(b,0,0,0), d = - _const_lambda*sq(Delta);
      {
       n += _const_alpha.x*val(a,1,0,0) + _const_alpha.x*val(a,-1,0,0);
       d += _const_alpha.x + _const_alpha.x;
     } 
-#line 305
+#line 298
 {
       n += _const_alpha.y*val(a,0,1,0) + _const_alpha.y*val(a,0,-1,0);
       d += _const_alpha.y + _const_alpha.y;
     } 
-#line 305
+#line 298
 {
       n += _const_alpha.z*val(a,0,0,1) + _const_alpha.z*val(a,0,0,-1);
       d += _const_alpha.z + _const_alpha.z;
@@ -17233,7 +17172,7 @@ foreach_level_or_leaf (l) {
 
       val(c,0,0,0) = n/d;
   }end_foreach_level_or_leaf();}}
-#line 338 "/home/lisergey/basilisk/src/poisson.h"
+#line 331 "/home/lisergey/basilisk/src/poisson.h"
 }
 
 
@@ -17253,30 +17192,30 @@ static double residual (scalar * al, scalar * bl, scalar * resl, void * data)
   vector  g=new_face_vector("g");
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_a(g.x,0,0,0); _stencil_val(alpha.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, a, 0);_stencil_val(a,0,0,0); _stencil_val(a,0 -1,0,0);           }}end__stencil_is_face_x()
-#line 355
+#line 348
 _stencil_is_face_y(){
     {_stencil_val_a(g.y,0,0,0); _stencil_val(alpha.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, a, 0);_stencil_val(a,0,0,0); _stencil_val(a,0,0 -1,0);           }}end__stencil_is_face_y()
-#line 355
+#line 348
 _stencil_is_face_z(){
     {_stencil_val_a(g.z,0,0,0); _stencil_val(alpha.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_gradient_z (point, a, 0);_stencil_val(a,0,0,0); _stencil_val(a,0,0,0 -1);           }}end__stencil_is_face_z()}end_foreach_face_stencil();
   
-#line 355
+#line 348
 if(!is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
     val(g.x,0,0,0) = val(alpha.x,0,0,0)*(_attribute[a.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, a, 0) : (val(a,0,0,0) - val(a,0 -1,0,0))/Delta);}end_is_face_x()
-#line 355
+#line 348
 is_face_y(){
     val(g.y,0,0,0) = val(alpha.y,0,0,0)*(_attribute[a.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, a, 0) : (val(a,0,0,0) - val(a,0,0 -1,0))/Delta);}end_is_face_y()
-#line 355
+#line 348
 is_face_z(){
     val(g.z,0,0,0) = val(alpha.z,0,0,0)*(_attribute[a.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, a, 0) : (val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
   {
-#line 355
+#line 348
 foreach_face_generic(){is_face_x(){
     val(g.x,0,0,0) = _const_alpha.x*(_attribute[a.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, a, 0) : (val(a,0,0,0) - val(a,0 -1,0,0))/Delta);}end_is_face_x()
-#line 355
+#line 348
 is_face_y(){
     val(g.y,0,0,0) = _const_alpha.y*(_attribute[a.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, a, 0) : (val(a,0,0,0) - val(a,0,0 -1,0))/Delta);}end_is_face_y()
-#line 355
+#line 348
 is_face_z(){
     val(g.z,0,0,0) = _const_alpha.z*(_attribute[a.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, a, 0) : (val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}
   foreach_stencil () {
@@ -17284,10 +17223,10 @@ is_face_z(){
     
       {_stencil_val_r(res,0,0,0);_stencil_val(g.x,1,0,0); _stencil_val(g.x,0,0,0);   }
       
-#line 360
+#line 353
 {_stencil_val_r(res,0,0,0);_stencil_val(g.y,0,1,0); _stencil_val(g.y,0,0,0);   }
       
-#line 360
+#line 353
 {_stencil_val_r(res,0,0,0);_stencil_val(g.z,0,0,1); _stencil_val(g.z,0,0,0);   }
 
     if (p->embed_flux) {   
@@ -17300,24 +17239,24 @@ _stencil_val(res,0,0,0);
 
         
   
-#line 369
+#line 362
 }end_foreach_stencil();
   
-#line 357
+#line 350
 if(!is_constant(lambda)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 357
+#line 350
 foreach () {
     val(res,0,0,0) = val(b,0,0,0) - val(lambda,0,0,0)*val(a,0,0,0);
     
       val(res,0,0,0) -= (val(g.x,1,0,0) - val(g.x,0,0,0))/Delta;
       
-#line 360
+#line 353
 val(res,0,0,0) -= (val(g.y,0,1,0) - val(g.y,0,0,0))/Delta;
       
-#line 360
+#line 353
 val(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;
 
     if (p->embed_flux) {
@@ -17331,22 +17270,22 @@ val(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 369
+#line 362
 }else {double _const_lambda=_constant[lambda.i-_NVARMAX];NOT_UNUSED(_const_lambda);
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 357
+#line 350
 foreach () {
     val(res,0,0,0) = val(b,0,0,0) - _const_lambda*val(a,0,0,0);
     
       val(res,0,0,0) -= (val(g.x,1,0,0) - val(g.x,0,0,0))/Delta;
       
-#line 360
+#line 353
 val(res,0,0,0) -= (val(g.y,0,1,0) - val(g.y,0,0,0))/Delta;
       
-#line 360
+#line 353
 val(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;
 
     if (p->embed_flux) {
@@ -17360,13 +17299,20 @@ val(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 369
+#line 362
 }
-#line 387 "/home/lisergey/basilisk/src/poisson.h"
+#line 380 "/home/lisergey/basilisk/src/poisson.h"
   {delete((scalar*)((vector[]){g,{{-1},{-1},{-1}}}));return maxres;}delete((scalar*)((vector[]){g,{{-1},{-1},{-1}}}));
 }
-#line 399 "/home/lisergey/basilisk/src/poisson.h"
-mgstats poisson (struct Poisson p)
+#line 392 "/home/lisergey/basilisk/src/poisson.h"
+mgstats poisson (scalar a, scalar b,
+           vector alpha,
+           scalar lambda,
+   double tolerance,
+   int nrelax,
+   int minlevel,
+   scalar * res,
+   double (* flux) (Point, scalar, vector, double *))
 {
 
 
@@ -17374,18 +17320,16 @@ mgstats poisson (struct Poisson p)
 
 
 
-  if (!p.alpha.x.i)
-    p.alpha = unityf;
-  if (!p.lambda.i) {
+  if (alpha.x.i < 0)
+    alpha = unityf;
+  if (lambda.i < 0) {
     const scalar zeroc = new_const_scalar("zeroc",13, 0.);
-    p.lambda = zeroc;
+    lambda = zeroc;
   }
 
 
 
 
-  vector alpha = p.alpha;
-  scalar lambda = p.lambda;
   restriction (((scalar[]){alpha.x,alpha.y,alpha.z,lambda,{-1}}));
 
 
@@ -17393,42 +17337,50 @@ mgstats poisson (struct Poisson p)
 
 
   double defaultol = TOLERANCE;
-  if (p.tolerance)
-    TOLERANCE = p.tolerance;
+  if (tolerance)
+    TOLERANCE = tolerance;
 
-  scalar a = p.a, b = p.b;
+  struct Poisson p = {a, b, alpha, lambda, tolerance, nrelax, minlevel, res };
 
-  if (!p.embed_flux && _attribute[a.i].boundary[embed] != symmetry)
+  if (!flux && _attribute[a.i].boundary[embed] != symmetry)
     p.embed_flux = embed_flux;
+  else
+    p.embed_flux = flux;
 
-  mgstats s = mg_solve ((struct MGSolve){((scalar[]){a,{-1}}),((scalar[]) {b,{-1}}), residual, relax,
-   &p, p.nrelax, p.res, .minlevel = max(1, p.minlevel)});
+  mgstats s = mg_solve ((
+#line 125
+scalar *
+#line 434
+)((scalar[]){a,{-1}}),( 
+#line 125
+scalar *
+#line 434
+)((scalar[]) {b,{-1}}), residual, relax, &p
+,
+   
+#line 435
+nrelax, res, max(1, minlevel)
+#line 133
+, 
+TOLERANCE
+#line 435
+);
 
 
 
 
-  if (p.tolerance)
+  if (tolerance)
     TOLERANCE = defaultol;
 
   return s;
 }
 #line 463 "/home/lisergey/basilisk/src/poisson.h"
-struct Project {
-  vector uf;
-  scalar p;
-  vector alpha;
-  double dt;
-  int nrelax;
-};
-
      
-mgstats project (struct Project q)
-{tracing("project","/home/lisergey/basilisk/src/poisson.h",472);
-  vector uf = q.uf;
-  scalar p = q.p;
-          vector alpha = q.alpha.x.i ? q.alpha : unityf;
-  double dt = q.dt ? q.dt : 1.;
-  int nrelax = q.nrelax ? q.nrelax : 4;
+mgstats project (vector uf, scalar p,
+           vector alpha,
+   double dt,
+   int nrelax)
+{tracing("project","/home/lisergey/basilisk/src/poisson.h",464);
 
 
 
@@ -17441,40 +17393,51 @@ mgstats project (struct Project q)
     
       {_stencil_val_r(div,0,0,0); _stencil_val(uf.x,1,0,0); _stencil_val(uf.x,0,0,0);  }
       
-#line 489
+#line 479
 {_stencil_val_r(div,0,0,0); _stencil_val(uf.y,0,1,0); _stencil_val(uf.y,0,0,0);  }
       
-#line 489
+#line 479
 {_stencil_val_r(div,0,0,0); _stencil_val(uf.z,0,0,1); _stencil_val(uf.z,0,0,0);  }
     _stencil_val_r(div,0,0,0);  
   }end_foreach_stencil();
   {
-#line 486
+#line 476
 foreach() {
     val(div,0,0,0) = 0.;
     
       val(div,0,0,0) += val(uf.x,1,0,0) - val(uf.x,0,0,0);
       
-#line 489
+#line 479
 val(div,0,0,0) += val(uf.y,0,1,0) - val(uf.y,0,0,0);
       
-#line 489
+#line 479
 val(div,0,0,0) += val(uf.z,0,0,1) - val(uf.z,0,0,0);
     val(div,0,0,0) /= dt*Delta;
   }end_foreach();}
-#line 502 "/home/lisergey/basilisk/src/poisson.h"
-  mgstats mgp = poisson ((struct Poisson){p, div, alpha,
-    .tolerance = TOLERANCE/sq(dt), .nrelax = nrelax});
+#line 492 "/home/lisergey/basilisk/src/poisson.h"
+  mgstats mgp = poisson (p, div, alpha
+#line 393
+,
+( scalar) {-1}
+#line 493
+, TOLERANCE/sq(dt), nrelax
+#line 396
+, 
+0, 
+NULL, 
+NULL
+#line 493
+);
 
 
 
 
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val_r(uf.x,0,0,0);_stencil_val(alpha.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, p, 0);_stencil_val(p,0,0,0); _stencil_val(p,0 -1,0,0);            }}end__stencil_is_face_x()
-#line 508
+#line 498
 _stencil_is_face_y(){
     {_stencil_val_r(uf.y,0,0,0);_stencil_val(alpha.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, p, 0);_stencil_val(p,0,0,0); _stencil_val(p,0,0 -1,0);            }}end__stencil_is_face_y()
-#line 508
+#line 498
 _stencil_is_face_z(){
     {_stencil_val_r(uf.z,0,0,0);_stencil_val(alpha.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_gradient_z (point, p, 0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,0 -1);            }}end__stencil_is_face_z()}end_foreach_face_stencil();
 
@@ -17482,13 +17445,13 @@ _stencil_is_face_z(){
 
 
   
-#line 508
+#line 498
 if(!is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) -= dt*val(alpha.x,0,0,0)*(_attribute[p.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, p, 0) : (val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()
-#line 508
+#line 498
 is_face_y(){
     val(uf.y,0,0,0) -= dt*val(alpha.y,0,0,0)*(_attribute[p.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, p, 0) : (val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()
-#line 508
+#line 498
 is_face_z(){
     val(uf.z,0,0,0) -= dt*val(alpha.z,0,0,0)*(_attribute[p.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, p, 0) : (val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
 
@@ -17496,30 +17459,27 @@ is_face_z(){
 
 
   {
-#line 508
+#line 498
 foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) -= dt*_const_alpha.x*(_attribute[p.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, p, 0) : (val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()
-#line 508
+#line 498
 is_face_y(){
     val(uf.y,0,0,0) -= dt*_const_alpha.y*(_attribute[p.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, p, 0) : (val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()
-#line 508
+#line 498
 is_face_z(){
     val(uf.z,0,0,0) -= dt*_const_alpha.z*(_attribute[p.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, p, 0) : (val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}
 
-  {delete((scalar*)((scalar[]){div,{-1}}));{end_tracing("project","/home/lisergey/basilisk/src/poisson.h",511);return mgp;}}delete((scalar*)((scalar[]){div,{-1}}));
-end_tracing("project","/home/lisergey/basilisk/src/poisson.h",512);}
+  {delete((scalar*)((scalar[]){div,{-1}}));{end_tracing("project","/home/lisergey/basilisk/src/poisson.h",501);return mgp;}}delete((scalar*)((scalar[]){div,{-1}}));
+end_tracing("project","/home/lisergey/basilisk/src/poisson.h",502);}
 #line 32 "/home/lisergey/basilisk/src/viscosity-embed.h"
 
 struct Viscosity {
-  vector u;
   vector mu;
   scalar rho;
   double dt;
-  int nrelax;
-  scalar * res;
   double (* embed_flux) (Point, scalar, vector, double *);
 };
-#line 61 "/home/lisergey/basilisk/src/viscosity-embed.h"
+#line 58 "/home/lisergey/basilisk/src/viscosity-embed.h"
 static void relax_diffusion (scalar * a, scalar * b, int l, void * data)
 {
   struct Viscosity * p = (struct Viscosity *) data;
@@ -17534,10 +17494,10 @@ static void relax_diffusion (scalar * a, scalar * b, int l, void * data)
     
       avgmu += val(mu.x,0,0,0) + val(mu.x,1,0,0);
       
-#line 73
+#line 70
 avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
       
-#line 73
+#line 70
 avgmu += val(mu.z,0,0,0) + val(mu.z,0,0,1);
     avgmu = dt*avgmu + 1e-30;
      {
@@ -17548,15 +17508,15 @@ avgmu += val(mu.z,0,0,0) + val(mu.z,0,0,1);
       
  a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).x + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -17565,15 +17525,15 @@ a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
       
  a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).y + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.z, mu, &c) : 0.;
@@ -17582,26 +17542,26 @@ a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       
  a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       val(u.z,0,0,0) = (dt*a + (val(r.z,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).z + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else if(is_constant(mu.x) && !is_constant(rho)){struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
   {
-#line 70
+#line 67
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += _const_mu.x + _const_mu.x;
       
-#line 73
+#line 70
 avgmu += _const_mu.y + _const_mu.y;
       
-#line 73
+#line 70
 avgmu += _const_mu.z + _const_mu.z;
     avgmu = dt*avgmu + 1e-30;
      {
@@ -17612,15 +17572,15 @@ avgmu += _const_mu.z + _const_mu.z;
       
  a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).x + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -17629,15 +17589,15 @@ a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
       
  a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).y + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.z, mu, &c) : 0.;
@@ -17646,26 +17606,26 @@ a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       
  a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       val(u.z,0,0,0) = (dt*a + (val(r.z,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(val(rho,0,0,0) + ((coord){0.,0.,0.}).z + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else if(!is_constant(mu.x) && is_constant(rho)){double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
   {
-#line 70
+#line 67
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += val(mu.x,0,0,0) + val(mu.x,1,0,0);
       
-#line 73
+#line 70
 avgmu += val(mu.y,0,0,0) + val(mu.y,0,1,0);
       
-#line 73
+#line 70
 avgmu += val(mu.z,0,0,0) + val(mu.z,0,0,1);
     avgmu = dt*avgmu + 1e-30;
      {
@@ -17676,15 +17636,15 @@ avgmu += val(mu.z,0,0,0) + val(mu.z,0,0,1);
       
  a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).x + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -17693,15 +17653,15 @@ a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
       
  a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).y + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.z, mu, &c) : 0.;
@@ -17710,26 +17670,26 @@ a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
       
  a += val(mu.z,0,0,1)*val(s,0,0,1) + val(mu.z,0,0,0)*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += val(mu.x,1,0,0)*val(s,1,0,0) + val(mu.x,0,0,0)*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += val(mu.y,0,1,0)*val(s,0,1,0) + val(mu.y,0,0,0)*val(s,0,-1,0);
       val(u.z,0,0,0) = (dt*a + (val(r.z,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).z + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}else {struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
   {
-#line 70
+#line 67
 foreach_level_or_leaf (l) {
     double avgmu = 0.;
     
       avgmu += _const_mu.x + _const_mu.x;
       
-#line 73
+#line 70
 avgmu += _const_mu.y + _const_mu.y;
       
-#line 73
+#line 70
 avgmu += _const_mu.z + _const_mu.z;
     avgmu = dt*avgmu + 1e-30;
      {
@@ -17740,15 +17700,15 @@ avgmu += _const_mu.z + _const_mu.z;
       
  a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
       val(u.x,0,0,0) = (dt*a + (val(r.x,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).x + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.y, mu, &c) : 0.;
@@ -17757,15 +17717,15 @@ a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
       
  a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
  
-#line 81
+#line 78
 a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       val(u.y,0,0,0) = (dt*a + (val(r.y,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).y + dt*d) + avgmu);
     } 
-#line 75
+#line 72
 {
       double c = 0.;
       double d = embed_flux ? embed_flux (point, u.z, mu, &c) : 0.;
@@ -17774,16 +17734,16 @@ a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
       
  a += _const_mu.z*val(s,0,0,1) + _const_mu.z*val(s,0,0,-1);
  
-#line 81
+#line 78
 a += _const_mu.x*val(s,1,0,0) + _const_mu.x*val(s,-1,0,0);
  
-#line 81
+#line 78
 a += _const_mu.y*val(s,0,1,0) + _const_mu.y*val(s,0,-1,0);
       val(u.z,0,0,0) = (dt*a + (val(r.z,0,0,0) - dt*c)*sq(Delta))/
  (sq(Delta)*(_const_rho + ((coord){0.,0.,0.}).z + dt*d) + avgmu);
     }
   }end_foreach_level_or_leaf();}}
-#line 97 "/home/lisergey/basilisk/src/viscosity-embed.h"
+#line 94 "/home/lisergey/basilisk/src/viscosity-embed.h"
 }
 
 static double residual_diffusion (scalar * a, scalar * b, scalar * resl,
@@ -17803,30 +17763,30 @@ static double residual_diffusion (scalar * a, scalar * b, scalar * resl,
     vector  g=new_face_vector("g");
     foreach_face_stencil(){_stencil_is_face_x(){
       {_stencil_val_a(g.x,0,0,0); _stencil_val(mu.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0 -1,0,0);           }}end__stencil_is_face_x()
-#line 114
+#line 111
 _stencil_is_face_y(){
       {_stencil_val_a(g.y,0,0,0); _stencil_val(mu.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0 -1,0);           }}end__stencil_is_face_y()
-#line 114
+#line 111
 _stencil_is_face_z(){
       {_stencil_val_a(g.z,0,0,0); _stencil_val(mu.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_gradient_z (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0,0 -1);           }}end__stencil_is_face_z()}end_foreach_face_stencil();
     
-#line 114
+#line 111
 if(!is_constant(mu.x)){{foreach_face_generic(){is_face_x(){
       val(g.x,0,0,0) = val(mu.x,0,0,0)*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 114
+#line 111
 is_face_y(){
       val(g.y,0,0,0) = val(mu.y,0,0,0)*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 114
+#line 111
 is_face_z(){
       val(g.z,0,0,0) = val(mu.z,0,0,0)*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
     {
-#line 114
+#line 111
 foreach_face_generic(){is_face_x(){
       val(g.x,0,0,0) = _const_mu.x*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 114
+#line 111
 is_face_y(){
       val(g.y,0,0,0) = _const_mu.y*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 114
+#line 111
 is_face_z(){
       val(g.z,0,0,0) = _const_mu.z*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}
     foreach_stencil () {   
@@ -17834,10 +17794,10 @@ is_face_z(){
       
  { _stencil_val(g.x,0,0,0); _stencil_val(g.x,1,0,0);  }
  
-#line 119
+#line 116
 { _stencil_val(g.y,0,0,0); _stencil_val(g.y,0,1,0);  }
  
-#line 119
+#line 116
 { _stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,1);  }
       _stencil_val_a(res.x,0,0,0); _stencil_val(r.x,0,0,0);_stencil_val(rho,0,0,0);_stencil_val(u.x,0,0,0);       
       if (embed_flux) {   
@@ -17848,24 +17808,24 @@ _stencil_val(res.x,0,0,0);
  {_stencil_val(res.x,0,0,0);   }
           
     
-#line 127
+#line 124
 }end_foreach_stencil();
     
-#line 116
+#line 113
 if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 119
+#line 116
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 119
+#line 116
 a += val(g.z,0,0,0) - val(g.z,0,0,1);
       val(res.x,0,0,0) = val(r.x,0,0,0) - (val(rho,0,0,0) + ((coord){0.,0.,0.}).x)*val(u.x,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -17878,22 +17838,22 @@ a += val(g.z,0,0,0) - val(g.z,0,0,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 119
+#line 116
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 119
+#line 116
 a += val(g.z,0,0,0) - val(g.z,0,0,1);
       val(res.x,0,0,0) = val(r.x,0,0,0) - (_const_rho + ((coord){0.,0.,0.}).x)*val(u.x,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -17906,39 +17866,39 @@ a += val(g.z,0,0,0) - val(g.z,0,0,1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }delete((scalar*)((vector[]){g,{{-1},{-1},{-1}}}));
   } 
-#line 111
+#line 108
 {
     scalar s = u.y;
     vector  g=new_face_vector("g");
     foreach_face_stencil(){_stencil_is_face_y(){
       {_stencil_val_a(g.y,0,0,0); _stencil_val(mu.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0 -1,0);           }}end__stencil_is_face_y()
-#line 114
+#line 111
 _stencil_is_face_z(){
       {_stencil_val_a(g.z,0,0,0); _stencil_val(mu.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_gradient_z (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0,0 -1);           }}end__stencil_is_face_z()
-#line 114
+#line 111
 _stencil_is_face_x(){
       {_stencil_val_a(g.x,0,0,0); _stencil_val(mu.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0 -1,0,0);           }}end__stencil_is_face_x()}end_foreach_face_stencil();
     
-#line 114
+#line 111
 if(!is_constant(mu.y)){{foreach_face_generic(){is_face_y(){
       val(g.y,0,0,0) = val(mu.y,0,0,0)*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 114
+#line 111
 is_face_z(){
       val(g.z,0,0,0) = val(mu.z,0,0,0)*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()
-#line 114
+#line 111
 is_face_x(){
       val(g.x,0,0,0) = val(mu.x,0,0,0)*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
     {
-#line 114
+#line 111
 foreach_face_generic(){is_face_y(){
       val(g.y,0,0,0) = _const_mu.y*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()
-#line 114
+#line 111
 is_face_z(){
       val(g.z,0,0,0) = _const_mu.z*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()
-#line 114
+#line 111
 is_face_x(){
       val(g.x,0,0,0) = _const_mu.x*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()}end_foreach_face_generic();}}
     foreach_stencil () {   
@@ -17946,10 +17906,10 @@ is_face_x(){
       
  { _stencil_val(g.y,0,0,0); _stencil_val(g.y,0,1,0);  }
  
-#line 119
+#line 116
 { _stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,1);  }
  
-#line 119
+#line 116
 { _stencil_val(g.x,0,0,0); _stencil_val(g.x,1,0,0);  }
       _stencil_val_a(res.y,0,0,0); _stencil_val(r.y,0,0,0);_stencil_val(rho,0,0,0);_stencil_val(u.y,0,0,0);       
       if (embed_flux) {   
@@ -17960,24 +17920,24 @@ _stencil_val(res.y,0,0,0);
  {_stencil_val(res.y,0,0,0);   }
           
     
-#line 127
+#line 124
 }end_foreach_stencil();
     
-#line 116
+#line 113
 if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 119
+#line 116
 a += val(g.z,0,0,0) - val(g.z,0,0,1);
  
-#line 119
+#line 116
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
       val(res.y,0,0,0) = val(r.y,0,0,0) - (val(rho,0,0,0) + ((coord){0.,0.,0.}).y)*val(u.y,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -17990,22 +17950,22 @@ a += val(g.x,0,0,0) - val(g.x,1,0,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.y,0,0,0) - val(g.y,0,1,0);
  
-#line 119
+#line 116
 a += val(g.z,0,0,0) - val(g.z,0,0,1);
  
-#line 119
+#line 116
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
       val(res.y,0,0,0) = val(r.y,0,0,0) - (_const_rho + ((coord){0.,0.,0.}).y)*val(u.y,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -18018,39 +17978,39 @@ a += val(g.x,0,0,0) - val(g.x,1,0,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }delete((scalar*)((vector[]){g,{{-1},{-1},{-1}}}));
   } 
-#line 111
+#line 108
 {
     scalar s = u.z;
     vector  g=new_face_vector("g");
     foreach_face_stencil(){_stencil_is_face_z(){
       {_stencil_val_a(g.z,0,0,0); _stencil_val(mu.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_gradient_z (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0,0 -1);           }}end__stencil_is_face_z()
-#line 114
+#line 111
 _stencil_is_face_x(){
       {_stencil_val_a(g.x,0,0,0); _stencil_val(mu.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_gradient_x (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0 -1,0,0);           }}end__stencil_is_face_x()
-#line 114
+#line 111
 _stencil_is_face_y(){
       {_stencil_val_a(g.y,0,0,0); _stencil_val(mu.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_gradient_y (point, s, 0);_stencil_val(s,0,0,0); _stencil_val(s,0,0 -1,0);           }}end__stencil_is_face_y()}end_foreach_face_stencil();
     
-#line 114
+#line 111
 if(!is_constant(mu.z)){{foreach_face_generic(){is_face_z(){
       val(g.z,0,0,0) = val(mu.z,0,0,0)*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()
-#line 114
+#line 111
 is_face_x(){
       val(g.x,0,0,0) = val(mu.x,0,0,0)*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 114
+#line 111
 is_face_y(){
       val(g.y,0,0,0) = val(mu.y,0,0,0)*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
     {
-#line 114
+#line 111
 foreach_face_generic(){is_face_z(){
       val(g.z,0,0,0) = _const_mu.z*(_attribute[s.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_gradient_z (point, s, 0) : (val(s,0,0,0) - val(s,0,0,0 -1))/Delta);}end_is_face_z()
-#line 114
+#line 111
 is_face_x(){
       val(g.x,0,0,0) = _const_mu.x*(_attribute[s.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_gradient_x (point, s, 0) : (val(s,0,0,0) - val(s,0 -1,0,0))/Delta);}end_is_face_x()
-#line 114
+#line 111
 is_face_y(){
       val(g.y,0,0,0) = _const_mu.y*(_attribute[s.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_gradient_y (point, s, 0) : (val(s,0,0,0) - val(s,0,0 -1,0))/Delta);}end_is_face_y()}end_foreach_face_generic();}}
     foreach_stencil () {   
@@ -18058,10 +18018,10 @@ is_face_y(){
       
  { _stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,1);  }
  
-#line 119
+#line 116
 { _stencil_val(g.x,0,0,0); _stencil_val(g.x,1,0,0);  }
  
-#line 119
+#line 116
 { _stencil_val(g.y,0,0,0); _stencil_val(g.y,0,1,0);  }
       _stencil_val_a(res.z,0,0,0); _stencil_val(r.z,0,0,0);_stencil_val(rho,0,0,0);_stencil_val(u.z,0,0,0);       
       if (embed_flux) {   
@@ -18072,24 +18032,24 @@ _stencil_val(res.z,0,0,0);
  {_stencil_val(res.z,0,0,0);   }
           
     
-#line 127
+#line 124
 }end_foreach_stencil();
     
-#line 116
+#line 113
 if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.z,0,0,0) - val(g.z,0,0,1);
  
-#line 119
+#line 116
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 119
+#line 116
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
       val(res.z,0,0,0) = val(r.z,0,0,0) - (val(rho,0,0,0) + ((coord){0.,0.,0.}).z)*val(u.z,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -18102,22 +18062,22 @@ a += val(g.y,0,0,0) - val(g.y,0,1,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
     
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
-#line 116
+#line 113
 foreach () {
       double a = 0.;
       
  a += val(g.z,0,0,0) - val(g.z,0,0,1);
  
-#line 119
+#line 116
 a += val(g.x,0,0,0) - val(g.x,1,0,0);
  
-#line 119
+#line 116
 a += val(g.y,0,0,0) - val(g.y,0,1,0);
       val(res.z,0,0,0) = val(r.z,0,0,0) - (_const_rho + ((coord){0.,0.,0.}).z)*val(u.z,0,0,0) - dt*a/Delta;
       if (embed_flux) {
@@ -18130,10 +18090,10 @@ a += val(g.y,0,0,0) - val(g.y,0,1,0);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 127
+#line 124
 }delete((scalar*)((vector[]){g,{{-1},{-1},{-1}}}));
   }
-#line 146 "/home/lisergey/basilisk/src/viscosity-embed.h"
+#line 143 "/home/lisergey/basilisk/src/viscosity-embed.h"
   return maxres;
 }
 
@@ -18142,41 +18102,43 @@ a += val(g.y,0,0,0) - val(g.y,0,1,0);
 double TOLERANCE_MU = 0.;
 
      
-mgstats viscosity (struct Viscosity p)
-{tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",154);
-  vector u = p.u,  r=new_vector("r");
-  scalar rho = p.rho;
+mgstats viscosity (vector u, vector mu, scalar rho, double dt,
+     int nrelax, scalar * res)
+{tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",151);
+  vector  r=new_vector("r");
   foreach_stencil()
     {
       {_stencil_val_a(r.x,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.x,0,0,0); }
       
-#line 160
+#line 157
 {_stencil_val_a(r.y,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.y,0,0,0); }
       
-#line 160
+#line 157
 {_stencil_val_a(r.z,0,0,0); _stencil_val(rho,0,0,0);_stencil_val(u.z,0,0,0); }}end_foreach_stencil();
   {
-#line 158
+#line 155
 foreach()
     {
       val(r.x,0,0,0) = val(rho,0,0,0)*val(u.x,0,0,0);
       
-#line 160
+#line 157
 val(r.y,0,0,0) = val(rho,0,0,0)*val(u.y,0,0,0);
       
-#line 160
+#line 157
 val(r.z,0,0,0) = val(rho,0,0,0)*val(u.z,0,0,0);}end_foreach();}
 
-  vector mu = p.mu;
   restriction (((scalar[]){mu.x,mu.y,mu.z, rho,{-1}}));
-
+  struct Viscosity p = { mu, rho, dt };
   p.embed_flux = _attribute[u.x.i].boundary[embed] != antisymmetry ? embed_flux : NULL;
-  { mgstats _ret= mg_solve ((struct MGSolve){(scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (scalar *)((vector[]){r,{{-1},{-1},{-1}}}),
-     residual_diffusion, relax_diffusion, &p, p.nrelax, p.res,
-     .minlevel = 1,
+  { mgstats _ret= mg_solve ((scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (scalar *)((vector[]){r,{{-1},{-1},{-1}}})
+,
+     
+#line 163
+residual_diffusion, relax_diffusion, &p, nrelax, res
+, 1
 
-     .tolerance = TOLERANCE_MU});delete((scalar*)((vector[]){r,{{-1},{-1},{-1}}}));{end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",170);return _ret;}}delete((scalar*)((vector[]){r,{{-1},{-1},{-1}}}));
-end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",171);}
+, TOLERANCE_MU ? TOLERANCE_MU : TOLERANCE);delete((scalar*)((vector[]){r,{{-1},{-1},{-1}}}));{end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",166);return _ret;}}delete((scalar*)((vector[]){r,{{-1},{-1},{-1}}}));
+end_tracing("viscosity","/home/lisergey/basilisk/src/viscosity-embed.h",167);}
 #line 32 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 #line 44 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 scalar  p={4};
@@ -18445,7 +18407,11 @@ static int default_display_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double
 
 #line 187
       static int default_display(const int i,const double t,Event *_ev){tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",187);
-  display ((struct _display){"squares (color = 'u.x', spread = -1);"});{end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);return 0;}end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);}
+  display ("squares (color = 'u.x', spread = -1);"
+#line 1422 "/home/lisergey/basilisk/src/common.h"
+, false
+#line 188 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+);{end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);return 0;}end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);}
 
 
 
@@ -18934,8 +18900,8 @@ static int advection_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double 
 {
   if (!stokes) {
     prediction();
-    mgpf = project ((struct Project){uf, pf, alpha, dt/2., mgpf.nrelax});
-    advection ((struct Advection){(scalar *)((vector[]){u,{{-1},{-1},{-1}}}), uf, dt, (scalar *)((vector[]){g,{{-1},{-1},{-1}}})});
+    mgpf = project (uf, pf, alpha, dt/2., mgpf.nrelax);
+    advection ((scalar *)((vector[]){u,{{-1},{-1},{-1}}}), uf, dt, (scalar *)((vector[]){g,{{-1},{-1},{-1}}}));
   }
 }{end_tracing("advection_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",323);return 0;}end_tracing("advection_term","/home/lisergey/basilisk/src/navier-stokes/centered.h",323);}
 
@@ -18982,7 +18948,11 @@ static int viscous_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
 {
   if (constant(mu.x) != 0.) {
     correction (dt);
-    mgu = viscosity ((struct Viscosity){u, mu, rho, dt, mgu.nrelax});
+    mgu = viscosity (u, mu, rho, dt, mgu.nrelax
+#line 152 "/home/lisergey/basilisk/src/viscosity-embed.h"
+, NULL
+#line 349 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+);
     correction (-dt);
   }
 
@@ -19219,7 +19189,7 @@ static int projection_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
 #line 421
       static int projection(const int i,const double t,Event *_ev){tracing("projection","/home/lisergey/basilisk/src/navier-stokes/centered.h",421);
 {
-  mgp = project ((struct Project){uf, p, alpha, dt, mgp.nrelax});
+  mgp = project (uf, p, alpha, dt, mgp.nrelax);
   centered_gradient (p, g);
 
 
@@ -19254,7 +19224,12 @@ static int adapt_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int
 #line 446 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
       static int adapt(const int i,const double t,Event *_ev){tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",446); {
 
-  fractions_cleanup ((struct Cleanup){cs, fs});
+  fractions_cleanup (cs, fs
+#line 293 "/home/lisergey/basilisk/src/embed.h"
+, 
+0., false
+#line 448 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
+);
   foreach_face_stencil(){_stencil_is_face_x(){
     {_stencil_val(uf.x,0,0,0);_stencil_val(fs.x,0,0,0);
       {_stencil_val_a(uf.x,0,0,0);  }   }}end__stencil_is_face_x()
@@ -19481,7 +19456,7 @@ JJ[2][i++] = (val(fs.z,0,0,0) && val(fs.z,0,0,1) ? (val(s,0,0,1) - val(s,0,0,-1)
 #line 12 "cylinder.c"
 #line 1 "output_xdmf.h"
 #line 1 "./output_xdmf.h"
-static int output_xdmf(scalar *list, vector *vlist,
+static int output_xdmf(double t, scalar *list, vector *vlist,
                        int cond(double, double, double, double),
                        const char *path) {
   float *xyz, *attr;
@@ -19584,6 +19559,8 @@ static int output_xdmf(scalar *list, vector *vlist,
             "    Version=\"2\">\n"
             "  <Domain>\n"
             "    <Grid>\n"
+            "      <Time\n"
+            "          Value=\"%.16e\"/>\n"
             "      <Topology\n"
             "          TopologyType=\"Hexahedron\"\n"
             "          Dimensions=\"%ld\"/>\n"
@@ -19594,7 +19571,7 @@ static int output_xdmf(scalar *list, vector *vlist,
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 8 * ncell_total, xyz_base);
+            t, ncell_total, 8 * ncell_total, xyz_base);
     j = 0;
     {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       fprintf(file,
@@ -19650,7 +19627,7 @@ static int output_xdmf(scalar *list, vector *vlist,
                   "  </Domain>\n"
                   "</Xdmf>\n");
     if (fclose(file) != 0) {
-      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 170,
+      fprintf(ferr, "%s:%d: error: fail to close '%s'\n", "./output_xdmf.h", 172,
               xdmf_path);
       return 1;
     }
@@ -21320,7 +21297,7 @@ char *end;
   if (Verbose && pid() == 0)
     fprintf(ferr, "cylinder: starting on %d ranks\n", npe());
   size(domain);
-  origin((struct _origin){-L0 / 2.5, -L0 / 2.0, -L0 / 2.0});
+  origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
 
   if (periodic_boundaries != NULL)
@@ -21364,21 +21341,54 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   } else {
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: reading dump '%s'\n", dump_path);
-    restore((struct Dump){dump_path});
-    fractions_cleanup((struct Cleanup){cs, fs});
+    restore(dump_path
+#line 1164 "/home/lisergey/basilisk/src/output.h"
+, 
+NULL, 
+NULL
+#line 505 "cylinder.c"
+);
+    fractions_cleanup(cs, fs
+#line 293 "/home/lisergey/basilisk/src/embed.h"
+, 
+0., false
+#line 506 "cylinder.c"
+);
   }
 
   if (stl_path == NULL) {
     for (;;) {
-      do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions ((struct Fractions){phi, cs, fs});delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
-      astats s = adapt_wavelet((struct Adapt){((scalar[]){cs,{-1}}), (double[]){0}, .maxlevel = maxlevel,
-                               .minlevel = minlevel});
+      do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions (phi, cs, fs
+#line 122 "/home/lisergey/basilisk/src/fractions.h"
+, 0.
+#line 511 "cylinder.c"
+);delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
+      astats s = adapt_wavelet(
+#line 512 "/home/lisergey/basilisk/src/grid/tree-common.h"
+(
+#line 173
+scalar *
+#line 512
+)
+#line 512 "cylinder.c"
+((scalar[]){cs,{-1}}), (double[]){0}, maxlevel
+, minlevel
+#line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
+, 
+all
+#line 513 "cylinder.c"
+);
       if (Verbose && pid() == 0)
         fprintf(ferr, "cylinder: refined %d cells\n", s.nf);
       if (s.nf == 0)
         break;
     }
-    fractions_cleanup((struct Cleanup){cs, fs});
+    fractions_cleanup(cs, fs
+#line 293 "/home/lisergey/basilisk/src/embed.h"
+, 
+0., false
+#line 519 "cylinder.c"
+);
   } else {
     if ((stl_file = fopen(stl_path, "r")) == NULL) {
       fprintf(ferr, "cylinder: error: fail to open '%s'\n", stl_path);
@@ -21568,13 +21578,20 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       lambda2(u, l2);
       if (FullOutput) {
         sprintf(path, "%s.%09d", output_prefix, i);
-        output_xdmf(((scalar[]){p, l2,{-1}}),((vector[]) {u, omega,{{-1},{-1},{-1}}}), NULL, path);
+        output_xdmf(t,((scalar[]) {p, l2,{-1}}),((vector[]) {u, omega,{{-1},{-1},{-1}}}), NULL, path);
       }
       snprintf(path, sizeof path, "%s.slice.%09d", output_prefix, i);
-      output_xdmf(((scalar[]){p, l2,{-1}}),((vector[]) {u, omega,{{-1},{-1},{-1}}}), slice, path);
+      output_xdmf(t,((scalar[]) {p, l2,{-1}}),((vector[]) {u, omega,{{-1},{-1},{-1}}}), slice, path);
       if (i % (10 * period) == 0) {
         snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
-        dump((struct Dump){path});
+        dump(path
+#line 1089 "/home/lisergey/basilisk/src/output.h"
+, 
+all, 
+NULL, 
+false
+#line 644 "cylinder.c"
+);
       }
     }
     if (force_path) {
@@ -21600,10 +21617,20 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
       }
     }
   }
-  astats s = adapt_wavelet((struct Adapt){(scalar *)((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){0, 0.01, 0.01, 0.01},
-                           .maxlevel = maxlevel, .minlevel = minlevel});
+  astats s = adapt_wavelet((scalar *)((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){0, 0.01, 0.01, 0.01}
+, maxlevel, minlevel
+#line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
+, 
+all
+#line 671 "cylinder.c"
+);
   do { static const int too_fine = 1 << user; {foreach_cell() { if (is_leaf(cell)) continue; if (is_local(cell) && (!(x < X0 + 0.9 * L0) && level > outlevel)) cell.flags |= too_fine; }end_foreach_cell();} for (int _l = depth(); _l >= 0; _l--) { {foreach_cell() { if (is_leaf(cell)) continue; if (level == _l) { if (is_local(cell) && (cell.flags & too_fine)) { coarsen_cell (point, all); cell.flags &= ~too_fine; } continue; } }end_foreach_cell();} mpi_boundary_coarsen (_l, too_fine); } mpi_boundary_update (all); } while (0);
-  fractions_cleanup((struct Cleanup){cs, fs});
+  fractions_cleanup(cs, fs
+#line 293 "/home/lisergey/basilisk/src/embed.h"
+, 
+0., false
+#line 673 "cylinder.c"
+);
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
@@ -21630,10 +21657,10 @@ octree_methods();
       
     
       {  
-#line 896 "/home/lisergey/basilisk/src/embed.h"
-event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",896,"metric"});  
-#line 939
-event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",939,"defaults"});  
+#line 895 "/home/lisergey/basilisk/src/embed.h"
+event_register((Event){0,1,metric,{metric_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",895,"metric"});  
+#line 938
+event_register((Event){0,1,defaults,{defaults_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/embed.h",938,"defaults"});  
 #line 42 "/home/lisergey/basilisk/src/run.h"
 event_register((Event){0,1,defaults_0,{defaults_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/run.h",42,"defaults"});  
 #line 126 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
@@ -21659,7 +21686,7 @@ event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),(
       
 #line 22 "ast/init_solver.h"
 }
-#line 1255 "/home/lisergey/basilisk/src/common.h"
+#line 1254 "/home/lisergey/basilisk/src/common.h"
 init_const_vector((vector){{_NVARMAX+0},{_NVARMAX+1},{_NVARMAX+2}},"zerof",(double[]){0.,0.,0.});
 init_const_vector((vector){{_NVARMAX+3},{_NVARMAX+4},{_NVARMAX+5}},"unityf",(double[]){1.,1.,1.});
 init_const_scalar((scalar){_NVARMAX+6},"unity", 1.);
@@ -21669,7 +21696,7 @@ init_const_scalar((scalar){_NVARMAX+7},"zeroc", 0.);
 
 init_const_vector((vector){{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}},"unityf0",(double[]){1.,1.,1.});
 init_const_scalar((scalar){_NVARMAX+11},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_face_vector((vector){{1},{2},{3}},"fs"); 
-#line 462 "/home/lisergey/basilisk/src/embed.h"
+#line 461 "/home/lisergey/basilisk/src/embed.h"
 embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_face_vector((vector){{15},{16},{17}},"muv");  init_scalar((scalar){18},"l2");  init_vector((vector){{19},{20},{21}},"omega");  init_vertex_scalar((scalar){22},"phi");
     
 #line 23 "ast/init_solver.h"
