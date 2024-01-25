@@ -25,6 +25,7 @@ struct DumpHeader {
 };
 static struct DumpHeader header;
 static int *index;
+static double *values;
 static int m_level;
 static long traverse(int);
 static double X0, Y0, Z0, L0;
@@ -32,18 +33,19 @@ static const double shift[8][3] = {
     {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
     {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
 };
-static FILE *xyz_file;
+static FILE *xyz_file, *attr_file;
 static long ncell_total;
 
 int main(int argc, char **argv) {
   FILE *file;
-  long i, j;
+  long i, j, nvect, nattr;
   unsigned len;
-  char *input_path, name[1024];
+  char *input_path;
   int Verbose;
   double o[4];
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
       *xyz_base, *attr_base;
+  char **names;
   char *path = "a";
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
@@ -92,11 +94,13 @@ int main(int argc, char **argv) {
   fprintf(stderr, "depth: %d\n", header.depth);
   fprintf(stderr, "i: %d\n", header.i);
   fprintf(stderr, "n: [%g %g %g]\n", header.n.x, header.n.y, header.n.z);
+  names = malloc(header.len * sizeof *names);
   for (i = 0; i < header.len; i++) {
     FREAD(&len, sizeof len, 1);
-    FREAD(&name, sizeof *name, len);
-    name[len] = '\0';
-    fprintf(stderr, "name[%d]: %s\n", len, name);
+    names[i] = malloc((len + 1) * sizeof *names[i]);
+    FREAD(names[i], sizeof *names[i], len);
+    names[i][len] = '\0';
+    fprintf(stderr, "name[%d]: %s\n", len, names[i]);
   }
   FREAD(o, sizeof o, 1);
   fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
@@ -107,14 +111,24 @@ int main(int argc, char **argv) {
   fprintf(stderr, "size: %g\n", o[3]);
   m_level = 0;
   index = NULL;
+  values = malloc(header.len * sizeof *values);
   if ((xyz_file = fopen(xyz_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xyz_path);
+    return 1;
+  }
+  if ((attr_file = fopen(attr_path, "w")) == NULL) {
+    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
+            attr_path);
     return 1;
   }
   ncell_total = 0;
   traverse(0);
   if (fclose(xyz_file) != 0) {
     fprintf(stderr, "dump_info: error: fail to close '%s'\n", xyz_path);
+    exit(1);
+  }
+  if (fclose(attr_file) != 0) {
+    fprintf(stderr, "dump_info: error: fail to close '%s'\n", attr_path);
     exit(1);
   }
   free(index);
@@ -143,6 +157,31 @@ int main(int argc, char **argv) {
           "        </DataItem>\n"
           "      </Geometry>\n",
           ncell_total, 8 * ncell_total, xyz_base);
+  j = 0;
+  nvect = 0;
+  nattr = header.len;
+  for (i = 0; i < header.len; i++)
+    fprintf(file,
+            "      <Attribute\n"
+            "          Name=\"%s\"\n"
+            "          Center=\"Cell\">\n"
+            "        <DataItem\n"
+            "            ItemType=\"HyperSlab\"\n"
+            "            Dimensions=\"%ld\"\n"
+            "            Type=\"HyperSlab\">\n"
+            "          <DataItem Dimensions=\"3 1\">\n"
+            "            %ld %ld %ld\n"
+            "          </DataItem>\n"
+            "          <DataItem\n"
+            "              Precision=\"8\"\n"
+            "              Dimensions=\"%ld\"\n"
+            "              Format=\"Binary\">\n"
+            "            %s\n"
+            "          </DataItem>\n"
+            "         </DataItem>\n"
+            "      </Attribute>\n",
+            names[i], ncell_total, j++, nattr + 3 * nvect, ncell_total,
+            (nattr + 3 * nvect) * ncell_total, attr_base);
   fprintf(file, "    </Grid>\n"
                 "  </Domain>\n"
                 "</Xdmf>\n");
@@ -151,32 +190,35 @@ int main(int argc, char **argv) {
 
 static void process(int level) {
   int i, j;
-  double Delta, x, y, z;
+  double Delta, x, y, z, epsilon;
   float xyz[8 * 3];
   x = 0;
   y = 0;
   z = 0;
-  assert(level < header.depth + 2);
   for (i = 1; i <= level; i++) {
     Delta = L0 * (1. / (1 << i));
     x += Delta * (shift[index[i]][0] - 0.5);
     y += Delta * (shift[index[i]][1] - 0.5);
     z += Delta * (shift[index[i]][2] - 0.5);
   }
-  j = 0;
-  for (i = 0; i < 8; i++) {
-    xyz[j++] = x + Delta * (shift[i][0] - 0.5);
-    xyz[j++] = y + Delta * (shift[i][1] - 0.5);
-    xyz[j++] = z + Delta * (shift[i][2] - 0.5);
+  epsilon = Delta / 10;
+  if (z <= -epsilon && z + Delta + epsilon >= 0) {
+    j = 0;
+    for (i = 0; i < 8; i++) {
+      xyz[j++] = x + Delta * (shift[i][0] - 0.5);
+      xyz[j++] = y + Delta * (shift[i][1] - 0.5);
+      xyz[j++] = z + Delta * (shift[i][2] - 0.5);
+    }
+    if (fwrite(xyz, sizeof xyz, 1, xyz_file) != 1) {
+      fprintf(stderr, "dump_info: failed to write coordinates\n");
+      exit(1);
+    }
+    if (fwrite(values, sizeof *values, header.len, attr_file) != header.len) {
+      fprintf(stderr, "dump_info: failed to write attributes\n");
+      exit(1);
+    }
+    ncell_total++;
   }
-  if (fwrite(xyz, sizeof xyz, 1, xyz_file) != 1) {
-    fprintf(stderr, "dump_info: failed to write\n");
-    exit(1);
-  }
-  // fprintf(stderr, ": %g %g %g: %d %d %d\n", x, y, z, index[1], index[2],
-  // index[3]);
-  fprintf(stdout, "%d %d %d\n", index[1], index[2], index[3]);
-  ncell_total++;
 }
 
 static long traverse(int level) {
@@ -188,13 +230,10 @@ static long traverse(int level) {
   long size, size0;
   int i;
   FREAD(&flags, sizeof flags, 1);
-  for (i = 0; i < header.len; i++) {
-    FREAD(&val, sizeof val, 1);
-    if (i == 0)
-      size = val;
-  }
+  FREAD(values, sizeof *values, header.len);
+  size = values[0];
   size0 = 1;
-  if (level == 3)
+  if (flags & leaf)
     process(level);
   if (flags & leaf) {
     /* */
