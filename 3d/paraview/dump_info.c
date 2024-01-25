@@ -12,32 +12,25 @@
     exit(1);                                                                   \
   }
 
-#define FSEEK(offset)                                                          \
-  if (fseek(input_file, offset, SEEK_CUR) != 0) {                              \
-    fprintf(stderr, "dump_info: error: fseek failed in '%s'\n", input_path);   \
-    exit(1);                                                                   \
-  }
-
-static int is_leaf(unsigned flags) {
-  enum { leaf = 1 << 1 };
-  return (leaf & leaf) != 0;
-}
+static FILE *input_file;
+static char *input_path;
+struct coord {
+  double x, y, z;
+};
+struct DumpHeader {
+  double t;
+  long len;
+  int i, depth, npe, version;
+  struct coord n;
+};
+static struct DumpHeader header;
+static void traverse(int);
 
 int main(int argc, char **argv) {
   int Verbose;
   long i, j;
   unsigned len;
   char *input_path, name[1024];
-  FILE *input_file;
-  struct coord {
-    double x, y, z;
-  };
-  struct DumpHeader {
-    double t;
-    long len;
-    int i, depth, npe, version;
-    struct coord n;
-  } header;
 
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
@@ -83,46 +76,38 @@ int main(int argc, char **argv) {
   }
 
   double o[4];
-  unsigned flags, prev;
+  unsigned flags;
   double val, size;
-  long offset, icell;
-  int *pos;
-  int level;
+  int lev, l;
 
   FREAD(o, sizeof o, 1);
   fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
   fprintf(stderr, "size: %g\n", o[3]);
-  offset = header.len * sizeof(double) + sizeof(unsigned);
-  if ((pos = calloc(1 + header.depth, sizeof *pos)) == NULL) {
-    fprintf(stderr, "dump_info: error: calloc failed\n");
-    exit(1);
-  }
-
-  level = 0;
-  icell = 0;
-  for (;;) {
-    if (fread(&flags, sizeof flags, 1, input_file) != 1)
-      break;
-    for (i = 0; i < header.len; i++) {
-      FREAD(&val, sizeof val, 1);
-      if (i == 0)
-        size = val;
-    }
-    if (icell > 0) {
-      if (!is_leaf(flags) && is_leaf(prev))
-        level--;
-      else if (!is_leaf(flags) && !is_leaf(prev))
-        level++;
-    }
-    fprintf(stderr, "tree size: %d %d %ld\n", level, is_leaf(flags),
-            (long)size);
-    prev = flags;
-    icell++;
-  }
-
-  free(pos);
+  traverse(0);
   if (fclose(input_file) != 0) {
     fprintf(stderr, "dump_info: error: fail to close '%s'\n", input_path);
     exit(1);
   }
+}
+
+static void traverse(int lvl) {
+  double o[4];
+  unsigned flags;
+  double val;
+  long size;
+  long offset, icell;
+  long *cnt;
+  int lev, l;
+  long i, j;
+  FREAD(&flags, sizeof flags, 1);
+  for (i = 0; i < header.len; i++) {
+    FREAD(&val, sizeof val, 1);
+    if (i == 0)
+      size = val;
+  }
+  if (lvl < 3)
+    fprintf(stderr, "lvl: %d %ld\n", lvl, size);
+  if (size != 1)
+    for (i = 0; i < 8; i++)
+      traverse(lvl + 1);
 }
