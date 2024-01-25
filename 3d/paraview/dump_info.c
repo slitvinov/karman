@@ -24,14 +24,14 @@ struct DumpHeader {
   struct coord n;
 };
 static struct DumpHeader header;
-static void traverse(int);
+static void traverse(int, int);
 
 int main(int argc, char **argv) {
-  int Verbose;
-  long i, j;
+  long i;
   unsigned len;
   char *input_path, name[1024];
-
+  int Verbose;
+  double o[4];
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -75,39 +75,33 @@ int main(int argc, char **argv) {
     fprintf(stderr, "name[%d]: %s\n", len, name);
   }
 
-  double o[4];
-  unsigned flags;
-  double val, size;
-  int lev, l;
-
   FREAD(o, sizeof o, 1);
   fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
   fprintf(stderr, "size: %g\n", o[3]);
-  traverse(0);
+  traverse(0, 0);
   if (fclose(input_file) != 0) {
     fprintf(stderr, "dump_info: error: fail to close '%s'\n", input_path);
     exit(1);
   }
 }
 
-static void traverse(int lvl) {
-  double o[4];
+static void process(int lvl, int index) {
+  fprintf(stderr, "lvl: %d %d\n", lvl, index);
+}
+
+static void traverse(int lvl, int index) {
   unsigned flags;
-  double val;
-  long size;
-  long offset, icell;
-  long *cnt;
-  int lev, l;
-  long i, j;
+  double val, size;
+  int i;
   FREAD(&flags, sizeof flags, 1);
   for (i = 0; i < header.len; i++) {
     FREAD(&val, sizeof val, 1);
     if (i == 0)
       size = val;
   }
-  if (lvl < 3)
-    fprintf(stderr, "lvl: %d %ld\n", lvl, size);
-  if (size != 1)
+  if (size == 1 || lvl + 1 == 4) {
+    process(lvl + 1, index);
+  } else
     for (i = 0; i < 8; i++)
-      traverse(lvl + 1);
+      traverse(lvl + 1, i);
 }
