@@ -123,6 +123,7 @@ int main(int argc, char **argv) {
   }
   ncell_total = 0;
   traverse(0);
+  fprintf(stderr, "ncell_total: %ld\n", ncell_total);
   if (fclose(xyz_file) != 0) {
     fprintf(stderr, "dump_info: error: fail to close '%s'\n", xyz_path);
     exit(1);
@@ -190,7 +191,7 @@ int main(int argc, char **argv) {
 
 static void process(int level) {
   int i, j;
-  double Delta, x, y, z, epsilon;
+  double Delta, l2, x, y, z, epsilon;
   float xyz[8 * 3];
   x = 0;
   y = 0;
@@ -201,8 +202,10 @@ static void process(int level) {
     y += Delta * (shift[index[i]][1] - 0.5);
     z += Delta * (shift[index[i]][2] - 0.5);
   }
+  l2 = values[8];
   epsilon = Delta / 10;
-  if (z <= -epsilon && z + Delta + epsilon >= 0) {
+  if (l2 > -0.60 && l2 <= -0.40) {
+  //if (z <= -epsilon && z + Delta + epsilon >= 0) {
     j = 0;
     for (i = 0; i < 8; i++) {
       xyz[j++] = x + Delta * (shift[i][0] - 0.5);
