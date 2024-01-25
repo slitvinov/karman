@@ -24,7 +24,10 @@ struct DumpHeader {
   struct coord n;
 };
 static struct DumpHeader header;
-static void traverse(int, int);
+static int *index;
+static void traverse(int);
+
+static double X0, Y0, Z0, L0;
 
 int main(int argc, char **argv) {
   long i;
@@ -77,19 +80,33 @@ int main(int argc, char **argv) {
 
   FREAD(o, sizeof o, 1);
   fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
+  X0 = o[0];
+  Y0 = o[1];
+  Z0 = o[2];
+  L0 = o[3];
   fprintf(stderr, "size: %g\n", o[3]);
-  traverse(0, 0);
+
+  index = calloc(1 + header.depth, sizeof *index);
+  traverse(0);
+  free(index);
   if (fclose(input_file) != 0) {
     fprintf(stderr, "dump_info: error: fail to close '%s'\n", input_path);
     exit(1);
   }
 }
 
-static void process(int lvl, int index) {
-  fprintf(stderr, "lvl: %d %d\n", lvl, index);
+static void process(int level) {
+  int i;
+  double Delta;
+  Delta = L0 * (1. / (1 << level));
+  fprintf(stderr, "level[%d]", level);
+  for (i = 0; i <= level; i++)
+    fprintf(stderr, " %d", index[i]);
+  fprintf(stderr, ": %g", Delta);
+  fprintf(stderr, "\n");
 }
 
-static void traverse(int lvl, int index) {
+static void traverse(int level) {
   unsigned flags;
   double val, size;
   int i;
@@ -99,9 +116,9 @@ static void traverse(int lvl, int index) {
     if (i == 0)
       size = val;
   }
-  if (size == 1 || lvl + 1 == 4) {
-    process(lvl + 1, index);
+  if (size == 1 || level == 1) {
+    process(level);
   } else
-    for (i = 0; i < 8; i++)
-      traverse(lvl + 1, i);
+    for (index[level + 1] = 0; index[level + 1] < 8; index[level + 1]++)
+      traverse(level + 1);
 }
