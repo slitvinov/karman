@@ -5,6 +5,7 @@ PREFIX = $(HOME)/.local
 CFLAGS = -O3 -g
 M = \
 dump_info \
+dump_select \
 
 all: $M
 .c:; $(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
