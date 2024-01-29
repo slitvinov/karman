@@ -94,7 +94,10 @@ int main(int argc, char **argv) {
   fprintf(stderr, "depth: %d\n", header.depth);
   fprintf(stderr, "i: %d\n", header.i);
   fprintf(stderr, "n: [%g %g %g]\n", header.n.x, header.n.y, header.n.z);
-  names = malloc(header.len * sizeof *names);
+  if ((names = malloc(header.len * sizeof *names)) == NULL) {
+    fprintf(stderr, "dump_info: error: malloc failed\n");
+    exit(1);
+  }
   for (i = 0; i < header.len; i++) {
     FREAD(&len, sizeof len, 1);
     names[i] = malloc((len + 1) * sizeof *names[i]);
@@ -111,7 +114,10 @@ int main(int argc, char **argv) {
   fprintf(stderr, "size: %g\n", o[3]);
   m_level = 0;
   index = NULL;
-  values = malloc(header.len * sizeof *values);
+  if ((values = malloc(header.len * sizeof *values)) == NULL) {
+    fprintf(stderr, "dump_info: error: malloc failed\n");
+    exit(1);
+  }
   if ((xyz_file = fopen(xyz_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xyz_path);
     return 1;
@@ -187,6 +193,9 @@ int main(int argc, char **argv) {
                 "  </Domain>\n"
                 "</Xdmf>\n");
   fclose(file);
+  for (i = 0; i < header.len; i++)
+    free(names[i]);
+  free(names);
 }
 
 static void process(int level) {
