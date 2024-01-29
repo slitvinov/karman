@@ -6,6 +6,7 @@ CFLAGS = -O3 -g
 M = \
 dump_info \
 dump_select \
+dump_2iso \
 
 all: $M
 .c:; $(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
