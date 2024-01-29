@@ -8,7 +8,7 @@
 
 #define FREAD(ptr, size, nmemb)                                                \
   if (fread(ptr, size, nmemb, input_file) != (uint64_t)(nmemb)) {              \
-    fprintf(stderr, "dump_info: error: fail to read from '%s'\n", input_path); \
+    fprintf(stderr, "dump_select: error: fail to read from '%s'\n", input_path); \
     exit(1);                                                                   \
   }
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-              "Usage: dump_info [-h] [-v] file.dump\n"
+              "Usage: dump_select [-h] [-v] file.dump\n"
               "Options:\n"
               "  -h                          Print help message and exit\n"
               "  -v                          Verbose\n"
@@ -74,16 +74,16 @@ int main(int argc, char **argv) {
       Verbose = 1;
       break;
     default:
-      fprintf(stderr, "dump_info: error: unknown option '%s'\n", *argv);
+      fprintf(stderr, "dump_select: error: unknown option '%s'\n", *argv);
       exit(1);
     }
   if ((input_path = argv[0]) == NULL) {
-    fprintf(stderr, "dump_info: error: file.dump xois not given\n");
+    fprintf(stderr, "dump_select: error: file.dump xois not given\n");
     exit(1);
   }
 
   if ((input_file = fopen(input_path, "r")) == NULL) {
-    fprintf(stderr, "dump_info: error: fail to open '%s'\n", input_path);
+    fprintf(stderr, "dump_select: error: fail to open '%s'\n", input_path);
     exit(1);
   }
   FREAD(&header, sizeof header, 1);
@@ -125,16 +125,16 @@ int main(int argc, char **argv) {
   traverse(0);
   fprintf(stderr, "ncell_total: %ld\n", ncell_total);
   if (fclose(xyz_file) != 0) {
-    fprintf(stderr, "dump_info: error: fail to close '%s'\n", xyz_path);
+    fprintf(stderr, "dump_select: error: fail to close '%s'\n", xyz_path);
     exit(1);
   }
   if (fclose(attr_file) != 0) {
-    fprintf(stderr, "dump_info: error: fail to close '%s'\n", attr_path);
+    fprintf(stderr, "dump_select: error: fail to close '%s'\n", attr_path);
     exit(1);
   }
   free(index);
   if (fclose(input_file) != 0) {
-    fprintf(stderr, "dump_info: error: fail to close '%s'\n", input_path);
+    fprintf(stderr, "dump_select: error: fail to close '%s'\n", input_path);
     exit(1);
   }
   if ((file = fopen(xdmf_path, "w")) == NULL) {
@@ -213,11 +213,11 @@ static void process(int level) {
       xyz[j++] = z + Delta * (shift[i][2] - 0.5);
     }
     if (fwrite(xyz, sizeof xyz, 1, xyz_file) != 1) {
-      fprintf(stderr, "dump_info: failed to write coordinates\n");
+      fprintf(stderr, "dump_select: failed to write coordinates\n");
       exit(1);
     }
     if (fwrite(values, sizeof *values, header.len, attr_file) != header.len) {
-      fprintf(stderr, "dump_info: failed to write attributes\n");
+      fprintf(stderr, "dump_select: failed to write attributes\n");
       exit(1);
     }
     ncell_total++;
