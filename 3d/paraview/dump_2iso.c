@@ -7,13 +7,19 @@
 #include <string.h>
 
 #define FREAD(ptr, size, nmemb)                                                \
-  if (fread(ptr, size, nmemb, input_file) != (uint64_t)(nmemb)) {              \
-    fprintf(stderr, "dump_2iso: error: fail to read from '%s'\n", input_path); \
+  if (fread(ptr, size, nmemb, context->input_file) != (uint64_t)(nmemb)) {     \
+    fprintf(stderr, "dump_2iso: error: fail to read from '%s'\n",              \
+            context->input_path);                                              \
     exit(1);                                                                   \
   }
 
-static FILE *input_file;
-static char *input_path;
+#define FREAD0(ptr, size, nmemb)                                               \
+  if (fread(ptr, size, nmemb, context.input_file) != (uint64_t)(nmemb)) {      \
+    fprintf(stderr, "dump_2iso: error: fail to read from '%s'\n",              \
+            context.input_path);                                               \
+    exit(1);                                                                   \
+  }
+
 struct coord {
   double x, y, z;
 };
@@ -25,11 +31,14 @@ struct DumpHeader {
 };
 static long traverse(int, void (*)(int, void *), void *);
 static void process(int, void *);
+static void counter(int, void *);
 struct Context {
   struct DumpHeader header;
-  int *index, malloc_level;
+  int *index, malloc_level, m_level;
   double *values, X0, Y0, Z0, L0;
   long nleaf;
+  FILE *input_file;
+  char *input_path;
 };
 
 static const double shift[8][3] = {
@@ -38,7 +47,7 @@ static const double shift[8][3] = {
 };
 
 int main(int argc, char **argv) {
-  long i;
+  long i, input_offset;
   unsigned len;
   char *input_path;
   int Verbose;
@@ -68,11 +77,11 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  if ((input_file = fopen(input_path, "r")) == NULL) {
+  if ((context.input_file = fopen(input_path, "r")) == NULL) {
     fprintf(stderr, "dump_2iso: error: fail to open '%s'\n", input_path);
     exit(1);
   }
-  FREAD(&context.header, sizeof context.header, 1);
+  FREAD0(&context.header, sizeof context.header, 1);
   fprintf(stderr, "verbose: %d\n", context.header.version);
   fprintf(stderr, "t: %g\n", context.header.t);
   fprintf(stderr, "len: %ld\n", context.header.len);
@@ -86,13 +95,13 @@ int main(int argc, char **argv) {
     exit(1);
   }
   for (i = 0; i < context.header.len; i++) {
-    FREAD(&len, sizeof len, 1);
+    FREAD0(&len, sizeof len, 1);
     names[i] = malloc((len + 1) * sizeof *names[i]);
-    FREAD(names[i], sizeof *names[i], len);
+    FREAD0(names[i], sizeof *names[i], len);
     names[i][len] = '\0';
     fprintf(stderr, "name: %s\n", names[i]);
   }
-  FREAD(o, sizeof o, 1);
+  FREAD0(o, sizeof o, 1);
   fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
   context.X0 = o[0];
   context.Y0 = o[1];
@@ -106,23 +115,38 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: malloc failed\n");
     exit(1);
   }
+  context.m_level = 0;
+
+  input_offset = ftell(context.input_file);
+  traverse(0, counter, &context);
+  fprintf(stderr, "m_level: %d\n", context.m_level);
+
   context.nleaf = 0;
+  fseek(context.input_file, input_offset, SEEK_SET);
   traverse(0, process, &context);
+
   fprintf(stderr, "nleaf: %ld\n", context.nleaf);
   free(context.index);
   free(context.values);
   for (i = 0; i < context.header.len; i++)
     free(names[i]);
   free(names);
-  if (fclose(input_file) != 0) {
+  if (fclose(context.input_file) != 0) {
     fprintf(stderr, "dump_2iso: error: fail to close '%s'\n", input_path);
     exit(1);
   }
 }
 
+static void counter(int level, void *context_v) {
+  struct Context *context;
+  context = context_v;
+  if (level > context->m_level)
+    context->m_level = level;
+}
+
 static void process(int level, void *context_v) {
   int i;
-  double Delta, x, y, z;
+  int Delta, x, y, z;
   struct Context *context;
   context = context_v;
 
@@ -130,12 +154,13 @@ static void process(int level, void *context_v) {
   y = 0;
   z = 0;
   for (i = 1; i <= level; i++) {
-    Delta = context->L0 * (1. / (1 << i));
+    Delta = 1 << (context->m_level - i);
     x += Delta * shift[context->index[i]][0];
     y += Delta * shift[context->index[i]][1];
     z += Delta * shift[context->index[i]][2];
   }
-  //fprintf(stderr, "x, y, z: %g %g %g\n", x, y, z);
+  Delta = 1 << level;
+  fprintf(stderr, "%d: %d: [%d %d %d]\n", level, Delta, x, y, z);
   context->nleaf++;
 }
 
@@ -150,8 +175,8 @@ static long traverse(int level, void (*process)(int, void *), void *context_v) {
   FREAD(context->values, sizeof *context->values, context->header.len);
   size = context->values[0];
   size0 = 1;
-  if (flags & leaf)
-    process(level, context);
+  // if (flags & leaf)
+  process(level, context);
   if (flags & leaf) {
     /* */
   } else {
