@@ -8,7 +8,8 @@
 
 #define FREAD(ptr, size, nmemb)                                                \
   if (fread(ptr, size, nmemb, input_file) != (uint64_t)(nmemb)) {              \
-    fprintf(stderr, "dump_select: error: fail to read from '%s'\n", input_path); \
+    fprintf(stderr, "dump_select: error: fail to read from '%s'\n",            \
+            input_path);                                                       \
     exit(1);                                                                   \
   }
 
@@ -215,7 +216,7 @@ static void process(int level) {
   l2 = values[8];
   epsilon = Delta / 10;
   if (l2 > -0.60 && l2 <= -0.40) {
-  //if (z <= -epsilon && z + Delta + epsilon >= 0) {
+    // if (z <= -epsilon && z + Delta + epsilon >= 0) {
     j = 0;
     for (i = 0; i < 8; i++) {
       xyz[j++] = x + Delta * (shift[i][0] - 0.5);
@@ -226,7 +227,8 @@ static void process(int level) {
       fprintf(stderr, "dump_select: failed to write coordinates\n");
       exit(1);
     }
-    if (fwrite(values, sizeof *values, header.len, attr_file) != (size_t)header.len) {
+    if (fwrite(values, sizeof *values, header.len, attr_file) !=
+        (size_t)header.len) {
       fprintf(stderr, "dump_select: failed to write attributes\n");
       exit(1);
     }

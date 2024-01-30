@@ -47,11 +47,11 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-	      "Usage: dump_info [-h] [-v] file.dump\n"
-	      "Options:\n"
-	      "  -h                          Print help message and exit\n"
-	      "  -v                          Verbose\n"
-	      "  file.dump                   basilisk dump\n");
+              "Usage: dump_info [-h] [-v] file.dump\n"
+              "Options:\n"
+              "  -h                          Print help message and exit\n"
+              "  -v                          Verbose\n"
+              "  file.dump                   basilisk dump\n");
       exit(1);
     case 'v':
       Verbose = 1;

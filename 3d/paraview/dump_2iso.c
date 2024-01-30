@@ -36,9 +36,8 @@ struct Context {
   struct DumpHeader header;
   int *index, malloc_level, m_level;
   double *values, X0, Y0, Z0, L0;
-  long nleaf;
-  FILE *input_file;
-  char *input_path;
+  FILE *input_file, *cells_file, *scalars_file;
+  char *input_path, *cells_path, *scalars_path;
 };
 
 static const double shift[8][3] = {
@@ -49,7 +48,6 @@ static const double shift[8][3] = {
 int main(int argc, char **argv) {
   long i, input_offset;
   unsigned len;
-  char *input_path;
   int Verbose;
   double o[4];
   char **names;
@@ -72,13 +70,21 @@ int main(int argc, char **argv) {
       fprintf(stderr, "dump_2iso: error: unknown option '%s'\n", *argv);
       exit(1);
     }
-  if ((input_path = argv[0]) == NULL) {
-    fprintf(stderr, "dump_2iso: error: file.dump xois not given\n");
+  if ((context.input_path = argv[0]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: file.dump is not given\n");
     exit(1);
   }
-
-  if ((context.input_file = fopen(input_path, "r")) == NULL) {
-    fprintf(stderr, "dump_2iso: error: fail to open '%s'\n", input_path);
+  if ((context.cells_path = argv[1]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: in.cells is not given\n");
+    exit(1);
+  }
+  if ((context.scalars_path = argv[2]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: in.scalars is not given\n");
+    exit(1);
+  }
+  if ((context.input_file = fopen(context.input_path, "r")) == NULL) {
+    fprintf(stderr, "dump_2iso: error: fail to open '%s'\n",
+            context.input_path);
     exit(1);
   }
   FREAD0(&context.header, sizeof context.header, 1);
@@ -121,18 +127,37 @@ int main(int argc, char **argv) {
   traverse(0, counter, &context);
   fprintf(stderr, "m_level: %d\n", context.m_level);
 
-  context.nleaf = 0;
   fseek(context.input_file, input_offset, SEEK_SET);
+  if ((context.cells_file = fopen(context.cells_path, "w")) == NULL) {
+    fprintf(stderr, "dump_2iso: error: fail to open '%s'\n",
+            context.cells_path);
+    exit(1);
+  }
+  if ((context.scalars_file = fopen(context.scalars_path, "w")) == NULL) {
+    fprintf(stderr, "dump_2iso: error: fail to open '%s'\n",
+            context.scalars_path);
+    exit(1);
+  }
   traverse(0, process, &context);
 
-  fprintf(stderr, "nleaf: %ld\n", context.nleaf);
   free(context.index);
   free(context.values);
   for (i = 0; i < context.header.len; i++)
     free(names[i]);
   free(names);
   if (fclose(context.input_file) != 0) {
-    fprintf(stderr, "dump_2iso: error: fail to close '%s'\n", input_path);
+    fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
+            context.input_path);
+    exit(1);
+  }
+  if (fclose(context.cells_file) != 0) {
+    fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
+            context.cells_path);
+    exit(1);
+  }
+  if (fclose(context.scalars_file) != 0) {
+    fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
+            context.scalars_path);
     exit(1);
   }
 }
@@ -146,22 +171,33 @@ static void counter(int level, void *context_v) {
 
 static void process(int level, void *context_v) {
   int i;
-  int Delta, x, y, z;
+  int Delta;
+  int cell[4];
+  float val;
   struct Context *context;
   context = context_v;
-
-  x = 0;
-  y = 0;
-  z = 0;
+  cell[0] = 0;
+  cell[1] = 0;
+  cell[2] = 0;
   for (i = 1; i <= level; i++) {
     Delta = 1 << (context->m_level - i);
-    x += Delta * shift[context->index[i]][0];
-    y += Delta * shift[context->index[i]][1];
-    z += Delta * shift[context->index[i]][2];
+    cell[0] += Delta * shift[context->index[i]][0];
+    cell[1] += Delta * shift[context->index[i]][1];
+    cell[2] += Delta * shift[context->index[i]][2];
   }
-  Delta = 1 << level;
-  fprintf(stderr, "%d: %d: [%d %d %d]\n", level, Delta, x, y, z);
-  context->nleaf++;
+  cell[3] = context->m_level - level;
+  if (fwrite(cell, sizeof cell, 1, context->cells_file) != 1) {
+    fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
+            context->cells_path);
+    exit(1);
+  }
+
+  val = context->values[8];
+  if (fwrite(&val, sizeof(val), 1, context->scalars_file) != 1) {
+    fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
+            context->scalars_path);
+    exit(1);
+  }
 }
 
 static long traverse(int level, void (*process)(int, void *), void *context_v) {
@@ -170,13 +206,12 @@ static long traverse(int level, void (*process)(int, void *), void *context_v) {
   long size, size0;
   struct Context *context;
   context = context_v;
-
+  size0 = 1;
   FREAD(&flags, sizeof flags, 1);
   FREAD(context->values, sizeof *context->values, context->header.len);
   size = context->values[0];
-  size0 = 1;
-  // if (flags & leaf)
-  process(level, context);
+  if (flags & leaf)
+    process(level, context);
   if (flags & leaf) {
     /* */
   } else {
