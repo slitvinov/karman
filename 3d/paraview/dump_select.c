@@ -139,6 +139,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   free(index);
+  free(values);
   if (fclose(input_file) != 0) {
     fprintf(stderr, "dump_select: error: fail to close '%s'\n", input_path);
     exit(1);

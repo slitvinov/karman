@@ -107,9 +107,10 @@ int main(int argc, char **argv) {
     exit(1);
   }
   context.nleaf = 0;
-  traverse(0, process, NULL);
+  traverse(0, process, &context);
   fprintf(stderr, "nleaf: %ld\n", context.nleaf);
   free(context.index);
+  free(context.values);
   for (i = 0; i < context.header.len; i++)
     free(names[i]);
   free(names);
@@ -134,7 +135,7 @@ static void process(int level, void *context_v) {
     y += Delta * shift[context->index[i]][1];
     z += Delta * shift[context->index[i]][2];
   }
-  fprintf(stderr, "x, y, z: %g %g %g\n", x, y, z);
+  //fprintf(stderr, "x, y, z: %g %g %g\n", x, y, z);
   context->nleaf++;
 }
 
