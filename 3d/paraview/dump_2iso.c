@@ -139,7 +139,6 @@ static void process(int level) {
 static long traverse(int level) {
   enum { leaf = 2 };
   unsigned flags;
-  double val;
   long size, size0;
   FREAD(&flags, sizeof flags, 1);
   FREAD(values, sizeof *values, header.len);

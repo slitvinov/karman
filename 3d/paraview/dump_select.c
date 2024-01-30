@@ -225,7 +225,7 @@ static void process(int level) {
       fprintf(stderr, "dump_select: failed to write coordinates\n");
       exit(1);
     }
-    if (fwrite(values, sizeof *values, header.len, attr_file) != header.len) {
+    if (fwrite(values, sizeof *values, header.len, attr_file) != (size_t)header.len) {
       fprintf(stderr, "dump_select: failed to write attributes\n");
       exit(1);
     }
