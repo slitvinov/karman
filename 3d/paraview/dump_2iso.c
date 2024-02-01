@@ -36,8 +36,8 @@ struct Context {
   struct DumpHeader header;
   int *index, malloc_level, m_level;
   double *values, X0, Y0, Z0, L0;
-  FILE *input_file, *cells_file, *scalars_file;
-  char *input_path, *cells_path, *scalars_path;
+  FILE *input_file, *cells_file, *scalars_file, *field_file;
+  char *input_path, *cells_path, *scalars_path, *field_path;
 };
 
 static const double shift[8][3] = {
@@ -80,6 +80,10 @@ int main(int argc, char **argv) {
   }
   if ((context.scalars_path = argv[2]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.scalars is not given\n");
+    exit(1);
+  }
+  if ((context.field_path = argv[3]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: in.field is not given\n");
     exit(1);
   }
   if ((context.input_file = fopen(context.input_path, "r")) == NULL) {
@@ -138,6 +142,11 @@ int main(int argc, char **argv) {
             context.scalars_path);
     exit(1);
   }
+  if ((context.field_file = fopen(context.field_path, "w")) == NULL) {
+    fprintf(stderr, "dump_2iso: error: fail to open '%s'\n",
+            context.field_path);
+    exit(1);
+  }
   traverse(0, process, &context);
 
   free(context.index);
@@ -158,6 +167,11 @@ int main(int argc, char **argv) {
   if (fclose(context.scalars_file) != 0) {
     fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
             context.scalars_path);
+    exit(1);
+  }
+  if (fclose(context.field_file) != 0) {
+    fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
+            context.field_path);
     exit(1);
   }
 }
@@ -196,6 +210,13 @@ static void process(int level, void *context_v) {
   if (fwrite(&val, sizeof(val), 1, context->scalars_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
             context->scalars_path);
+    exit(1);
+  }
+
+  val = context->values[9];
+  if (fwrite(&val, sizeof(val), 1, context->field_file) != 1) {
+    fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
+            context->field_path);
     exit(1);
   }
 }
