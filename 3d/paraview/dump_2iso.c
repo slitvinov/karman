@@ -39,7 +39,7 @@ struct Context {
   FILE *input_file, *cells_file, *scalars_file, *field_file;
   char *input_path, *cells_path, *scalars_path, *field_path;
 };
-static const double shift[8][3] = {
+static const int shift[8][3] = {
     {0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
     {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1},
 };
