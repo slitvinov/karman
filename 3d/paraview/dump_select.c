@@ -45,7 +45,6 @@ int main(int argc, char **argv) {
   FILE *file;
   long i, j, nvect, nattr;
   unsigned len;
-  char *input_path;
   int Verbose;
   double o[4];
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],

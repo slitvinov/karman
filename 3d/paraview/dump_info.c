@@ -33,7 +33,6 @@ static long nleaf;
 int main(int argc, char **argv) {
   long i;
   unsigned len;
-  char *input_path;
   int Verbose;
   double o[4];
   char **names;
