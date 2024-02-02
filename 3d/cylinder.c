@@ -18,7 +18,6 @@ static const double diameter = 1;
 static const int outlevel = 7;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
-static long seed;
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
@@ -227,7 +226,6 @@ int main(int argc, char **argv) {
   ReynoldsFlag = 0;
   TendFlag = 0;
   Verbose = 0;
-  seed = -1;
   output_prefix = NULL;
   force_path = NULL;
   dump_path = NULL;
@@ -250,7 +248,6 @@ int main(int argc, char **argv) {
           "  -F          Output the full field\n"
           "  -b <string> Periodic boundary (ft|f|t: front (f), top (t) or both,"
           "default is symmetric boundary)\n"
-          "  -R <num>    Add random perturbation (positive integer)\n"
           "  -r <num>    Reynolds number\n"
           "  -l <num>    Minimum resolution level (positive integer)\n"
           "  -m <num>    Maximum resolution level (positive integer)\n"
@@ -307,19 +304,6 @@ int main(int argc, char **argv) {
         exit(1);
       }
       MinLevelFlag = 1;
-      break;
-    case 'R':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -R needs an argument\n");
-        exit(1);
-      }
-      seed = strtol(*argv, &end, 10);
-      if (*end != '\0' || minlevel <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
-      }
       break;
     case 'p':
       argv++;
@@ -603,18 +587,6 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
-
-  if (seed != -1) {
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: add random noise with seed %ld\n", seed);
-    srand(npe() + seed);
-    foreach ()
-      if (cs[] == 1) {
-        u.x[] = u.x[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.y[] = u.y[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
-        u.z[] = u.z[] + 0.01 * (1 - 2 * rand() / (double)RAND_MAX);
-      }
-  }
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
