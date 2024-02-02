@@ -1,4 +1,4 @@
-int output_xdmf(scalar *list, vector *vlist, const char *path) {
+int output_xdmf(double t, scalar *list, vector *vlist, const char *path) {
   float *xyz, *attr;
   long nattr, nvect, ncell, ncell_total, nsize, j, offset;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
@@ -99,6 +99,8 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "    Version=\"2\">\n"
             "  <Domain>\n"
             "    <Grid>\n"
+            "      <Time\n"
+            "          Value=\"%.16e\"/>\n"
             "      <Topology\n"
             "          TopologyType=\"Quadrilateral\"\n"
             "          Dimensions=\"%ld\"/>\n"
@@ -109,7 +111,7 @@ int output_xdmf(scalar *list, vector *vlist, const char *path) {
             "          %s\n"
             "        </DataItem>\n"
             "      </Geometry>\n",
-            ncell_total, 4 * ncell_total, xyz_base);
+            t, ncell_total, 4 * ncell_total, xyz_base);
     j = 0;
     for (scalar s in list)
       fprintf(file,
