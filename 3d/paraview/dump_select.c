@@ -31,6 +31,10 @@ static int m_level;
 static long traverse(int);
 static double X0, Y0, Z0, L0;
 static const double shift[8][3] = {
+    {0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
+    {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1},
+};
+static const double shift_vtk[8][3] = {
     {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
     {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
 };
@@ -219,9 +223,9 @@ static void process(int level) {
     // if (z <= -epsilon && z + Delta + epsilon >= 0) {
     j = 0;
     for (i = 0; i < 8; i++) {
-      xyz[j++] = x + Delta * (shift[i][0] - 0.5);
-      xyz[j++] = y + Delta * (shift[i][1] - 0.5);
-      xyz[j++] = z + Delta * (shift[i][2] - 0.5);
+      xyz[j++] = x + Delta * (shift_vtk[i][0] - 0.5);
+      xyz[j++] = y + Delta * (shift_vtk[i][1] - 0.5);
+      xyz[j++] = z + Delta * (shift_vtk[i][2] - 0.5);
     }
     if (fwrite(xyz, sizeof xyz, 1, xyz_file) != 1) {
       fprintf(stderr, "dump_select: failed to write coordinates\n");
