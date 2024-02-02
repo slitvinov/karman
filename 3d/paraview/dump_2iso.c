@@ -198,7 +198,7 @@ static void process(int level, void *context_v) {
     cell[1] += Delta * shift[context->index[i]][1];
     cell[2] += Delta * shift[context->index[i]][2];
   }
-  cell[3] = level // context->m_level - level;
+  cell[3] = level; // context->m_level - level;
   if (fwrite(cell, sizeof cell, 1, context->cells_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
             context->cells_path);
