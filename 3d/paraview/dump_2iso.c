@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-              "Usage: dump_2iso [-h] [-v] file.dump\n"
+              "Usage: dump_2iso [-h] [-v] file.dump in.cells in.scalar in.field\n"
               "Options:\n"
               "  -h                          Print help message and exit\n"
               "  -v                          Verbose\n"
