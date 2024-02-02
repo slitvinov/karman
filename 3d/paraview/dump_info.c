@@ -30,11 +30,6 @@ static int malloc_level;
 static long traverse(int);
 static double X0, Y0, Z0, L0;
 static long nleaf;
-static const double shift[8][3] = {
-    {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
-    {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
-};
-
 int main(int argc, char **argv) {
   long i;
   unsigned len;
@@ -115,24 +110,6 @@ int main(int argc, char **argv) {
 }
 
 static void process(int level) {
-  int i, j;
-  double Delta, x, y, z;
-  float xyz[8 * 3];
-  x = 0;
-  y = 0;
-  z = 0;
-  for (i = 1; i <= level; i++) {
-    Delta = L0 * (1. / (1 << i));
-    x += Delta * (shift[index[i]][0] - 0.5);
-    y += Delta * (shift[index[i]][1] - 0.5);
-    z += Delta * (shift[index[i]][2] - 0.5);
-  }
-  j = 0;
-  for (i = 0; i < 8; i++) {
-    xyz[j++] = x + Delta * (shift[i][0] - 0.5);
-    xyz[j++] = y + Delta * (shift[i][1] - 0.5);
-    xyz[j++] = z + Delta * (shift[i][2] - 0.5);
-  }
   nleaf++;
 }
 
