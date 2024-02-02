@@ -193,12 +193,12 @@ static void process(int level, void *context_v) {
   cell[1] = 0;
   cell[2] = 0;
   for (i = 1; i <= level; i++) {
-    Delta = 1 << (context->m_level - i + 1);
+    Delta = 1 << (context->m_level - i);
     cell[0] += Delta * shift[context->index[i]][0];
     cell[1] += Delta * shift[context->index[i]][1];
     cell[2] += Delta * shift[context->index[i]][2];
   }
-  cell[3] = context->m_level - level + 1;
+  cell[3] = context->m_level - level;
   if (fwrite(cell, sizeof cell, 1, context->cells_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
             context->cells_path);
