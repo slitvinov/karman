@@ -178,6 +178,14 @@ static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
+static double dist_sq(const double *a, const double *b) {
+  double dx, dy, dz;
+  dx = a[0] - b[0];
+  dy = a[1] - b[1];
+  dz = a[2] - b[2];
+  return dx * dx + dy * dy + dz * dz;
+}
+
 static void vorticity_vector(const vector u, vector omega) {
   foreach () {
     double delta;
@@ -560,13 +568,13 @@ event init(t = 0) {
       c[0] = stl_ver[j + 6];
       c[1] = stl_ver[j + 7];
       c[2] = stl_ver[j + 8];
-      dist2 = dot3(a, b);
+      dist2 = dist_sq(a, b);
       if (dist2 > m_dist2)
         m_dist2 = dist2;
-      dist2 = dot3(a, c);
+      dist2 = dist_sq(a, c);
       if (dist2 > m_dist2)
         m_dist2 = dist2;
-      dist2 = dot3(b, c);
+      dist2 = dist_sq(b, c);
       if (dist2 > m_dist2)
         m_dist2 = dist2;
     }
