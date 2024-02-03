@@ -478,7 +478,7 @@ int main(int argc, char **argv) {
 
 event init(t = 0) {
   int nc;
-  uint32_t i, j, stl_nt, stl_nv;
+  uint32_t i, j, irefine, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3];
 
@@ -553,13 +553,12 @@ event init(t = 0) {
     }
     //phi.refine = phi.prolongation = fraction_refine;
     predicate_ini();
-    for (;;) {
+    for (irefine = 0; irefine < 10; irefine++) {
       foreach_vertex() {
         if (box_lo[0] < x && x < box_hi[1] && box_lo[1] < x && x < box_hi[2] &&
             box_lo[1] < x && x < box_hi[2]) {
           double minimum;
-          uint32_t intersect;
-          uint32_t stl_i, j;
+          uint32_t intersect, stl_i, j;
           double a[3], b[3], c[3], e[3], s[3], dist2;
           intersect = 0;
           minimum = DBL_MAX;
@@ -584,15 +583,20 @@ event init(t = 0) {
             e[0] = s[0];
             e[1] = s[1];
             e[2] = s[2] + 2 * L0;
-
             dist2 = tri_point_distance2(a, b, c, s);
             if (dist2 < minimum)
               minimum = dist2;
             intersect += predicate_ray(s, e, a, b, c);
           }
           phi[] = intersect % 2 ? -minimum : minimum;
-        } else
-          phi[] = 0.125 * diameter;
+        } else {
+	  double dist;
+	  dist = 0;
+	  dist += fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
+	  dist += fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
+	  dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
+          phi[] = dist;
+	}
       }
       fractions(phi, cs, fs);
       nc = fractions_cleanup(cs, fs);

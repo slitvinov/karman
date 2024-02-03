@@ -1,6 +1,8 @@
 import struct
 import math
 import sys
+
+
 def circle(z, orient):
     i0 = len(ver)
     ver.append((0, 0, z))
@@ -18,6 +20,7 @@ def circle(z, orient):
         else:
             tri.append((a, b, c))
 
+
 def write(path, ver, tri):
     with open(path, "wb") as out:
         out.write(bytes(80 + 4))
@@ -28,14 +31,15 @@ def write(path, ver, tri):
             nt += 1
         out.seek(80)
         out.write(struct.pack('<I', nt))
-            
+
+
 L = 5
 R = 1
 n = 30
 ver = []
 tri = []
-circle(-L/2, True)
-circle(L/2, False)
+circle(-L / 2, True)
+circle(L / 2, False)
 for i in range(n):
     a = i + 1
     b = 1 if i == n - 1 else i + 2
