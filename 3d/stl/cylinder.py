@@ -44,4 +44,4 @@ for i in range(n):
     tri.append((a, b, c))
     tri.append((c, b, d))
 write("center.stl", ver, tri)
-write("trans.stl", [(z, y, x) for x, y, z in ver], tri)
+# write("trans.stl", [(z, y, x) for x, y, z in ver], tri)
