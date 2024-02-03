@@ -17,7 +17,7 @@ static char *dump_path;
 static const double diameter = 1;
 static const int outlevel = 7;
 static double reynolds, tend;
-static int maxlevel, minlevel, period, Surface, Verbose, FullOutput;
+static int maxlevel, minlevel, period, Verbose, FullOutput;
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
