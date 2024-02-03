@@ -46,7 +46,7 @@ zc = (zlo + zhi) / 2
 
 L = [xhi - xlo, yhi - ylo, zhi - zlo]
 ix, iy, iz = sorted([0, 1, 2], key=lambda i: L[i])
-scale = 2 / L[ix]
+scale = 1 / L[ix]
 R = [(x - xc) * scale, (y - yc) * scale, (z - zc) * scale]
 x, y, z = R[ix], R[iy], R[iz]
 sys.stderr.write("center.py: %g %g\ncenter.py: %g %g\ncenter.py: %g %g\n" %

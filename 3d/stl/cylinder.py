@@ -36,7 +36,7 @@ def write(path, ver, tri, flip):
 
 
 L = 5
-R = 1
+R = 0.5
 n = 30
 ver = []
 tri = []
