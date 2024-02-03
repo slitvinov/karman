@@ -477,6 +477,7 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
+  int nc;
   uint32_t i, j, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3];
@@ -550,7 +551,7 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: STL bounding box hi: %.16e %.16e %.16e\n",
               box_hi[0], box_hi[1], box_hi[2]);
     }
-    // phi.refine = phi.prolongation = fraction_refine;
+    //phi.refine = phi.prolongation = fraction_refine;
     predicate_ini();
     for (;;) {
       foreach_vertex() {
@@ -594,11 +595,11 @@ event init(t = 0) {
           phi[] = 0.125 * diameter;
       }
       fractions(phi, cs, fs);
-      fractions_cleanup(cs, fs);
+      nc = fractions_cleanup(cs, fs);
       astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
                                minlevel = minlevel);
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+        fprintf(stderr, "cylinder: refined/cleaned %d/%d cells\n", s.nf, nc);
       if (s.nf == 0)
         break;
     }
