@@ -443,7 +443,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if (shape == NULL && stl_path == NULL) {
-    fprintf(stderr, "cylinder: error: either -S or -s\n");
+    fprintf(stderr, "cylinder: error: either -S or -s must be set\n");
     exit(1);
   }
   if (Verbose && pid() == 0)
@@ -477,9 +477,10 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
-  uint32_t stl_i, stl_nt;
+  uint32_t i, j, stl_nt, stl_nv;
   FILE *stl_file;
-  float *stl_ver;
+  float *stl_ver, box_lo[3], box_hi[3];
+
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
     refine(x < X0 + 0.9 * L0 && level < minlevel);
@@ -520,9 +521,9 @@ event init(t = 0) {
     }
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: triangles in STL file: %d\n", stl_nt);
-    for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+    for (i = 0; i < stl_nt; i++) {
       fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
-      if (fread(&stl_ver[9 * stl_i], sizeof *stl_ver, 9, stl_file) != 9) {
+      if (fread(&stl_ver[9 * i], sizeof *stl_ver, 9, stl_file) != 9) {
         fprintf(stderr, "cylinder: error: fail to read '%s'\n", stl_path);
         exit(1);
       }
@@ -532,52 +533,75 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
       exit(1);
     }
-    phi.refine = phi.prolongation = fraction_refine;
-    refine(sq(x) + sq(y) <= sq(diameter) && sq(x) + sq(y) >= sq(diameter / 2) &&
-           level < maxlevel);
-    predicate_ini();
-    foreach_vertex() {
-      if (sq(x) + sq(y) <= sq(1.25 * diameter / 2) &&
-          sq(x) + sq(y) >= sq(0.75 * diameter / 2)) {
-        double minimum;
-        uint32_t intersect;
-        uint32_t stl_i, j;
-        double a[3], b[3], c[3], e[3], s[3], dist2;
-        intersect = 0;
-        minimum = DBL_MAX;
-        for (stl_i = 0; stl_i < stl_nt; stl_i++) {
-          j = 9 * stl_i;
-          a[0] = stl_ver[j];
-          a[1] = stl_ver[j + 1];
-          a[2] = stl_ver[j + 2];
-
-          b[0] = stl_ver[j + 3];
-          b[1] = stl_ver[j + 4];
-          b[2] = stl_ver[j + 5];
-
-          c[0] = stl_ver[j + 6];
-          c[1] = stl_ver[j + 7];
-          c[2] = stl_ver[j + 8];
-
-          s[0] = x;
-          s[1] = y;
-          s[2] = z;
-
-          e[0] = s[0];
-          e[1] = s[1];
-          e[2] = s[2] + 2 * L0;
-
-          dist2 = tri_point_distance2(a, b, c, s);
-          if (dist2 < minimum)
-            minimum = dist2;
-          intersect += predicate_ray(s, e, a, b, c);
-        }
-        phi[] = intersect % 2 ? -minimum : minimum;
-      } else
-        phi[] = 0.25 * diameter / 2;
+    box_lo[0] = box_lo[1] = box_lo[2] = FLT_MAX;
+    box_hi[0] = box_hi[1] = box_hi[2] = -FLT_MAX;
+    stl_nv = 3 * stl_nt;
+    for (i = 0; i < stl_nv; i++) {
+      for (j = 0; j < 3; j++) {
+        if (stl_ver[3 * i + j] < box_lo[j])
+          box_lo[j] = stl_ver[3 * i + j];
+        if (stl_ver[3 * i + j] > box_hi[j])
+          box_hi[j] = stl_ver[3 * i + j];
+      }
     }
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: exported geometry\n");
+    if (Verbose && pid() == 0) {
+      fprintf(stderr, "cylinder: STL bounding box lo: %.16e %.16e %.16e\n",
+              box_lo[0], box_lo[1], box_lo[2]);
+      fprintf(stderr, "cylinder: STL bounding box hi: %.16e %.16e %.16e\n",
+              box_hi[0], box_hi[1], box_hi[2]);
+    }
+    // phi.refine = phi.prolongation = fraction_refine;
+    predicate_ini();
+    for (;;) {
+      foreach_vertex() {
+        if (box_lo[0] < x && x < box_hi[1] && box_lo[1] < x && x < box_hi[2] &&
+            box_lo[1] < x && x < box_hi[2]) {
+          double minimum;
+          uint32_t intersect;
+          uint32_t stl_i, j;
+          double a[3], b[3], c[3], e[3], s[3], dist2;
+          intersect = 0;
+          minimum = DBL_MAX;
+          for (stl_i = 0; stl_i < stl_nt; stl_i++) {
+            j = 9 * stl_i;
+            a[0] = stl_ver[j];
+            a[1] = stl_ver[j + 1];
+            a[2] = stl_ver[j + 2];
+
+            b[0] = stl_ver[j + 3];
+            b[1] = stl_ver[j + 4];
+            b[2] = stl_ver[j + 5];
+
+            c[0] = stl_ver[j + 6];
+            c[1] = stl_ver[j + 7];
+            c[2] = stl_ver[j + 8];
+
+            s[0] = x;
+            s[1] = y;
+            s[2] = z;
+
+            e[0] = s[0];
+            e[1] = s[1];
+            e[2] = s[2] + 2 * L0;
+
+            dist2 = tri_point_distance2(a, b, c, s);
+            if (dist2 < minimum)
+              minimum = dist2;
+            intersect += predicate_ray(s, e, a, b, c);
+          }
+          phi[] = intersect % 2 ? -minimum : minimum;
+        } else
+          phi[] = 0.125 * diameter;
+      }
+      fractions(phi, cs, fs);
+      fractions_cleanup(cs, fs);
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+                               minlevel = minlevel);
+      if (Verbose && pid() == 0)
+        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+        break;
+    }
     free(stl_ver);
   }
 
