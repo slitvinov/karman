@@ -572,7 +572,7 @@ event init(t = 0) {
             minimum = dist2;
           intersect += predicate_ray(s, e, a, b, c);
         }
-        phi[] = intersect % 2 ? -dist2 : dist2;
+        phi[] = intersect % 2 ? -minimum : minimum;
       } else
         phi[] = 0.25 * diameter / 2;
     }
