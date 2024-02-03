@@ -589,8 +589,7 @@ event init(t = 0) {
     predicate_ini();
     for (irefine = 0; irefine < 10; irefine++) {
       foreach_vertex() {
-        if (box_lo[0] < x && x < box_hi[0] &&
-	    box_lo[1] < y && y < box_hi[1] &&
+        if (box_lo[0] < x && x < box_hi[0] && box_lo[1] < y && y < box_hi[1] &&
             box_lo[2] < z && z < box_hi[2]) {
           double minimum;
           uint32_t intersect, stl_i, j;
