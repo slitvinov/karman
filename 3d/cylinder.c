@@ -481,6 +481,7 @@ event init(t = 0) {
   uint32_t i, j, irefine, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3];
+  double dist2, m_dist2, a[3], b[3], c[3];
 
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
@@ -545,13 +546,38 @@ event init(t = 0) {
           box_hi[j] = stl_ver[3 * i + j];
       }
     }
+    m_dist2 = 0;
+    for (i = 0; i < stl_nt; i++) {
+      j = 9 * i;
+      a[0] = stl_ver[j];
+      a[1] = stl_ver[j + 1];
+      a[2] = stl_ver[j + 2];
+
+      b[0] = stl_ver[j + 3];
+      b[1] = stl_ver[j + 4];
+      b[2] = stl_ver[j + 5];
+
+      c[0] = stl_ver[j + 6];
+      c[1] = stl_ver[j + 7];
+      c[2] = stl_ver[j + 8];
+      dist2 = dot3(a, b);
+      if (dist2 > m_dist2)
+        m_dist2 = dist2;
+      dist2 = dot3(a, c);
+      if (dist2 > m_dist2)
+        m_dist2 = dist2;
+      dist2 = dot3(b, c);
+      if (dist2 > m_dist2)
+        m_dist2 = dist2;
+    }
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: STL bounding box lo: %.16e %.16e %.16e\n",
               box_lo[0], box_lo[1], box_lo[2]);
       fprintf(stderr, "cylinder: STL bounding box hi: %.16e %.16e %.16e\n",
               box_hi[0], box_hi[1], box_hi[2]);
+      fprintf(stderr, "triangle m_dist: %.16e\n", sqrt(m_dist2));
     }
-    //phi.refine = phi.prolongation = fraction_refine;
+    // phi.refine = phi.prolongation = fraction_refine;
     predicate_ini();
     for (irefine = 0; irefine < 10; irefine++) {
       foreach_vertex() {
@@ -590,13 +616,13 @@ event init(t = 0) {
           }
           phi[] = intersect % 2 ? -minimum : minimum;
         } else {
-	  double dist;
-	  dist = 0;
-	  dist += fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
-	  dist += fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
-	  dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
+          double dist;
+          dist = 0;
+          dist += fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
+          dist += fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
+          dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
           phi[] = dist;
-	}
+        }
       }
       fractions(phi, cs, fs);
       nc = fractions_cleanup(cs, fs);
