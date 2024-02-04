@@ -637,7 +637,8 @@ event init(t = 0) {
       nc1 = fractions_cleanup(cs, fs);
       astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = level,
                                minlevel = minlevel);
-      nc2 = fractions_cleanup(cs, fs);
+      // nc2 = fractions_cleanup(cs, fs);
+      nc2 = 0;
       if (Verbose && pid() == 0)
         fprintf(stderr, "cylinder: refined/cleaned1/cleaned2: %d/%d/%d cells\n",
                 s.nf, nc1, nc2);
