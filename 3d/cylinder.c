@@ -588,7 +588,7 @@ event init(t = 0) {
       fprintf(stderr, "triangle m_dist: %.16e\n", sqrt(m_dist2));
     }
     //phi.refine = phi.prolongation = fraction_refine;
-    phi.prolongation = refine_bilinear;
+    //phi.prolongation = refine_bilinear;
     predicate_ini();
     for (;;) {
       foreach_vertex() {
