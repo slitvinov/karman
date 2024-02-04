@@ -488,7 +488,7 @@ event init(t = 0) {
   int nc1, nc2;
   uint32_t i, j, level, stl_nt, stl_nv;
   FILE *stl_file;
-  float *stl_ver, box_lo[3], box_hi[3];
+  float *stl_ver, box_lo[3], box_hi[3], L;
   double dist2, m_dist2, a[3], b[3], c[3];
 
   if (dump_path == NULL) {
@@ -543,8 +543,11 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: error: fail to close '%s'\n", stl_path);
       exit(1);
     }
-    box_lo[0] = box_lo[1] = box_lo[2] = FLT_MAX;
-    box_hi[0] = box_hi[1] = box_hi[2] = -FLT_MAX;
+    for (j = 0; j < 3; j++) {
+      L = box_hi[j] - box_lo[j];
+      box_lo[j] -= 0.1 * L;
+      box_hi[j] += 0.1 * L;
+    }
     stl_nv = 3 * stl_nt;
     for (i = 0; i < stl_nv; i++) {
       for (j = 0; j < 3; j++) {
