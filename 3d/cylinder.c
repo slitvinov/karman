@@ -218,7 +218,7 @@ u.t[embed] = dirichlet(0);
 face vector muv[];
 static scalar l2[];
 static vector omega[];
-static vertex scalar phi[];
+static scalar phi[];
 
 int main(int argc, char **argv) {
   char *end;
@@ -586,6 +586,7 @@ event init(t = 0) {
       fprintf(stderr, "triangle m_dist: %.16e\n", sqrt(m_dist2));
     }
     //phi.refine = phi.prolongation = fraction_refine;
+    phi.prolongation = refine_bilinear;
     predicate_ini();
     for (level = minlevel + 1; level <= maxlevel; level++) {
       foreach_vertex() {
