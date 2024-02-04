@@ -21321,15 +21321,14 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 
 #line 487
       static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",487); {
-  int nc1, nc2;
-  uint32_t i, j, level, stl_nt, stl_nv;
+  uint32_t i, j, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3], L;
   double dist2, m_dist2, a[3], b[3], c[3];
 
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 496); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 495); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
   } else {
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: reading dump '%s'\n", dump_path);
@@ -21338,13 +21337,13 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
 , 
 NULL, 
 NULL
-#line 500 "cylinder.c"
+#line 499 "cylinder.c"
 );
     fractions_cleanup(cs, fs
 #line 293 "/home/lisergey/basilisk/src/embed.h"
 , 
 0., false
-#line 501 "cylinder.c"
+#line 500 "cylinder.c"
 );
   }
 
@@ -21353,22 +21352,22 @@ NULL
       do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions (phi, cs, fs
 #line 122 "/home/lisergey/basilisk/src/fractions.h"
 , 0.
-#line 506 "cylinder.c"
+#line 505 "cylinder.c"
 );delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
       astats s = adapt_wavelet(
-#line 507 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 506 "/home/lisergey/basilisk/src/grid/tree-common.h"
 (
 #line 173
 scalar *
-#line 507
+#line 506
 )
-#line 507 "cylinder.c"
+#line 506 "cylinder.c"
 ((scalar[]){cs,{-1}}), (double[]){0}, maxlevel
 , minlevel
 #line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
 , 
 all
-#line 508 "cylinder.c"
+#line 507 "cylinder.c"
 );
       if (Verbose && pid() == 0)
         fprintf(ferr, "cylinder: refined %d cells\n", s.nf);
@@ -21379,7 +21378,7 @@ all
 #line 293 "/home/lisergey/basilisk/src/embed.h"
 , 
 0., false
-#line 514 "cylinder.c"
+#line 513 "cylinder.c"
 );
   } else {
     if ((stl_file = fopen(stl_path, "r")) == NULL) {
@@ -21460,7 +21459,7 @@ all
 
     _attribute[phi.i].prolongation = refine_bilinear;
     predicate_ini();
-    for (level = minlevel + 1; level <= maxlevel; level++) {
+    for (;;) {
       foreach_vertex_stencil() {             
         
         
@@ -21504,10 +21503,10 @@ all
                          
                   
       
-#line 635
+#line 634
 }end_foreach_vertex_stencil();
       {
-#line 595
+#line 594
 foreach_vertex() {
         uint32_t intersect, stl_i, j;
         double a[3], b[3], c[3], e[3], s[3], dist2, dx, dy, dz, minimum;
@@ -21552,66 +21551,65 @@ foreach_vertex() {
       fractions(phi, cs, fs
 #line 122 "/home/lisergey/basilisk/src/fractions.h"
 , 0.
-#line 636 "cylinder.c"
-);
-      nc1 = fractions_cleanup(cs, fs
-#line 293 "/home/lisergey/basilisk/src/embed.h"
-, 
-0., false
-#line 637 "cylinder.c"
+#line 635 "cylinder.c"
 );
       astats s = adapt_wavelet(
-#line 638 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 636 "/home/lisergey/basilisk/src/grid/tree-common.h"
 (
 #line 173
 scalar *
-#line 638
+#line 636
 )
-#line 638 "cylinder.c"
-((scalar[]){cs,{-1}}), (double[]){0}, level
+#line 636 "cylinder.c"
+((scalar[]){cs,{-1}}), (double[]){0}, maxlevel
 , minlevel
 #line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
 , 
 all
-#line 639 "cylinder.c"
+#line 637 "cylinder.c"
 );
-
-      nc2 = 0;
       if (Verbose && pid() == 0)
-        fprintf(ferr, "cylinder: refined/cleaned1/cleaned2: %d/%d/%d cells\n",
-                s.nf, nc1, nc2);
+        fprintf(ferr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+ break;
     }
+    fractions_cleanup(cs, fs
+#line 293 "/home/lisergey/basilisk/src/embed.h"
+, 
+0., false
+#line 643 "cylinder.c"
+);
     pfree(stl_ver,__func__,__FILE__,__LINE__);
   }
 
   if (dump_path == NULL)
     {
     
-#line 650
+#line 648
 foreach_stencil () {
       _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
       _stencil_val_a(u.y,0,0,0);  
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();{
-#line 650
+#line 648
 foreach () {
       val(u.x,0,0,0) = val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
       val(u.z,0,0,0) = 0;
     }end_foreach();}}
-}{end_tracing("init_0","cylinder.c",655);return 0;}end_tracing("init_0","cylinder.c",655);}
+}{end_tracing("init_0","cylinder.c",653);return 0;}end_tracing("init_0","cylinder.c",653);}
 
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 657
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",657); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",657);return 0;}end_tracing("properties_0","cylinder.c",657);}
+#line 655
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",655); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);     }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);     }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);     }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x * diameter / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y * diameter / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z * diameter / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",655);return 0;}end_tracing("properties_0","cylinder.c",655);}
 
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 659
-      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",659); {
+#line 657
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",657); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -21639,7 +21637,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 all, 
 NULL, 
 false
-#line 681 "cylinder.c"
+#line 679 "cylinder.c"
 );
       }
     }
@@ -21671,19 +21669,19 @@ false
 #line 176 "/home/lisergey/basilisk/src/grid/tree-common.h"
 , 
 all
-#line 708 "cylinder.c"
+#line 706 "cylinder.c"
 );
   do { static const int too_fine = 1 << user; {foreach_cell() { if (is_leaf(cell)) continue; if (is_local(cell) && (!(x < X0 + 0.9 * L0) && level > outlevel)) cell.flags |= too_fine; }end_foreach_cell();} for (int _l = depth(); _l >= 0; _l--) { {foreach_cell() { if (is_leaf(cell)) continue; if (level == _l) { if (is_local(cell) && (cell.flags & too_fine)) { coarsen_cell (point, all); cell.flags &= ~too_fine; } continue; } }end_foreach_cell();} mpi_boundary_coarsen (_l, too_fine); } mpi_boundary_update (all); } while (0);
   fractions_cleanup(cs, fs
 #line 293 "/home/lisergey/basilisk/src/embed.h"
 , 
 0., false
-#line 710 "cylinder.c"
+#line 708 "cylinder.c"
 );
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
-}{end_tracing("velocity","cylinder.c",714);return 0;}end_tracing("velocity","cylinder.c",714);}
+}{end_tracing("velocity","cylinder.c",712);return 0;}end_tracing("velocity","cylinder.c",712);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -21727,8 +21725,8 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
 #line 487 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",487,"init"});  
-#line 659
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",659,"velocity"});
+#line 657
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",657,"velocity"});
 	
 	
 	
@@ -21795,8 +21793,8 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",446,"adapt"});  
-#line 657 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",657,"properties"});
+#line 655 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",655,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
