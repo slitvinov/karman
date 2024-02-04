@@ -485,7 +485,7 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
-  int nc;
+  int nc1, nc2;
   uint32_t i, j, level, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3];
@@ -589,8 +589,8 @@ event init(t = 0) {
     predicate_ini();
     for (level = minlevel + 1; level <= maxlevel; level++) {
       foreach_vertex() {
-	uint32_t intersect, stl_i, j;
-	double a[3], b[3], c[3], e[3], s[3], dist2, dx, dy, dz, minimum;
+        uint32_t intersect, stl_i, j;
+        double a[3], b[3], c[3], e[3], s[3], dist2, dx, dy, dz, minimum;
         if (box_lo[0] < x && x < box_hi[0] && box_lo[1] < y && y < box_hi[1] &&
             box_lo[2] < z && z < box_hi[2]) {
           intersect = 0;
@@ -623,18 +623,20 @@ event init(t = 0) {
           }
           phi[] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
         } else {
-	  dx = fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
+          dx = fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
           dy = fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
           dz = fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
-          phi[] = - sqrt(dx * dx + dy * dy + dz * dz);
+          phi[] = -sqrt(dx * dx + dy * dy + dz * dz);
         }
       }
       fractions(phi, cs, fs);
-      nc = fractions_cleanup(cs, fs);
+      nc1 = fractions_cleanup(cs, fs);
       astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = level,
                                minlevel = minlevel);
+      nc2 = fractions_cleanup(cs, fs);
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: refined/cleaned %d/%d cells\n", s.nf, nc);
+        fprintf(stderr, "cylinder: refined/cleaned1/cleaned2: %d/%d/%d cells\n",
+                s.nf, nc1, nc2);
     }
     free(stl_ver);
   }
