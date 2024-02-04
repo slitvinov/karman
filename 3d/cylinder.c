@@ -631,8 +631,6 @@ event init(t = 0) {
           dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
           phi[] = -dist;
         }
-        if (phi[0] > 0)
-          fprintf(stdout, "%g %g %g\n", x, y, z);
       }
       fractions(phi, cs, fs);
       nc = fractions_cleanup(cs, fs);
