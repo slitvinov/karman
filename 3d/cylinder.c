@@ -589,11 +589,10 @@ event init(t = 0) {
     predicate_ini();
     for (irefine = 0; irefine < 10; irefine++) {
       foreach_vertex() {
+	uint32_t intersect, stl_i, j;
+	double a[3], b[3], c[3], e[3], s[3], dist2, dx, dy, dz, minimum;
         if (box_lo[0] < x && x < box_hi[0] && box_lo[1] < y && y < box_hi[1] &&
             box_lo[2] < z && z < box_hi[2]) {
-          double minimum;
-          uint32_t intersect, stl_i, j;
-          double a[3], b[3], c[3], e[3], s[3], dist2;
           intersect = 0;
           minimum = DBL_MAX;
           for (stl_i = 0; stl_i < stl_nt; stl_i++) {
@@ -622,14 +621,12 @@ event init(t = 0) {
               minimum = dist2;
             intersect += predicate_ray(s, e, a, b, c);
           }
-          phi[] = intersect % 2 == 0 ? -minimum : minimum;
+          phi[] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
         } else {
-          double dist;
-          dist = 0;
-          dist += fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
-          dist += fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
-          dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
-          phi[] = -dist;
+	  dx = fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
+          dy = fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
+          dz = fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
+          phi[] = - sqrt(dx * dx + dy * dy + dz * dz);
         }
       }
       fractions(phi, cs, fs);
