@@ -622,15 +622,17 @@ event init(t = 0) {
               minimum = dist2;
             intersect += predicate_ray(s, e, a, b, c);
           }
-          phi[] = intersect % 2 ? -minimum : minimum;
+          phi[] = intersect % 2 == 0 ? -minimum : minimum;
         } else {
           double dist;
           dist = 0;
           dist += fmin(fabs(box_hi[0] - x), fabs(box_lo[0] - x));
           dist += fmin(fabs(box_hi[1] - y), fabs(box_lo[1] - y));
           dist += fmin(fabs(box_hi[2] - z), fabs(box_lo[2] - z));
-          phi[] = dist;
+          phi[] = -dist;
         }
+        if (phi[0] > 0)
+          fprintf(stdout, "%g %g %g\n", x, y, z);
       }
       fractions(phi, cs, fs);
       nc = fractions_cleanup(cs, fs);
