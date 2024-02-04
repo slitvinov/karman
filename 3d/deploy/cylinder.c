@@ -10210,12 +10210,10 @@ void fractions (scalar Phi, scalar c,
   vector s, double val)
 {tracing("fractions","/home/lisergey/basilisk/src/fractions.h",121);
 
-
-
   vector   as=(s).x.i>0?(s):new_face_vector("as");
-#line 136 "/home/lisergey/basilisk/src/fractions.h"
+#line 134 "/home/lisergey/basilisk/src/fractions.h"
   vector  p=new_vector("p");
-#line 148 "/home/lisergey/basilisk/src/fractions.h"
+#line 146 "/home/lisergey/basilisk/src/fractions.h"
   foreach_vertex_stencil() { {_stencil_neighbor(1,0,0); {
 
 
@@ -10234,7 +10232,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.x,0,0,0); _stencil_val(p.x,0,0,0);   }     
          
     
-#line 164
+#line 162
 }
       
 
@@ -10252,11 +10250,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } } 
-#line 148
+#line 146
 {_stencil_neighbor(1,0,0); {
 
 
@@ -10275,7 +10273,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.y,0,0,0); _stencil_val(p.y,0,0,0);   }     
          
     
-#line 164
+#line 162
 }
       
 
@@ -10293,11 +10291,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } } 
-#line 148
+#line 146
 {_stencil_neighbor(1,0,0); {
 
 
@@ -10316,7 +10314,7 @@ _stencil_val(Phi,0,0,0);
  {_stencil_val_a(p.z,0,0,0); _stencil_val(p.z,0,0,0);   }     
          
     
-#line 164
+#line 162
 }
       
 
@@ -10334,11 +10332,11 @@ _stencil_val(Phi,0,0,0);
 
 
            
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     
   
 } }}end_foreach_vertex_stencil();
-#line 148 "/home/lisergey/basilisk/src/fractions.h"
+#line 146 "/home/lisergey/basilisk/src/fractions.h"
   {foreach_vertex() { if (is_vertex(neighbor(1,0,0))) {
 
 
@@ -10356,11 +10354,11 @@ _stencil_val(Phi,0,0,0);
       if (val(Phi,0,0,0) < val)
  val(p.x,0,0,0) = 1. - val(p.x,0,0,0);
     }
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.x,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,1,0,0) > val);
   } 
-#line 148
+#line 146
 if (is_vertex(neighbor(0,1,0))) {
 
 
@@ -10378,11 +10376,11 @@ if (is_vertex(neighbor(0,1,0))) {
       if (val(Phi,0,0,0) < val)
  val(p.y,0,0,0) = 1. - val(p.y,0,0,0);
     }
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.y,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,1,0) > val);
   } 
-#line 148
+#line 146
 if (is_vertex(neighbor(0,0,1))) {
 
 
@@ -10400,18 +10398,18 @@ if (is_vertex(neighbor(0,0,1))) {
       if (val(Phi,0,0,0) < val)
  val(p.z,0,0,0) = 1. - val(p.z,0,0,0);
     }
-#line 173 "/home/lisergey/basilisk/src/fractions.h"
+#line 171 "/home/lisergey/basilisk/src/fractions.h"
     else
       val(p.z,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,0,1) > val);
   }}end_foreach_vertex();}
-#line 192 "/home/lisergey/basilisk/src/fractions.h"
+#line 190 "/home/lisergey/basilisk/src/fractions.h"
   
     _attribute[p.x.i].dirty = false;
     
-#line 193
+#line 191
 _attribute[p.y.i].dirty = false;
     
-#line 193
+#line 191
 _attribute[p.z.i].dirty = false;
 
   scalar s_x = as.x, s_y = as.y, s_z = as.z;
@@ -10421,7 +10419,7 @@ _attribute[p.z.i].dirty = false;
 
 
   {    
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10429,15 +10427,15 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,1,0,0);
        
        
     
-#line 238
+#line 236
 } 
-#line 235
+#line 233
 { 
 _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);  
        
        
     
-#line 238
+#line 236
 }
 
 
@@ -10469,7 +10467,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
      
    }      }
    
-#line 263
+#line 261
 {_stencil_val(p.y,i,0,0); _stencil_val(p.y,i,0,0); {       
      _stencil_val(p.y,i,0,0);_stencil_val(Phi,i,0,0); 
           
@@ -10494,7 +10492,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
 
 
       }}}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10515,16 +10513,16 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
        
     
   
-#line 288
+#line 286
 }}end__stencil_is_face_z()
-#line 196
+#line 194
 _stencil_is_face_x(){
 
 
 
 
   {    
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10532,15 +10530,15 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,0,1,0);
        
        
     
-#line 238
+#line 236
 } 
-#line 235
+#line 233
 { 
 _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);  
        
        
     
-#line 238
+#line 236
 }
 
 
@@ -10572,7 +10570,7 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
      
    }      }
    
-#line 263
+#line 261
 {_stencil_val(p.z,0,i,0); _stencil_val(p.z,0,i,0); {       
      _stencil_val(p.z,0,i,0);_stencil_val(Phi,0,i,0); 
           
@@ -10597,7 +10595,7 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
 
 
       }}}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10618,16 +10616,16 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
        
     
   
-#line 288
+#line 286
 }}end__stencil_is_face_x()
-#line 196
+#line 194
 _stencil_is_face_y(){
 
 
 
 
   {    
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     
     
      { 
@@ -10635,15 +10633,15 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,0,1);
        
        
     
-#line 238
+#line 236
 } 
-#line 235
+#line 233
 { 
 _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);  
        
        
     
-#line 238
+#line 236
 }
 
 
@@ -10675,7 +10673,7 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
      
    }      }
    
-#line 263
+#line 261
 {_stencil_val(p.x,0,0,i); _stencil_val(p.x,0,0,i); {       
      _stencil_val(p.x,0,0,i);_stencil_val(Phi,0,0,i); 
           
@@ -10700,7 +10698,7 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
 
 
       }}}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
          
           
       
@@ -10721,24 +10719,24 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
        
     
   
-#line 288
+#line 286
 }}end__stencil_is_face_y()}end_foreach_face_stencil();
   {
-#line 196
+#line 194
 foreach_face_generic(){is_face_z(){
 
 
 
 
   {
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.x = val(p.y,0,0,0) - val(p.y,1,0,0);
       nn += fabs(n.x);
     } 
-#line 235
+#line 233
 {
       n.y = val(p.x,0,0,0) - val(p.x,0,1,0);
       nn += fabs(n.y);
@@ -10759,7 +10757,7 @@ foreach_face_generic(){is_face_z(){
       
  n.x /= nn;
  
-#line 253
+#line 251
 n.y /= nn;
 
 
@@ -10776,13 +10774,13 @@ n.y /= nn;
      ni++;
    }
    
-#line 263
+#line 261
 if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
      double a = sign(val(Phi,i,0,0) - val)*(val(p.y,i,0,0) - 0.5);
      alpha += n.y*a + n.x*(i - 0.5);
      ni++;
    }}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_z,0,0,0) = max (val(p.x,0,0,0), val(p.y,0,0,0));
       else if (ni != 4)
@@ -10796,21 +10794,21 @@ if (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {
       }
     }
   }}end_is_face_z()
-#line 196
+#line 194
 is_face_x(){
 
 
 
 
   {
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.y = val(p.z,0,0,0) - val(p.z,0,1,0);
       nn += fabs(n.y);
     } 
-#line 235
+#line 233
 {
       n.z = val(p.y,0,0,0) - val(p.y,0,0,1);
       nn += fabs(n.z);
@@ -10831,7 +10829,7 @@ is_face_x(){
       
  n.y /= nn;
  
-#line 253
+#line 251
 n.z /= nn;
 
 
@@ -10848,13 +10846,13 @@ n.z /= nn;
      ni++;
    }
    
-#line 263
+#line 261
 if (val(p.z,0,i,0) > 0. && val(p.z,0,i,0) < 1.) {
      double a = sign(val(Phi,0,i,0) - val)*(val(p.z,0,i,0) - 0.5);
      alpha += n.z*a + n.y*(i - 0.5);
      ni++;
    }}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_x,0,0,0) = max (val(p.y,0,0,0), val(p.z,0,0,0));
       else if (ni != 4)
@@ -10868,21 +10866,21 @@ if (val(p.z,0,i,0) > 0. && val(p.z,0,i,0) < 1.) {
       }
     }
   }}end_is_face_x()
-#line 196
+#line 194
 is_face_y(){
 
 
 
 
   {
-#line 233 "/home/lisergey/basilisk/src/fractions.h"
+#line 231 "/home/lisergey/basilisk/src/fractions.h"
     coord n;
     double nn = 0.;
      {
       n.z = val(p.x,0,0,0) - val(p.x,0,0,1);
       nn += fabs(n.z);
     } 
-#line 235
+#line 233
 {
       n.x = val(p.z,0,0,0) - val(p.z,1,0,0);
       nn += fabs(n.x);
@@ -10903,7 +10901,7 @@ is_face_y(){
       
  n.z /= nn;
  
-#line 253
+#line 251
 n.x /= nn;
 
 
@@ -10920,13 +10918,13 @@ n.x /= nn;
      ni++;
    }
    
-#line 263
+#line 261
 if (val(p.x,0,0,i) > 0. && val(p.x,0,0,i) < 1.) {
      double a = sign(val(Phi,0,0,i) - val)*(val(p.x,0,0,i) - 0.5);
      alpha += n.x*a + n.z*(i - 0.5);
      ni++;
    }}
-#line 276 "/home/lisergey/basilisk/src/fractions.h"
+#line 274 "/home/lisergey/basilisk/src/fractions.h"
       if (ni == 0)
  val(s_y,0,0,0) = max (val(p.z,0,0,0), val(p.x,0,0,0));
       else if (ni != 4)
@@ -10959,23 +10957,23 @@ _stencil_val(as.x,0,0,0); _stencil_val(as.x,1,0,0);
        
        
     
-#line 306
+#line 304
 } 
-#line 303
+#line 301
 { 
 _stencil_val(as.y,0,0,0); _stencil_val(as.y,0,1,0);  
        
        
     
-#line 306
+#line 304
 } 
-#line 303
+#line 301
 { 
 _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);  
        
        
     
-#line 306
+#line 304
 }
 {
       {_stencil_val_a(c,0,0,0); _stencil_val(as.x,0,0,0); } 
@@ -10998,14 +10996,14 @@ _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);
        
      }      }
      
-#line 322
+#line 320
 {_stencil_val(p.y,j,0,i); _stencil_val(p.y,j,0,i); {       
        _stencil_val(p.y,j,0,i);_stencil_val(Phi,j,0,i); 
                 
        
      }      }
      
-#line 322
+#line 320
 {_stencil_val(p.z,i,j,0); _stencil_val(p.z,i,j,0); {       
        _stencil_val(p.z,i,j,0);_stencil_val(Phi,i,j,0); 
                 
@@ -11029,12 +11027,12 @@ _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);
               
       
     
-#line 337
+#line 335
 }}
        
     
   
-#line 338
+#line 336
 }end_foreach_stencil();
 
 
@@ -11044,7 +11042,7 @@ _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);
 
 
   {
-#line 296
+#line 294
 foreach() {
 
 
@@ -11056,12 +11054,12 @@ foreach() {
       n.x = val(as.x,0,0,0) - val(as.x,1,0,0);
       nn += fabs(n.x);
     } 
-#line 303
+#line 301
 {
       n.y = val(as.y,0,0,0) - val(as.y,0,1,0);
       nn += fabs(n.y);
     } 
-#line 303
+#line 301
 {
       n.z = val(as.z,0,0,0) - val(as.z,0,0,1);
       nn += fabs(n.z);
@@ -11072,10 +11070,10 @@ foreach() {
       
  n.x /= nn;
  
-#line 311
+#line 309
 n.y /= nn;
  
-#line 311
+#line 309
 n.z /= nn;
 
 
@@ -11093,14 +11091,14 @@ n.z /= nn;
        ni++;
      }
      
-#line 322
+#line 320
 if (val(p.y,j,0,i) > 0. && val(p.y,j,0,i) < 1.) {
        double a = sign(val(Phi,j,0,i) - val)*(val(p.y,j,0,i) - 0.5);
        alpha += n.y*a + n.z*(i - 0.5) + n.x*(j - 0.5);
        ni++;
      }
      
-#line 322
+#line 320
 if (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {
        double a = sign(val(Phi,i,j,0) - val)*(val(p.z,i,j,0) - 0.5);
        alpha += n.z*a + n.x*(i - 0.5) + n.y*(j - 0.5);
@@ -11118,27 +11116,26 @@ if (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {
  val(c,0,0,0) = plane_volume (n, alpha/ni);
     }
   }end_foreach();}delete((scalar*)((vector[]){p,{{-1},{-1},{-1}}}));
-
-
-end_tracing("fractions","/home/lisergey/basilisk/src/fractions.h",341);}
-#line 385 "/home/lisergey/basilisk/src/fractions.h"
+#line 351 "/home/lisergey/basilisk/src/fractions.h"
+end_tracing("fractions","/home/lisergey/basilisk/src/fractions.h",351);}
+#line 395 "/home/lisergey/basilisk/src/fractions.h"
 coord youngs_normal (Point point, scalar c)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   coord n;
   double nn = 0.;
-  if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/fractions.h", 389, "dimension == 2");
+  if (!(3 == 2)) qassert ("/home/lisergey/basilisk/src/fractions.h", 399, "dimension == 2");
    {
     n.x = (val(c,-1,1,0) + 2.*val(c,-1,0,0) + val(c,-1,-1,0) -
     val(c,+1,1,0) - 2.*val(c,+1,0,0) - val(c,+1,-1,0));
     nn += fabs(n.x);
   } 
-#line 390
+#line 400
 {
     n.y = (val(c,0,-1,1) + 2.*val(c,0,-1,0) + val(c,0,-1,-1) -
     val(c,0,+1,1) - 2.*val(c,0,+1,0) - val(c,0,+1,-1));
     nn += fabs(n.y);
   } 
-#line 390
+#line 400
 {
     n.z = (val(c,1,0,-1) + 2.*val(c,0,0,-1) + val(c,-1,0,-1) -
     val(c,1,0,+1) - 2.*val(c,0,0,+1) - val(c,-1,0,+1));
@@ -11149,10 +11146,10 @@ coord youngs_normal (Point point, scalar c)
     {
       n.x /= nn;
       
-#line 398
+#line 408
 n.y /= nn;
       
-#line 398
+#line 408
 n.z /= nn;}
   else
     n.x = 1.;
@@ -11172,12 +11169,12 @@ coord facet_normal (Point point, scalar c, vector s)
       n.x = val(s.x,0,0,0) - val(s.x,1,0,0);
       nn += fabs(n.x);
     } 
-#line 413
+#line 423
 {
       n.y = val(s.y,0,0,0) - val(s.y,0,1,0);
       nn += fabs(n.y);
     } 
-#line 413
+#line 423
 {
       n.z = val(s.z,0,0,0) - val(s.z,0,0,1);
       nn += fabs(n.z);
@@ -11186,19 +11183,19 @@ coord facet_normal (Point point, scalar c, vector s)
       {
  n.x /= nn;
  
-#line 419
+#line 429
 n.y /= nn;
  
-#line 419
+#line 429
 n.z /= nn;}
     else
       {
  n.x = 1./3;
  
-#line 422
+#line 432
 n.y = 1./3;
  
-#line 422
+#line 432
 n.z = 1./3;}
     return n;
   }
@@ -11210,7 +11207,7 @@ n.z = 1./3;}
 
 
 
-#line 408
+#line 418
 static void _stencil_facet_normal (Point point, scalar c, vector s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (s.x.i >= 0) {    
@@ -11221,23 +11218,23 @@ _stencil_val(s.x,0,0,0); _stencil_val(s.x,1,0,0);
        
        
     
-#line 416
+#line 426
 } 
-#line 413
+#line 423
 { 
 _stencil_val(s.y,0,0,0); _stencil_val(s.y,0,1,0);  
        
        
     
-#line 416
+#line 426
 } 
-#line 413
+#line 423
 { 
 _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);  
        
        
     
-#line 416
+#line 426
 }
       
    
@@ -11249,13 +11246,13 @@ _stencil_val(s.z,0,0,0); _stencil_val(s.z,0,0,1);
   } 
 _stencil_mycs (point, c);
   
-#line 425
+#line 435
 return;
 }
-#line 435 "/home/lisergey/basilisk/src/fractions.h"
+#line 445 "/home/lisergey/basilisk/src/fractions.h"
      
 void reconstruction (const scalar c, vector n, scalar alpha)
-{tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",436);
+{tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",446);
   foreach_stencil() {
 
 
@@ -11267,10 +11264,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
       
  {_stencil_val_a(n.x,0,0,0);  }
  
-#line 447
+#line 457
 {_stencil_val_a(n.y,0,0,0);  }
  
-#line 447
+#line 457
 {_stencil_val_a(n.z,0,0,0);  }
     } 
 {  
@@ -11284,10 +11281,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
       
  {_stencil_val_a(n.x,0,0,0);  }
  
-#line 458
+#line 468
 {_stencil_val_a(n.y,0,0,0);  }
  
-#line 458
+#line 468
 {_stencil_val_a(n.z,0,0,0);  }
       _stencil_val_a(alpha,0,0,0);_stencil_val(c,0,0,0);    
     }}
@@ -11299,10 +11296,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
           
     
   
-#line 461
+#line 471
 }end_foreach_stencil();
   {
-#line 438
+#line 448
 foreach() {
 
 
@@ -11314,10 +11311,10 @@ foreach() {
       
  val(n.x,0,0,0) = 0.;
  
-#line 447
+#line 457
 val(n.y,0,0,0) = 0.;
  
-#line 447
+#line 457
 val(n.z,0,0,0) = 0.;
     }
     else {
@@ -11331,22 +11328,22 @@ val(n.z,0,0,0) = 0.;
       
  val(n.x,0,0,0) = m.x;
  
-#line 458
+#line 468
 val(n.y,0,0,0) = m.y;
  
-#line 458
+#line 468
 val(n.z,0,0,0) = m.z;
       val(alpha,0,0,0) = plane_alpha (val(c,0,0,0), m);
     }
   }end_foreach();}
-#line 470 "/home/lisergey/basilisk/src/fractions.h"
+#line 480 "/home/lisergey/basilisk/src/fractions.h"
   
     _attribute[n.x.i].refine = _attribute[n.x.i].prolongation = refine_injection;
     
-#line 471
+#line 481
 _attribute[n.y.i].refine = _attribute[n.y.i].prolongation = refine_injection;
     
-#line 471
+#line 481
 _attribute[n.z.i].refine = _attribute[n.z.i].prolongation = refine_injection;
 
 
@@ -11355,16 +11352,16 @@ _attribute[n.z.i].refine = _attribute[n.z.i].prolongation = refine_injection;
   _attribute[alpha.i].n = n;
   _attribute[alpha.i].refine = _attribute[alpha.i].prolongation = alpha_refine;
 
-end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",479);}
-#line 499 "/home/lisergey/basilisk/src/fractions.h"
+end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",489);}
+#line 509 "/home/lisergey/basilisk/src/fractions.h"
      
 void output_facets (scalar c, FILE * fp, vector s)
-{tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",500);
+{tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",510);
   foreach_stencil()
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {  
        _stencil_facet_normal (point, c, s);     
       _stencil_val(c,0,0,0);        
-#line 515 "/home/lisergey/basilisk/src/fractions.h"
+#line 525 "/home/lisergey/basilisk/src/fractions.h"
       
                  
               
@@ -11375,12 +11372,12 @@ void output_facets (scalar c, FILE * fp, vector s)
 
     }        }end_foreach_stencil();
   {
-#line 502
+#line 512
 foreach()
     if (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {
       coord n = facet_normal (point, c, s);
       double alpha = plane_alpha (val(c,0,0,0), n);
-#line 515 "/home/lisergey/basilisk/src/fractions.h"
+#line 525 "/home/lisergey/basilisk/src/fractions.h"
       coord v[12];
       int m = facets (n, alpha, v, 1.);
       for (int i = 0; i < m; i++)
@@ -11392,7 +11389,7 @@ foreach()
     }end_foreach();}
 
   fflush (fp);
-end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",526);}
+end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",536);}
 
 
 
@@ -11402,7 +11399,7 @@ end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",526);}
 
      
 double interface_area (scalar c)
-{tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",535);
+{tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",545);
   double area = 0.;
   foreach_stencil ()
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {   
@@ -11414,7 +11411,7 @@ double interface_area (scalar c)
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:area)){
-#line 538
+#line 548
 foreach ()
     if (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {
       coord n = mycs (point, c), p;
@@ -11425,9 +11422,9 @@ foreach ()
 #define OMP_PARALLEL() OMP(omp parallel)
 }
   
-#line 544
-{end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",544);return area;}
-end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",545);}
+#line 554
+{end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",554);return area;}
+end_tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",555);}
 #line 9 "cylinder.c"
 #line 1 "embed.h"
 #line 1 "/home/lisergey/basilisk/src/embed.h"
