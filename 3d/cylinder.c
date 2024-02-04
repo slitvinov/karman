@@ -486,7 +486,7 @@ int main(int argc, char **argv) {
 
 event init(t = 0) {
   int nc;
-  uint32_t i, j, irefine, stl_nt, stl_nv;
+  uint32_t i, j, level, stl_nt, stl_nv;
   FILE *stl_file;
   float *stl_ver, box_lo[3], box_hi[3];
   double dist2, m_dist2, a[3], b[3], c[3];
@@ -587,7 +587,7 @@ event init(t = 0) {
     }
     phi.refine = phi.prolongation = fraction_refine;
     predicate_ini();
-    for (irefine = 0; irefine < 10; irefine++) {
+    for (level = minlevel + 1; level <= maxlevel; level++) {
       foreach_vertex() {
 	uint32_t intersect, stl_i, j;
 	double a[3], b[3], c[3], e[3], s[3], dist2, dx, dy, dz, minimum;
@@ -631,12 +631,10 @@ event init(t = 0) {
       }
       fractions(phi, cs, fs);
       nc = fractions_cleanup(cs, fs);
-      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = level,
                                minlevel = minlevel);
       if (Verbose && pid() == 0)
         fprintf(stderr, "cylinder: refined/cleaned %d/%d cells\n", s.nf, nc);
-      if (s.nf == 0)
-        break;
     }
     free(stl_ver);
   }
