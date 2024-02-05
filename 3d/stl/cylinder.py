@@ -26,8 +26,6 @@ def write(path, ver, tri, flip):
         out.write(bytes(80 + 4))
         nt = 0
         for i, j, k in tri:
-            if flip:
-                i, j, k = j, i, k
             out.write(struct.pack('12f', 0, 0, 0, *ver[i], *ver[j], *ver[k]))
             out.write(bytes(2))
             nt += 1
@@ -49,5 +47,4 @@ for i in range(n):
     d = b + (n + 1)
     tri.append((a, b, c))
     tri.append((c, b, d))
-write("center.stl", ver, tri, True)
-# write("trans.stl", [(z, y, x) for x, y, z in ver], tri)
+write("center.stl", ver, tri)
