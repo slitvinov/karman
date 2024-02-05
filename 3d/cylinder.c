@@ -673,7 +673,7 @@ event velocity(i++; t <= tend) {
         output_xdmf(t, {p, l2}, {u, omega}, NULL, path);
       }
       snprintf(path, sizeof path, "%s.slice.%09d", output_prefix, i);
-      output_xdmf(t, {p, l2}, {u, omega}, slice, path);
+      output_xdmf(t, {p, l2, cs, phi}, {u, omega}, slice, path);
       if (i % (100 * period) == 0) {
         snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
         dump(path);
