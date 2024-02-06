@@ -55,12 +55,13 @@ int main(int argc, char **argv) {
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(stderr,
-              "Usage: dump_2iso [-h] [-v] file.dump in.cells in.scalar in.field\n"
-              "Options:\n"
-              "  -h                          Print help message and exit\n"
-              "  -v                          Verbose\n"
-              "  file.dump                   basilisk dump\n");
+      fprintf(
+          stderr,
+          "Usage: dump_2iso [-h] [-v] file.dump in.cells in.scalar in.field\n"
+          "Options:\n"
+          "  -h                          Print help message and exit\n"
+          "  -v                          Verbose\n"
+          "  file.dump                   basilisk dump\n");
       exit(1);
     case 'v':
       Verbose = 1;

@@ -34,10 +34,6 @@ static const double shift[8][3] = {
     {0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
     {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1},
 };
-static const double shift_vtk[8][3] = {
-    {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
-    {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
-};
 static FILE *xyz_file, *attr_file;
 static long ncell_total;
 
@@ -48,12 +44,49 @@ int main(int argc, char **argv) {
   int Verbose;
   double o[4];
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX],
-      *xyz_base, *attr_base;
-  char **names;
-  char *path = "a";
-  snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
-  snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
-  snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
+      *xyz_base, *attr_base, **names, *output_path;
+  Verbose = 0;
+  output_path = NULL;
+  while (*++argv != NULL && argv[0][0] == '-')
+    switch (argv[0][1]) {
+    case 'h':
+      fprintf(stderr, "Usage: dump_select [-h] [-v] -o select file.dump\n"
+                      "Options:\n"
+                      "  -h          Print help message and exit\n"
+                      "  -v          Verbose\n"
+                      "  -o <string> Prefix for the output files\n"
+                      "  file.dump   basilisk dump\n");
+      exit(1);
+    case 'v':
+      Verbose = 1;
+      break;
+    case 'o':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "dump_select: error: -o needs an argument\n");
+        exit(1);
+      }
+      output_path = *argv;
+      break;
+    default:
+      fprintf(stderr, "dump_select: error: unknown option '%s'\n", *argv);
+      exit(1);
+    }
+  if (output_path == NULL) {
+    fprintf(stderr, "dump_select: error: output path (-o) is not set\n");
+    exit(1);
+  }
+  if ((input_path = argv[0]) == NULL) {
+    fprintf(stderr, "dump_select: error: file.dump is not set\n");
+    exit(1);
+  }
+  if ((input_file = fopen(input_path, "r")) == NULL) {
+    fprintf(stderr, "dump_select: error: fail to open '%s'\n", input_path);
+    exit(1);
+  }
+  snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", output_path);
+  snprintf(attr_path, sizeof attr_path, "%s.attr.raw", output_path);
+  snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", output_path);
   xyz_base = xyz_path;
   attr_base = attr_path;
   for (j = 0; xyz_path[j] != '\0'; j++) {
@@ -62,42 +95,16 @@ int main(int argc, char **argv) {
       attr_base = &attr_path[j + 1];
     }
   }
-
-  Verbose = 0;
-  while (*++argv != NULL && argv[0][0] == '-')
-    switch (argv[0][1]) {
-    case 'h':
-      fprintf(stderr,
-              "Usage: dump_select [-h] [-v] file.dump\n"
-              "Options:\n"
-              "  -h                          Print help message and exit\n"
-              "  -v                          Verbose\n"
-              "  file.dump                   basilisk dump\n");
-      exit(1);
-    case 'v':
-      Verbose = 1;
-      break;
-    default:
-      fprintf(stderr, "dump_select: error: unknown option '%s'\n", *argv);
-      exit(1);
-    }
-  if ((input_path = argv[0]) == NULL) {
-    fprintf(stderr, "dump_select: error: file.dump is not given\n");
-    exit(1);
-  }
-
-  if ((input_file = fopen(input_path, "r")) == NULL) {
-    fprintf(stderr, "dump_select: error: fail to open '%s'\n", input_path);
-    exit(1);
-  }
   FREAD(&header, sizeof header, 1);
-  fprintf(stderr, "verbose: %d\n", header.version);
-  fprintf(stderr, "t: %g\n", header.t);
-  fprintf(stderr, "len: %ld\n", header.len);
-  fprintf(stderr, "npe: %d\n", header.npe);
-  fprintf(stderr, "depth: %d\n", header.depth);
-  fprintf(stderr, "i: %d\n", header.i);
-  fprintf(stderr, "n: [%g %g %g]\n", header.n.x, header.n.y, header.n.z);
+  if (Verbose) {
+    fprintf(stderr, "verbose: %d\n", header.version);
+    fprintf(stderr, "t: %g\n", header.t);
+    fprintf(stderr, "len: %ld\n", header.len);
+    fprintf(stderr, "npe: %d\n", header.npe);
+    fprintf(stderr, "depth: %d\n", header.depth);
+    fprintf(stderr, "i: %d\n", header.i);
+    fprintf(stderr, "n: [%g %g %g]\n", header.n.x, header.n.y, header.n.z);
+  }
   if ((names = malloc(header.len * sizeof *names)) == NULL) {
     fprintf(stderr, "dump_info: error: malloc failed\n");
     exit(1);
@@ -107,15 +114,19 @@ int main(int argc, char **argv) {
     names[i] = malloc((len + 1) * sizeof *names[i]);
     FREAD(names[i], sizeof *names[i], len);
     names[i][len] = '\0';
-    fprintf(stderr, "name[%d]: %s\n", len, names[i]);
   }
+  if (Verbose)
+    for (i = 0; i < header.len; i++)
+      fprintf(stderr, "[%ld]: %s\n", i, names[i]);
   FREAD(o, sizeof o, 1);
-  fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
+  if (Verbose) {
+    fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
+    fprintf(stderr, "size: %g\n", o[3]);
+  }
   X0 = o[0];
   Y0 = o[1];
   Z0 = o[2];
   L0 = o[3];
-  fprintf(stderr, "size: %g\n", o[3]);
   m_level = 0;
   index = NULL;
   if ((values = malloc(header.len * sizeof *values)) == NULL) {
@@ -160,6 +171,7 @@ int main(int argc, char **argv) {
           "    <Grid>\n"
           "      <Topology\n"
           "          TopologyType=\"Hexahedron\"\n"
+          "          Order=\"0 1 3 2 4 5 7 6\"\n"
           "          Dimensions=\"%ld\"/>\n"
           "      <Geometry>\n"
           "        <DataItem\n"
@@ -222,9 +234,9 @@ static void process(int level) {
     // if (z <= -epsilon && z + Delta + epsilon >= 0) {
     j = 0;
     for (i = 0; i < 8; i++) {
-      xyz[j++] = x + Delta * (shift_vtk[i][0] - 0.5);
-      xyz[j++] = y + Delta * (shift_vtk[i][1] - 0.5);
-      xyz[j++] = z + Delta * (shift_vtk[i][2] - 0.5);
+      xyz[j++] = x + Delta * (shift[i][0] - 0.5);
+      xyz[j++] = y + Delta * (shift[i][1] - 0.5);
+      xyz[j++] = z + Delta * (shift[i][2] - 0.5);
     }
     if (fwrite(xyz, sizeof xyz, 1, xyz_file) != 1) {
       fprintf(stderr, "dump_select: failed to write coordinates\n");

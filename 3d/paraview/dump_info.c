@@ -108,9 +108,7 @@ int main(int argc, char **argv) {
   }
 }
 
-static void process(int level) {
-  nleaf++;
-}
+static void process(int level) { nleaf++; }
 
 static long traverse(int level) {
   enum { leaf = 2 };

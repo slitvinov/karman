@@ -259,7 +259,7 @@ int main(int argc, char **argv) {
           "  -r <num>    Reynolds number\n"
           "  -l <num>    Minimum resolution level (positive integer)\n"
           "  -m <num>    Maximum resolution level (positive integer)\n"
-          "  -o <pref>   Prefix for the output files\n"
+          "  -o <string> Prefix for the output files\n"
           "  -p <num>    Dump period (positive integer)\n"
           "  -e <num>    End time of the simulation (decimal number)\n"
           "  -f <file>   Output force file\n"
