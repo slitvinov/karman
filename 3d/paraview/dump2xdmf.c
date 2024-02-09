@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
   }
   FREAD(&context.header, sizeof context.header, 1);
   if (Verbose) {
-    fprintf(stderr, "verbose: %d\n", context.header.version);
-    fprintf(stderr, "t: %g\n", context.header.t);
+    fprintf(stderr, "version: %d\n", context.header.version);
+    fprintf(stderr, "t: %.16e\n", context.header.t);
     fprintf(stderr, "len: %ld\n", context.header.len);
     fprintf(stderr, "npe: %d\n", context.header.npe);
     fprintf(stderr, "depth: %d\n", context.header.depth);
@@ -159,7 +159,8 @@ int main(int argc, char **argv) {
   }
   context.ncell_total = 0;
   traverse(0, &context);
-  fprintf(stderr, "ncell_total: %ld\n", context.ncell_total);
+  if (Verbose)
+    fprintf(stderr, "ncell_total: %ld\n", context.ncell_total);
   if (fclose(context.xyz_file) != 0) {
     fprintf(stderr, "dump2xdmf: error: fail to close '%s'\n", context.xyz_path);
     exit(1);

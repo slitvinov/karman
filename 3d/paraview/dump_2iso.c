@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
     exit(1);
   }
   FREAD0(&context.header, sizeof context.header, 1);
-  fprintf(stderr, "verbose: %d\n", context.header.version);
-  fprintf(stderr, "t: %g\n", context.header.t);
+  fprintf(stderr, "version: %d\n", context.header.version);
+  fprintf(stderr, "t: %.16e\n", context.header.t);
   fprintf(stderr, "len: %ld\n", context.header.len);
   fprintf(stderr, "npe: %d\n", context.header.npe);
   fprintf(stderr, "depth: %d\n", context.header.depth);
