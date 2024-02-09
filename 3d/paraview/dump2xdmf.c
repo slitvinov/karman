@@ -107,13 +107,13 @@ int main(int argc, char **argv) {
   FREAD(&context.header, sizeof context.header, 1);
   if (Verbose)
     fprintf(stderr,
-            "version: dump version: %d\n"
-            "t: simulation time: %.16e\n"
-            "len: numer of fields: %ld\n"
-            "npe: number of processors: %d\n"
-            "depth: multigrid depth: %d\n"
-            "i: simulation iteration: %d\n"
-            "n: MPI dimensions for multigrid: [%g %g %g]\n",
+            "version:             dump version: %d\n"
+            "      t:          simulation time: %.16e\n"
+            "    len:          numer of fields: %ld\n"
+            "    npe:     number of processors: %d\n"
+            "  depth:          multigrid depth: %d\n"
+            "      i:     simulation iteration: %d\n"
+            "      n: multigrid MPI dimensions: [%g %g %g]\n",
             context.header.version, context.header.t, context.header.len,
             context.header.npe, context.header.depth, context.header.i,
             context.header.n.x, context.header.n.y, context.header.n.z);
@@ -132,12 +132,12 @@ int main(int argc, char **argv) {
   }
   if (Verbose)
     for (i = 0; i < context.header.len; i++)
-      fprintf(stderr, "[%ld]: %s\n", i, names[i]);
+      fprintf(stderr, "   f[%ld]: %s\n", i, names[i]);
   FREAD(o, sizeof o, 1);
   if (Verbose)
     fprintf(stderr,
-            "origin: [%.16e %.16e %.16e]\n"
-            "size: %.16e\n",
+            " origin: [%.16e %.16e %.16e]\n"
+            "   size: %.16e\n",
             o[0], o[1], o[2], o[3]);
   context.X0 = o[0];
   context.Y0 = o[1];

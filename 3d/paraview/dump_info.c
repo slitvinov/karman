@@ -33,10 +33,8 @@ static long nleaf;
 int main(int argc, char **argv) {
   long i;
   unsigned len;
-  int Verbose;
   double o[4];
   char **names;
-  Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -44,12 +42,8 @@ int main(int argc, char **argv) {
               "Usage: dump_info [-h] [-v] file.dump\n"
               "Options:\n"
               "  -h                          Print help message and exit\n"
-              "  -v                          Verbose\n"
               "  file.dump                   basilisk dump\n");
       exit(1);
-    case 'v':
-      Verbose = 1;
-      break;
     default:
       fprintf(stderr, "dump_info: error: unknown option '%s'\n", *argv);
       exit(1);
@@ -64,13 +58,17 @@ int main(int argc, char **argv) {
     exit(1);
   }
   FREAD(&header, sizeof header, 1);
-  fprintf(stderr, "verbose: %d\n", header.version);
-  fprintf(stderr, "t: %g\n", header.t);
-  fprintf(stderr, "len: %ld\n", header.len);
-  fprintf(stderr, "npe: %d\n", header.npe);
-  fprintf(stderr, "depth: %d\n", header.depth);
-  fprintf(stderr, "i: %d\n", header.i);
-  fprintf(stderr, "n: [%g %g %g]\n", header.n.x, header.n.y, header.n.z);
+  fprintf(stderr,
+            "version:             dump version: %d\n"
+            "      t:          simulation time: %.16e\n"
+            "    len:          numer of fields: %ld\n"
+            "    npe:     number of processors: %d\n"
+            "  depth:          multigrid depth: %d\n"
+            "      i:     simulation iteration: %d\n"
+            "      n: multigrid MPI dimensions: [%g %g %g]\n",
+            header.version, header.t, header.len,
+            header.npe, header.depth, header.i,
+            header.n.x, header.n.y, header.n.z);
   if ((names = malloc(header.len * sizeof *names)) == NULL) {
     fprintf(stderr, "dump_info: error: malloc failed\n");
     exit(1);
@@ -83,12 +81,14 @@ int main(int argc, char **argv) {
     fprintf(stderr, "name: %s\n", names[i]);
   }
   FREAD(o, sizeof o, 1);
-  fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
+  fprintf(stderr,
+	  " origin: [%.16e %.16e %.16e]\n"
+	  "   size: %.16e\n",
+	  o[0], o[1], o[2], o[3]);
   X0 = o[0];
   Y0 = o[1];
   Z0 = o[2];
   L0 = o[3];
-  fprintf(stderr, "size: %g\n", o[3]);
   malloc_level = 0;
   index = NULL;
   if ((values = malloc(header.len * sizeof *values)) == NULL) {
