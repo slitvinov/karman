@@ -274,8 +274,6 @@ static void traverse(int level, void *vcontext) {
     leaf = 1 << 1,
   };
   unsigned flags;
-  double val;
-  int i;
   struct Context *context;
 
   context = vcontext;
