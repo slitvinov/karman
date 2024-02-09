@@ -59,16 +59,15 @@ int main(int argc, char **argv) {
   }
   FREAD(&header, sizeof header, 1);
   fprintf(stderr,
-            "version:             dump version: %d\n"
-            "      t:          simulation time: %.16e\n"
-            "    len:          numer of fields: %ld\n"
-            "    npe:     number of processors: %d\n"
-            "  depth:          multigrid depth: %d\n"
-            "      i:     simulation iteration: %d\n"
-            "      n: multigrid MPI dimensions: [%g %g %g]\n",
-            header.version, header.t, header.len,
-            header.npe, header.depth, header.i,
-            header.n.x, header.n.y, header.n.z);
+          "version:             dump version: %d\n"
+          "      t:          simulation time: %.16e\n"
+          "    len:          numer of fields: %ld\n"
+          "    npe:     number of processors: %d\n"
+          "  depth:          multigrid depth: %d\n"
+          "      i:     simulation iteration: %d\n"
+          "      n: multigrid MPI dimensions: [%g %g %g]\n",
+          header.version, header.t, header.len, header.npe, header.depth,
+          header.i, header.n.x, header.n.y, header.n.z);
   if ((names = malloc(header.len * sizeof *names)) == NULL) {
     fprintf(stderr, "dump_info: error: malloc failed\n");
     exit(1);
@@ -82,9 +81,9 @@ int main(int argc, char **argv) {
   }
   FREAD(o, sizeof o, 1);
   fprintf(stderr,
-	  " origin: [%.16e %.16e %.16e]\n"
-	  "   size: %.16e\n",
-	  o[0], o[1], o[2], o[3]);
+          " origin: [%.16e %.16e %.16e]\n"
+          "   size: %.16e\n",
+          o[0], o[1], o[2], o[3]);
   X0 = o[0];
   Y0 = o[1];
   Z0 = o[2];
@@ -107,9 +106,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 }
-
 static void process(int level) { nleaf++; }
-
 static long traverse(int level) {
   enum { leaf = 2 };
   unsigned flags;

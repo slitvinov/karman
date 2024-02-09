@@ -219,9 +219,9 @@ static void process(int level) {
   int i, j;
   double Delta, l2, x, y, z, epsilon;
   float xyz[8 * 3];
-  x = 0;
-  y = 0;
-  z = 0;
+  x = X0 + L0 / 2;
+  y = Y0 + L0 / 2;
+  z = Z0 + L0 / 2;
   for (i = 1; i <= level; i++) {
     Delta = L0 * (1. / (1 << i));
     x += Delta * (shift[index[i]][0] - 0.5);

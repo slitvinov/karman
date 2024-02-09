@@ -243,15 +243,17 @@ static void process(int level, void *vcontext) {
   struct Context *context;
   context = vcontext;
 
-  x = context->X0;
-  y = context->Y0;
-  z = context->Z0;
+  x = context->X0 + context->L0 / 2;
+  y = context->Y0 + context->L0 / 2;
+  z = context->Z0 + context->L0 / 2;
   for (i = 1; i <= level; i++) {
     Delta = context->L0 * (1. / (1 << i));
     x += Delta * (shift[context->index[i]][0] - 0.5);
     y += Delta * (shift[context->index[i]][1] - 0.5);
     z += Delta * (shift[context->index[i]][2] - 0.5);
   }
+  if (level == 0)
+    fprintf(stderr, "%g %g %g\n", x, y, z);
   Delta = context->L0 * (1. / (1 << level));
   j = 0;
   for (i = 0; i < 8; i++) {

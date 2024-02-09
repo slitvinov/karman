@@ -4,12 +4,39 @@ import os
 
 
 def indicator(x, y, z):
-    return (x - x0)**2 / rx**2 + (y - y0)**2 / ry**2 + (z - z0)**2 / rz**2 - 1
+    return (x - xc)**2 / rx**2 + (y - yc)**2 / ry**2 + (z - zc)**2 / rz**2 - 1
 
 
-def traverse(l):
+def refinep(x, y, z, delta):
+    seen = None
+    for dx, dy, dz in shift:
+        u = x + delta * (dx - 1 / 2)
+        v = y + delta * (dy - 1 / 2)
+        w = z + delta * (dz - 1 / 2)
+        sign = indicator(u, v, w) > 0
+        if sign < 0:
+            print(sign)
+        if seen != None and sign != seen:
+            return True
+        else:
+            seen = sign
+    return False
+
+
+def traverse(level):
     values = [0] * nfields
-    leaf = l == maxlevel
+    x = X0 + L0 / 2
+    y = Y0 + L0 / 2
+    z = Z0 + L0 / 2
+    for i in range(1, level + 1):
+        Delta = L0 * (1 / (1 << i))
+        x += Delta * (shift[index[i]][0] - 1 / 2)
+        y += Delta * (shift[index[i]][1] - 1 / 2)
+        z += Delta * (shift[index[i]][2] - 1 / 2)
+    Delta = L0 * (1.0 / (1 << level))
+    values[1] = indicator(x, y, z)
+    leaf = level >= minlevel and (level == maxlevel
+                                  or not refinep(x, y, z, Delta))
     fmt = "%dd" % nfields
     dump.write(struct.pack("I", 2 if leaf else 0))
     pos = dump.tell()
@@ -18,8 +45,8 @@ def traverse(l):
     if leaf:
         pass
     else:
-        for index[l + 1] in range(0, 8):
-            cell_size += traverse(l + 1)
+        for index[level + 1] in range(8):
+            cell_size += traverse(level + 1)
     curr = dump.tell()
     dump.seek(pos, os.SEEK_SET)
     dump.write(struct.pack("d", cell_size))
@@ -30,10 +57,10 @@ def traverse(l):
 shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 minlevel = 1
-maxlevel = 5
-x0 = 1 / 2
-y0 = 1 / 2
-z0 = 1 / 2
+maxlevel = 6
+xc = 1 / 2
+yc = 1 / 2
+zc = 1 / 2
 rx = 1 / 4
 ry = 1 / 5
 rz = 1 / 6
@@ -55,4 +82,4 @@ with open("gen.dump", "wb") as dump:
         fmt = "I%ds" % len(field)
         dump.write(struct.pack(fmt, len(field), str.encode(field)))
     dump.write(struct.pack("4d", X0, Y0, Z0, L0))
-    traverse(0)
+    print("cells: ", traverse(0))
