@@ -15,6 +15,9 @@ def ellipse(x, y, z):
     rz = 1 / 6
     return (x - xc)**2 / rx**2 + (y - yc)**2 / ry**2 + (z - zc)**2 / rz**2 - 1
 
+def cylinder(x, y, z):
+    diameter = 10
+    return x**2 + y**2 - (diameter/2)**2
 
 def refinep(x, y, z, delta):
     seen = None
@@ -62,8 +65,8 @@ def traverse(level):
     dump.seek(curr, os.SEEK_SET)
     return cell_size
 
-minlevel = 1
-maxlevel = 6
+minlevel = 5
+maxlevel = 8
 fields = "size", "cs"
 nfields = len(fields)
 t = 0
@@ -72,10 +75,11 @@ depth = 7  # TODO:
 npe = 1
 version = 170901
 n = 0, 0, 0
-X0, Y0, Z0 = 0, 0, 0
-L0 = 1
 index = collections.defaultdict(int)
-indicator = ellipse
+
+# indicator, X0, Y0, Z0, L0 = ellipse, 0, 0, 0, 1
+indicator, X0, Y0, Z0, L0 = cylinder, -20, -25, -25, 50
+
 with open("gen.dump", "wb") as dump:
     dump.write(struct.pack("dl4i3d", t, nfields, i, depth, npe, version, *n))
     for field in fields:
