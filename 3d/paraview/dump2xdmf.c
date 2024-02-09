@@ -11,7 +11,7 @@
     fprintf(stderr, "dump2xdmf: error: fail to read from '%s'\n", input_path); \
     exit(1);                                                                   \
   }
-static long traverse(int, void *);
+static void traverse(int, void *);
 static void process(int, void *);
 static FILE *input_file;
 static char *input_path;
@@ -32,7 +32,7 @@ struct Context {
   struct DumpHeader header;
   int *index;
   double *values;
-  int m_alloc_level;
+  int m_alloc_level, maxlevel;
   double X0, Y0, Z0, L0;
   FILE *xyz_file, *attr_file;
   char xyz_path[FILENAME_MAX], attr_path[FILENAME_MAX];
@@ -44,21 +44,36 @@ int main(int argc, char **argv) {
   unsigned len;
   int Verbose;
   double o[4];
-  char xdmf_path[FILENAME_MAX], *xyz_base, *attr_base, **names, *output_path;
+  char xdmf_path[FILENAME_MAX], *xyz_base, *attr_base, **names, *output_path,
+      *end;
   struct Context context;
   Verbose = 0;
+  context.maxlevel = -1;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(stderr, "Usage: dump2xdmf [-h] [-v] file.dump output\n"
+      fprintf(stderr, "Usage: dump2xdmf [-h] [-v] [-l int] file.dump output\n"
                       "Options:\n"
                       "  -h          Print help message and exit\n"
                       "  -v          Verbose\n"
+                      "  -l <int>    maximum resalution level\n"
                       "  file.dump   basilisk dump\n"
                       "  ouput       output file prefix\n");
       exit(1);
     case 'v':
       Verbose = 1;
+      break;
+    case 'l':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "dump2xdmf: error: -l needs an argument\n");
+        exit(1);
+      }
+      context.maxlevel = strtol(*argv, &end, 10);
+      if (*end != '\0' || context.maxlevel < 0) {
+        fprintf(stderr, "dump2xdmf: error: '%s' is integer >= 0\n", *argv);
+        exit(1);
+      }
       break;
     default:
       fprintf(stderr, "dump2xdmf: error: unknown option '%s'\n", *argv);
@@ -106,7 +121,10 @@ int main(int argc, char **argv) {
   }
   for (i = 0; i < context.header.len; i++) {
     FREAD(&len, sizeof len, 1);
-    names[i] = malloc((len + 1) * sizeof *names[i]);
+    if ((names[i] = malloc((len + 1) * sizeof *names[i])) == NULL) {
+      fprintf(stderr, "dump2xdmf: malloc failed\n");
+      exit(1);
+    }
     FREAD(names[i], sizeof *names[i], len);
     names[i][len] = '\0';
   }
@@ -251,26 +269,21 @@ static void process(int level, void *vcontext) {
   context->ncell_total++;
 }
 
-static long traverse(int level, void *vcontext) {
+static void traverse(int level, void *vcontext) {
   enum {
     leaf = 1 << 1,
   };
   unsigned flags;
   double val;
-  long size, size0;
   int i;
   struct Context *context;
-  context = vcontext;
 
+  context = vcontext;
   FREAD(&flags, sizeof flags, 1);
   FREAD(context->values, sizeof *context->values, context->header.len);
-  size = context->values[0];
-  size0 = 1;
-  if (level == 6) {
+  if ((flags & leaf) ||
+      (context->maxlevel != -1 && level >= context->maxlevel)) {
     process(level, context);
-  }
-  if (flags & leaf) {
-    /* */
   } else {
     while (level + 1 >= context->m_alloc_level) {
       context->m_alloc_level = 2 * context->m_alloc_level + 1;
@@ -283,8 +296,6 @@ static long traverse(int level, void *vcontext) {
     }
     for (context->index[level + 1] = 0; context->index[level + 1] < 8;
          context->index[level + 1]++)
-      size0 += traverse(level + 1, context);
+      traverse(level + 1, context);
   }
-  assert(size0 == size);
-  return size;
 }
