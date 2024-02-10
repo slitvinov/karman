@@ -21,7 +21,7 @@ def circle(z, orient):
             tri.append((a, b, c))
 
 
-def write(path, ver, tri, flip):
+def write(path, ver, tri):
     with open(path, "wb") as out:
         out.write(bytes(80 + 4))
         nt = 0

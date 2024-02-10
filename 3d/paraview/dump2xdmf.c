@@ -54,9 +54,9 @@ int main(int argc, char **argv) {
     case 'h':
       fprintf(stderr, "Usage: dump2xdmf [-h] [-v] [-l int] file.dump output\n"
                       "Options:\n"
-                      "  -h          Print help message and exit\n"
-                      "  -v          Verbose\n"
-                      "  -l <int>    maximum resalution level\n"
+                      "  -h          print help message and exit\n"
+                      "  -v          verbose\n"
+                      "  -l <int>    maximum resolution level\n"
                       "  file.dump   basilisk dump\n"
                       "  ouput       output file prefix\n");
       exit(1);

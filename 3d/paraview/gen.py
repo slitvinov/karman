@@ -1,6 +1,6 @@
 import collections
-import struct
 import os
+import struct
 import sys
 
 shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
@@ -65,8 +65,8 @@ def traverse(level):
     dump.seek(curr, os.SEEK_SET)
     return cell_size
 
-minlevel = 5
-maxlevel = 8
+minlevel = 1
+maxlevel = 6
 fields = "size", "cs"
 nfields = len(fields)
 t = 0
