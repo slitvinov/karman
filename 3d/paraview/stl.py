@@ -1,8 +1,12 @@
+import itertools
+import mmap
+import numpy as np
+import os
 import struct
 import sys
-import mmap
-import itertools
-import numpy as np
+
+shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
+         (1, 1, 0), (1, 1, 1))
 
 
 def read_stl(path):
@@ -11,6 +15,27 @@ def read_stl(path):
         nt, = struct.unpack('<i', mm[80:80 + 4])
         return np.ndarray((nt, 3, 3), np.dtype("<f4"), mm, 80 + 4 + 12,
                           (36 + 12 + 2, 12, 4))
+
+
+def traverse(r, level):
+    values = [0] * nfields
+    values[-1] = level
+    leaf = level >= minlevel and (level == maxlevel
+                                  or not (*r, level) in cells)
+    fmt = "%dd" % nfields
+    dump.write(struct.pack("I", 2 if leaf else 0))
+    pos = dump.tell()
+    dump.write(struct.pack(fmt, *values))
+    cell_size = 1
+    if not leaf:
+        for s in shift:
+            r0 = [(r << 1) + s for r, s in zip(r, s)]
+            cell_size += traverse(r0, level + 1)
+    curr = dump.tell()
+    dump.seek(pos, os.SEEK_SET)
+    dump.write(struct.pack("d", cell_size))
+    dump.seek(curr, os.SEEK_SET)
+    return cell_size
 
 
 Verbose = 0
@@ -78,7 +103,33 @@ for tri in stl:
     hi = (hi - R0) / L
     inv_delta = 1 << (maxlevel - 1)
     lo = [max(0, int(r)) for r in lo * inv_delta]
-    hi = [min(int(r) + 1, inv_delta) for r in hi * inv_delta]
+    hi = [min(int(r) + 2, inv_delta) for r in hi * inv_delta]
     for cell in itertools.product(*map(range, lo, hi)):
-        cells.add(cell)
-print(len(cells))
+        cells.add((*cell, maxlevel - 1))
+        level = maxlevel - 1
+        while True:
+            level -= 1
+            if level < 0:
+                break
+            cell = tuple(cell >> 1 for cell in cell)
+            if (*cell, level) in cells:
+                break
+            else:
+                cells.add((*cell, level))
+
+fields = "size", "cs", "level"
+nfields = len(fields)
+t = 0
+i = 0
+depth = 7  # TODO:
+npe = 1
+version = 170901
+n = 0, 0, 0
+
+with open(dump_path, "wb") as dump:
+    dump.write(struct.pack("dl4i3d", t, nfields, i, depth, npe, version, *n))
+    for field in fields:
+        fmt = "I%ds" % len(field)
+        dump.write(struct.pack(fmt, len(field), str.encode(field)))
+    dump.write(struct.pack("4d", X0, Y0, Z0, L))
+    sys.stderr.write("cells: %ld\n" % traverse((0, 0, 0), 0))

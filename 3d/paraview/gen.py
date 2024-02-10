@@ -6,6 +6,7 @@ import sys
 shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 
+
 def ellipse(x, y, z):
     xc = 1 / 2
     yc = 1 / 2
@@ -15,9 +16,11 @@ def ellipse(x, y, z):
     rz = 1 / 6
     return (x - xc)**2 / rx**2 + (y - yc)**2 / ry**2 + (z - zc)**2 / rz**2 - 1
 
+
 def cylinder(x, y, z):
     diameter = 10
-    return x**2 + y**2 - (diameter/2)**2
+    return x**2 + y**2 - (diameter / 2)**2
+
 
 def refinep(x, y, z, delta):
     seen = None
@@ -54,9 +57,7 @@ def traverse(level):
     pos = dump.tell()
     dump.write(struct.pack(fmt, *values))
     cell_size = 1
-    if leaf:
-        pass
-    else:
+    if not leaf:
         for index[level + 1] in range(8):
             cell_size += traverse(level + 1)
     curr = dump.tell()
@@ -64,6 +65,7 @@ def traverse(level):
     dump.write(struct.pack("d", cell_size))
     dump.seek(curr, os.SEEK_SET)
     return cell_size
+
 
 minlevel = 1
 maxlevel = 6
