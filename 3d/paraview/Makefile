@@ -8,6 +8,7 @@ dump_2iso \
 dump2xdmf \
 dump_info \
 dump_select \
+stl2dump \
 
 all: $M
 .c:; $(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
