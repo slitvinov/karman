@@ -51,7 +51,7 @@ static const struct {
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
                                {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
-static char *fields[] = {"size", "cs"};
+static char *fields[] = {"size", "cs", "level"};
 
 int main(int argc, char **argv) {
   char *end;
@@ -324,14 +324,17 @@ static int set_has(struct Set *set, int64_t key) {
 }
 
 static int64_t traverse(int x, int y, int z, int level, struct Config *config) {
-  double values[2];
+  double values[sizeof fields / sizeof *fields];
   int leaf, i, u, v, w;
   uint32_t leaf_code;
   uint64_t code, cell_size;
   long pos, curr;
+
+  values[1] = 42;
+  values[2] = level;
   code = morton(x, y, z);
   leaf = level >= config->minlevel &&
-         (level == config->maxlevel || set_has(config->set[level], code));
+         (level == config->maxlevel || !set_has(config->set[level], code));
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
