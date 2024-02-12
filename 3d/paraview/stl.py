@@ -95,15 +95,19 @@ except ValueError:
 
 R0 = X0, Y0, Z0
 cells = set()
+inv_delta = 1 << (maxlevel - 1)
 for tri in stl:
     a, b, c = tri
     hi = np.max(tri, 0)
     lo = np.min(tri, 0)
     lo = (lo - R0) / L
     hi = (hi - R0) / L
-    inv_delta = 1 << (maxlevel - 1)
+
     lo = [max(0, int(r)) for r in lo * inv_delta]
+    lo = [min(inv_delta, r) for r in lo]
+
     hi = [min(int(r) + 2, inv_delta) for r in hi * inv_delta]
+    hi = [max(0, r) for r in lo]
     for cell in itertools.product(*map(range, lo, hi)):
         cells.add((*cell, maxlevel - 1))
         level = maxlevel - 1

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <float.h>
 #include <inttypes.h>
 #include <math.h>
 #include <stddef.h>
@@ -8,7 +9,7 @@
 #include <string.h>
 
 struct Config {
-  double X0, Y0, Z0, L;
+  double R[3], L;
   int minlevel, maxlevel;
   char *stl_path, *dump_path;
 };
@@ -18,9 +19,9 @@ static struct {
   int type;
   long offset;
 } Table[] = {
-    {"X0", TABLE_DOUBLE, offsetof(struct Config, X0)},
-    {"Y0", TABLE_DOUBLE, offsetof(struct Config, Y0)},
-    {"Z0", TABLE_DOUBLE, offsetof(struct Config, Z0)},
+    {"X0", TABLE_DOUBLE, offsetof(struct Config, R[0])},
+    {"Y0", TABLE_DOUBLE, offsetof(struct Config, R[1])},
+    {"Z0", TABLE_DOUBLE, offsetof(struct Config, R[2])},
     {"L", TABLE_DOUBLE, offsetof(struct Config, L)},
     {"minlevel", TABLE_INT, offsetof(struct Config, minlevel)},
     {"maxlevel", TABLE_INT, offsetof(struct Config, maxlevel)},
@@ -48,11 +49,14 @@ int main(int argc, char **argv) {
     case 'v':
       Verbose = 1;
       break;
+    case '-':
+      argv++;
+      goto positional;
     default:
       fprintf(stderr, "stl2dump: error: unknown option '%s'\n", *argv);
       exit(1);
     }
-
+positional:
   for (i = 0; i < sizeof(Table) / sizeof(*Table); i++) {
     if (*argv == NULL) {
       fprintf(stderr, "stl2dump: missing '%s' option\n", Table[i].name);
@@ -109,5 +113,41 @@ int main(int argc, char **argv) {
   if (fclose(stl_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.stl_path);
     exit(1);
+  }
+
+  int inv_delta, d, j, ilo[3], ihi[3], x, y, z;
+  double lo[3], hi[3], r;
+  inv_delta = 1 << (config.maxlevel - 1);
+  fprintf(stderr, "%d\n", inv_delta);
+  for (i = 0; i < stl_nt; i++) {
+    lo[0] = lo[1] = lo[2] = DBL_MAX;
+    hi[0] = hi[1] = hi[2] = -DBL_MAX;
+    for (j = 0; j < 3; j++) {
+      for (d = 0; d < 3; d++) {
+        r = stl_ver[9 * i + 3 * j + d];
+        if (r < lo[d])
+          lo[d] = r;
+        if (r > hi[d])
+          hi[d] = r;
+      }
+    }
+    for (d = 0; d < 3; d++) {
+      ilo[d] = (lo[d] - config.R[d]) / config.L * inv_delta;
+      if (ilo[d] < 0)
+        ilo[d] = 0;
+      if (ilo[d] > inv_delta)
+        ilo[d] = inv_delta;
+      ihi[d] = (hi[d] - config.R[d]) / config.L * inv_delta + 2;
+      if (ihi[d] < 0)
+        ihi[d] = 0;
+      if (ihi[d] > inv_delta)
+        ihi[d] = inv_delta;
+    }
+
+    for (x = ilo[0]; x < ihi[0]; x++)
+      for (y = ilo[1]; y < ihi[1]; y++)
+        for (z = ilo[2]; z < ihi[2]; z++) {
+          fprintf(stderr, "%d: [%d %d %d]\n", i, x, y, z);
+        }
   }
 }
