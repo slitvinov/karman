@@ -8,14 +8,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct Set {
+  size_t M;
+  int64_t *nodes;
+};
 struct Config {
   double R[3], L;
   int minlevel, maxlevel;
   char *stl_path, *dump_path;
-};
-struct Set {
-  size_t M;
-  int64_t *nodes;
+  FILE *dump_file;
+  struct Set **set;
 };
 struct coord {
   double x, y, z;
@@ -26,15 +28,14 @@ struct DumpHeader {
   int i, depth, npe, version;
   struct coord n;
 };
-struct Context {};
 static long morton(uint32_t, uint32_t, uint32_t);
 static int set_ini(size_t, void *, struct Set *);
 static int set_add(struct Set *, int64_t);
 static int set_has(struct Set *, int64_t);
-static int64_t traverse(int, int, int, int, struct Context *);
+static int64_t traverse(int, int, int, int, struct Config *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
-static struct {
+static const struct {
   const char *name;
   int type;
   long offset;
@@ -48,18 +49,19 @@ static struct {
     {"stl_path", TABLE_PCHAR, offsetof(struct Config, stl_path)},
     {"dump_path", TABLE_PCHAR, offsetof(struct Config, dump_path)},
 };
+static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
+                               {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
 static char *fields[] = {"size", "cs"};
 
 int main(int argc, char **argv) {
   char *end;
-  FILE *stl_file, *dump_file;
+  FILE *stl_file;
   float *stl_ver;
   double lo[3], hi[3], r;
   int Verbose, d, j, level, status;
   struct Config config;
   int32_t stl_nt, i, inv_delta, x, y, z, u, v, w, ilo[3], ihi[3];
   uint64_t code, ncells;
-  struct Set **set;
   void **work;
   size_t nbytes;
   struct DumpHeader header;
@@ -143,7 +145,7 @@ positional:
     exit(1);
   }
 
-  set = malloc(config.maxlevel * sizeof *set);
+  config.set = malloc(config.maxlevel * sizeof *config.set);
   work = malloc(config.maxlevel * sizeof *work);
   nbytes = 1 << 28;
   for (i = 0; i < config.maxlevel; i++) {
@@ -151,8 +153,8 @@ positional:
       fprintf(stderr, "stl2dump: malloc failed\n");
       exit(1);
     }
-    set[i] = malloc(sizeof *set[i]);
-    set_ini(nbytes, work[i], set[i]);
+    config.set[i] = malloc(sizeof *config.set[i]);
+    set_ini(nbytes, work[i], config.set[i]);
   }
 
   ncells = 0;
@@ -191,14 +193,14 @@ positional:
           w = z;
           for (;;) {
             code = morton(u, v, w);
-            if (status = set_has(set[level], code)) {
+            if (status = set_has(config.set[level], code)) {
               if (status == 2) {
                 fprintf(stderr, "stl2dump: set problem: level: %d\n", level);
                 exit(1);
               }
               break;
             }
-            if (set_add(set[level], code) != 0) {
+            if (set_add(config.set[level], code) != 0) {
               fprintf(stderr, "stl2dump: set overflow: level: %d\n", level);
               exit(1);
             }
@@ -216,7 +218,7 @@ positional:
 
   fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
 
-  if ((dump_file = fopen(config.dump_path, "w")) == NULL) {
+  if ((config.dump_file = fopen(config.dump_path, "w")) == NULL) {
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.dump_path);
     exit(1);
   }
@@ -231,35 +233,34 @@ positional:
   header.n.y = 0;
   header.n.z = 0;
 
-  if (fwrite(&header, sizeof(header), 1, dump_file) != 1) {
+  if (fwrite(&header, sizeof(header), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
   unsigned len;
   for (i = 0; i < header.len; i++) {
     len = strlen(fields[i]);
-    if (fwrite(&len, sizeof(len), 1, dump_file) != 1) {
+    if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
               config.dump_path);
       exit(1);
     }
-    if (fwrite(fields[i], len, 1, dump_file) != 1) {
+    if (fwrite(fields[i], len, 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
               config.dump_path);
       exit(1);
     }
   }
-  if (fwrite(config.R, sizeof(config.R), 1, dump_file) != 1) {
+  if (fwrite(config.R, sizeof(config.R), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  if (fwrite(&config.L, sizeof(config.L), 1, dump_file) != 1) {
+  if (fwrite(&config.L, sizeof(config.L), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  struct Context context;
-  traverse(0, 0, 0, 0, &context);
-  if (fclose(dump_file) != 0) {
+  traverse(0, 0, 0, 0, &config);
+  if (fclose(config.dump_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.dump_path);
     exit(1);
   }
@@ -322,7 +323,41 @@ static int set_has(struct Set *set, int64_t key) {
   return 2;
 }
 
-static int64_t traverse(int x, int y, int z, int level,
-                        struct Context *context) {
-  return 0;
+static int64_t traverse(int x, int y, int z, int level, struct Config *config) {
+  double values[2];
+  int leaf, i, u, v, w;
+  uint32_t leaf_code;
+  uint64_t code, cell_size;
+  long pos, curr;
+  code = morton(x, y, z);
+  leaf = level >= config->minlevel &&
+         (level == config->maxlevel || set_has(config->set[level], code));
+  leaf_code = leaf ? 2 : 0;
+  if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
+    fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
+    exit(1);
+  }
+  pos = ftell(config->dump_file);
+  if (fwrite(values, sizeof(values), 1, config->dump_file) != 1) {
+    fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
+    exit(1);
+  }
+  cell_size = 1;
+  if (!leaf) {
+    for (i = 0; i < sizeof shift / sizeof *shift; i++) {
+      u = x << 1 + shift[i][0];
+      v = y << 1 + shift[i][1];
+      w = z << 1 + shift[i][2];
+      cell_size += traverse(u, v, w, level + 1, config);
+    }
+  }
+  curr = ftell(config->dump_file);
+  fseek(config->dump_file, pos, SEEK_SET);
+  values[0] = cell_size;
+  if (fwrite(&values[0], sizeof(values[0]), 1, config->dump_file) != 1) {
+    fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
+    exit(1);
+  }
+  fseek(config->dump_file, curr, SEEK_SET);
+  return cell_size;
 }
