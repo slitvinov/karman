@@ -13,6 +13,8 @@ struct Config {
   int minlevel, maxlevel;
   char *stl_path, *dump_path;
 };
+static uint64_t morton(uint32_t, uint32_t, uint32_t);
+
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static struct {
   const char *name;
@@ -115,8 +117,11 @@ positional:
     exit(1);
   }
 
-  int inv_delta, d, j, ilo[3], ihi[3], x, y, z;
+  int d, j;
   double lo[3], hi[3], r;
+  uint32_t inv_delta, x, y, z, ilo[3], ihi[3];
+  uint64_t code;
+
   inv_delta = 1 << (config.maxlevel - 1);
   fprintf(stderr, "%d\n", inv_delta);
   for (i = 0; i < stl_nt; i++) {
@@ -143,11 +148,27 @@ positional:
       if (ihi[d] > inv_delta)
         ihi[d] = inv_delta;
     }
+    fprintf(stderr, "[%d %d %d]\n", ilo[0], ilo[1], ilo[2]);
+    fprintf(stderr, "[%d %d %d]\n", ihi[0], ihi[1], ihi[2]);
 
     for (x = ilo[0]; x < ihi[0]; x++)
       for (y = ilo[1]; y < ihi[1]; y++)
         for (z = ilo[2]; z < ihi[2]; z++) {
-          fprintf(stderr, "%d: [%d %d %d]\n", i, x, y, z);
+          code = morton(x, y, z);
+          fprintf(stderr, "%d: [%d %d %d] %d\n", i, x, y, z, (int)code);
         }
   }
+}
+
+static uint64_t left(uint64_t x) {
+  x = (x | x << 32) & 0x1f00000000ffffull;
+  x = (x | x << 16) & 0x1f0000ff0000ffull;
+  x = (x | x << 8) & 0x100f00f00f00f00full;
+  x = (x | x << 4) & 0x10c30c30c30c30c3ull;
+  x = (x | x << 2) & 0x1249249249249249ull;
+  return x;
+}
+
+static uint64_t morton(uint32_t x, uint32_t y, uint32_t z) {
+  return (left(z) << 2) | (left(y) << 1) | (left(x) << 0);
 }
