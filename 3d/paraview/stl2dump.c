@@ -13,7 +13,14 @@ struct Config {
   int minlevel, maxlevel;
   char *stl_path, *dump_path;
 };
+struct Hash {
+  size_t M;
+  struct Node *nodes;
+};
 static uint64_t morton(uint32_t, uint32_t, uint32_t);
+static int hash_ini(size_t, void *, struct Hash *);
+static int hash_insert(struct Hash *, uint64_t, int);
+static int hash_search(struct Hash *, uint64_t, int *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static struct {
@@ -171,4 +178,59 @@ static uint64_t left(uint64_t x) {
 
 static uint64_t morton(uint32_t x, uint32_t y, uint32_t z) {
   return (left(z) << 2) | (left(y) << 1) | (left(x) << 0);
+}
+
+struct Node {
+  uint64_t key;
+  int value;
+};
+static int hash_ini(size_t nbytes, void *memory, struct Hash *hash)
+{
+  size_t i;
+  hash->M = nbytes / sizeof(struct Node);
+  hash->nodes = (struct Node *) memory;
+  for (i = 0; i < hash->M; i++) hash->nodes[i].key = -1;
+  return 0;
+}
+static int hash_insert(struct Hash *hash, uint64_t key, int value)
+{
+  int x;
+  size_t cnt;
+  uint64_t key0;
+  assert(key >= 0);
+  x = key % hash->M;
+  for (cnt = 0; cnt < hash->M; cnt++) {
+    key0 = hash->nodes[x].key;
+    if (key0 == -1) {
+      hash->nodes[x].key = key;
+      hash->nodes[x].value = value;
+      return 0;
+    } else if (key0 == key) {
+      hash->nodes[x].value = value;
+      return 0;
+    }
+    x = (x + 1) % hash->M;
+  }
+  return -1;
+}
+static int hash_search(struct Hash *hash, uint64_t key, int *status)
+{
+  int x;
+  uint64_t key0;
+  size_t cnt;
+  assert(key >= 0);
+  x = key % hash->M;
+  for (cnt = 0; cnt < hash->M; cnt++) {
+    key0 = hash->nodes[x].key;
+    if (key0 == key) {
+      *status = 0;
+      return hash->nodes[x].value;
+    } else if (key0 == -1) {
+      *status = 1;
+      return -1;
+    }
+    x = (x + 1) % hash->M;
+  }
+  *status = 2;
+  return -1;
 }
