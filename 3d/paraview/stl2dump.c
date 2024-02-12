@@ -26,10 +26,12 @@ struct DumpHeader {
   int i, depth, npe, version;
   struct coord n;
 };
+struct Context {};
 static long morton(uint32_t, uint32_t, uint32_t);
 static int set_ini(size_t, void *, struct Set *);
 static int set_add(struct Set *, int64_t);
 static int set_has(struct Set *, int64_t);
+static int64_t traverse(int, int, int, int, struct Context *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static struct {
@@ -255,8 +257,8 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  //  traverse(0, 0, 0, l);
-
+  struct Context context;
+  traverse(0, 0, 0, 0, &context);
   if (fclose(dump_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.dump_path);
     exit(1);
@@ -318,4 +320,9 @@ static int set_has(struct Set *set, int64_t key) {
     x = (x + 1) % set->M;
   }
   return 2;
+}
+
+static int64_t traverse(int x, int y, int z, int level,
+                        struct Context *context) {
+  return 0;
 }
