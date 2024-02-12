@@ -107,7 +107,7 @@ for tri in stl:
     lo = [min(inv_delta, r) for r in lo]
 
     hi = [min(int(r) + 2, inv_delta) for r in hi * inv_delta]
-    hi = [max(0, r) for r in lo]
+    hi = [max(0, r) for r in hi]
     for cell in itertools.product(*map(range, lo, hi)):
         cells.add((*cell, maxlevel - 1))
         level = maxlevel - 1
@@ -120,7 +120,7 @@ for tri in stl:
                 break
             else:
                 cells.add((*cell, level))
-
+sys.stderr.write("cells: %ld\n" % len(cells));
 fields = "size", "cs", "level"
 nfields = len(fields)
 t = 0
