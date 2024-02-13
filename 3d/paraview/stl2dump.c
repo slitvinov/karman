@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Set {
+struct Hash {
   size_t M;
   int64_t *nodes;
 };
@@ -17,7 +17,7 @@ struct Config {
   int minlevel, maxlevel;
   char *stl_path, *dump_path;
   FILE *dump_file;
-  struct Set **set;
+  struct Hash **hash;
 };
 struct coord {
   double x, y, z;
@@ -29,9 +29,9 @@ struct DumpHeader {
   struct coord n;
 };
 static uint64_t morton(uint64_t, uint64_t, uint64_t);
-static int set_ini(size_t, void *, struct Set *);
-static int set_add(struct Set *, int64_t);
-static int set_has(struct Set *, int64_t);
+static int hash_ini(size_t, void *, struct Hash *);
+static int hash_add(struct Hash *, int64_t);
+static int hash_has(struct Hash *, int64_t);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
@@ -147,19 +147,19 @@ positional:
     exit(1);
   }
 
-  config.set = malloc(config.maxlevel * sizeof *config.set);
+  config.hash = malloc(config.maxlevel * sizeof *config.hash);
   work = malloc(config.maxlevel * sizeof *work);
-  nbytes = (1ul << 25) * sizeof *(*config.set)->nodes;
+  nbytes = (1ul << 25) * sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
       exit(1);
     }
-    if ((config.set[i] = malloc(sizeof *config.set[i])) == NULL) {
+    if ((config.hash[i] = malloc(sizeof *config.hash[i])) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
       exit(1);
     }
-    set_ini(nbytes, work[i], config.set[i]);
+    hash_ini(nbytes, work[i], config.hash[i]);
   }
 
   ncells = 0;
@@ -199,9 +199,9 @@ positional:
           w = z;
           for (;;) {
             code = morton(u, v, w);
-            if (set_has(config.set[level], code))
+            if (hash_has(config.hash[level], code))
               break;
-            if (set_add(config.set[level], code) != 0) {
+            if (hash_add(config.hash[level], code) != 0) {
               fprintf(stderr, "stl2dump: set overflow: level: %d\n", level);
               exit(1);
             }
@@ -259,11 +259,11 @@ positional:
   fprintf(stderr, "stl2dump: size: %" PRIu64 "\n", size);
 
   for (i = 0; i < config.maxlevel; i++) {
-    free(config.set[i]);
+    free(config.hash[i]);
     free(work[i]);
   }
   free(work);
-  free(config.set);
+  free(config.hash);
   free(stl_ver);
   if (fclose(config.dump_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.dump_path);
@@ -284,7 +284,7 @@ static uint64_t morton(uint64_t x, uint64_t y, uint64_t z) {
   return (left(z) << 2) | (left(y) << 1) | (left(x) << 0);
 }
 
-static int set_ini(size_t nbytes, void *memory, struct Set *set) {
+static int hash_ini(size_t nbytes, void *memory, struct Hash *set) {
   size_t i;
   set->M = nbytes / sizeof *set->nodes;
   set->nodes = memory;
@@ -292,7 +292,7 @@ static int set_ini(size_t nbytes, void *memory, struct Set *set) {
     set->nodes[i] = -1;
   return 0;
 }
-static int set_add(struct Set *set, int64_t key) {
+static int hash_add(struct Hash *set, int64_t key) {
   int64_t key0;
   size_t cnt;
   uint64_t x;
@@ -308,10 +308,10 @@ static int set_add(struct Set *set, int64_t key) {
     }
     x = (x + 1 + cnt) % set->M;
   }
-  fprintf(stderr, "stl2dump: error: set_add: over capacity\n");
+  fprintf(stderr, "stl2dump: error: hash_add: over capacity\n");
   exit(1);
 }
-static int set_has(struct Set *set, int64_t key) {
+static int hash_has(struct Hash *set, int64_t key) {
   int64_t key0;
   size_t cnt;
   uint64_t x;
@@ -329,7 +329,7 @@ static int set_has(struct Set *set, int64_t key) {
     }
     x = (x + 1 + cnt) % set->M;
   }
-  fprintf(stderr, "stl2dump: error: set_has failed\n");
+  fprintf(stderr, "stl2dump: error: hash_has failed\n");
   exit(1);
 }
 
@@ -346,7 +346,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   values[2] = level;
   code = morton(x, y, z);
   leaf = level >= config->minlevel &&
-         (level == config->maxlevel || !set_has(config->set[level], code));
+         (level == config->maxlevel || !hash_has(config->hash[level], code));
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
