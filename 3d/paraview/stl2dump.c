@@ -10,7 +10,10 @@
 
 struct Hash {
   size_t M;
-  int64_t *nodes;
+  struct {
+    int64_t key;
+    void *value;
+  } * nodes;
 };
 struct Config {
   double R[3], L;
@@ -30,8 +33,8 @@ struct DumpHeader {
 };
 static uint64_t morton(uint64_t, uint64_t, uint64_t);
 static int hash_ini(size_t, void *, struct Hash *);
-static int hash_add(struct Hash *, int64_t);
-static int hash_has(struct Hash *, int64_t);
+static int hash_insert(struct Hash *, int64_t, void *);
+static int hash_search(struct Hash *, int64_t, void **);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
@@ -55,7 +58,7 @@ static char *fields[] = {"size", "cs", "level"};
 
 int main(int argc, char **argv) {
   char *end;
-  double lo[3], hi[3], r;
+  double lo[3], hi[3], r, *cs;
   FILE *stl_file;
   float *stl_ver;
   int64_t inv_delta;
@@ -64,7 +67,7 @@ int main(int argc, char **argv) {
   size_t nbytes;
   struct Config config;
   struct DumpHeader header;
-  uint64_t code, ncells, u, v, w, x, y, z, size;
+  uint64_t code, nleaf, ncells, max_leaf, u, v, w, x, y, z, size;
   unsigned len;
   void **work;
 
@@ -162,7 +165,9 @@ positional:
     hash_ini(nbytes, work[i], config.hash[i]);
   }
 
+  max_leaf = 0;
   ncells = 0;
+  nleaf = 0;
   inv_delta = 1ul << (config.maxlevel - 1);
   for (i = 0; i < stl_nt; i++) {
     if (i % 10 == 0)
@@ -199,9 +204,9 @@ positional:
           w = z;
           for (;;) {
             code = morton(u, v, w);
-            if (hash_has(config.hash[level], code))
+            if (hash_search(config.hash[level], code, NULL))
               break;
-            if (hash_add(config.hash[level], code) != 0) {
+            if (hash_insert(config.hash[level], code, NULL) != 0) {
               fprintf(stderr, "stl2dump: set overflow: level: %d\n", level);
               exit(1);
             }
@@ -289,29 +294,30 @@ static int hash_ini(size_t nbytes, void *memory, struct Hash *set) {
   set->M = nbytes / sizeof *set->nodes;
   set->nodes = memory;
   for (i = 0; i < set->M; i++)
-    set->nodes[i] = -1;
+    set->nodes[i].key = -1;
   return 0;
 }
-static int hash_add(struct Hash *set, int64_t key) {
+static int hash_insert(struct Hash *set, int64_t key, void *value) {
   int64_t key0;
   size_t cnt;
   uint64_t x;
   assert(key >= 0);
   x = key % set->M;
   for (cnt = 0; cnt < set->M; cnt++) {
-    key0 = set->nodes[x];
+    key0 = set->nodes[x].key;
     if (key0 == -1) {
-      set->nodes[x] = key;
+      set->nodes[x].key = key;
+      set->nodes[x].value = value;
       return 0;
     } else if (key0 == key) {
       return 0;
     }
     x = (x + 1 + cnt) % set->M;
   }
-  fprintf(stderr, "stl2dump: error: hash_add: over capacity\n");
+  fprintf(stderr, "stl2dump: error: hash_insert: over capacity\n");
   exit(1);
 }
-static int hash_has(struct Hash *set, int64_t key) {
+static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
   int64_t key0;
   size_t cnt;
   uint64_t x;
@@ -321,8 +327,10 @@ static int hash_has(struct Hash *set, int64_t key) {
   }
   x = key % set->M;
   for (cnt = 0; cnt < set->M; cnt++) {
-    key0 = set->nodes[x];
+    key0 = set->nodes[x].key;
     if (key0 == key) {
+      if (pvalue != NULL)
+        *pvalue = set->nodes[x].value;
       return 1;
     } else if (key0 == -1) {
       return 0;
@@ -346,7 +354,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   values[2] = level;
   code = morton(x, y, z);
   leaf = level >= config->minlevel &&
-         (level == config->maxlevel || !hash_has(config->hash[level], code));
+         (level == config->maxlevel ||
+          !hash_search(config->hash[level], code, NULL));
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
