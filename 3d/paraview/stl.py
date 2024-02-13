@@ -92,6 +92,7 @@ except FileNotFoundError as e:
 except ValueError:
     sys.stderr.write("stl.py: error: fail to read STL file %s\n" % stl_path)
     sys.exit(1)
+sys.stderr.write("stl.py: stl_nt: %ld\n" % len(stl))
 
 R0 = X0, Y0, Z0
 cells = set()
@@ -120,7 +121,7 @@ for tri in stl:
                 break
             else:
                 cells.add((*cell, level))
-sys.stderr.write("cells: %ld\n" % len(cells));
+sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
 fields = "size", "cs", "level"
 nfields = len(fields)
 t = 0
@@ -136,4 +137,4 @@ with open(dump_path, "wb") as dump:
         fmt = "I%ds" % len(field)
         dump.write(struct.pack(fmt, len(field), str.encode(field)))
     dump.write(struct.pack("4d", X0, Y0, Z0, L))
-    sys.stderr.write("cells: %ld\n" % traverse((0, 0, 0), 0))
+    sys.stderr.write("stl.py: cells: %ld\n" % traverse((0, 0, 0), 0))

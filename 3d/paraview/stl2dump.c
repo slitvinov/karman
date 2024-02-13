@@ -32,7 +32,7 @@ static long morton(uint32_t, uint32_t, uint32_t);
 static int set_ini(size_t, void *, struct Set *);
 static int set_add(struct Set *, int64_t);
 static int set_has(struct Set *, int64_t);
-static int64_t traverse(int, int, int, int, struct Config *);
+static uint64_t traverse(uint32_t, uint32_t, uint32_t, int, struct Config *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
@@ -147,7 +147,7 @@ positional:
 
   config.set = malloc(config.maxlevel * sizeof *config.set);
   work = malloc(config.maxlevel * sizeof *work);
-  nbytes = 1 << 28;
+  nbytes = 1 << 20;
   for (i = 0; i < config.maxlevel; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
@@ -160,7 +160,6 @@ positional:
   ncells = 0;
   inv_delta = 1 << (config.maxlevel - 1);
   for (i = 0; i < stl_nt; i++) {
-    fprintf(stderr, "i: %d\n", i);
     lo[0] = lo[1] = lo[2] = DBL_MAX;
     hi[0] = hi[1] = hi[2] = -DBL_MAX;
     for (j = 0; j < 3; j++) {
@@ -215,14 +214,11 @@ positional:
           }
         }
   }
-
   fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
-
   if ((config.dump_file = fopen(config.dump_path, "w")) == NULL) {
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.dump_path);
     exit(1);
   }
-
   header.t = 0;
   header.len = sizeof fields / sizeof *fields; /* */
   header.i = 0;
@@ -238,6 +234,7 @@ positional:
     exit(1);
   }
   unsigned len;
+  uint64_t size;
   for (i = 0; i < header.len; i++) {
     len = strlen(fields[i]);
     if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
@@ -259,7 +256,16 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  traverse(0, 0, 0, 0, &config);
+  size = traverse(0, 0, 0, 0, &config);
+  fprintf(stderr, "stl2dump: size: %" PRIu64 "\n", size);
+
+  for (i = 0; i < config.maxlevel; i++) {
+    free(config.set[i]);
+    free(work[i]);
+  }
+  free(work);
+  free(config.set);
+  free(stl_ver);
   if (fclose(config.dump_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.dump_path);
     exit(1);
@@ -309,6 +315,10 @@ static int set_has(struct Set *set, int64_t key) {
   int x;
   int64_t key0;
   size_t cnt;
+  if (key < 0) {
+    fprintf(stderr, "stl2dump: error: key < 0\n");
+    exit(1);
+  }
   assert(key >= 0);
   x = key % set->M;
   for (cnt = 0; cnt < set->M; cnt++) {
@@ -320,16 +330,19 @@ static int set_has(struct Set *set, int64_t key) {
     }
     x = (x + 1) % set->M;
   }
-  return 2;
+  fprintf(stderr, "stl2dump: error: set_has failed\n");
+  exit(1);
 }
 
-static int64_t traverse(int x, int y, int z, int level, struct Config *config) {
+static uint64_t traverse(uint32_t x, uint32_t y, uint32_t z, int level,
+                         struct Config *config) {
   double values[sizeof fields / sizeof *fields];
-  int leaf, i, u, v, w;
-  uint32_t leaf_code;
-  uint64_t code, cell_size;
-  long pos, curr;
+  int leaf, i;
+  uint32_t leaf_code, u, v, w;
+  uint64_t cell_size;
+  long pos, curr, code;
 
+  values[0] = 0;
   values[1] = 42;
   values[2] = level;
   code = morton(x, y, z);
