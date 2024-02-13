@@ -28,11 +28,11 @@ struct DumpHeader {
   int i, depth, npe, version;
   struct coord n;
 };
-static long morton(uint32_t, uint32_t, uint32_t);
+static uint64_t morton(uint64_t, uint64_t, uint64_t);
 static int set_ini(size_t, void *, struct Set *);
 static int set_add(struct Set *, int64_t);
 static int set_has(struct Set *, int64_t);
-static uint64_t traverse(uint32_t, uint32_t, uint32_t, int, struct Config *);
+static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
   FILE *stl_file;
   float *stl_ver;
   double lo[3], hi[3], r;
-  int Verbose, d, j, level, status;
+  int Verbose, d, j, level;
   struct Config config;
   int32_t stl_nt, i, inv_delta, x, y, z, u, v, w, ilo[3], ihi[3];
   uint64_t code, ncells;
@@ -192,18 +192,12 @@ positional:
           w = z;
           for (;;) {
             code = morton(u, v, w);
-            if (status = set_has(config.set[level], code)) {
-              if (status == 2) {
-                fprintf(stderr, "stl2dump: set problem: level: %d\n", level);
-                exit(1);
-              }
+            if (set_has(config.set[level], code))
               break;
-            }
             if (set_add(config.set[level], code) != 0) {
               fprintf(stderr, "stl2dump: set overflow: level: %d\n", level);
               exit(1);
             }
-            // fprintf(stderr, "%ld\n", code);
             ncells++;
             if (level <= 0)
               break;
@@ -272,7 +266,7 @@ positional:
   }
 }
 
-static long left(long x) {
+static uint64_t left(uint64_t x) {
   x = (x | x << 32) & 0x1f00000000ffffull;
   x = (x | x << 16) & 0x1f0000ff0000ffull;
   x = (x | x << 8) & 0x100f00f00f00f00full;
@@ -281,7 +275,7 @@ static long left(long x) {
   return x;
 }
 
-static long morton(uint32_t x, uint32_t y, uint32_t z) {
+static uint64_t morton(uint64_t x, uint64_t y, uint64_t z) {
   return (left(z) << 2) | (left(y) << 1) | (left(x) << 0);
 }
 
@@ -334,12 +328,12 @@ static int set_has(struct Set *set, int64_t key) {
   exit(1);
 }
 
-static uint64_t traverse(uint32_t x, uint32_t y, uint32_t z, int level,
+static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
                          struct Config *config) {
   double values[sizeof fields / sizeof *fields];
   int leaf, i;
-  uint32_t leaf_code, u, v, w;
-  uint64_t cell_size;
+  uint32_t leaf_code;
+  uint64_t cell_size,  u, v, w;
   long pos, curr, code;
 
   values[0] = 0;
@@ -361,9 +355,9 @@ static uint64_t traverse(uint32_t x, uint32_t y, uint32_t z, int level,
   cell_size = 1;
   if (!leaf) {
     for (i = 0; i < sizeof shift / sizeof *shift; i++) {
-      u = x << 1 + shift[i][0];
-      v = y << 1 + shift[i][1];
-      w = z << 1 + shift[i][2];
+      u = (x << 1) + shift[i][0];
+      v = (y << 1) + shift[i][1];
+      w = (z << 1) + shift[i][2];
       cell_size += traverse(u, v, w, level + 1, config);
     }
   }
