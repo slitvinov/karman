@@ -55,16 +55,18 @@ static char *fields[] = {"size", "cs", "level"};
 
 int main(int argc, char **argv) {
   char *end;
+  double lo[3], hi[3], r;
   FILE *stl_file;
   float *stl_ver;
-  double lo[3], hi[3], r;
+  int64_t inv_delta;
+  int32_t stl_nt, i, ilo[3], ihi[3];
   int Verbose, d, j, level;
-  struct Config config;
-  int32_t stl_nt, i, inv_delta, x, y, z, u, v, w, ilo[3], ihi[3];
-  uint64_t code, ncells;
-  void **work;
   size_t nbytes;
+  struct Config config;
   struct DumpHeader header;
+  uint64_t code, ncells, u, v, w, x, y, z, size;
+  unsigned len;
+  void **work;
 
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
@@ -147,19 +149,24 @@ positional:
 
   config.set = malloc(config.maxlevel * sizeof *config.set);
   work = malloc(config.maxlevel * sizeof *work);
-  nbytes = 1 << 20;
+  nbytes = (1ul << 25) * sizeof *(*config.set)->nodes;
   for (i = 0; i < config.maxlevel; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
       exit(1);
     }
-    config.set[i] = malloc(sizeof *config.set[i]);
+    if ((config.set[i] = malloc(sizeof *config.set[i])) == NULL) {
+      fprintf(stderr, "stl2dump: malloc failed\n");
+      exit(1);
+    }
     set_ini(nbytes, work[i], config.set[i]);
   }
 
   ncells = 0;
-  inv_delta = 1 << (config.maxlevel - 1);
+  inv_delta = 1ul << (config.maxlevel - 1);
   for (i = 0; i < stl_nt; i++) {
+    if (i % 10 == 0)
+      fprintf(stderr, "stl2dump: %d/%d\n", i, stl_nt);
     lo[0] = lo[1] = lo[2] = DBL_MAX;
     hi[0] = hi[1] = hi[2] = -DBL_MAX;
     for (j = 0; j < 3; j++) {
@@ -227,8 +234,6 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  unsigned len;
-  uint64_t size;
   for (i = 0; i < header.len; i++) {
     len = strlen(fields[i]);
     if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
@@ -281,16 +286,16 @@ static uint64_t morton(uint64_t x, uint64_t y, uint64_t z) {
 
 static int set_ini(size_t nbytes, void *memory, struct Set *set) {
   size_t i;
-  set->M = nbytes / sizeof(int64_t);
+  set->M = nbytes / sizeof *set->nodes;
   set->nodes = memory;
   for (i = 0; i < set->M; i++)
     set->nodes[i] = -1;
   return 0;
 }
 static int set_add(struct Set *set, int64_t key) {
-  int x;
-  size_t cnt;
   int64_t key0;
+  size_t cnt;
+  uint64_t x;
   assert(key >= 0);
   x = key % set->M;
   for (cnt = 0; cnt < set->M; cnt++) {
@@ -301,19 +306,19 @@ static int set_add(struct Set *set, int64_t key) {
     } else if (key0 == key) {
       return 0;
     }
-    x = (x + 1) % set->M;
+    x = (x + 1 + cnt) % set->M;
   }
-  return 1;
+  fprintf(stderr, "stl2dump: error: set_add: over capacity\n");
+  exit(1);
 }
 static int set_has(struct Set *set, int64_t key) {
-  int x;
   int64_t key0;
   size_t cnt;
+  uint64_t x;
   if (key < 0) {
     fprintf(stderr, "stl2dump: error: key < 0\n");
     exit(1);
   }
-  assert(key >= 0);
   x = key % set->M;
   for (cnt = 0; cnt < set->M; cnt++) {
     key0 = set->nodes[x];
@@ -322,7 +327,7 @@ static int set_has(struct Set *set, int64_t key) {
     } else if (key0 == -1) {
       return 0;
     }
-    x = (x + 1) % set->M;
+    x = (x + 1 + cnt) % set->M;
   }
   fprintf(stderr, "stl2dump: error: set_has failed\n");
   exit(1);
@@ -333,7 +338,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   double values[sizeof fields / sizeof *fields];
   int leaf, i;
   uint32_t leaf_code;
-  uint64_t cell_size,  u, v, w;
+  uint64_t cell_size, u, v, w;
   long pos, curr, code;
 
   values[0] = 0;
