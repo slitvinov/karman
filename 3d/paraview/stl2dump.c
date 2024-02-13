@@ -58,7 +58,7 @@ static char *fields[] = {"size", "cs", "level"};
 
 int main(int argc, char **argv) {
   char *end;
-  double lo[3], hi[3], r, *cs;
+  double lo[3], hi[3], r;
   FILE *stl_file;
   float *stl_ver;
   int64_t inv_delta;
@@ -67,9 +67,9 @@ int main(int argc, char **argv) {
   size_t nbytes;
   struct Config config;
   struct DumpHeader header;
-  uint64_t code, nleaf, ncells, max_leaf, u, v, w, x, y, z, size;
+  uint64_t code, ncells, u, v, w, x, y, z, size;
   unsigned len;
-  void **work, *vpcs;
+  void **work;
 
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
@@ -165,10 +165,7 @@ positional:
     hash_ini(nbytes, work[i], config.hash[i]);
   }
 
-  max_leaf = 0;
   ncells = 0;
-  nleaf = 0;
-  cs = NULL;
   inv_delta = 1ul << (config.maxlevel - 1);
   for (i = 0; i < stl_nt; i++) {
     if (i % 10 == 0)
@@ -203,33 +200,23 @@ positional:
           u = x;
           v = y;
           w = z;
-          code = morton(u, v, w);
-          if (hash_search(config.hash[level], code, &vpcs) == 0) {
-            while (nleaf >= max_leaf) {
-              max_leaf = 2 * max_leaf + 1;
-              if ((cs = realloc(cs, max_leaf * sizeof *cs)) == NULL) {
-                fprintf(stderr, "stl2dump: realloc failed\n");
-                exit(1);
-              }
-            }
-            cs[nleaf] = nleaf;
-            hash_insert(config.hash[level], code, &cs[nleaf]);
-	    nleaf++;
-          } else {
-            break;
-          }
-          while (--level > 0) {
+          for (;;) {
+            code = morton(u, v, w);
+            if (hash_search(config.hash[level], code, NULL) == 0) {
+              hash_insert(config.hash[level], code, NULL);
+              ncells++;
+            } else
+              break;
+            if (level == 0)
+              break;
+            level--;
             u >>= 1;
             v >>= 1;
             w >>= 1;
-            if (hash_insert(config.hash[level], morton(u, v, w), NULL) == 1)
-              break;
-            ncells++;
           }
         }
   }
   fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
-  fprintf(stderr, "stl2dump: nleaf: %ld\n", nleaf);
 
   if ((config.dump_file = fopen(config.dump_path, "w")) == NULL) {
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.dump_path);
@@ -359,15 +346,13 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code;
-  void *vpcs;
 
   values[0] = 0;
   values[2] = level;
   code = morton(x, y, z);
   leaf = level >= config->minlevel &&
          (level == config->maxlevel ||
-          !hash_search(config->hash[level], code, &vpcs));
-  values[1] = level == config->maxlevel ? *(double*)vpcs : 0;
+          !hash_search(config->hash[level], code, NULL));
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
