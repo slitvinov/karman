@@ -348,6 +348,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   long pos, curr, code;
 
   values[0] = 0;
+  values[1] = 0;
   values[2] = level;
   code = morton(x, y, z);
   leaf = level >= config->minlevel &&
