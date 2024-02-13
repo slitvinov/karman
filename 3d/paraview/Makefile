@@ -12,7 +12,7 @@ stl2dump \
 morton \
 
 all: $M
-.c:; $(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
+.c:; $(CC) $< $(CFLAGS) -o $@ -lm
 clean:; -rm $M
 
 install: all

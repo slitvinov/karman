@@ -1,3 +1,5 @@
+#include "../predicate.h"
+#include "../predicate_c.h"
 #include <assert.h>
 #include <float.h>
 #include <inttypes.h>
@@ -21,6 +23,8 @@ struct Config {
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
+  int32_t stl_nt;
+  float *stl_ver;
 };
 struct coord {
   double x, y, z;
@@ -36,6 +40,8 @@ static int hash_ini(size_t, void *, struct Hash *);
 static int hash_insert(struct Hash *, int64_t, void *);
 static int hash_search(struct Hash *, int64_t, void **);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
+static double tri_point_distance2(const double[3], const double[3],
+                                  const double[3], const double[3]);
 
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
@@ -60,9 +66,8 @@ int main(int argc, char **argv) {
   char *end;
   double lo[3], hi[3], r;
   FILE *stl_file;
-  float *stl_ver;
   int64_t inv_delta;
-  int32_t stl_nt, i, ilo[3], ihi[3];
+  int32_t i, ilo[3], ihi[3];
   int Verbose, d, j, level;
   size_t nbytes;
   struct Config config;
@@ -126,20 +131,22 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
     exit(1);
   }
-  if (fread(&stl_nt, sizeof(stl_nt), 1, stl_file) != 1) {
+  if (fread(&config.stl_nt, sizeof(config.stl_nt), 1, stl_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
     exit(1);
   }
   if (Verbose)
-    fprintf(stderr, "stl2dump: stl_nt: %d\n", stl_nt);
+    fprintf(stderr, "stl2dump: stl_nt: %d\n", config.stl_nt);
 
-  if ((stl_ver = malloc(9 * stl_nt * sizeof *stl_ver)) == NULL) {
+  if ((config.stl_ver = malloc(9 * config.stl_nt * sizeof *config.stl_ver)) ==
+      NULL) {
     fprintf(stderr, "stl2dump: error: malloc failed\n");
     exit(1);
   }
-  for (i = 0; i < stl_nt; i++) {
-    fseek(stl_file, 3 * sizeof *stl_ver, SEEK_CUR);
-    if (fread(&stl_ver[9 * i], sizeof *stl_ver, 9, stl_file) != 9) {
+  for (i = 0; i < config.stl_nt; i++) {
+    fseek(stl_file, 3 * sizeof *config.stl_ver, SEEK_CUR);
+    if (fread(&config.stl_ver[9 * i], sizeof *config.stl_ver, 9, stl_file) !=
+        9) {
       fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
       exit(1);
     }
@@ -167,14 +174,12 @@ positional:
 
   ncells = 0;
   inv_delta = 1ul << (config.maxlevel - 1);
-  for (i = 0; i < stl_nt; i++) {
-    if (i % 10 == 0)
-      fprintf(stderr, "stl2dump: %d/%d\n", i, stl_nt);
+  for (i = 0; i < config.stl_nt; i++) {
     lo[0] = lo[1] = lo[2] = DBL_MAX;
     hi[0] = hi[1] = hi[2] = -DBL_MAX;
     for (j = 0; j < 3; j++) {
       for (d = 0; d < 3; d++) {
-        r = stl_ver[9 * i + 3 * j + d];
+        r = config.stl_ver[9 * i + 3 * j + d];
         if (r < lo[d])
           lo[d] = r;
         if (r > hi[d])
@@ -257,6 +262,7 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
+  predicate_ini();
   size = traverse(0, 0, 0, 0, &config);
   fprintf(stderr, "stl2dump: size: %" PRIu64 "\n", size);
 
@@ -266,7 +272,7 @@ positional:
   }
   free(work);
   free(config.hash);
-  free(stl_ver);
+  free(config.stl_ver);
   if (fclose(config.dump_file) != 0) {
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.dump_path);
     exit(1);
@@ -341,16 +347,48 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
 
 static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
                          struct Config *config) {
-  double values[sizeof fields / sizeof *fields];
-  int leaf, i;
+  double delta, values[sizeof fields / sizeof *fields], a[3], b[3], c[3], e[3],
+      s[3], dist2, dx, dy, dz, minimum;
+  int leaf, i, j, intersect;
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code;
 
-  values[0] = 0;
-  values[1] = 0;
-  values[2] = level;
   code = morton(x, y, z);
+  delta = config->L / (1ul << level);
+  s[0] = config->R[0] + delta * x;
+  s[1] = config->R[1] + delta * y;
+  s[2] = config->R[2] + delta * z;
+
+  intersect = 0;
+  minimum = DBL_MAX;
+  for (i = 0; i < config->stl_nt; i++) {
+    j = 9 * i;
+    a[0] = config->stl_ver[j];
+    a[1] = config->stl_ver[j + 1];
+    a[2] = config->stl_ver[j + 2];
+
+    b[0] = config->stl_ver[j + 3];
+    b[1] = config->stl_ver[j + 4];
+    b[2] = config->stl_ver[j + 5];
+
+    c[0] = config->stl_ver[j + 6];
+    c[1] = config->stl_ver[j + 7];
+    c[2] = config->stl_ver[j + 8];
+
+    e[0] = s[0];
+    e[1] = s[1];
+    e[2] = s[2] + 2 * config->L;
+    dist2 = tri_point_distance2(a, b, c, s);
+    if (dist2 < minimum)
+      minimum = dist2;
+    intersect += predicate_ray(s, e, a, b, c);
+  }
+  values[0] = 0;
+  values[1] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
+  values[2] = level;
+  // fprintf(stderr, "%d: %g\n", intersect, values[1]);
+
   leaf = level >= config->minlevel &&
          (level == config->maxlevel ||
           !hash_search(config->hash[level], code, NULL));
@@ -382,4 +420,84 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   }
   fseek(config->dump_file, curr, SEEK_SET);
   return cell_size;
+}
+
+static double vec_dot(const double a[3], const double b[3]) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+static double edg_sq(const double a[3], const double b[3]) {
+  double u[3];
+  u[0] = a[0] - b[0];
+  u[1] = a[1] - b[1];
+  u[2] = a[2] - b[2];
+  return vec_dot(u, u);
+}
+
+static double edg_point_distance2(const double a[3], const double b[3],
+                                  const double p[3]) {
+  enum { X, Y, Z };
+  double t, s, x, y, z;
+
+  s = edg_sq(a, b);
+  if (s == 0)
+    return edg_sq(p, a);
+  t = ((b[X] - a[X]) * (p[X] - a[X]) + (b[Y] - a[Y]) * (p[Y] - a[Y]) +
+       (b[Z] - a[Z]) * (p[Z] - a[Z])) /
+      s;
+  if (t > 1.0)
+    return edg_sq(p, b);
+  if (t < 0.0)
+    return edg_sq(p, a);
+  x = (1 - t) * a[X] + t * b[X] - p[X];
+  y = (1 - t) * a[Y] + t * b[Y] - p[Y];
+  z = (1 - t) * a[Z] + t * b[Z] - p[Z];
+  return x * x + y * y + z * z;
+}
+
+static void vec_minus(const double a[3], const double b[3], /**/ double c[3]) {
+  enum { X, Y, Z };
+  c[X] = a[X] - b[X];
+  c[Y] = a[Y] - b[Y];
+  c[Z] = a[Z] - b[Z];
+}
+
+static double tri_point_distance2(const double a[3], const double b[3],
+                                  const double c[3], const double p[3]) {
+  enum { X, Y, Z };
+
+  double u[3], v[3], q[3];
+  double A, B, C, D, E, det;
+  double t1, t2;
+  double x, y, z;
+  double d1, d2;
+
+  vec_minus(b, a, u);
+  vec_minus(c, a, v);
+  B = vec_dot(v, u);
+  E = vec_dot(u, u);
+  C = vec_dot(v, v);
+  det = B * B - E * C;
+  if (det == 0) {
+    d1 = edg_point_distance2(a, b, p);
+    d2 = edg_point_distance2(b, c, p);
+    if (d1 < d2)
+      return d1;
+    return d2;
+  }
+  vec_minus(a, p, q);
+  A = vec_dot(v, q);
+  D = vec_dot(u, q);
+  t1 = (D * C - A * B) / det;
+  t2 = (A * E - D * B) / det;
+  if (t1 < 0)
+    return edg_point_distance2(a, c, p);
+  if (t2 < 0)
+    return edg_point_distance2(a, b, p);
+  if (t1 + t2 > 1)
+    return edg_point_distance2(b, c, p);
+  x = q[X] + t1 * u[X] + t2 * v[X];
+  y = q[Y] + t1 * u[Y] + t2 * v[Y];
+  z = q[Z] + t1 * u[Z] + t2 * v[Z];
+  return x * x + y * y + z * z;
 }
