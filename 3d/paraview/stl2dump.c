@@ -18,12 +18,12 @@ struct Hash {
   } * nodes;
 };
 struct Config {
-  double R[3], L;
-  int minlevel, maxlevel;
+  double R[3], L, dgrid;
+  int minlevel, maxlevel, ngrid, size_grid;
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
-  int32_t stl_nt;
+  int32_t stl_nt, **grid, *max_grid;
   float *stl_ver;
 };
 struct coord {
@@ -42,7 +42,7 @@ static int hash_search(struct Hash *, int64_t, void **);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 static double tri_point_distance2(const double[3], const double[3],
                                   const double[3], const double[3]);
-
+static double edg2_sq(const float[2], const float[2]);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
   const char *name;
@@ -156,10 +156,9 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to close '%s'\n", config.stl_path);
     exit(1);
   }
-
   config.hash = malloc(config.maxlevel * sizeof *config.hash);
   work = malloc(config.maxlevel * sizeof *work);
-  nbytes = (1ul << 25) * sizeof *(*config.hash)->nodes;
+  nbytes = (1ul << 24) * sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
@@ -172,6 +171,58 @@ positional:
     hash_ini(nbytes, work[i], config.hash[i]);
   }
 
+  float *a, *b, *c, s[3];
+  double d2, d2max;
+  int index, iy, iz, iv, iw;
+  d2max = 0;
+  for (i = 0; i < config.stl_nt; i++) { /* yz */
+    a = &config.stl_ver[9 * i];
+    b = &config.stl_ver[9 * i + 3];
+    c = &config.stl_ver[9 * i + 6];
+    if ((d2 = edg2_sq(a + 1, b + 1)) > d2max)
+      d2max = d2;
+    if ((d2 = edg2_sq(a + 1, c + 1)) > d2max)
+      d2max = d2;
+    if ((d2 = edg2_sq(b + 1, c + 1)) > d2max)
+      d2max = d2;
+  }
+  config.dgrid = sqrt(d2max);
+  config.ngrid = ceil(config.L / config.dgrid);
+  config.size_grid = config.ngrid * config.ngrid;
+  if ((config.grid = malloc(config.size_grid * sizeof *config.grid)) == NULL) {
+    fprintf(stderr, "stl2dump: malloc failed\n");
+    exit(1);
+  }
+  if ((config.max_grid = malloc(config.size_grid * sizeof *config.max_grid)) ==
+      NULL) {
+    fprintf(stderr, "stl2dump: malloc failed\n");
+    exit(1);
+  }
+  for (i = 0; i < config.size_grid; i++) {
+    config.grid[i] = NULL;
+    config.max_grid[i] = 0;
+  }
+  for (i = 0; i < config.stl_nt; i++) { /* yz */
+    a = &config.stl_ver[9 * i];
+    b = &config.stl_ver[9 * i + 3];
+    c = &config.stl_ver[9 * i + 6];
+    s[0] = (a[0] + b[0] + c[0]) / 3;
+    s[1] = (a[1] + b[1] + c[1]) / 3;
+    s[2] = (a[2] + b[2] + c[2]) / 3;
+    iv = (s[1] - config.R[1]) / config.dgrid;
+    iw = (s[2] - config.R[2]) / config.dgrid;
+    for (iy = iv - 1; iy <= iv + 1; iy++)
+      for (iz = iw - 1; iz <= iw + 1; iz++) {
+        index = iy * config.ngrid + iz;
+        if (0 <= index && index < config.size_grid) {
+          config.max_grid[index]++;
+          config.grid[index] =
+              realloc(config.grid[index],
+                      config.max_grid[index] * sizeof *config.grid[index]);
+          config.grid[index][config.max_grid[index] - 1] = i;
+        }
+      }
+  }
   ncells = 0;
   inv_delta = 1ul << (config.maxlevel - 1);
   for (i = 0; i < config.stl_nt; i++) {
@@ -265,7 +316,10 @@ positional:
   predicate_ini();
   size = traverse(0, 0, 0, 0, &config);
   fprintf(stderr, "stl2dump: size: %" PRIu64 "\n", size);
-
+  for (i = 0; i < config.size_grid; i++)
+    free(config.grid[i]);
+  free(config.grid);
+  free(config.max_grid);
   for (i = 0; i < config.maxlevel; i++) {
     free(config.hash[i]);
     free(work[i]);
@@ -347,23 +401,30 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
 
 static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
                          struct Config *config) {
-  double delta, values[sizeof fields / sizeof *fields], a[3], b[3], c[3], e[3],
-      s[3], dist2, dx, dy, dz, minimum;
-  int leaf, i, j, intersect;
+  double delta, values[sizeof fields / sizeof *fields], dx, dy, dz, minimum,
+      s[3];
+  int leaf, i, intersect, iy, iz, index;
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code;
 
   code = morton(x, y, z);
   delta = config->L / (1ul << level);
-  s[0] = config->R[0] + delta * x;
-  s[1] = config->R[1] + delta * y;
-  s[2] = config->R[2] + delta * z;
+  s[0] = config->R[0] + delta * (x + 0.5);
+  s[1] = config->R[1] + delta * (y + 0.5);
+  s[2] = config->R[2] + delta * (z + 0.5);
 
+  iy = (s[1] - config->R[1]) / config->dgrid;
+  iz = (s[2] - config->R[2]) / config->dgrid;
+  index = iy * config->ngrid + iz;
+  assert(0 <= index && index < config->size_grid);
   intersect = 0;
-  minimum = DBL_MAX;
-  for (i = 0; i < config->stl_nt; i++) {
-    j = 9 * i;
+  minimum = config->dgrid;
+#pragma omp parallel for reduction(min : minimum) reduction(+ : intersect)
+  for (i = 0; i < config->max_grid[index]; i++) {
+    int j;
+    double a[3], b[3], c[3], e[3], dist2;
+    j = 9 * config->grid[index][i];
     a[0] = config->stl_ver[j];
     a[1] = config->stl_ver[j + 1];
     a[2] = config->stl_ver[j + 2];
@@ -376,9 +437,9 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
     c[1] = config->stl_ver[j + 7];
     c[2] = config->stl_ver[j + 8];
 
-    e[0] = s[0];
+    e[0] = s[0] + 3 * config->L;
     e[1] = s[1];
-    e[2] = s[2] + 2 * config->L;
+    e[2] = s[2];
     dist2 = tri_point_distance2(a, b, c, s);
     if (dist2 < minimum)
       minimum = dist2;
@@ -387,8 +448,6 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   values[0] = 0;
   values[1] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
   values[2] = level;
-  // fprintf(stderr, "%d: %g\n", intersect, values[1]);
-
   leaf = level >= config->minlevel &&
          (level == config->maxlevel ||
           !hash_search(config->hash[level], code, NULL));
@@ -420,6 +479,13 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   }
   fseek(config->dump_file, curr, SEEK_SET);
   return cell_size;
+}
+
+static double edg2_sq(const float a[2], const float b[2]) {
+  double x, y;
+  x = a[0] - b[0];
+  y = a[1] - b[1];
+  return x * x + y * y;
 }
 
 static double vec_dot(const double a[3], const double b[3]) {
