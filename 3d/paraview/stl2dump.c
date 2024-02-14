@@ -60,7 +60,7 @@ static const struct {
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
                                {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
-static char *fields[] = {"size", "cs", "level"};
+static char *fields[] = {"size", "phi", "level"};
 
 int main(int argc, char **argv) {
   char *end;
@@ -188,7 +188,7 @@ positional:
     }
     for (d = 0; d < 3; d++) {
       ilo[d] = (lo[d] - config.R[d]) / config.L * inv_delta;
-      ihi[d] = (hi[d] - config.R[d]) / config.L * inv_delta + 2;
+      ihi[d] = ceil((hi[d] - config.R[d]) / config.L * inv_delta);
       if (ilo[d] < 0)
         ilo[d] = 0;
       if (ilo[d] > inv_delta)
