@@ -60,8 +60,9 @@ static const struct {
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
                                {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
-static char *fields[] = {"size", "phi", "level"};
-
+static char *fields[] = {"size",    "cs",      "u.x", "u.y", "u.z",
+                         "g.x",     "g.y",     "g.z", "l2",  "omega.x",
+                         "omega.y", "omega.z", "phi"};
 int main(int argc, char **argv) {
   char *end;
   double lo[3], hi[3], r;
@@ -281,7 +282,7 @@ positional:
   header.t = 0;
   header.len = sizeof fields / sizeof *fields; /* */
   header.i = 0;
-  header.depth = 7;
+  header.depth = 8;
   header.npe = 1;
   header.version = 170901;
   header.n.x = 0;
@@ -445,9 +446,9 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
       minimum = dist2;
     intersect += predicate_ray(s, e, a, b, c);
   }
-  values[0] = 0;
-  values[1] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
-  values[2] = level;
+  for (i = 0; i < sizeof fields / sizeof *fields; i++)
+    values[i] = 42;
+  values[12] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum); /* phi */
   leaf = level >= config->minlevel &&
          (level == config->maxlevel ||
           !hash_search(config->hash[level], code, NULL));

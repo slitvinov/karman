@@ -10,30 +10,28 @@
 #include "navier-stokes/centered.h"
 #include "lambda2.h"
 #include "output_xdmf.h"
-#include "predicate.h"
-#include "predicate_c.h"
-static const char *force_path, *output_prefix;
-static char *dump_path;
-static const double diameter = 1;
-static const int outlevel = 7;
-static double reynolds, tend;
-static int maxlevel, minlevel, period, Verbose, FullOutput;
-static int slice(double x, double y, double z, double Delta) {
+#include "embed.h"
+#include "fractions.h"
+#include "grid/octree.h"
+#include "lambda2.h"
+#include "navier-stokes/centered.h"
+#include "output_xdmf.h"
+    static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
 }
 static double shape_cylinder(double x, double y, double z) {
-  return sq(x) + sq(y) - sq(diameter / 2);
+  return sq(x) + sq(y) - sq(1.0 / 2);
 }
 static double shape_sphere(double x, double y, double z) {
-  return sq(x) + sq(y) + sq(z) - sq(diameter / 2);
+  return sq(x) + sq(y) + sq(z) - sq(1.0 / 2);
 }
 static double (*Shape[])(double, double, double) = {shape_cylinder,
                                                     shape_sphere};
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
-trace double embed_interpolate3(Point point, scalar s, coord p) {
+trace static double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
   if (cs[i, 0, 0] && cs[0, j, 0] && cs[i, j, 0] && cs[0, 0, k] && cs[i, 0, k] &&
       cs[0, j, k] && cs[i, j, k]) {
@@ -60,7 +58,7 @@ trace double embed_interpolate3(Point point, scalar s, coord p) {
   }
 }
 
-trace void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
+trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
                         coord *Fmu) {
   coord Fps = {0}, Fmus = {0};
   foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
@@ -98,14 +96,6 @@ static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-static double dist_sq(const double *a, const double *b) {
-  double dx, dy, dz;
-  dx = a[0] - b[0];
-  dy = a[1] - b[1];
-  dz = a[2] - b[2];
-  return dx * dx + dy * dy + dz * dz;
-}
-
 static void vorticity_vector(const vector u, vector omega) {
   foreach () {
     double delta;
@@ -124,6 +114,17 @@ static void vorticity_vector(const vector u, vector omega) {
     omega.z[] = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }
 }
+
+static const char *force_path, *output_prefix;
+static char *dump_path;
+static const int outlevel = 7;
+static double reynolds, tend;
+static int maxlevel, minlevel, period, Verbose, FullOutput;
+static face vector muv[];
+static scalar l2[];
+static vector omega[];
+static scalar phi[];
+
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
 pf[left] = neumann(0);
@@ -134,12 +135,6 @@ pf[right] = dirichlet(0);
 
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
-
-face vector muv[];
-static scalar l2[];
-static vector omega[];
-static scalar phi[];
-
 int main(int argc, char **argv) {
   char *end;
   const char *periodic_boundaries;
@@ -360,12 +355,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -z must be set\n");
     exit(1);
   }
+  if (dump_path == NULL && shape == NULL) {
+    fprintf(stderr, "cylinder: error: eather -d (dump) or -s (shape) must be "
+                    "set must be set\n");
+    exit(1);
+  }
   if (Verbose && pid() == 0)
     fprintf(stderr, "cylinder: starting on %d ranks\n", npe());
   size(domain);
   origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
   mu = muv;
-
   if (periodic_boundaries != NULL)
     for (i = 0; periodic_boundaries[i] != '\0'; i++)
       switch (periodic_boundaries[i]) {
@@ -391,40 +390,41 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
-  uint32_t i, j, stl_nt, stl_nv;
-  FILE *stl_file;
-  float *stl_ver, box_lo[3], box_hi[3], L;
-  double dist2, m_dist2, a[3], b[3], c[3];
-
   if (dump_path == NULL) {
     init_grid(1 << outlevel);
     refine(x < X0 + 0.9 * L0 && level < minlevel);
+    for (;;) {
+      solid(cs, fs, shape(x, y, z));
+      astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
+                               minlevel = minlevel);
+      if (Verbose && pid() == 0)
+        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+      if (s.nf == 0)
+        break;
+    }
   } else {
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: reading dump '%s'\n", dump_path);
     restore(dump_path);
+    if (Verbose && pid() == 0) {
+      fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
+              dump_path, t, i);
+      fields_stats();
+    }
+    if (i == 0)
+      fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
   }
-
-  for (;;) {
-    solid(cs, fs, shape(x, y, z));
-    astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
-			     minlevel = minlevel);
+  if (i == 0) {
     if (Verbose && pid() == 0)
-      fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
-    if (s.nf == 0)
-      break;
-  }
-  fractions_cleanup(cs, fs);
-  if (dump_path == NULL)
+      fprintf(stderr, "cylinder: initialize velocity\n");
     foreach () {
       u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
+  }
 }
 
-event properties(i++) { foreach_face() muv.x[] = fm.x[] * diameter / reynolds; }
+event properties(i++) { foreach_face() muv.x[] = fm.x[] / reynolds; }
 
 event velocity(i++; t <= tend) {
   char path[FILENAME_MAX];
