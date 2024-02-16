@@ -43,6 +43,8 @@ static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 static double tri_point_distance2(const double[3], const double[3],
                                   const double[3], const double[3]);
 static double edg2_sq(const float[2], const float[2]);
+static uint64_t refine_neighbors(struct Config *, uint64_t, uint64_t, uint64_t,
+                                 int);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
   const char *name;
@@ -259,6 +261,7 @@ positional:
             w = z >> (config.maxlevel - level - 1);
             code = morton(u, v, w);
             ncells += hash_insert(config.hash[level], code, (void *)1);
+            ncells += refine_neighbors(&config, u, v, w, level);
           }
         }
   }
@@ -557,4 +560,30 @@ static double tri_point_distance2(const double a[3], const double b[3],
   y = q[Y] + t1 * u[Y] + t2 * v[Y];
   z = q[Z] + t1 * u[Z] + t2 * v[Z];
   return x * x + y * y + z * z;
+}
+
+static uint64_t refine_neighbors(struct Config *config, uint64_t x, uint64_t y,
+                                 uint64_t z, int level) {
+  int size, cnt;
+  uint64_t u, v, w, xl, yl, zl, xh, yh, zh, code;
+  void *flag;
+  if (level <= 0)
+    return 0;
+  size = 1 << level;
+  xl = x == 0 ? 0 : x - 1;
+  yl = y == 0 ? 0 : y - 1;
+  zl = z == 0 ? 0 : z - 1;
+  xh = x == size - 1 ? size : x + 2;
+  yh = y == size - 1 ? size : y + 2;
+  zh = z == size - 1 ? size : z + 2;
+  cnt = 0;
+  for (u = xl; u < xh; u++)
+    for (v = yl; v < yh; v++)
+      for (w = zl; w < zh; w++)
+        if (u != x || v != y || w != z) {
+          code = morton(u, v, w);
+          if (!hash_search(config->hash[level], code, NULL))
+            cnt += hash_insert(config->hash[level], code, NULL);
+        }
+  return cnt;
 }
