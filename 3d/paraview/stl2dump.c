@@ -203,6 +203,7 @@ positional:
     config.grid[i] = NULL;
     config.max_grid[i] = 0;
   }
+  ncells = 0;
   for (i = 0; i < config.stl_nt; i++) { /* yz */
     a = &config.stl_ver[9 * i];
     b = &config.stl_ver[9 * i + 3];
@@ -224,7 +225,6 @@ positional:
         }
       }
   }
-  ncells = 0;
   inv_delta = 1ul << (config.maxlevel - 1);
   for (i = 0; i < config.stl_nt; i++) {
     lo[0] = lo[1] = lo[2] = DBL_MAX;
@@ -253,23 +253,12 @@ positional:
     for (x = ilo[0]; x < ihi[0]; x++)
       for (y = ilo[1]; y < ihi[1]; y++)
         for (z = ilo[2]; z < ihi[2]; z++) {
-          level = config.maxlevel - 1;
-          u = x;
-          v = y;
-          w = z;
-          for (;;) {
+          for (level = 0; level < config.maxlevel; level++) {
+            u = x >> (config.maxlevel - level - 1);
+            v = y >> (config.maxlevel - level - 1);
+            w = z >> (config.maxlevel - level - 1);
             code = morton(u, v, w);
-            if (hash_search(config.hash[level], code, NULL) == 0) {
-              hash_insert(config.hash[level], code, NULL);
-              ncells++;
-            } else
-              break;
-            if (level == 0)
-              break;
-            level--;
-            u >>= 1;
-            v >>= 1;
-            w >>= 1;
+            ncells += hash_insert(config.hash[level], code, (void *)1);
           }
         }
   }
@@ -366,10 +355,10 @@ static int hash_insert(struct Hash *set, int64_t key, void *value) {
     if (key0 == -1) {
       set->nodes[x].key = key;
       set->nodes[x].value = value;
-      return 0;
+      return 1;
     } else if (key0 == key) {
       set->nodes[x].value = value;
-      return 1;
+      return 0;
     }
     x = (x + 1 + cnt) % set->M;
   }
@@ -408,6 +397,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code;
+  void *flag;
 
   code = morton(x, y, z);
   delta = config->L / (1ul << level);
@@ -451,7 +441,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   values[12] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum); /* phi */
   leaf = level >= config->minlevel &&
          (level == config->maxlevel ||
-          !hash_search(config->hash[level], code, NULL));
+          !hash_search(config->hash[level], code, &flag) || flag == NULL);
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
