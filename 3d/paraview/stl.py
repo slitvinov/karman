@@ -95,8 +95,9 @@ except FileNotFoundError as e:
 except ValueError:
     sys.stderr.write("stl.py: error: fail to read STL file %s\n" % stl_path)
     sys.exit(1)
-sys.stderr.write("stl.py: stl_nt: %ld\n" % len(stl))
 
+if Verbose:
+    sys.stderr.write("stl.py: stl_nt: %ld\n" % len(stl))
 R0 = X0, Y0, Z0
 cells = set()
 inv_delta = 1 << (maxlevel - 1)
@@ -124,8 +125,10 @@ for tri in stl:
                 break
             else:
                 cells.add((*cell, level))
-sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
-fields = "size", "cs", "u.x", "u.y", "u.z", "g.x", "g.y", "g.z", "l2", "omega.x", "omega.y", "omega.z", "phi"
+if Verbose:
+    sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
+fields = "size", "cs", "u.x", "u.y", "u.z", "g.x", "g.y", "g.z", "l2", \
+          "omega.x", "omega.y", "omega.z", "phi"
 nfields = len(fields)
 t = 0
 i = 0
@@ -140,4 +143,5 @@ with open(dump_path, "wb") as dump:
         fmt = "I%ds" % len(field)
         dump.write(struct.pack(fmt, len(field), str.encode(field)))
     dump.write(struct.pack("4d", X0, Y0, Z0, L))
-    sys.stderr.write("stl.py: cells: %ld\n" % traverse((0, 0, 0), 0))
+    if Verbose:
+        sys.stderr.write("stl.py: cells: %ld\n" % traverse((0, 0, 0), 0))
