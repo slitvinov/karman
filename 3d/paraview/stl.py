@@ -12,6 +12,20 @@ shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 
 
+def create_cell(cell, level):
+    if level >= 0 and (*cell, level) not in cells:
+        cells.add((*cell, level))
+        parent = tuple(cell >> 1 for cell in cell)
+        create_cell(parent, level - 1)
+        for s in shift:
+            sibling = tuple((r << 1) + s for r, s in zip(parent, s))
+            create_cell(sibling, level)
+        ncell = tuple((cell + 1) if cell & 1 else (cell - 1) for cell in cell)
+        for s in shift:
+            gcell = [r + s for r, s in zip(ncell, s)]
+            create_cell(tuple(gcell >> 1 for gcell in gcell), level - 1)
+
+
 def read_stl(path):
     with open(path, "rb+") as file:
         mm = mmap.mmap(file.fileno(), 0)
@@ -22,8 +36,8 @@ def read_stl(path):
 
 def traverse(r, level):
     values = [42.0] * nfields
-    leaf = level >= minlevel and (level == maxlevel
-                                  or not (*r, level) in cells)
+    ch = tuple(r << 1 for r in r)
+    leaf = level >= minlevel and not (*ch, level + 1) in cells
     fmt = "%dd" % nfields
     dump.write(struct.pack("I", 2 if leaf else 0))
     pos = dump.tell()
@@ -101,7 +115,7 @@ if Verbose:
     sys.stderr.write("stl.py: stl_nt: %ld\n" % len(stl))
 R0 = X0, Y0, Z0
 cells = set()
-inv_delta = 1 << (maxlevel - 1)
+inv_delta = 1 << maxlevel
 for tri in stl:
     a, b, c = tri
     hi = np.max(tri, 0)
@@ -115,17 +129,7 @@ for tri in stl:
     hi = [min(math.ceil(r), inv_delta) for r in hi * inv_delta]
     hi = [max(0, r) for r in hi]
     for cell in itertools.product(*map(range, lo, hi)):
-        cells.add((*cell, maxlevel - 1))
-        level = maxlevel - 1
-        while True:
-            level -= 1
-            if level < 0:
-                break
-            cell = tuple(cell >> 1 for cell in cell)
-            if (*cell, level) in cells:
-                break
-            else:
-                cells.add((*cell, level))
+        create_cell(cell, maxlevel)
 if Verbose:
     sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
 fields = "size", "cs", "u.x", "u.y", "u.z", "g.x", "g.y", "g.z", "l2", \
