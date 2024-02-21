@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import itertools
 import mmap
 import numpy as np
@@ -18,8 +20,7 @@ def read_stl(path):
 
 
 def traverse(r, level):
-    values = [0] * nfields
-    values[-1] = level
+    values = [42.0] * nfields
     leaf = level >= minlevel and (level == maxlevel
                                   or not (*r, level) in cells)
     fmt = "%dd" % nfields
@@ -45,10 +46,12 @@ while True:
     if len(sys.argv) and len(sys.argv[0]) > 1 and sys.argv[0][0] == '-':
         if sys.argv[0][1] == 'h':
             sys.stderr.write(
-                """usage: stl.py [-h] [-v] X0 Y0 Z0 L minlevel maxlevel file.stl basilisk.dump
+                """usage: stl.py [-h] [-v] [--] X0 Y0 Z0 L minlevel maxlevel file.stl basilisk.dump
 Options:
   -h     display this help message
   -v     verbose
+Examples:
+  ./stl.py -- -4 -4 -4 8   4 6 center.stl basilisk.dump
 """)
             sys.exit(2)
         elif sys.argv[0][1] == 'v':
@@ -69,6 +72,7 @@ try:
     L = float(sys.argv.pop(0))
 except IndexError:
     sys.stderr.write("stl.py: error: not enough arguments\n")
+    sys.exit(1)
 except ValueError as e:
     sys.stderr.write("stl.py: error: %s\n" % e)
     sys.exit(1)
@@ -83,7 +87,6 @@ except IndexError:
 except ValueError as e:
     sys.stderr.write("stl.py: error: %s\n" % e)
     sys.exit(1)
-
 try:
     stl = read_stl(stl_path)
 except FileNotFoundError as e:
@@ -122,11 +125,11 @@ for tri in stl:
             else:
                 cells.add((*cell, level))
 sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
-fields = "size", "cs", "level"
+fields = "size", "cs", "u.x", "u.y", "u.z", "g.x", "g.y", "g.z", "l2", "omega.x", "omega.y", "omega.z", "phi"
 nfields = len(fields)
 t = 0
 i = 0
-depth = 7  # TODO:
+depth = 8  # TODO:
 npe = 1
 version = 170901
 n = 0, 0, 0
