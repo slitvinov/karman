@@ -41,10 +41,12 @@ static int hash_insert(struct Hash *, int64_t, void *);
 static int hash_search(struct Hash *, int64_t, void **);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 static double tri_point_distance2(const double[3], const double[3],
-                                  const double[3], const double[3]);
+				  const double[3], const double[3]);
 static double edg2_sq(const float[2], const float[2]);
-static uint64_t refine_neighbors(struct Config *, uint64_t, uint64_t, uint64_t,
-                                 int);
+static uint64_t create_cell(struct Config *, uint64_t, uint64_t, uint64_t,
+			    int);
+static uint64_t create_cell0(struct Config *, uint64_t, uint64_t, uint64_t,
+			     int, int, int);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
   const char *name;
@@ -61,10 +63,10 @@ static const struct {
     {"dump_path", TABLE_PCHAR, offsetof(struct Config, dump_path)},
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
-                               {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
+			       {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
 static char *fields[] = {"size",    "cs",      "u.x", "u.y", "u.z",
-                         "g.x",     "g.y",     "g.z", "l2",  "omega.x",
-                         "omega.y", "omega.z", "phi"};
+			 "g.x",     "g.y",     "g.z", "l2",  "omega.x",
+			 "omega.y", "omega.z", "phi"};
 int main(int argc, char **argv) {
   char *end;
   double lo[3], hi[3], r;
@@ -84,10 +86,10 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr, "Usage: stl2dump [-h] [-v] X0 Y0 Z0 L minlevel maxlevel "
-                      "file.stl basilisk.dump\n"
-                      "Options:\n"
-                      "  -h          print help message and exit\n"
-                      "  -v          verbose\n");
+		      "file.stl basilisk.dump\n"
+		      "Options:\n"
+		      "  -h          print help message and exit\n"
+		      "  -v          verbose\n");
       exit(1);
     case 'v':
       Verbose = 1;
@@ -109,15 +111,15 @@ positional:
     case TABLE_DOUBLE:
       *(double *)((void *)&config + Table[i].offset) = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
-        exit(1);
+	fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
+	exit(1);
       }
       break;
     case TABLE_INT:
       *(int *)((void *)&config + Table[i].offset) = strtol(*argv, &end, 10);
       if (*end != '\0') {
-        fprintf(stderr, "stl2dump: error: '%s' is not an integer\n", *argv);
-        exit(1);
+	fprintf(stderr, "stl2dump: error: '%s' is not an integer\n", *argv);
+	exit(1);
       }
       break;
     case TABLE_PCHAR:
@@ -149,7 +151,7 @@ positional:
   for (i = 0; i < config.stl_nt; i++) {
     fseek(stl_file, 3 * sizeof *config.stl_ver, SEEK_CUR);
     if (fread(&config.stl_ver[9 * i], sizeof *config.stl_ver, 9, stl_file) !=
-        9) {
+	9) {
       fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
       exit(1);
     }
@@ -217,14 +219,14 @@ positional:
     iw = (s[2] - config.R[2]) / config.dgrid;
     for (iy = iv - 1; iy <= iv + 1; iy++)
       for (iz = iw - 1; iz <= iw + 1; iz++) {
-        index = iy * config.ngrid + iz;
-        if (0 <= index && index < config.size_grid) {
-          config.max_grid[index]++;
-          config.grid[index] =
-              realloc(config.grid[index],
-                      config.max_grid[index] * sizeof *config.grid[index]);
-          config.grid[index][config.max_grid[index] - 1] = i;
-        }
+	index = iy * config.ngrid + iz;
+	if (0 <= index && index < config.size_grid) {
+	  config.max_grid[index]++;
+	  config.grid[index] =
+	      realloc(config.grid[index],
+		      config.max_grid[index] * sizeof *config.grid[index]);
+	  config.grid[index][config.max_grid[index] - 1] = i;
+	}
       }
   }
   inv_delta = 1ul << (config.maxlevel - 1);
@@ -233,37 +235,29 @@ positional:
     hi[0] = hi[1] = hi[2] = -DBL_MAX;
     for (j = 0; j < 3; j++) {
       for (d = 0; d < 3; d++) {
-        r = config.stl_ver[9 * i + 3 * j + d];
-        if (r < lo[d])
-          lo[d] = r;
-        if (r > hi[d])
-          hi[d] = r;
+	r = config.stl_ver[9 * i + 3 * j + d];
+	if (r < lo[d])
+	  lo[d] = r;
+	if (r > hi[d])
+	  hi[d] = r;
       }
     }
     for (d = 0; d < 3; d++) {
       ilo[d] = (lo[d] - config.R[d]) / config.L * inv_delta;
       ihi[d] = ceil((hi[d] - config.R[d]) / config.L * inv_delta);
       if (ilo[d] < 0)
-        ilo[d] = 0;
+	ilo[d] = 0;
       if (ilo[d] > inv_delta)
-        ilo[d] = inv_delta;
+	ilo[d] = inv_delta;
       if (ihi[d] < 0)
-        ihi[d] = 0;
+	ihi[d] = 0;
       if (ihi[d] > inv_delta)
-        ihi[d] = inv_delta;
+	ihi[d] = inv_delta;
     }
     for (x = ilo[0]; x < ihi[0]; x++)
       for (y = ilo[1]; y < ihi[1]; y++)
-        for (z = ilo[2]; z < ihi[2]; z++) {
-          for (level = 0; level < config.maxlevel; level++) {
-            u = x >> (config.maxlevel - level - 1);
-            v = y >> (config.maxlevel - level - 1);
-            w = z >> (config.maxlevel - level - 1);
-            code = morton(u, v, w);
-            ncells += hash_insert(config.hash[level], code, (void *)1);
-            ncells += refine_neighbors(&config, u, v, w, level);
-          }
-        }
+	for (z = ilo[2]; z < ihi[2]; z++)
+	  ncells += create_cell(&config, x << 1, y << 1, z << 1, config.maxlevel);
   }
   fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
 
@@ -289,12 +283,12 @@ positional:
     len = strlen(fields[i]);
     if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
-              config.dump_path);
+	      config.dump_path);
       exit(1);
     }
     if (fwrite(fields[i], len, 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
-              config.dump_path);
+	      config.dump_path);
       exit(1);
     }
   }
@@ -381,7 +375,7 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
     key0 = set->nodes[x].key;
     if (key0 == key) {
       if (pvalue != NULL)
-        *pvalue = set->nodes[x].value;
+	*pvalue = set->nodes[x].value;
       return 1;
     } else if (key0 == -1) {
       return 0;
@@ -495,7 +489,7 @@ static double edg_sq(const double a[3], const double b[3]) {
 }
 
 static double edg_point_distance2(const double a[3], const double b[3],
-                                  const double p[3]) {
+				  const double p[3]) {
   enum { X, Y, Z };
   double t, s, x, y, z;
 
@@ -523,7 +517,7 @@ static void vec_minus(const double a[3], const double b[3], /**/ double c[3]) {
 }
 
 static double tri_point_distance2(const double a[3], const double b[3],
-                                  const double c[3], const double p[3]) {
+				  const double c[3], const double p[3]) {
   enum { X, Y, Z };
 
   double u[3], v[3], q[3];
@@ -562,28 +556,43 @@ static double tri_point_distance2(const double a[3], const double b[3],
   return x * x + y * y + z * z;
 }
 
-static uint64_t refine_neighbors(struct Config *config, uint64_t x, uint64_t y,
-                                 uint64_t z, int level) {
-  int size, cnt;
-  uint64_t u, v, w, xl, yl, zl, xh, yh, zh, code;
+static uint64_t create_cell(struct Config *config, uint64_t x, uint64_t y,
+			     uint64_t z, int level) {
+  return create_cell0(config, x, y, z, level, 1, 1);
+}
+
+static uint64_t create_cell0(struct Config *config, uint64_t x, uint64_t y,
+			     uint64_t z, int level, int need_siblings, int leaf) {
+  int i;
+  uint64_t u, v, w, px, py, pz, sx, sy, sz, code, ncells;
   void *flag;
-  if (level <= 0)
-    return 0;
-  size = 1 << level;
-  xl = x == 0 ? 0 : x - 1;
-  yl = y == 0 ? 0 : y - 1;
-  zl = z == 0 ? 0 : z - 1;
-  xh = x == size - 1 ? size : x + 2;
-  yh = y == size - 1 ? size : y + 2;
-  zh = z == size - 1 ? size : z + 2;
-  cnt = 0;
-  for (u = xl; u < xh; u++)
-    for (v = yl; v < yh; v++)
-      for (w = zl; w < zh; w++)
-        if (u != x || v != y || w != z) {
-          code = morton(u, v, w);
-          if (!hash_search(config->hash[level], code, NULL))
-            cnt += hash_insert(config->hash[level], code, NULL);
-        }
-  return cnt;
+  ncells = 0;
+  code = morton(x, y, z);
+  if (level > 0 && (level == config->maxlevel || !hash_search(config->hash[level], code, NULL))) {
+    if (need_siblings) {
+      px = x >> 1;
+      py = y >> 1;
+      pz = z >> 1;
+      ncells += create_cell0(config, px, py, pz, level - 1, 1, 0);
+      for (i = 0; i < sizeof shift / sizeof *shift; i++) {
+	u = (px << 1) + shift[i][0];
+	v = (py << 1) + shift[i][1];
+	w = (pz << 1) + shift[i][2];
+	ncells += create_cell0(config, u, v, w, level, 0, 0);
+      }
+    }
+    sx = (x & 1) ? x + 1 : x - 1;
+    sy = (y & 1) ? y + 1 : y - 1;
+    sz = (z & 1) ? z + 1 : z - 1;
+    for (i = 0; i < sizeof shift / sizeof *shift; i++) {
+      u = (sx + shift[i][0]) >> 1;
+      v = (sy + shift[i][1]) >> 1;
+      w = (sz + shift[i][2]) >> 1;
+      ncells += create_cell0(config, u, v, w, level - 1, 1, 1);
+    }
+    if (level < config->maxlevel && (!hash_search(config->hash[level], code, &flag) || flag == NULL)) {
+      ncells += hash_insert(config->hash[level], code, leaf ? NULL : (void *)1);
+    }
+  }
+  return ncells;
 }
