@@ -41,7 +41,7 @@ def has(root, i, j, k, level):
 
 def create_cell(cell, level):
     if level >= 0 and (*cell, level) not in cells:
-        add(root, *cells, level)
+        add(root, *cell, level)
         cells.add((*cell, level))
         parent = tuple(cell >> 1 for cell in cell)
         create_cell(parent, level - 1)
