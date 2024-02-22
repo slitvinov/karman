@@ -11,9 +11,37 @@ import sys
 shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 
+class Node:
+    def __init__(self):
+        self.children = None
+def add(root, i, j, k, level):
+    def add_rec(node, l, i, j, k):
+        d = level - l
+        if d > 0:
+            x = (i >> d) & 1
+            y = (j >> d) & 1
+            z = (k >> d) & 1
+            idx = shift.index((x, y, z))
+            if node.children == None:
+                node.children = [Node() for i in range(8)]
+            add_rec(node.children[idx], l + 1, i, j, k)
+    add_rec(root, 0, i, j, k)
+def has(root, i, j, k, level):
+    def has_rec(node, l, i, j, k):
+        d = level - l
+        if d > 0:
+            x = (i >> d) & 1
+            y = (j >> d) & 1
+            z = (k >> d) & 1
+            idx = shift.index((x, y, z))
+            return node.children != None and has_rec(node.children[idx], l + 1, i, j, k)
+        else:
+            return True
+    return has_rec(root, 0, i, j, k)
 
 def create_cell(cell, level):
     if level >= 0 and (*cell, level) not in cells:
+        add(root, *cells, level)
         cells.add((*cell, level))
         parent = tuple(cell >> 1 for cell in cell)
         create_cell(parent, level - 1)
@@ -37,7 +65,7 @@ def read_stl(path):
 def traverse(r, level):
     values = [42.0] * nfields
     ch = tuple(r << 1 for r in r)
-    leaf = level >= minlevel and not (*ch, level + 1) in cells
+    leaf = level >= minlevel and not has(root, *ch, level + 1)
     fmt = "%dd" % nfields
     dump.write(struct.pack("I", 2 if leaf else 0))
     pos = dump.tell()
@@ -114,6 +142,7 @@ except ValueError:
 if Verbose:
     sys.stderr.write("stl.py: stl_nt: %ld\n" % len(stl))
 R0 = X0, Y0, Z0
+root = Node()
 cells = set()
 inv_delta = 1 << maxlevel
 for tri in stl:
