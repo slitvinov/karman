@@ -12,19 +12,19 @@ shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 
 
-def create_cell(cell, level):
-    if level >= 0 and (*cell, level) not in cells:
-        cells.add((*cell, level))
-        parent = tuple(cell >> 1 for cell in cell)
-        create_cell(parent, level - 1)
-        for s in shift:
-            sibling = tuple((r << 1) + s for r, s in zip(parent, s))
-            create_cell(sibling, level)
+def create_cell(cell, level, need_neighbors):
+    if level > 0 and (*cell, level) not in cells:
+        if need_neighbors:
+            parent = tuple(cell >> 1 for cell in cell)
+            create_cell(parent, level - 1, True)
+            for s in shift:
+                sibling = tuple((r << 1) + s for r, s in zip(parent, s))
+                create_cell(sibling, level, False)
         ncell = tuple((cell + 1) if cell & 1 else (cell - 1) for cell in cell)
         for s in shift:
             gcell = [r + s for r, s in zip(ncell, s)]
-            create_cell(tuple(gcell >> 1 for gcell in gcell), level - 1)
-
+            create_cell(tuple(gcell >> 1 for gcell in gcell), level - 1, True)
+        cells.add((*cell, level))
 
 def read_stl(path):
     with open(path, "rb+") as file:
@@ -129,7 +129,7 @@ for tri in stl:
     hi = [min(math.ceil(r), inv_delta) for r in hi * inv_delta]
     hi = [max(0, r) for r in hi]
     for cell in itertools.product(*map(range, lo, hi)):
-        create_cell(cell, maxlevel)
+        create_cell(cell, maxlevel, True)
 if Verbose:
     sys.stderr.write("stl.py: cells: %ld\n" % len(cells))
 fields = "size", "cs", "u.x", "u.y", "u.z", "g.x", "g.y", "g.z", "l2", \
