@@ -403,7 +403,7 @@ event init(t = 0) {
         break;
     }
   } else {
-    fprintf(stderr, "DT: %g\n", DT);
+    DT = 0.01;
     restore(dump_path);
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
