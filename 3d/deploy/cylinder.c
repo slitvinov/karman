@@ -20321,42 +20321,29 @@ foreach () {
       val(u.z,0,0,0) = 0;
     }end_foreach();}
     foreach_face_stencil(){_stencil_is_face_x(){
-      {_stencil_val(fm.x,0,0,0);
+      {_stencil_val(fs.x,0,0,0);
  {_stencil_val_a(u.x,0,0,0);  }   }}end__stencil_is_face_x()
 #line 426
 _stencil_is_face_y(){
-      {_stencil_val(fm.y,0,0,0);
+      {_stencil_val(fs.y,0,0,0);
  {_stencil_val_a(u.y,0,0,0);  }   }}end__stencil_is_face_y()
 #line 426
 _stencil_is_face_z(){
-      {_stencil_val(fm.z,0,0,0);
+      {_stencil_val(fs.z,0,0,0);
  {_stencil_val_a(u.z,0,0,0);  }   }}end__stencil_is_face_z()}end_foreach_face_stencil();
-    
-#line 426
-if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
-      if (val(fm.x,0,0,0) == 0)
- val(u.x,0,0,0) = 0;}end_is_face_x()
-#line 426
-is_face_y(){
-      if (val(fm.y,0,0,0) == 0)
- val(u.y,0,0,0) = 0;}end_is_face_y()
-#line 426
-is_face_z(){
-      if (val(fm.z,0,0,0) == 0)
- val(u.z,0,0,0) = 0;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
     {
 #line 426
 foreach_face_generic(){is_face_x(){
-      if (_const_fm.x == 0)
+      if (val(fs.x,0,0,0) == 0)
  val(u.x,0,0,0) = 0;}end_is_face_x()
 #line 426
 is_face_y(){
-      if (_const_fm.y == 0)
+      if (val(fs.y,0,0,0) == 0)
  val(u.y,0,0,0) = 0;}end_is_face_y()
 #line 426
 is_face_z(){
-      if (_const_fm.z == 0)
- val(u.z,0,0,0) = 0;}end_is_face_z()}end_foreach_face_generic();}}
+      if (val(fs.z,0,0,0) == 0)
+ val(u.z,0,0,0) = 0;}end_is_face_z()}end_foreach_face_generic();}
   }
 }{end_tracing("init_0","cylinder.c",430);return 0;}end_tracing("init_0","cylinder.c",430);}
 

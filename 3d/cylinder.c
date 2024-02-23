@@ -424,7 +424,7 @@ event init(t = 0) {
       u.z[] = 0;
     }
     foreach_face()
-      if (fm.x[] == 0)
+      if (fs.x[] == 0)
 	u.x[] = 0;
   }
 }
