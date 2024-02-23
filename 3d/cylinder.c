@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -e must be set\n");
     exit(1);
   }
-  if (!DomainFlag) {
+  if (dump_path == NULL && !DomainFlag) {
     fprintf(stderr, "cylinder: error: -z must be set\n");
     exit(1);
   }
