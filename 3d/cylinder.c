@@ -478,6 +478,7 @@ event velocity(i++; t <= tend) {
   }
   astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
                            maxlevel = maxlevel, minlevel = minlevel);
+  fractions_cleanup(cs, fs);
   unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
   fractions_cleanup(cs, fs);
   if (Verbose && i % period == 0 && pid() == 0)
