@@ -362,8 +362,10 @@ int main(int argc, char **argv) {
   }
   if (Verbose && pid() == 0)
     fprintf(stderr, "cylinder: starting on %d ranks\n", npe());
-  size(domain);
-  origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
+  if (dump_path == NULL) {
+    size(domain);
+    origin(-L0 / 2.5, -L0 / 2.0, -L0 / 2.0);
+  }
   mu = muv;
   if (periodic_boundaries != NULL)
     for (i = 0; periodic_boundaries[i] != '\0'; i++)
