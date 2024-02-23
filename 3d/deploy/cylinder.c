@@ -20309,24 +20309,17 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: initialize velocity\n");
     foreach_stencil () {
-      _stencil_val_a(u.x,0,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(cs,0,0,0);      
+      _stencil_val_a(u.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(cs,0,0,0);      
       _stencil_val_a(u.y,0,0,0);  
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();
-    
-#line 421
-if(!is_constant(fm.x)){{foreach () {
-      val(u.x,0,0,0) = val(fm.x,0,0,0) == 0 ? 0 : val(cs,0,0,0);
-      val(u.y,0,0,0) = 0;
-      val(u.z,0,0,0) = 0;
-    }end_foreach();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
     {
 #line 421
 foreach () {
-      val(u.x,0,0,0) = _const_fm.x == 0 ? 0 : val(cs,0,0,0);
+      val(u.x,0,0,0) = val(fs.x,0,0,0) == 0 ? 0 : val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
       val(u.z,0,0,0) = 0;
-    }end_foreach();}}
+    }end_foreach();}
   }
 }{end_tracing("init_0","cylinder.c",427);return 0;}end_tracing("init_0","cylinder.c",427);}
 
