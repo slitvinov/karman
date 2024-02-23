@@ -413,7 +413,7 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
-    fm = fs;
+    restriction ({cs, fs});
     fields_stats();
   }
   if (i == 0) {
