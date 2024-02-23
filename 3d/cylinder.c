@@ -27,7 +27,7 @@ static double shape_sphere(double x, double y, double z) {
   return sq(x) + sq(y) + sq(z) - sq(1.0 / 2);
 }
 static double (*Shape[])(double, double, double) = {shape_cylinder,
-                                                    shape_sphere};
+						    shape_sphere};
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
@@ -37,29 +37,29 @@ trace static double embed_interpolate3(Point point, scalar s, coord p) {
       cs[0, j, k] && cs[i, j, k]) {
     double val_0, val_k;
     val_0 =
-        (s[0, 0, 0] * (1. - fabs(p.x)) + s[i, 0, 0] * fabs(p.x)) *
-            (1. - fabs(p.y)) +
-        (s[0, j, 0] * (1. - fabs(p.x)) + s[i, j, 0] * fabs(p.x)) * fabs(p.y);
+	(s[0, 0, 0] * (1. - fabs(p.x)) + s[i, 0, 0] * fabs(p.x)) *
+	    (1. - fabs(p.y)) +
+	(s[0, j, 0] * (1. - fabs(p.x)) + s[i, j, 0] * fabs(p.x)) * fabs(p.y);
     val_k =
-        (s[0, 0, k] * (1. - fabs(p.x)) + s[i, 0, k] * fabs(p.x)) *
-            (1. - fabs(p.y)) +
-        (s[0, j, k] * (1. - fabs(p.x)) + s[i, j, k] * fabs(p.x)) * fabs(p.y);
+	(s[0, 0, k] * (1. - fabs(p.x)) + s[i, 0, k] * fabs(p.x)) *
+	    (1. - fabs(p.y)) +
+	(s[0, j, k] * (1. - fabs(p.x)) + s[i, j, k] * fabs(p.x)) * fabs(p.y);
     return (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));
   } else {
     double val = s[];
     foreach_dimension() {
       int i = sign(p.x);
       if (cs[i])
-        val += fabs(p.x) * (s[i] - s[]);
+	val += fabs(p.x) * (s[i] - s[]);
       else if (cs[-i])
-        val += fabs(p.x) * (s[] - s[-i]);
+	val += fabs(p.x) * (s[] - s[-i]);
     }
     return val;
   }
 }
 
 trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
-                               coord *Fmu) {
+			       coord *Fmu) {
   coord Fps = {0}, Fmus = {0};
   foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
     if (cs[] > 0. && cs[] < 1.) {
@@ -69,16 +69,16 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
       double Fn = area * embed_interpolate3(point, p, b);
       foreach_dimension() Fps.x += Fn * n.x;
       if (constant(mu.x) != 0.) {
-        double mua = 0., fa = 0.;
-        foreach_dimension() {
-          mua += mu.x[] + mu.x[1];
-          fa += fs.x[] + fs.x[1];
-        }
-        mua /= fa;
-        coord dudn = embed_gradient(point, u, b, n);
-        foreach_dimension() Fmus.x -=
-            area * mua *
-            (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z);
+	double mua = 0., fa = 0.;
+	foreach_dimension() {
+	  mua += mu.x[] + mu.x[1];
+	  fa += fs.x[] + fs.x[1];
+	}
+	mua /= fa;
+	coord dudn = embed_gradient(point, u, b, n);
+	foreach_dimension() Fmus.x -=
+	    area * mua *
+	    (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z);
       }
     }
   }
@@ -158,85 +158,85 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(
-          stderr,
-          "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
-          "-l <resolution level> -m <maximum resolution level> "
-          "-o <prefix> -p <dump period> -e <end time> "
-          "-f <force file> -S cylinder|sphere "
-          "-z <domain size> [-b <boundaries>] [-d <dump file>]\n\n"
-          "Options:\n"
-          "  -h          Display this help message\n"
-          "  -v          Verbose\n"
-          "  -F          Output the full field\n"
-          "  -b <string> Periodic boundary (ft|f|t: front (f), top (t) or both,"
-          "default is symmetric boundary)\n"
-          "  -r <num>    Reynolds number\n"
-          "  -l <num>    Minimum resolution level (positive integer)\n"
-          "  -m <num>    Maximum resolution level (positive integer)\n"
-          "  -o <string> Prefix for the output files\n"
-          "  -p <num>    Dump period (positive integer)\n"
-          "  -e <num>    End time of the simulation (decimal number)\n"
-          "  -f <file>   Output force file\n"
-          "  -S <string> Specify shape (cylinder|sphere)\n"
-          "  -d <file>   Restart simulation from the dump file\n"
-          "  -z <num>    Domain size\n\n"
-          "Example usage:\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
-          "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
-          "-S cylinder -o h -b t\n");
+	  stderr,
+	  "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
+	  "-l <resolution level> -m <maximum resolution level> "
+	  "-o <prefix> -p <dump period> -e <end time> "
+	  "-f <force file> -S cylinder|sphere "
+	  "-z <domain size> [-b <boundaries>] [-d <dump file>]\n\n"
+	  "Options:\n"
+	  "  -h          Display this help message\n"
+	  "  -v          Verbose\n"
+	  "  -F          Output the full field\n"
+	  "  -b <string> Periodic boundary (ft|f|t: front (f), top (t) or both,"
+	  "default is symmetric boundary)\n"
+	  "  -r <num>    Reynolds number\n"
+	  "  -l <num>    Minimum resolution level (positive integer)\n"
+	  "  -m <num>    Maximum resolution level (positive integer)\n"
+	  "  -o <string> Prefix for the output files\n"
+	  "  -p <num>    Dump period (positive integer)\n"
+	  "  -e <num>    End time of the simulation (decimal number)\n"
+	  "  -f <file>   Output force file\n"
+	  "  -S <string> Specify shape (cylinder|sphere)\n"
+	  "  -d <file>   Restart simulation from the dump file\n"
+	  "  -z <num>    Domain size\n\n"
+	  "Example usage:\n"
+	  "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
+	  "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
+	  "-S cylinder -o h -b t\n");
       exit(1);
     case 'r':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -r needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -r needs an argument\n");
+	exit(1);
       }
       reynolds = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+	exit(1);
       }
       ReynoldsFlag = 1;
       break;
     case 'm':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -m needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -m needs an argument\n");
+	exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || maxlevel <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+		*argv);
+	exit(1);
       }
       MaxLevelFlag = 1;
       break;
     case 'l':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -l needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -l needs an argument\n");
+	exit(1);
       }
       minlevel = strtol(*argv, &end, 10);
       if (*end != '\0' || minlevel <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+		*argv);
+	exit(1);
       }
       MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -p needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -p needs an argument\n");
+	exit(1);
       }
       period = strtol(*argv, &end, 10);
       if (*end != '\0' || period <= 0) {
-        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
-                *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+		*argv);
+	exit(1);
       }
       PeriodFlag = 1;
       break;
@@ -246,29 +246,29 @@ int main(int argc, char **argv) {
     case 'd':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -d needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -d needs an argument\n");
+	exit(1);
       }
       dump_path = *argv;
       break;
     case 'e':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -e needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -e needs an argument\n");
+	exit(1);
       }
       tend = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+	exit(1);
       }
       TendFlag = 1;
       break;
     case 'f':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -f needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -f needs an argument\n");
+	exit(1);
       }
       force_path = *argv;
       break;
@@ -278,52 +278,52 @@ int main(int argc, char **argv) {
     case 'S':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -S needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -S needs an argument\n");
+	exit(1);
       }
       for (i = 0; /**/; i++) {
-        if (i == sizeof shape_names / sizeof *shape_names) {
-          fprintf(stderr, "cylinder: error: unknown shape '%s'\n", *argv);
-          exit(1);
-        }
-        if (strcmp(shape_names[i], *argv) == 0) {
-          shape = Shape[i];
-          break;
-        }
+	if (i == sizeof shape_names / sizeof *shape_names) {
+	  fprintf(stderr, "cylinder: error: unknown shape '%s'\n", *argv);
+	  exit(1);
+	}
+	if (strcmp(shape_names[i], *argv) == 0) {
+	  shape = Shape[i];
+	  break;
+	}
       }
       break;
     case 'b':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -b needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -b needs an argument\n");
+	exit(1);
       }
       periodic_boundaries = *argv;
       break;
     case 'o':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -o needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -o needs an argument\n");
+	exit(1);
       }
       output_prefix = *argv;
       break;
     case 'z':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -z needs an argument\n");
-        exit(1);
+	fprintf(stderr, "cylinder: error: -z needs an argument\n");
+	exit(1);
       }
       domain = strtod(*argv, &end);
       if (*end != '\0') {
-        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
+	fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+	exit(1);
       }
       if (domain < 1) {
-        fprintf(stderr,
-                "cylinder: error: '%s': domain size (-z) is less then one\n",
-                *argv);
-        exit(1);
+	fprintf(stderr,
+		"cylinder: error: '%s': domain size (-z) is less then one\n",
+		*argv);
+	exit(1);
       }
       DomainFlag = 1;
       break;
@@ -370,20 +370,20 @@ int main(int argc, char **argv) {
     for (i = 0; periodic_boundaries[i] != '\0'; i++)
       switch (periodic_boundaries[i]) {
       case 'f':
-        periodic(front);
-        if (Verbose && pid() == 0)
-          fprintf(stderr, "cylinder: front boundary is periodic\n");
-        break;
+	periodic(front);
+	if (Verbose && pid() == 0)
+	  fprintf(stderr, "cylinder: front boundary is periodic\n");
+	break;
       case 't':
-        periodic(top);
-        if (Verbose && pid() == 0)
-          fprintf(stderr, "cylinder: top boundary is periodic\n");
-        break;
+	periodic(top);
+	if (Verbose && pid() == 0)
+	  fprintf(stderr, "cylinder: top boundary is periodic\n");
+	break;
       default:
-        fprintf(stderr, "cylinder: unknown boundary in '%s'\n",
-                periodic_boundaries);
-        exit(1);
-        break;
+	fprintf(stderr, "cylinder: unknown boundary in '%s'\n",
+		periodic_boundaries);
+	exit(1);
+	break;
       }
   run();
   if (Verbose && pid() == 0)
@@ -397,17 +397,17 @@ event init(t = 0) {
     for (;;) {
       solid(cs, fs, shape(x, y, z));
       astats s = adapt_wavelet({cs}, (double[]){0}, maxlevel = maxlevel,
-                               minlevel = minlevel);
+			       minlevel = minlevel);
       if (Verbose && pid() == 0)
-        fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
+	fprintf(stderr, "cylinder: refined %d cells\n", s.nf);
       if (s.nf == 0)
-        break;
+	break;
     }
   } else {
     restore(dump_path);
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
-              dump_path, t, i);
+	      dump_path, t, i);
       fields_stats();
     }
     if (i == 0)
@@ -423,7 +423,23 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
+    /* event metric() */
+    if (is_constant (fm.x)) {
+      foreach_dimension()
+	assert (constant (fm.x) == 1.);
+      fm = fs;
+    }
+    foreach_face()
+      fs.x[] = 1.;
+    if (is_constant (cm)) {
+      assert (constant (cm) == 1.);
+      cm = cs;
+    }
+    foreach()
+      cs[] = 1.;
+    restriction ({cs, fs});
   }
+  /* end of metric() */
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] / reynolds; }
@@ -437,51 +453,51 @@ event velocity(i++; t <= tend) {
     if (Verbose) {
       fields_stats();
       if (pid() == 0)
-        fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
+	fprintf(stderr, "cylinder: %d: %09d %.16e %ld\n", npe(), i, t, grid->n);
     }
     if (output_prefix != NULL) {
       vorticity_vector(u, omega);
       lambda2(u, l2);
       if (FullOutput) {
-        sprintf(path, "%s.%09d", output_prefix, i);
-        output_xdmf(t, {p, l2}, {u, omega}, NULL, path);
+	sprintf(path, "%s.%09d", output_prefix, i);
+	output_xdmf(t, {p, l2}, {u, omega}, NULL, path);
       }
       snprintf(path, sizeof path, "%s.slice.%09d", output_prefix, i);
       output_xdmf(t, {p, l2, cs, phi}, {u, omega}, slice, path);
       if (i % (100 * period) == 0) {
-        snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
-        dump(path);
+	snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
+	dump(path);
       }
     }
     if (force_path) {
       embed_force3(p, u, mu, &Fp, &Fmu);
       if (pid() == 0) {
-        if (fp == NULL) {
-          if ((fp = fopen(force_path, "w")) == NULL) {
-            fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        } else {
-          if ((fp = fopen(force_path, "a")) == NULL) {
-            fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
-            exit(1);
-          }
-        }
-        fprintf(fp,
-                "%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
-                "%.16e %.16e\n",
-                i, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
-                Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
-        fflush(fp);
+	if (fp == NULL) {
+	  if ((fp = fopen(force_path, "w")) == NULL) {
+	    fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
+	    exit(1);
+	  }
+	} else {
+	  if ((fp = fopen(force_path, "a")) == NULL) {
+	    fprintf(stderr, "cylinder: error: fail to open '%s'\n", force_path);
+	    exit(1);
+	  }
+	}
+	fprintf(fp,
+		"%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e "
+		"%.16e %.16e\n",
+		i, t, Fp.x + Fmu.x, Fp.y + Fmu.y, Fp.z + Fmu.z, Fp.x, Fp.y,
+		Fp.z, Fmu.x, Fmu.y, Fmu.z, dt);
+	fflush(fp);
       }
     }
   }
   astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
-                           maxlevel = maxlevel, minlevel = minlevel);
+			   maxlevel = maxlevel, minlevel = minlevel);
   fractions_cleanup(cs, fs);
   unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
   fractions_cleanup(cs, fs);
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
-            s.nc);
+	    s.nc);
 }
