@@ -5,6 +5,6 @@ f(x) := al * x + be;
 eq: [f(-25) = 0, f(sz/2^l) - f(0)= 1];
 so: linsolve(eq, [al, be]);
 
-f(0), so, float;
-(f(0) - f(1))/2, so, float;
+f(12) - f(0), so, float;
+
 
