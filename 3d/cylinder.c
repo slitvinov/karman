@@ -416,7 +416,6 @@ event init(t = 0) {
     fields_stats();
   }
   if (i == 0) {
-    DT = 0.1;
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach () {
