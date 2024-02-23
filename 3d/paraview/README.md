@@ -8,8 +8,8 @@ mpiexec -n 2 ../cylinder -v -r 100 -l 3 -m 6 -p 1 -e 3000 -f force.dat -z 2 -S c
 
 Production
 ```
-./stl2dump -v -- -20 -25 -25 50   8 11      2 center.stl basilisk.dump
 ../stl/center.py '/u/tsponge/geometry/No helix.stl'
+./stl2dump -v -- -20 -25 -25 50   8 11      2 center.stl basilisk.dump
 d=.
 ./cylinder -v -r 220 -l 8 -m 11 -p 10 -e 3000 -f $d/force.dat -z 50 -S cylinder -o $d/h -b t -d basilisk.dump
 ```
