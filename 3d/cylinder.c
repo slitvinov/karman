@@ -16,7 +16,7 @@
 #include "lambda2.h"
 #include "navier-stokes/centered.h"
 #include "output_xdmf.h"
-    static int slice(double x, double y, double z, double Delta) {
+static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
 }
@@ -59,7 +59,7 @@ trace static double embed_interpolate3(Point point, scalar s, coord p) {
 }
 
 trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
-                        coord *Fmu) {
+                               coord *Fmu) {
   coord Fps = {0}, Fmus = {0};
   foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
     if (cs[] > 0. && cs[] < 1.) {
@@ -403,7 +403,6 @@ event init(t = 0) {
         break;
     }
   } else {
-    DT = 0.01;
     restore(dump_path);
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
@@ -413,13 +412,13 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
-    fields_stats();    
+    fields_stats();
   }
   if (i == 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach () {
-      u.x[] = cs[];
+      u.x[] = 0;
       u.y[] = 0;
       u.z[] = 0;
     }
