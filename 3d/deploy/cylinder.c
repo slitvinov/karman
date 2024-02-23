@@ -20303,7 +20303,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (i == 0)
       fractions((struct Fractions){phi, cs, fs});
     fractions_cleanup((struct Cleanup){cs, fs});
-    fm = fs;
+    restriction (((scalar[]){cs, fs.x, fs.y, fs.z,{-1}}));
     fields_stats();
   }
   if (i == 0) {
