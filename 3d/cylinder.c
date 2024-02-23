@@ -413,33 +413,18 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
+    fm = fs;
     fields_stats();
   }
   if (i == 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach () {
-      u.x[] = phi[] > 0 ? 0 : 1;
+      u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
-    /* event metric() */
-    if (is_constant (fm.x)) {
-      foreach_dimension()
-	assert (constant (fm.x) == 1.);
-      fm = fs;
-    }
-    foreach_face()
-      fs.x[] = 1.;
-    if (is_constant (cm)) {
-      assert (constant (cm) == 1.);
-      cm = cs;
-    }
-    foreach()
-      cs[] = 1.;
-    restriction ({cs, fs});
   }
-  /* end of metric() */
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] / reynolds; }
