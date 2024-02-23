@@ -11,10 +11,15 @@ import sys
 shift = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1),
          (1, 1, 0), (1, 1, 1))
 
+
 class Node:
+
     def __init__(self):
         self.children = None
+
+
 def add(root, i, j, k, level):
+
     def add_rec(node, l, i, j, k):
         d = level - l
         if d > 0:
@@ -25,8 +30,12 @@ def add(root, i, j, k, level):
             if node.children == None:
                 node.children = [Node() for i in range(8)]
             add_rec(node.children[idx], l + 1, i, j, k)
+
     add_rec(root, 0, i, j, k)
+
+
 def has(root, i, j, k, level):
+
     def has_rec(node, l, i, j, k):
         d = level - l
         if d > 0:
@@ -34,10 +43,13 @@ def has(root, i, j, k, level):
             y = (j >> d) & 1
             z = (k >> d) & 1
             idx = shift.index((x, y, z))
-            return node.children != None and has_rec(node.children[idx], l + 1, i, j, k)
+            return node.children != None and has_rec(node.children[idx], l + 1,
+                                                     i, j, k)
         else:
             return True
+
     return has_rec(root, 0, i, j, k)
+
 
 def create_cell(cell, level):
     if level > 0 and (*cell, level) not in cells:

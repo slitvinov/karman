@@ -404,11 +404,9 @@ event init(t = 0) {
     }
   } else {
     restore(dump_path);
-    if (Verbose && pid() == 0) {
+    if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
               dump_path, t, i);
-      fields_stats();
-    }
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);

@@ -26,6 +26,7 @@ def create_cell(cell, level, need_neighbors):
             create_cell(tuple(gcell >> 1 for gcell in gcell), level - 1, True)
         cells.add((*cell, level))
 
+
 def read_stl(path):
     with open(path, "rb+") as file:
         mm = mmap.mmap(file.fileno(), 0)
@@ -61,7 +62,7 @@ while True:
     if len(sys.argv) and len(sys.argv[0]) > 1 and sys.argv[0][0] == '-':
         if sys.argv[0][1] == 'h':
             sys.stderr.write(
-                """usage: stl.py [-h] [-v] [--] X0 Y0 Z0 L minlevel maxlevel file.stl basilisk.dump
+                """usage: stl.py [-h] [-v] [--] X0 Y0 Z0 L minlevel maxlevel npe file.stl basilisk.dump
 Options:
   -h     display this help message
   -v     verbose
@@ -94,6 +95,7 @@ except ValueError as e:
 try:
     minlevel = int(sys.argv.pop(0))
     maxlevel = int(sys.argv.pop(0))
+    npe = int(sys.argv.pop(0))
     stl_path = sys.argv.pop(0)
     dump_path = sys.argv.pop(0)
 except IndexError:
@@ -138,7 +140,6 @@ nfields = len(fields)
 t = 0
 i = 0
 depth = 8  # TODO:
-npe = 1
 version = 170901
 n = 0, 0, 0
 
