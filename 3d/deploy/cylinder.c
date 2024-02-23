@@ -20293,7 +20293,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
         break;
     }
   } else {
-    fprintf(ferr, "DT: %g\n", DT);
+    DT = 0.01;
     restore((struct Dump){dump_path});
     if (Verbose && pid() == 0) {
       fprintf(ferr, "cylinder: starting from '%s': time: %g, step: %d\n",
