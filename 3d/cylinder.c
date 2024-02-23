@@ -415,6 +415,7 @@ event init(t = 0) {
     fractions_cleanup(cs, fs);
     fm = fs;
     cm = cs;
+    restriction ({cs, fs});
     fields_stats();
   }
   if (i == 0) {

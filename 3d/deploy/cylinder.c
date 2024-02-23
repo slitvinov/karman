@@ -20303,6 +20303,8 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (i == 0)
       fractions((struct Fractions){phi, cs, fs});
     fractions_cleanup((struct Cleanup){cs, fs});
+    fm = fs;
+    cm = cs;
     restriction (((scalar[]){cs, fs.x, fs.y, fs.z,{-1}}));
     fields_stats();
   }
@@ -20315,26 +20317,26 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();
     {
-#line 422
+#line 424
 foreach () {
       val(u.x,0,0,0) = val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
       val(u.z,0,0,0) = 0;
     }end_foreach();}
   }
-}{end_tracing("init_0","cylinder.c",428);return 0;}end_tracing("init_0","cylinder.c",428);}
+}{end_tracing("init_0","cylinder.c",430);return 0;}end_tracing("init_0","cylinder.c",430);}
 
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 430
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",430); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",430);return 0;}end_tracing("properties_0","cylinder.c",430);}
+#line 432
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",432); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",432);return 0;}end_tracing("properties_0","cylinder.c",432);}
 
 static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int velocity_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 432
-      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",432); {
+#line 434
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",434); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -20390,7 +20392,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
   if (Verbose && i % period == 0 && pid() == 0)
     fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
      s.nc);
-}{end_tracing("velocity","cylinder.c",488);return 0;}end_tracing("velocity","cylinder.c",488);}
+}{end_tracing("velocity","cylinder.c",490);return 0;}end_tracing("velocity","cylinder.c",490);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20434,8 +20436,8 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
 #line 393 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",393,"init"});  
-#line 432
-event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",432,"velocity"});
+#line 434
+event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",434,"velocity"});
 	
 	
 	
@@ -20502,8 +20504,8 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",446,"adapt"});  
-#line 430 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",430,"properties"});
+#line 432 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",432,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
