@@ -391,8 +391,8 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
+  init_grid(1 << outlevel);
   if (dump_path == NULL) {
-    init_grid(1 << outlevel);
     refine(x < X0 + 0.9 * L0 && level < minlevel);
     for (;;) {
       solid(cs, fs, shape(x, y, z));
@@ -405,6 +405,7 @@ event init(t = 0) {
     }
   } else {
     restore(dump_path);
+    restriction (all);
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
 	      dump_path, t, i);
