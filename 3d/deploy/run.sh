@@ -1,15 +1,5 @@
 #!/bin/sh
-#SBATCH --constraint gpu
-#SBATCH --account s1160
 
-. /etc/profile
-module load daint-mc
-module load cray-mpich
-
-set -x
-r=$1
-d=$SCRATCH/$r
-make MPICC=cc 'MPICCFLAGS = -O2 -g' && {
-    mkdir -p $d
-    exec srun ./cylinder -v -r $r -l 8 -m 12 -p 100 -e 2600 -f $d/force.dat -o $d/h
-}
+../stl/cylinder.py
+../paraview/stl2dump -v -- -4.8 -6 -6 12    5 7   64 center.stl basilisk.dump
+exec mpiexec ./cylinder -v -r 220 -l 5 -m 7 -p 10 -e 3000 -d basilisk.dump -o h
