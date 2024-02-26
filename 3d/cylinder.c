@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if (dump_path == NULL && shape == NULL) {
-    fprintf(stderr, "cylinder: error: eather -d (dump) or -s (shape) must be set\n");
+    fprintf(stderr, "cylinder: error: eather -d (dump) or -S (shape) must be set\n");
     exit(1);
   }
   if (Verbose && pid() == 0)
