@@ -335,12 +335,12 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -r is not set\n");
     exit(1);
   }
-  if (!MaxLevelFlag) {
-    fprintf(stderr, "cylinder: error: -m is not set\n");
-    exit(1);
-  }
   if (!MinLevelFlag) {
     fprintf(stderr, "cylinder: error: -l is not set\n");
+    exit(1);
+  }
+  if (!MaxLevelFlag) {
+    fprintf(stderr, "cylinder: error: -m is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
