@@ -412,7 +412,7 @@ event init(t = 0) {
       event("metric");
       fractions(phi, cs, fs);
     }
-    //fractions_cleanup(cs, fs);
+    fractions_cleanup(cs, fs);
     if (Verbose)
       fields_stats();
   }
