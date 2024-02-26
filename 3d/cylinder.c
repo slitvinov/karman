@@ -117,7 +117,7 @@ static void vorticity_vector(const vector u, vector omega) {
 
 static const char *force_path, *output_prefix;
 static char *dump_path;
-static const int outlevel = 7;
+static const int outlevel = 5;
 static double reynolds, tend;
 static int maxlevel, minlevel, period, Verbose, FullOutput;
 static face vector muv[];
