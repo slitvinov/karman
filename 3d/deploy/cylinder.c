@@ -4402,7 +4402,22 @@ static int event_cond (Event * ev, int i, double t)
     return true;
   return (* ev->expr[1]) (&i, &t, ev);
 }
-#line 136 "/home/lisergey/basilisk/src/grid/events.h"
+
+
+static void event_print (Event * ev, FILE * fp)
+{
+  char * root = strstr (ev->file, "/home/lisergey/basilisk/src");
+  fprintf (fp, "  %-25s %s%s:%d\n", ev->name,
+    root ? "src" : "",
+    root ? &ev->file[strlen("/home/lisergey/basilisk/src")] : ev->file,
+    ev->line);
+}
+
+
+
+
+
+
 static bool overload_event() { return true; }
 
 static int event_do (Event * ev, bool action)
@@ -4414,7 +4429,7 @@ static int event_do (Event * ev, bool action)
       bool finished = false;
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  if ((* e->action) (iter, t, e))
    finished = true;
@@ -4451,14 +4466,14 @@ static int event_do (Event * ev, bool action)
 static void end_event_do (bool action)
 {
 
-
-
+  if (action)
+    fprintf (ferr, "\nend events (i = %d, t = %g)\n", iter, t);
 
   for (Event * ev = Events; !ev->last; ev++)
     if (ev->i == END_EVENT && action)
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  e->action (iter, t, e);
       }
@@ -4467,8 +4482,8 @@ static void end_event_do (bool action)
 int events (bool action)
 {
 
-
-
+  if (action)
+    fprintf (ferr, "\nevents (i = %d, t = %g)\n", iter, t);
 
 
   if (iter == 0)
@@ -4509,7 +4524,7 @@ void event (const char * name)
     if (!strcmp (ev->name, name))
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  (* e->action) (0, 0, e);
       }
@@ -20218,12 +20233,12 @@ char *end;
     fprintf(ferr, "cylinder: error: -r is not set\n");
     exit(1);
   }
-  if (!MaxLevelFlag) {
-    fprintf(ferr, "cylinder: error: -m is not set\n");
-    exit(1);
-  }
   if (!MinLevelFlag) {
     fprintf(ferr, "cylinder: error: -l is not set\n");
+    exit(1);
+  }
+  if (!MaxLevelFlag) {
+    fprintf(ferr, "cylinder: error: -m is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
