@@ -20316,7 +20316,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (i == 0)
       fractions((struct Fractions){phi, cs, fs});
 
-    if (Verbose && pid() == 0)
+    if (Verbose)
       fields_stats();
   }
   if (i == 0) {
