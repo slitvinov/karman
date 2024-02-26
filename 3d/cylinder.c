@@ -422,13 +422,14 @@ event init(t = 0) {
       u.z[] = 0;
     }
     event("metric");
-    event ("defaults");
+    event("defaults");
+    event("dump");
   }
 }
 
 event properties(i++) { foreach_face() muv.x[] = fm.x[] / reynolds; }
 
-event velocity(i++; t <= tend) {
+event dump(i++; t <= tend) {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
