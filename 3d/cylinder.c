@@ -411,7 +411,8 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
-    fields_stats();
+    if (Verbose && pid() == 0)
+      fields_stats();
   }
   if (i == 0) {
     if (Verbose && pid() == 0)
