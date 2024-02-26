@@ -405,9 +405,6 @@ event init(t = 0) {
     }
   } else {
     restore(dump_path);
-    restriction (all);
-    event("metric");
-
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
 	      dump_path, t, i);
@@ -426,11 +423,8 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
-    /*
-    foreach_face()
-      if (fs.x[] == 0)
-	u.x[] = 0;
-    */
+    event("metric");
+    event ("defaults");
   }
 }
 
