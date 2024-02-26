@@ -20330,18 +20330,18 @@ foreach_vertex()
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: initialize velocity\n");
     event("defaults");
-    foreach_vertex_stencil () {
+    foreach_stencil() {
       _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
       _stencil_val_a(u.y,0,0,0);  
       _stencil_val_a(u.z,0,0,0);  
-    }end_foreach_vertex_stencil();
+    }end_foreach_stencil();
     {
 #line 424
-foreach_vertex () {
+foreach() {
       val(u.x,0,0,0) = val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
       val(u.z,0,0,0) = 0;
-    }end_foreach_vertex();}
+    }end_foreach();}
     event("dump");
   }
 }{end_tracing("init_0","cylinder.c",431);return 0;}end_tracing("init_0","cylinder.c",431);}
