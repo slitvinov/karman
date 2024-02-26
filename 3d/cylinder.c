@@ -419,7 +419,7 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: initialize velocity\n");
     event("defaults");
     foreach() {
-      u.x[] = 1 - cs[];
+      u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
