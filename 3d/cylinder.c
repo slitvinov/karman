@@ -417,12 +417,12 @@ event init(t = 0) {
   if (i == 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
+    event("defaults");
     foreach () {
       u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
-    event("defaults");
     event("dump");
   }
 }
