@@ -424,9 +424,11 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
+    /*
     foreach_face()
       if (fs.x[] == 0)
 	u.x[] = 0;
+    */
   }
 }
 
