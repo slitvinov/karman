@@ -406,6 +406,8 @@ event init(t = 0) {
   } else {
     restore(dump_path);
     restriction (all);
+    event("metric");
+
     if (Verbose && pid() == 0) {
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
 	      dump_path, t, i);
