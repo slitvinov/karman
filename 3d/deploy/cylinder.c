@@ -20315,7 +20315,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
        dump_path, t, i);
     if (i == 0)
       fractions((struct Fractions){phi, cs, fs});
-    fractions_cleanup((struct Cleanup){cs, fs});
+
     if (Verbose && pid() == 0)
       fields_stats();
   }

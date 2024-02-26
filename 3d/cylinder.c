@@ -410,7 +410,7 @@ event init(t = 0) {
 	      dump_path, t, i);
     if (i == 0)
       fractions(phi, cs, fs);
-    fractions_cleanup(cs, fs);
+    //fractions_cleanup(cs, fs);
     if (Verbose && pid() == 0)
       fields_stats();
   }
