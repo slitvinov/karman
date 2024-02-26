@@ -424,6 +424,7 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
+    event("metric");
     event("defaults");
     event("dump");
   }
