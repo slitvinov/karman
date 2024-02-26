@@ -20030,7 +20030,7 @@ static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary12(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary12_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary13_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 int main(int argc, char **argv) {
-#line 391
+#line 392
 _init_solver();
   
 #line 139
@@ -20254,7 +20254,7 @@ char *end;
     exit(1);
   }
   if (dump_path == NULL && shape == NULL) {
-    fprintf(ferr, "cylinder: error: eather -d (dump) or -s (shape) must be set\n");
+    fprintf(ferr, "cylinder: error: eather -d (dump) or -S (shape) must be set\n");
     exit(1);
   }
   if (Verbose && pid() == 0)
@@ -20283,20 +20283,20 @@ char *end;
  exit(1);
  break;
       }
+  init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
     fprintf(ferr, "cylinder: done\n");
 free_solver();
 
-#line 391
+#line 392
 }
 
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 393
-      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",393); {
-  init_grid(1 << outlevel);
+#line 394
+      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",394); {
   if (dump_path == NULL) {
     do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 396); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
     for (;;) {
@@ -20471,8 +20471,8 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
-#line 393 "cylinder.c"
-event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",393,"init"});  
+#line 394 "cylinder.c"
+event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",394,"init"});  
 #line 435
 event_register((Event){0,2,velocity,{velocity_expr0,velocity_expr1},((int *)0),((double *)0),"cylinder.c",435,"velocity"});
 	

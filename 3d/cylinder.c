@@ -385,13 +385,13 @@ int main(int argc, char **argv) {
 	exit(1);
 	break;
       }
+  init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
     fprintf(stderr, "cylinder: done\n");
 }
 
 event init(t = 0) {
-  init_grid(1 << outlevel);
   if (dump_path == NULL) {
     refine(x < X0 + 0.9 * L0 && level < minlevel);
     for (;;) {
