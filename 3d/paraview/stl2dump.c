@@ -432,7 +432,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   }
   for (i = 0; i < sizeof fields / sizeof *fields; i++)
     values[i] = 0.0;
-  values[12] = intersect % 2 == 0 ? -sqrt(minimum) : sqrt(minimum);
+  values[12] = intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
   code_ch = morton(x << 1, y << 1, z << 1);
   leaf = level >= config->minlevel &&
 	 (level + 1 > config->maxlevel ||
