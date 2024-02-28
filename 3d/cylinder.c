@@ -411,8 +411,6 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
-    foreach()
-      cs[] = -cs[];
     if (Verbose)
       fields_stats();
   }
