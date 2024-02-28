@@ -20309,14 +20309,14 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       fprintf(ferr, "cylinder: initialize velocity\n");
     event("defaults");
     foreach_stencil() {
-      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0);     
+      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
       _stencil_val_a(u.y,0,0,0);  
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();
     {
 #line 421
 foreach() {
-      val(u.x,0,0,0) = val(cs,0,0,0) ? 1 : 0;
+      val(u.x,0,0,0) = val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
       val(u.z,0,0,0) = 0;
     }end_foreach();}
