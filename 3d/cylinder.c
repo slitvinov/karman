@@ -411,6 +411,8 @@ event init(t = 0) {
     if (i == 0)
       fractions(phi, cs, fs);
     fractions_cleanup(cs, fs);
+    foreach()
+      cs[] = -cs[];
     if (Verbose)
       fields_stats();
   }
@@ -419,7 +421,7 @@ event init(t = 0) {
       fprintf(stderr, "cylinder: initialize velocity\n");
     event("defaults");
     foreach() {
-      u.x[] = cs[];
+      u.x[] = cs[] ? 1 : 0;
       u.y[] = 0;
       u.z[] = 0;
     }
