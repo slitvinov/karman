@@ -119,7 +119,7 @@ static const char *force_path, *output_prefix;
 static char *dump_path;
 static const int outlevel = 5;
 static double reynolds, tend;
-static int maxlevel, minlevel, period, Verbose, FullOutput;
+static int maxlevel, minlevel, period, Verbose, FullOutput, AdaptFlag;
 static face vector muv[];
 static scalar l2[];
 static vector omega[];
@@ -141,6 +141,7 @@ int main(int argc, char **argv) {
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
       DomainFlag, i;
   double domain;
+  AdaptFlag = 0;
   DomainFlag = 0;
   FullOutput = 0;
   MaxLevelFlag = 0;
@@ -159,7 +160,7 @@ int main(int argc, char **argv) {
     case 'h':
       fprintf(
 	  stderr,
-	  "Usage: cylinder [-h] [-v] [-F] -r <Reynolds number> "
+	  "Usage: cylinder [-h] [-v] [-a] [-F] [-r <Reynolds number> "
 	  "-l <resolution level> -m <maximum resolution level> "
 	  "-o <prefix> -p <dump period> -e <end time> "
 	  "-f <force file> -S cylinder|sphere "
@@ -168,6 +169,7 @@ int main(int argc, char **argv) {
 	  "  -h          Display this help message\n"
 	  "  -v          Verbose\n"
 	  "  -F          Output the full field\n"
+	  "  -a          Use adoptation\n"
 	  "  -b <string> Periodic boundary (ft|f|t: front (f), top (t) or both,"
 	  "default is symmetric boundary)\n"
 	  "  -r <num>    Reynolds number\n"
@@ -242,6 +244,9 @@ int main(int argc, char **argv) {
       break;
     case 'v':
       Verbose = 1;
+      break;
+    case 'a':
+      AdaptFlag = 1;
       break;
     case 'd':
       argv++;
@@ -418,7 +423,7 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach() {
-      u.x[] = 0;
+      u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
@@ -477,12 +482,14 @@ event dump(i++; t <= tend) {
       }
     }
   }
-  astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
-			   maxlevel = maxlevel, minlevel = minlevel);
-  fractions_cleanup(cs, fs);
-  unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
-  fractions_cleanup(cs, fs);
-  if (Verbose && i % period == 0 && pid() == 0)
-    fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
-	    s.nc);
+  if (AdaptFlag) {
+    astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.1, 0.1, 0.1},
+			     maxlevel = maxlevel, minlevel = minlevel);
+    fractions_cleanup(cs, fs);
+    unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
+    fractions_cleanup(cs, fs);
+    if (Verbose && i % period == 0 && pid() == 0)
+      fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
+	      s.nc);
+  }
 }
