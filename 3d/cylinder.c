@@ -491,8 +491,5 @@ event dump(i++; t <= tend) {
     if (Verbose && i % period == 0 && pid() == 0)
       fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
 	      s.nc);
-  } else {
-    unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
-    fractions_cleanup(cs, fs);
   }
 }
