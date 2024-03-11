@@ -19,7 +19,7 @@ struct Hash {
 };
 struct Config {
   double R[3], L, dgrid;
-  int minlevel, maxlevel, npe, ngrid, size_grid;
+  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, OutLevelFlag;
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
@@ -41,10 +41,10 @@ static int hash_insert(struct Hash *, int64_t, void *);
 static int hash_search(struct Hash *, int64_t, void **);
 static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 static double tri_point_distance2(const double[3], const double[3],
-				  const double[3], const double[3]);
+                                  const double[3], const double[3]);
 static double edg2_sq(const float[2], const float[2]);
 static uint64_t create_cell(struct Config *, uint64_t, uint64_t, uint64_t, int,
-			    int);
+                            int);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
   const char *name;
@@ -62,10 +62,10 @@ static const struct {
     {"dump_path", TABLE_PCHAR, offsetof(struct Config, dump_path)},
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
-			       {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
+                               {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
 static char *fields[] = {"size",    "cs",      "u.x", "u.y", "u.z",
-			 "g.x",     "g.y",     "g.z", "l2",  "omega.x",
-			 "omega.y", "omega.z", "phi"};
+                         "g.x",     "g.y",     "g.z", "l2",  "omega.x",
+                         "omega.y", "omega.z", "phi"};
 int main(int argc, char **argv) {
   char *end;
   double lo[3], hi[3], r, d2, d2max;
@@ -81,18 +81,33 @@ int main(int argc, char **argv) {
   void **work;
 
   Verbose = 0;
+  config.OutLevelFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-	      "Usage: stl2dump [-h] [-v] X0 Y0 Z0 L minlevel maxlevel npe "
-	      "file.stl basilisk.dump\n"
-	      "Options:\n"
-	      "  -h          print help message and exit\n"
-	      "  -v          verbose\n");
+              "Usage: stl2dump [-h] [-v] X0 Y0 Z0 L minlevel maxlevel npe "
+              "file.stl basilisk.dump\n"
+              "Options:\n"
+              "  -o  outlevel\n"
+              "  -h          print help message and exit\n"
+              "  -v          verbose\n");
       exit(1);
     case 'v':
       Verbose = 1;
+      break;
+    case 'r':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -o needs an argument\n");
+        exit(1);
+      }
+      config.outlevel = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
+        exit(1);
+      }
+      config.OutLevelFlag = 1;
       break;
     case '-':
       argv++;
@@ -111,15 +126,15 @@ positional:
     case TABLE_DOUBLE:
       *(double *)((void *)&config + Table[i].offset) = strtod(*argv, &end);
       if (*end != '\0') {
-	fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
-	exit(1);
+        fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
+        exit(1);
       }
       break;
     case TABLE_INT:
       *(int *)((void *)&config + Table[i].offset) = strtol(*argv, &end, 10);
       if (*end != '\0') {
-	fprintf(stderr, "stl2dump: error: '%s' is not an integer\n", *argv);
-	exit(1);
+        fprintf(stderr, "stl2dump: error: '%s' is not an integer\n", *argv);
+        exit(1);
       }
       break;
     case TABLE_PCHAR:
@@ -151,7 +166,7 @@ positional:
   for (i = 0; i < config.stl_nt; i++) {
     fseek(stl_file, 3 * sizeof *config.stl_ver, SEEK_CUR);
     if (fread(&config.stl_ver[9 * i], sizeof *config.stl_ver, 9, stl_file) !=
-	9) {
+        9) {
       fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
       exit(1);
     }
@@ -163,7 +178,7 @@ positional:
   }
   config.hash = malloc((config.maxlevel + 1) * sizeof *config.hash);
   work = malloc((config.maxlevel + 1) * sizeof *work);
-  nbytes = (1ul << 24) * sizeof *(*config.hash)->nodes;
+  nbytes = (1ul << 23) * sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
@@ -216,14 +231,14 @@ positional:
     iw = (s[2] - config.R[2]) / config.dgrid;
     for (iy = iv - 1; iy <= iv + 1; iy++)
       for (iz = iw - 1; iz <= iw + 1; iz++) {
-	index = iy * config.ngrid + iz;
-	if (0 <= index && index < config.size_grid) {
-	  config.max_grid[index]++;
-	  config.grid[index] =
-	      realloc(config.grid[index],
-		      config.max_grid[index] * sizeof *config.grid[index]);
-	  config.grid[index][config.max_grid[index] - 1] = i;
-	}
+        index = iy * config.ngrid + iz;
+        if (0 <= index && index < config.size_grid) {
+          config.max_grid[index]++;
+          config.grid[index] =
+              realloc(config.grid[index],
+                      config.max_grid[index] * sizeof *config.grid[index]);
+          config.grid[index][config.max_grid[index] - 1] = i;
+        }
       }
   }
   inv_delta = 1ul << config.maxlevel;
@@ -232,29 +247,29 @@ positional:
     hi[0] = hi[1] = hi[2] = -DBL_MAX;
     for (j = 0; j < 3; j++) {
       for (d = 0; d < 3; d++) {
-	r = config.stl_ver[9 * i + 3 * j + d];
-	if (r < lo[d])
-	  lo[d] = r;
-	if (r > hi[d])
-	  hi[d] = r;
+        r = config.stl_ver[9 * i + 3 * j + d];
+        if (r < lo[d])
+          lo[d] = r;
+        if (r > hi[d])
+          hi[d] = r;
       }
     }
     for (d = 0; d < 3; d++) {
       ilo[d] = (lo[d] - config.R[d]) / config.L * inv_delta;
       ihi[d] = ceil((hi[d] - config.R[d]) / config.L * inv_delta);
       if (ilo[d] < 0)
-	ilo[d] = 0;
+        ilo[d] = 0;
       if (ilo[d] > inv_delta)
-	ilo[d] = inv_delta;
+        ilo[d] = inv_delta;
       if (ihi[d] < 0)
-	ihi[d] = 0;
+        ihi[d] = 0;
       if (ihi[d] > inv_delta)
-	ihi[d] = inv_delta;
+        ihi[d] = inv_delta;
     }
     for (x = ilo[0]; x < ihi[0]; x++)
       for (y = ilo[1]; y < ihi[1]; y++)
-	for (z = ilo[2]; z < ihi[2]; z++)
-	  ncells += create_cell(&config, x, y, z, config.maxlevel, 1);
+        for (z = ilo[2]; z < ihi[2]; z++)
+          ncells += create_cell(&config, x, y, z, config.maxlevel, 1);
   }
   if (Verbose)
     fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
@@ -281,12 +296,12 @@ positional:
     len = strlen(fields[i]);
     if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
-	      config.dump_path);
+              config.dump_path);
       exit(1);
     }
     if (fwrite(fields[i], len, 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
-	      config.dump_path);
+              config.dump_path);
       exit(1);
     }
   }
@@ -374,7 +389,7 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
     key0 = set->nodes[x].key;
     if (key0 == key) {
       if (pvalue != NULL)
-	*pvalue = set->nodes[x].value;
+        *pvalue = set->nodes[x].value;
       return 1;
     } else if (key0 == -1) {
       return 0;
@@ -386,7 +401,7 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
 }
 
 static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
-			 struct Config *config) {
+                         struct Config *config) {
   double delta, values[sizeof fields / sizeof *fields], minimum, s[3];
   int leaf, i, intersect, iy, iz, index;
   uint32_t leaf_code;
@@ -435,8 +450,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   values[12] = intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
   code_ch = morton(x << 1, y << 1, z << 1);
   leaf = level >= config->minlevel &&
-	 (level + 1 > config->maxlevel ||
-	  !hash_search(config->hash[level + 1], code_ch, NULL));
+         (level + 1 > config->maxlevel ||
+          !hash_search(config->hash[level + 1], code_ch, NULL));
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
@@ -487,7 +502,7 @@ static double edg_sq(const double a[3], const double b[3]) {
 }
 
 static double edg_point_distance2(const double a[3], const double b[3],
-				  const double p[3]) {
+                                  const double p[3]) {
   enum { X, Y, Z };
   double t, s, x, y, z;
 
@@ -515,7 +530,7 @@ static void vec_minus(const double a[3], const double b[3], /**/ double c[3]) {
 }
 
 static double tri_point_distance2(const double a[3], const double b[3],
-				  const double c[3], const double p[3]) {
+                                  const double c[3], const double p[3]) {
   enum { X, Y, Z };
 
   double u[3], v[3], q[3];
@@ -555,7 +570,7 @@ static double tri_point_distance2(const double a[3], const double b[3],
 }
 
 static uint64_t create_cell(struct Config *config, uint64_t x, uint64_t y,
-			    uint64_t z, int level, int need_siblings) {
+                            uint64_t z, int level, int need_siblings) {
   int i;
   uint64_t u, v, w, px, py, pz, sx, sy, sz, code, ncells;
   ncells = 0;
@@ -567,10 +582,10 @@ static uint64_t create_cell(struct Config *config, uint64_t x, uint64_t y,
       pz = z >> 1;
       ncells += create_cell(config, px, py, pz, level - 1, 1);
       for (i = 0; i < sizeof shift / sizeof *shift; i++) {
-	u = (px << 1) + shift[i][0];
-	v = (py << 1) + shift[i][1];
-	w = (pz << 1) + shift[i][2];
-	ncells += create_cell(config, u, v, w, level, 0);
+        u = (px << 1) + shift[i][0];
+        v = (py << 1) + shift[i][1];
+        w = (pz << 1) + shift[i][2];
+        ncells += create_cell(config, u, v, w, level, 0);
       }
     }
     sx = (x & 1) ? x + 1 : x - 1;
