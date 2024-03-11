@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
   double lo[3], hi[3], r, d2, d2max;
   FILE *stl_file;
   float *a, *b, *c, s[3];
-  int OutLevelFlag;
+  int OutletFlag;
   int32_t i, ilo[3], ihi[3];
   int64_t inv_delta, ncells, x, y, z, size;
   int index, iy, iz, iv, iw, Verbose, d, j;
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
   void **work;
 
   Verbose = 0;
-  OutLevelFlag = 0;
+  OutletFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -98,17 +98,7 @@ int main(int argc, char **argv) {
       Verbose = 1;
       break;
     case 'o':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -o needs an argument\n");
-        exit(1);
-      }
-      config.outlevel = strtod(*argv, &end);
-      if (*end != '\0') {
-        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
-      }
-      OutLevelFlag = 1;
+      OutletFlag = 1;
       break;
     case '-':
       argv++;
@@ -118,8 +108,6 @@ int main(int argc, char **argv) {
       exit(1);
     }
 positional:
-  if (!OutLevelFlag)
-    config.outlevel = config.minlevel;
   for (i = 0; i < sizeof(Table) / sizeof(*Table); i++) {
     if (*argv == NULL) {
       fprintf(stderr, "stl2dump: missing '%s' option\n", Table[i].name);
@@ -274,6 +262,16 @@ positional:
         for (z = ilo[2]; z < ihi[2]; z++)
           ncells += create_cell(&config, x, y, z, config.maxlevel, 1);
   }
+
+  inv_delta = 1ul << config.minlevel;
+  for (z = 0; z < inv_delta; z++)
+    for (y = 0; y < inv_delta; y++)
+      if (OutletFlag)
+        for (x = 0; 10 * x < 9 * inv_delta; x++)
+          ncells += create_cell(&config, x, y, z, config.minlevel, 1);
+      else
+        for (x = 0; x < inv_delta; x++)
+          ncells += create_cell(&config, x, y, z, config.minlevel, 1);
   if (Verbose)
     fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
 
@@ -452,10 +450,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
     values[i] = 0.0;
   values[12] = intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
   code_ch = morton(x << 1, y << 1, z << 1);
-  leaf = level >= ((delta * (x + 0.5) < 0.9 * config->L) ? config->minlevel
-                                                         : config->outlevel) &&
-         (level + 1 > config->maxlevel ||
-          !hash_search(config->hash[level + 1], code_ch, NULL));
+  leaf = level + 1 > config->maxlevel ||
+         !hash_search(config->hash[level + 1], code_ch, NULL);
   leaf_code = leaf ? 2 : 0;
   if (fwrite(&leaf_code, sizeof(leaf_code), 1, config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
