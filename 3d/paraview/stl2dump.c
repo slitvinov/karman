@@ -169,7 +169,7 @@ positional:
   }
   config.hash = malloc((config.maxlevel + 1) * sizeof *config.hash);
   work = malloc((config.maxlevel + 1) * sizeof *work);
-  nbytes = (1ul << 25) * sizeof *(*config.hash)->nodes;
+  nbytes = (1ul << 24) * sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
