@@ -19,7 +19,7 @@ struct Hash {
 };
 struct Config {
   double R[3], L, dgrid;
-  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, OutLevelFlag;
+  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid;
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
   double lo[3], hi[3], r, d2, d2max;
   FILE *stl_file;
   float *a, *b, *c, s[3];
+  int OutLevelFlag;
   int32_t i, ilo[3], ihi[3];
   int64_t inv_delta, ncells, x, y, z, size;
   int index, iy, iz, iv, iw, Verbose, d, j;
@@ -81,7 +82,7 @@ int main(int argc, char **argv) {
   void **work;
 
   Verbose = 0;
-  config.OutLevelFlag = 0;
+  OutLevelFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -96,7 +97,7 @@ int main(int argc, char **argv) {
     case 'v':
       Verbose = 1;
       break;
-    case 'r':
+    case 'o':
       argv++;
       if (*argv == NULL) {
         fprintf(stderr, "cylinder: error: -o needs an argument\n");
@@ -107,7 +108,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
         exit(1);
       }
-      config.OutLevelFlag = 1;
+      OutLevelFlag = 1;
       break;
     case '-':
       argv++;
@@ -117,6 +118,8 @@ int main(int argc, char **argv) {
       exit(1);
     }
 positional:
+  if (!OutLevelFlag)
+    config.outlevel = config.minlevel;
   for (i = 0; i < sizeof(Table) / sizeof(*Table); i++) {
     if (*argv == NULL) {
       fprintf(stderr, "stl2dump: missing '%s' option\n", Table[i].name);
@@ -449,7 +452,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
     values[i] = 0.0;
   values[12] = intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
   code_ch = morton(x << 1, y << 1, z << 1);
-  leaf = level >= config->minlevel &&
+  leaf = level >= ((delta * (x + 0.5) < 0.9 * config->L) ? config->minlevel
+                                                         : config->outlevel) &&
          (level + 1 > config->maxlevel ||
           !hash_search(config->hash[level + 1], code_ch, NULL));
   leaf_code = leaf ? 2 : 0;
