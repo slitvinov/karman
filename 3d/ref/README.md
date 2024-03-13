@@ -5,3 +5,9 @@ do for i in 0 1 2 3 4 5
    done
 done
 </pre>
+
+tecplot transform matrix
+
+Translate: 2.127659574468085 -0.2127659574468085 0
+Rotate: 0 0 -90
+Scale: 0.0425531914893617 0.0425531914893617 0.0425531914893617
