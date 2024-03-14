@@ -113,7 +113,7 @@ static long traverse(int level) {
   long size, size0;
 
   if (fread(&flags, sizeof flags, 1, input_file) != 1 ||
-      fread(values, sizeof *values, header.len) != header.len) {
+      fread(values, sizeof *values, header.len, input_file) != header.len) {
     fprintf(stderr, "dump_info: fail to read '%s' at level '%d'\n", input_path, level);
     exit(1);
   }
