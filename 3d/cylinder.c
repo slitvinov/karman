@@ -419,7 +419,7 @@ event init(t = 0) {
     if (Verbose)
       fields_stats();
   }
-  if (i == 0) {
+  if (dump_path == NULL) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach() {
