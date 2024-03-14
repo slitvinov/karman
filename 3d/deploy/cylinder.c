@@ -20288,7 +20288,7 @@ char *end;
         exit(1);
         break;
       }
-  DT = 0.1;
+  DT = 0.05;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
