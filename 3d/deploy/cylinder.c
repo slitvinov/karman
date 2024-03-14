@@ -20344,28 +20344,31 @@ foreach () {
   }
 }{end_tracing("init_0","cylinder.c",448);return 0;}end_tracing("init_0","cylinder.c",448);}
 
+
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 450
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",450); {
+
+#line 451
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",451); {
   double re;
   re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
-  fprintf(ferr, "re[%d]: %g\n", i, re);
+  if (Verbose && pid() == 0)
+    fprintf(ferr, "re[%d]: %g\n", i, re);
   foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   
-#line 454
+#line 456
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / re;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 454
+#line 456
 foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / re;}end_is_face_z()}end_foreach_face_generic();}}
-}{end_tracing("properties_0","cylinder.c",455);return 0;}end_tracing("properties_0","cylinder.c",455);}
+}{end_tracing("properties_0","cylinder.c",457);return 0;}end_tracing("properties_0","cylinder.c",457);}
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 457
-      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",457); {
+#line 459
+      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",459); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -20423,7 +20426,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
               s.nc);
   }
-}{end_tracing("dump_0","cylinder.c",515);return 0;}end_tracing("dump_0","cylinder.c",515);}
+}{end_tracing("dump_0","cylinder.c",517);return 0;}end_tracing("dump_0","cylinder.c",517);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20467,8 +20470,8 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
 #line 414 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",414,"init"});  
-#line 457
-event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",457,"dump"});
+#line 459
+event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",459,"dump"});
 	
 	
 	
@@ -20535,8 +20538,8 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",446,"adapt"});  
-#line 450 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",450,"properties"});
+#line 451 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",451,"properties"});
   
 #line 24 "ast/init_solver.h"
 }
