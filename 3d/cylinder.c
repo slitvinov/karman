@@ -405,6 +405,7 @@ int main(int argc, char **argv) {
         exit(1);
         break;
       }
+  DT = 0.1;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
