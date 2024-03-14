@@ -169,7 +169,7 @@ positional:
   }
   config.hash = malloc((config.maxlevel + 1) * sizeof *config.hash);
   work = malloc((config.maxlevel + 1) * sizeof *work);
-  nmax = (1ul << 23) * sizeof *(*config.hash)->nodes;
+  nmax = (1ul << 24) * sizeof *(*config.hash)->nodes;
   nfull = sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
     nbytes = nfull < nmax ? nfull : nmax;
