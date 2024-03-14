@@ -43,7 +43,7 @@ static uint64_t traverse(uint64_t, uint64_t, uint64_t, int, struct Config *);
 static double tri_point_distance2(const double[3], const double[3],
                                   const double[3], const double[3]);
 static double edg2_sq(const float[2], const float[2]);
-static uint64_t create_cell(struct Config *, uint64_t, uint64_t, uint64_t, int,
+static uint64_t create_cell(struct Config *, int64_t, int64_t, int64_t, int,
                             int);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
   int32_t i, ilo[3], ihi[3];
   int64_t inv_delta, ncells, x, y, z, size;
   int index, iy, iz, iv, iw, Verbose, d, j;
-  size_t nbytes;
+  size_t nbytes, nfull, nmax;
   struct Config config;
   struct DumpHeader header;
   unsigned len;
@@ -169,8 +169,10 @@ positional:
   }
   config.hash = malloc((config.maxlevel + 1) * sizeof *config.hash);
   work = malloc((config.maxlevel + 1) * sizeof *work);
-  nbytes = (1ul << 24) * sizeof *(*config.hash)->nodes;
+  nmax = (1ul << 23) * sizeof *(*config.hash)->nodes;
+  nfull = sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
+    nbytes = nfull < nmax ? nfull : nmax;
     if ((work[i] = malloc(nbytes)) == NULL) {
       fprintf(stderr, "stl2dump: malloc failed\n");
       exit(1);
@@ -180,6 +182,7 @@ positional:
       exit(1);
     }
     hash_ini(nbytes, work[i], config.hash[i]);
+    nfull <<= 3;
   }
 
   d2max = 0;
@@ -374,7 +377,9 @@ static int hash_insert(struct Hash *set, int64_t key, void *value) {
     }
     x = (x + 1 + cnt) % set->M;
   }
-  fprintf(stderr, "stl2dump: error: hash_insert: over capacity\n");
+  fprintf(stderr,
+          "stl2dump: error: hash_insert over capacity (M: %ld, key: %ld)\n",
+          set->M, key % set->M);
   exit(1);
 }
 static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
@@ -397,7 +402,8 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
     }
     x = (x + 1 + cnt) % set->M;
   }
-  fprintf(stderr, "stl2dump: error: hash_has failed\n");
+  fprintf(stderr, "stl2dump: error: hash_search failed (M: %ld, key: %ld)\n",
+          set->M, key % set->M);
   exit(1);
 }
 
@@ -569,10 +575,16 @@ static double tri_point_distance2(const double a[3], const double b[3],
   return x * x + y * y + z * z;
 }
 
-static uint64_t create_cell(struct Config *config, uint64_t x, uint64_t y,
-                            uint64_t z, int level, int need_siblings) {
+static uint64_t create_cell(struct Config *config, int64_t x, int64_t y,
+                            int64_t z, int level, int need_siblings) {
   int i;
-  uint64_t u, v, w, px, py, pz, sx, sy, sz, code, ncells;
+  uint64_t px, py, pz, code, ncells, delta;
+  int64_t sx, sy, sz, u, v, w;
+  if (x < 0 || y < 0 || z < 0)
+    return 0;
+  delta = 1 << level;
+  if (x >= delta || y >= delta || z >= delta)
+    return 0;
   ncells = 0;
   code = morton(x, y, z);
   if (level > 0 && !hash_search(config->hash[level], code, NULL)) {
