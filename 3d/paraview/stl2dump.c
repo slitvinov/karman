@@ -19,7 +19,7 @@ struct Hash {
 };
 struct Config {
   double R[3], L, dgrid;
-  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, Verbose;
+  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, phi_index, Verbose;
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
@@ -292,6 +292,15 @@ positional:
   header.n.y = 0;
   header.n.z = 0;
 
+  config.phi_index = -1;
+  for (i = 0; i < header.len; i++)
+    if (strcmp(fields[i], "phi") == 0)
+      config.phi_index = i;
+  if (config.phi_index == -1) {
+    fprintf(stderr, "stl2dump: error: not `phi' in fields\n");
+    exit(1);
+  }
+  fprintf(stderr, "config.phi_index: %d\n", config.phi_index);
   if (fwrite(&header, sizeof(header), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
@@ -456,7 +465,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   }
   for (i = 0; i < sizeof fields / sizeof *fields; i++)
     values[i] = 0.0;
-  values[12] = intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
+  values[config->phi_index] =
+      intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
   code_ch = morton(x << 1, y << 1, z << 1);
   leaf = level + 1 > config->maxlevel ||
          !hash_search(config->hash[level + 1], code_ch, NULL);
