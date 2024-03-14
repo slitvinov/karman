@@ -19,7 +19,7 @@ struct Hash {
 };
 struct Config {
   double R[3], L, dgrid;
-  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid;
+  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, Verbose;
   char *stl_path, *dump_path;
   FILE *dump_file;
   struct Hash **hash;
@@ -74,14 +74,14 @@ int main(int argc, char **argv) {
   int OutletFlag;
   int32_t i, ilo[3], ihi[3];
   int64_t inv_delta, ncells, x, y, z, size;
-  int index, iy, iz, iv, iw, Verbose, d, j;
+  int index, iy, iz, iv, iw, d, j;
   size_t nbytes, nfull, nmax;
   struct Config config;
   struct DumpHeader header;
   unsigned len;
   void **work;
 
-  Verbose = 0;
+  config.Verbose = 0;
   OutletFlag = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
               "  -v          verbose\n");
       exit(1);
     case 'v':
-      Verbose = 1;
+      config.Verbose = 1;
       break;
     case 'o':
       OutletFlag = 1;
@@ -146,7 +146,7 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to read '%s'\n", config.stl_path);
     exit(1);
   }
-  if (Verbose)
+  if (config.Verbose)
     fprintf(stderr, "stl2dump: stl_nt: %d\n", config.stl_nt);
 
   if ((config.stl_ver = malloc(9 * config.stl_nt * sizeof *config.stl_ver)) ==
@@ -275,7 +275,7 @@ positional:
       else
         for (x = 0; x < inv_delta; x++)
           ncells += create_cell(&config, x, y, z, config.minlevel, 1);
-  if (Verbose)
+  if (config.Verbose)
     fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
 
   if ((config.dump_file = fopen(config.dump_path, "w")) == NULL) {
@@ -319,7 +319,7 @@ positional:
   }
   predicate_ini();
   size = traverse(0, 0, 0, 0, &config);
-  if (Verbose)
+  if (config.Verbose)
     fprintf(stderr, "stl2dump: size: %" PRIu64 "\n", size);
   for (i = 0; i < config.size_grid; i++)
     free(config.grid[i]);
@@ -427,6 +427,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   assert(0 <= index && index < config->size_grid);
   intersect = 0;
   minimum = config->dgrid;
+  if (config->Verbose && level == 3)
+    fprintf(stderr, "stl2dump: level: %d [%ld %ld %ld]\n", level, x, y, z);
 #pragma omp parallel for reduction(min : minimum) reduction(+ : intersect)
   for (i = 0; i < config->max_grid[index]; i++) {
     int j;

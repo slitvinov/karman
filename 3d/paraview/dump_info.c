@@ -111,8 +111,12 @@ static long traverse(int level) {
   enum { leaf = 2 };
   unsigned flags;
   long size, size0;
-  FREAD(&flags, sizeof flags, 1);
-  FREAD(values, sizeof *values, header.len);
+
+  if (fread(&flags, sizeof flags, 1, input_file) != 1 ||
+      fread(values, sizeof *values, header.len) != header.len) {
+    fprintf(stderr, "dump_info: fail to read '%s' at level '%d'\n", input_path, level);
+    exit(1);
+  }
   size = values[0];
   size0 = 1;
   if (flags & leaf)
