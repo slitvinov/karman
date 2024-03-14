@@ -20309,7 +20309,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
     if (Verbose)
       fields_stats();
   }
-  if (i == 0) {
+  if (dump_path == NULL) {
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: initialize velocity\n");
     foreach_stencil() {
