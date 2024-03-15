@@ -400,6 +400,7 @@ int main(int argc, char **argv) {
         break;
       }
   DT = 0.05;
+  int NITERMAX = 2;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
