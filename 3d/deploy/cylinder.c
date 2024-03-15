@@ -19283,6 +19283,169 @@ is_face_z(){
   event ("properties");
 }{end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",454);return 0;}end_tracing("adapt","/home/lisergey/basilisk/src/navier-stokes/centered.h",454);}
 #line 11 "cylinder.c"
+#line 1 "navier-stokes/double-projection.h"
+#line 1 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+#line 101 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+vector Af;
+scalar  dp={15};
+
+
+
+
+
+
+
+
+
+static int advection_term_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 112 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+      static int advection_term_0(const int i,const double t,Event *_ev){tracing("advection_term_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",112);
+{
+  Af = new_face_vector("Af");
+  foreach_face_stencil(){_stencil_is_face_x(){
+    {_stencil_val_a(Af.x,0,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_value_x (point, u.x, 0);_stencil_val(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0 -1,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0 -1,0,0);                  }}end__stencil_is_face_x()
+#line 115
+_stencil_is_face_y(){
+    {_stencil_val_a(Af.y,0,0,0); _stencil_val(fm.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_value_y (point, u.y, 0);_stencil_val(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0 -1,0); _stencil_val(cs,0,0 -1,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0 -1,0);                  }}end__stencil_is_face_y()
+#line 115
+_stencil_is_face_z(){
+    {_stencil_val_a(Af.z,0,0,0); _stencil_val(fm.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_value_z (point, u.z, 0);_stencil_val(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0 -1); _stencil_val(cs,0,0,0 -1);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0 -1);                  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  
+#line 115
+if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) = - val(fm.x,0,0,0)*(_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.)));}end_is_face_x()
+#line 115
+is_face_y(){
+    val(Af.y,0,0,0) = - val(fm.y,0,0,0)*(_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.)));}end_is_face_y()
+#line 115
+is_face_z(){
+    val(Af.z,0,0,0) = - val(fm.z,0,0,0)*(_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.)));}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  {
+#line 115
+foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) = - _const_fm.x*(_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.)));}end_is_face_x()
+#line 115
+is_face_y(){
+    val(Af.y,0,0,0) = - _const_fm.y*(_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.)));}end_is_face_y()
+#line 115
+is_face_z(){
+    val(Af.z,0,0,0) = - _const_fm.z*(_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.)));}end_is_face_z()}end_foreach_face_generic();}}
+}{end_tracing("advection_term_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",117);return 0;}end_tracing("advection_term_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",117);}
+#line 129 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+vector ab;
+
+static int acceleration_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+#line 131
+      static int acceleration_0(const int i,const double t,Event *_ev){tracing("acceleration_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",131);
+{
+  foreach_face_stencil(){_stencil_is_face_x(){
+    {_stencil_val_r(Af.x,0,0,0); _stencil_val(fm.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,0,0,0); _stencil_embed_face_value_x (point, u.x, 0);_stencil_val(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0 -1,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0 -1,0,0);_stencil_val(a.x,0,0,0);                   }}end__stencil_is_face_x()
+#line 133
+_stencil_is_face_y(){
+    {_stencil_val_r(Af.y,0,0,0); _stencil_val(fm.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,0,0); _stencil_embed_face_value_y (point, u.y, 0);_stencil_val(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0 -1,0); _stencil_val(cs,0,0 -1,0);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0 -1,0);_stencil_val(a.y,0,0,0);                   }}end__stencil_is_face_y()
+#line 133
+_stencil_is_face_z(){
+    {_stencil_val_r(Af.z,0,0,0); _stencil_val(fm.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,0); _stencil_embed_face_value_z (point, u.z, 0);_stencil_val(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0 -1); _stencil_val(cs,0,0,0 -1);_stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0 -1);_stencil_val(a.z,0,0,0);                   }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  
+#line 133
+if(!is_constant(fm.x) && !is_constant(a.x)){{foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) += val(fm.x,0,0,0)*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*val(a.x,0,0,0));}end_is_face_x()
+#line 133
+is_face_y(){
+    val(Af.y,0,0,0) += val(fm.y,0,0,0)*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*val(a.y,0,0,0));}end_is_face_y()
+#line 133
+is_face_z(){
+    val(Af.z,0,0,0) += val(fm.z,0,0,0)*((_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.))) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  {
+#line 133
+foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) += _const_fm.x*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*val(a.x,0,0,0));}end_is_face_x()
+#line 133
+is_face_y(){
+    val(Af.y,0,0,0) += _const_fm.y*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*val(a.y,0,0,0));}end_is_face_y()
+#line 133
+is_face_z(){
+    val(Af.z,0,0,0) += _const_fm.z*((_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.))) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  {
+#line 133
+foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) += val(fm.x,0,0,0)*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*_const_a.x);}end_is_face_x()
+#line 133
+is_face_y(){
+    val(Af.y,0,0,0) += val(fm.y,0,0,0)*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*_const_a.y);}end_is_face_y()
+#line 133
+is_face_z(){
+    val(Af.z,0,0,0) += val(fm.z,0,0,0)*((_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.))) + dt*_const_a.z);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  {
+#line 133
+foreach_face_generic(){is_face_x(){
+    val(Af.x,0,0,0) += _const_fm.x*((_attribute[u.x.i].third && val(fs.x,0,0,0) < 1. && val(fs.x,0,0,0) > 0. ? embed_face_value_x (point, u.x, 0) : ((val(u.x,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.x,0 -1,0,0)*(1.5 + val(cs,0 -1,0,0)))/ (val(cs,0,0,0) + val(cs,0 -1,0,0) + 3.))) + dt*_const_a.x);}end_is_face_x()
+#line 133
+is_face_y(){
+    val(Af.y,0,0,0) += _const_fm.y*((_attribute[u.y.i].third && val(fs.y,0,0,0) < 1. && val(fs.y,0,0,0) > 0. ? embed_face_value_y (point, u.y, 0) : ((val(u.y,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.y,0,0 -1,0)*(1.5 + val(cs,0,0 -1,0)))/ (val(cs,0,0,0) + val(cs,0,0 -1,0) + 3.))) + dt*_const_a.y);}end_is_face_y()
+#line 133
+is_face_z(){
+    val(Af.z,0,0,0) += _const_fm.z*((_attribute[u.z.i].third && val(fs.z,0,0,0) < 1. && val(fs.z,0,0,0) > 0. ? embed_face_value_z (point, u.z, 0) : ((val(u.z,0,0,0)*(1.5 + val(cs,0,0,0)) + val(u.z,0,0,0 -1)*(1.5 + val(cs,0,0,0 -1)))/ (val(cs,0,0,0) + val(cs,0,0,0 -1) + 3.))) + dt*_const_a.z);}end_is_face_z()}end_foreach_face_generic();}}
+
+
+
+
+
+  correction (dt);
+
+
+
+
+
+
+
+  ab = a;
+  a = zerof;
+}{end_tracing("acceleration_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",150);return 0;}end_tracing("acceleration_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",150);}
+
+
+
+
+
+
+
+static int projection_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+
+
+
+
+
+
+
+#line 158
+      static int projection_0(const int i,const double t,Event *_ev){tracing("projection_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",158);
+{
+  scalar_clone (dp, p);
+  do { scalar __tmp = p; p = dp; dp = __tmp; } while(0);
+}{end_tracing("projection_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",162);return 0;}end_tracing("projection_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",162);}
+
+
+
+
+
+
+
+
+static int end_timestep_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+#line 171 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+      static int end_timestep_0(const int i,const double t,Event *_ev){tracing("end_timestep_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",171);
+{
+  do { scalar __tmp = p; p = dp; dp = __tmp; } while(0);
+  a = ab;
+
+  mgp = project ((struct Project){Af, p, alpha, dt, mgp.nrelax});
+  delete ((scalar *)((vector[]){Af,{{-1},{-1},{-1}}}));
+  centered_gradient (p, g);
+}{end_tracing("end_timestep_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",179);return 0;}end_tracing("end_timestep_0","/home/lisergey/basilisk/src/navier-stokes/double-projection.h",179);}
+#line 12 "cylinder.c"
 #line 1 "lambda2.h"
 #line 1 "/home/lisergey/basilisk/src/lambda2.h"
 static void eigsrt (double d[3],
@@ -19478,7 +19641,7 @@ JJ[2][i++] = (val(fs.z,0,0,0) && val(fs.z,0,0,1) ? (val(s,0,0,1) - val(s,0,0,-1)
     val(l2,0,0,0) = lambda[1]/2.;
   }end_foreach();}
 }
-#line 12 "cylinder.c"
+#line 13 "cylinder.c"
 #line 1 "output_xdmf.h"
 #line 1 "./output_xdmf.h"
 static int output_xdmf(double t, scalar *list, vector *vlist,
@@ -19659,7 +19822,7 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
   }
   return 0;
 }
-#line 13 "cylinder.c"
+#line 14 "cylinder.c"
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
@@ -19675,7 +19838,7 @@ static double (*Shape[])(double, double, double) = {shape_cylinder,
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
-      static double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;tracing("embed_interpolate3","cylinder.c",28);
+      static double embed_interpolate3(Point point, scalar s, coord p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;tracing("embed_interpolate3","cylinder.c",29);
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
   if (val(cs,i, 0, 0) && val(cs,0, j, 0) && val(cs,i, j, 0) && val(cs,0, 0, k) && val(cs,i, 0, k) &&
       val(cs,0, j, k) && val(cs,i, j, k)) {
@@ -19688,7 +19851,7 @@ static double (*shape)(double, double, double);
         (val(s,0, 0, k) * (1. - fabs(p.x)) + val(s,i, 0, k) * fabs(p.x)) *
             (1. - fabs(p.y)) +
         (val(s,0, j, k) * (1. - fabs(p.x)) + val(s,i, j, k) * fabs(p.x)) * fabs(p.y);
-    { double _ret= (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));end_tracing("embed_interpolate3","cylinder.c",41);return _ret;}
+    { double _ret= (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));end_tracing("embed_interpolate3","cylinder.c",42);return _ret;}
   } else {
     double val = val(s,0,0,0);
      {
@@ -19698,7 +19861,7 @@ static double (*shape)(double, double, double);
       else if (val(cs,-i,0,0))
         val += fabs(p.x) * (val(s,0,0,0) - val(s,-i,0,0));
     } 
-#line 44
+#line 45
 {
       int i = sign(p.y);
       if (val(cs,0,i,0))
@@ -19706,7 +19869,7 @@ static double (*shape)(double, double, double);
       else if (val(cs,0,-i,0))
         val += fabs(p.y) * (val(s,0,0,0) - val(s,0,-i,0));
     } 
-#line 44
+#line 45
 {
       int i = sign(p.z);
       if (val(cs,0,0,i))
@@ -19714,17 +19877,17 @@ static double (*shape)(double, double, double);
       else if (val(cs,0,0,-i))
         val += fabs(p.z) * (val(s,0,0,0) - val(s,0,0,-i));
     }
-    {end_tracing("embed_interpolate3","cylinder.c",51);return val;}
+    {end_tracing("embed_interpolate3","cylinder.c",52);return val;}
   }
-end_tracing("embed_interpolate3","cylinder.c",53);}
+end_tracing("embed_interpolate3","cylinder.c",54);}
 
 
-#line 28
+#line 29
 static void _stencil_embed_interpolate3(Point point, scalar s,_stencil_undefined * p) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
   
 _stencil_val(cs,o_stencil, 0, 0); _stencil_val(cs,0,o_stencil , 0); _stencil_val(cs,o_stencil,o_stencil , 0); _stencil_val(cs,0, 0,o_stencil ); _stencil_val(cs,o_stencil, 0,o_stencil );
       _stencil_val(cs,0,o_stencil, o_stencil ); _stencil_val(cs,o_stencil,o_stencil, o_stencil );
-#line 30
+#line 31
 { 
 {  
     
@@ -19736,7 +19899,7 @@ _stencil_val(s,0,o_stencil , 0); _stencil_val(s,o_stencil,o_stencil , 0);
            
                     
           
-#line 38
+#line 39
 _stencil_val(s,0, 0,o_stencil ); _stencil_val(s,o_stencil, 0,o_stencil );
 
 _stencil_val(s,0,o_stencil, o_stencil ); _stencil_val(s,o_stencil,o_stencil, o_stencil );         
@@ -19752,9 +19915,9 @@ _stencil_val(cs,o_stencil,0,0);{
        
       
     
-#line 50
+#line 51
 } 
-#line 44
+#line 45
 {   
       
 _stencil_val(cs,0,o_stencil,0);{
@@ -19764,9 +19927,9 @@ _stencil_val(cs,0,o_stencil,0);{
        
       
     
-#line 50
+#line 51
 } 
-#line 44
+#line 45
 {   
       
 _stencil_val(cs,0,0,o_stencil);{
@@ -19776,17 +19939,17 @@ _stencil_val(cs,0,0,o_stencil);{
        
       
     
-#line 50
+#line 51
 } 
     
   }}
           
 
-#line 53
+#line 54
 }
 
       static void embed_force3(scalar p, vector u, vector mu, coord *Fp,
-                               coord *Fmu) {tracing("embed_force3","cylinder.c",55);
+                               coord *Fmu) {tracing("embed_force3","cylinder.c",56);
   coord Fps = {0}, Fmus = {0};
   foreach_stencil () {
 _stencil_val(cs,0,0,0); _stencil_val(cs,0,0,0); {    
@@ -19802,23 +19965,23 @@ _stencil_val(mu.x,0,0,0); _stencil_val(mu.x,1,0,0);
             _stencil_val(fs.x,0,0,0); _stencil_val(fs.x,1,0,0); 
            
         
-#line 70
+#line 71
 } 
-#line 67
+#line 68
 { 
 _stencil_val(mu.y,0,0,0); _stencil_val(mu.y,0,1,0); 
             _stencil_val(fs.y,0,0,0); _stencil_val(fs.y,0,1,0); 
            
         
-#line 70
+#line 71
 } 
-#line 67
+#line 68
 { 
 _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1); 
             _stencil_val(fs.z,0,0,0); _stencil_val(fs.z,0,0,1); 
            
         
-#line 70
+#line 71
 }  
           
          _stencil_embed_gradient(point, u,NULL ,NULL );
@@ -19829,13 +19992,13 @@ _stencil_val(mu.z,0,0,0); _stencil_val(mu.z,0,0,1);
     }
           
   
-#line 78
+#line 79
 }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+ : Fmus)reduction(+ : Fps)){
-#line 58
+#line 59
 foreach () {
     if (val(cs,0,0,0) > 0. && val(cs,0,0,0) < 1.) {
       coord n, b;
@@ -19849,12 +20012,12 @@ foreach () {
           mua += val(mu.x,0,0,0) + val(mu.x,1,0,0);
           fa += val(fs.x,0,0,0) + val(fs.x,1,0,0);
         } 
-#line 67
+#line 68
 {
           mua += val(mu.y,0,0,0) + val(mu.y,0,1,0);
           fa += val(fs.y,0,0,0) + val(fs.y,0,1,0);
         } 
-#line 67
+#line 68
 {
           mua += val(mu.z,0,0,0) + val(mu.z,0,0,1);
           fa += val(fs.z,0,0,0) + val(fs.z,0,0,1);
@@ -19864,11 +20027,11 @@ foreach () {
          Fmus.x -=
             area * mua *
             (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z); 
-#line 73
+#line 74
 Fmus.y -=
             area * mua *
             (dudn.y * (sq(n.y) + 1.) + dudn.z * n.y * n.z + dudn.x * n.y * n.x); 
-#line 73
+#line 74
 Fmus.z -=
             area * mua *
             (dudn.z * (sq(n.z) + 1.) + dudn.x * n.z * n.x + dudn.y * n.z * n.y);
@@ -19880,7 +20043,7 @@ Fmus.z -=
 }
 
   
-#line 80
+#line 81
 Fp->x = Fps.x;
   Fp->y = Fps.y;
   Fp->z = Fps.z;
@@ -19888,7 +20051,7 @@ Fp->x = Fps.x;
   Fmu->x = Fmus.x;
   Fmu->y = Fmus.y;
   Fmu->z = Fmus.z;
-end_tracing("embed_force3","cylinder.c",87);}
+end_tracing("embed_force3","cylinder.c",88);}
 
 static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -19900,7 +20063,7 @@ static void vorticity_vector(const vector u, vector omega) {
 _stencil_val(cm,0,0,0);      
           
     
-#line 97
+#line 98
 _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(fm.x,1,0,0);     
     _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0, 1,0); _stencil_val(fm.y,0,0,0);_stencil_val(fm.y,0, 1,0);     
     _stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0, 0, 1); _stencil_val(fm.z,0,0,0);_stencil_val(fm.z,0, 0, 1);   
@@ -19915,7 +20078,7 @@ _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_st
     _stencil_val_a(omega.z,0,0,0);        
   }end_foreach_stencil();
   
-#line 94
+#line 95
 if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
     double delta;
     delta = (2. * val(cm,0,0,0) * Delta + 1e-30);
@@ -19933,7 +20096,7 @@ if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else if(is_constant(cm) && !is_constant(fm.x)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
   {
-#line 94
+#line 95
 foreach () {
     double delta;
     delta = (2. * _const_cm * Delta + 1e-30);
@@ -19951,7 +20114,7 @@ foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else if(!is_constant(cm) && is_constant(fm.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 94
+#line 95
 foreach () {
     double delta;
     delta = (2. * val(cm,0,0,0) * Delta + 1e-30);
@@ -19969,7 +20132,7 @@ foreach () {
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 94
+#line 95
 foreach () {
     double delta;
     delta = (2. * _const_cm * Delta + 1e-30);
@@ -19993,10 +20156,10 @@ static char *dump_path;
 static const int outlevel = 5;
 static double reynolds, trelax, tend;
 static int maxlevel, minlevel, period, Verbose, FullOutput, AdaptFlag;
-static vector  muv={{15},{16},{17}};
-static scalar  l2={18};
-static vector  omega={{19},{20},{21}};
-static scalar  phi={22};
+static vector  muv={{16},{17},{18}};
+static scalar  l2={19};
+static vector  omega={{20},{21},{22}};
+static scalar  phi={23};
 
 static double _boundary6(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(1, point, neighbor, _s, data));}}}static double _boundary6_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(1, point, neighbor, _s, data));}}}
 static double _boundary7(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(0, point, neighbor, _s, data));}}}static double _boundary7_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(0, point, neighbor, _s, data));}}}
@@ -20009,10 +20172,10 @@ static double _boundary11(Point point,Point neighbor,scalar _s,void *data){int i
 static double _boundary12(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary12_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 static double _boundary13(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet(0, point, neighbor, _s, data));}}}static double _boundary13_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _dirichlet_homogeneous(0, point, neighbor, _s, data));}}}
 int main(int argc, char **argv) {
-#line 408
+#line 409
 _init_solver();
   
-#line 133
+#line 134
 char *end;
   const char *periodic_boundaries;
   int ReynoldsFlag, MaxLevelFlag, MinLevelFlag, PeriodFlag, TendFlag,
@@ -20290,17 +20453,17 @@ char *end;
     fprintf(ferr, "cylinder: done\n");
 free_solver();
 
-#line 408
+#line 409
 }
 
 static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(t = 0)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 410
-      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",410); {
+#line 411
+      static int init_0(const int i,const double t,Event *_ev){tracing("init_0","cylinder.c",411); {
   FILE *dump_file;
   if (dump_path == NULL) {
-    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 413); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
+    do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 414); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
     for (;;) {
       do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions ((struct Fractions){phi, cs, fs});delete((scalar*)((scalar[]){phi,{-1}})); } while(0);
       astats s = adapt_wavelet((struct Adapt){((scalar[]){cs,{-1}}), (double[]){0}, .maxlevel = maxlevel,
@@ -20338,7 +20501,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();
     {
-#line 445
+#line 446
 foreach () {
       val(u.x,0,0,0) = val(cs,0,0,0);
       val(u.y,0,0,0) = 0;
@@ -20347,33 +20510,33 @@ foreach () {
     event("defaults");
     event("dump");
   }
-}{end_tracing("init_0","cylinder.c",453);return 0;}end_tracing("init_0","cylinder.c",453);}
+}{end_tracing("init_0","cylinder.c",454);return 0;}end_tracing("init_0","cylinder.c",454);}
 
 
 static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
 
-#line 456
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",456); {
+#line 457
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",457); {
   double re;
   re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
   if (Verbose && pid() == 0)
     fprintf(ferr, "re[%d]: %g\n", i, re);
   foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   
-#line 461
+#line 462
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / re;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
   {
-#line 461
+#line 462
 foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / re;}end_is_face_z()}end_foreach_face_generic();}}
-}{end_tracing("properties_0","cylinder.c",462);return 0;}end_tracing("properties_0","cylinder.c",462);}
+}{end_tracing("properties_0","cylinder.c",463);return 0;}end_tracing("properties_0","cylinder.c",463);}
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 464
-      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",464); {
+#line 465
+      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",465); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -20431,13 +20594,13 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
               s.nc);
   }
-}{end_tracing("dump_0","cylinder.c",522);return 0;}end_tracing("dump_0","cylinder.c",522);}
+}{end_tracing("dump_0","cylinder.c",523);return 0;}end_tracing("dump_0","cylinder.c",523);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
 {
   void init_solver();
-datasize=23*sizeof(double);
+datasize=24*sizeof(double);
   
 #line 6
 init_solver();
@@ -20473,10 +20636,10 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
-#line 410 "cylinder.c"
-event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",410,"init"});  
-#line 464
-event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",464,"dump"});
+#line 411 "cylinder.c"
+event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",411,"init"});  
+#line 465
+event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",465,"dump"});
 	
 	
 	
@@ -20494,7 +20657,7 @@ init_const_scalar((scalar){_NVARMAX+7},"zeroc", 0.);
 init_const_vector((vector){{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}},"unityf0",(double[]){1.,1.,1.});
 init_const_scalar((scalar){_NVARMAX+11},"unity0", 1.);  init_scalar((scalar){0},"cs");  init_face_vector((vector){{1},{2},{3}},"fs"); 
 #line 462 "/home/lisergey/basilisk/src/embed.h"
-embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_face_vector((vector){{15},{16},{17}},"muv");  init_scalar((scalar){18},"l2");  init_vector((vector){{19},{20},{21}},"omega");  init_scalar((scalar){22},"phi");
+embed=new_bid();  init_scalar((scalar){4},"p");  init_vector((vector){{5},{6},{7}},"u");  init_vector((vector){{8},{9},{10}},"g");  init_scalar((scalar){11},"pf");  init_face_vector((vector){{12},{13},{14}},"uf");  init_scalar((scalar){15},"dp");  init_face_vector((vector){{16},{17},{18}},"muv");  init_scalar((scalar){19},"l2");  init_vector((vector){{20},{21},{22}},"omega");  init_scalar((scalar){23},"phi");
     
 #line 23 "ast/init_solver.h"
 }_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary0,_attribute[p.i].boundary_homogeneous[right]=_boundary0_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary1,_attribute[p.i].boundary_homogeneous[left]=_boundary1_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[top]=_boundary2,_attribute[p.i].boundary_homogeneous[top]=_boundary2_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[bottom]=_boundary3,_attribute[p.i].boundary_homogeneous[bottom]=_boundary3_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[front]=_boundary4,_attribute[p.i].boundary_homogeneous[front]=_boundary4_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[back]=_boundary5,_attribute[p.i].boundary_homogeneous[back]=_boundary5_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[left]=_boundary6,_attribute[u.x.i].boundary_homogeneous[left]=_boundary6_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[left]=_boundary7,_attribute[p.i].boundary_homogeneous[left]=_boundary7_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[left]=_boundary8,_attribute[pf.i].boundary_homogeneous[left]=_boundary8_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[right]=_boundary9,_attribute[u.x.i].boundary_homogeneous[right]=_boundary9_homogeneous;_attribute[p.i].dirty=1,_attribute[p.i].boundary[right]=_boundary10,_attribute[p.i].boundary_homogeneous[right]=_boundary10_homogeneous;_attribute[pf.i].dirty=1,_attribute[pf.i].boundary[right]=_boundary11,_attribute[pf.i].boundary_homogeneous[right]=_boundary11_homogeneous;_attribute[u.x.i].dirty=1,_attribute[u.x.i].boundary[embed]=_boundary12,_attribute[u.x.i].boundary_homogeneous[embed]=_boundary12_homogeneous;_attribute[u.y.i].dirty=1,_attribute[u.y.i].boundary[embed]=_boundary13,_attribute[u.y.i].boundary_homogeneous[embed]=_boundary13_homogeneous;  
@@ -20543,8 +20706,16 @@ event_register((Event){0,1,end_timestep,{end_timestep_expr0},((int *)0),((double
 
 
 event_register((Event){0,1,adapt,{adapt_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",446,"adapt"});  
-#line 456 "cylinder.c"
-event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",456,"properties"});
+#line 112 "/home/lisergey/basilisk/src/navier-stokes/double-projection.h"
+event_register((Event){0,1,advection_term_0,{advection_term_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/double-projection.h",112,"advection_term"});  
+#line 131
+event_register((Event){0,1,acceleration_0,{acceleration_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/double-projection.h",131,"acceleration"});  
+#line 158
+event_register((Event){0,1,projection_0,{projection_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/double-projection.h",158,"projection"});  
+#line 171
+event_register((Event){0,1,end_timestep_0,{end_timestep_0_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/double-projection.h",171,"end_timestep"});  
+#line 457 "cylinder.c"
+event_register((Event){0,1,properties_0,{properties_0_expr0},((int *)0),((double *)0),"cylinder.c",457,"properties"});
   
 #line 24 "ast/init_solver.h"
 }

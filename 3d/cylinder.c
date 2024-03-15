@@ -8,6 +8,7 @@
 #include "fractions.h"
 #include "embed.h"
 #include "navier-stokes/centered.h"
+#include "navier-stokes/double-projection.h"
 #include "lambda2.h"
 #include "output_xdmf.h"
 static int slice(double x, double y, double z, double Delta) {
