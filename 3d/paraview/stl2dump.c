@@ -295,7 +295,7 @@ positional:
        config.header.len++)
     ;
   config.header.i = 0;
-  config.header.depth = 8;
+  config.header.depth = config.maxlevel;
   config.header.npe = config.npe;
   config.header.version = 170901;
   config.header.n.x = 0;
