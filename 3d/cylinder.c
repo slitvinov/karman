@@ -10,12 +10,6 @@
 #include "navier-stokes/centered.h"
 #include "lambda2.h"
 #include "output_xdmf.h"
-#include "embed.h"
-#include "fractions.h"
-#include "grid/octree.h"
-#include "lambda2.h"
-#include "navier-stokes/centered.h"
-#include "output_xdmf.h"
 static int slice(double x, double y, double z, double Delta) {
   double epsilon = Delta / 10;
   return z <= -epsilon && z + Delta + epsilon >= 0;
