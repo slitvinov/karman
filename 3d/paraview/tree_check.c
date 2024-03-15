@@ -6,11 +6,6 @@
 #include "embed.h"
 #include "navier-stokes/centered.h"
 #include "lambda2.h"
-#include "../output_xdmf.h"
-static int slice(double x, double y, double z, double Delta) {
-  double epsilon = Delta / 10;
-  return z <= -epsilon && z + Delta + epsilon >= 0;
-}
 static scalar l2[];
 static vector omega[];
 static scalar phi[];
@@ -58,7 +53,6 @@ int main(int argc, char **argv) {
   if (Verbose)
     fprintf(stderr, "tree_check: refined %d cells, coarsened %d cells\n", s.nf,
             s.nc);
-  output_xdmf(t, {p, l2}, {u, omega}, slice, "o");
   if (Verbose)
     fprintf(stderr, "tree_check: done\n");
 }

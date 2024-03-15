@@ -407,6 +407,7 @@ int main(int argc, char **argv) {
 }
 
 event init(t = 0) {
+  FILE *dump_file;
   if (dump_path == NULL) {
     refine(x < X0 + 0.9 * L0 && level < minlevel);
     for (;;) {
@@ -419,7 +420,15 @@ event init(t = 0) {
         break;
     }
   } else {
-    restore(dump_path);
+    if ((dump_file = fopen(dump_path, "r")) == NULL) {
+      fprintf(stderr, "cylinder: error: failed to open '%s'\n", dump_path);
+      exit(1);
+    }
+    restore(fp = dump_file);
+    if (fclose(dump_file) != 0) {
+      fprintf(stderr, "cylinder: error: failed to close '%s'\n", dump_path);
+      exit(1);
+    }
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
               dump_path, t, i);
