@@ -2,13 +2,23 @@
 @include <stdlib.h>
 @include <string.h>
 #include "grid/octree.h"
-#include "utils.h"
-#include "output.h"
+#include "fractions.h"
+#include "embed.h"
+#include "navier-stokes/centered.h"
+#include "lambda2.h"
+#include "../output_xdmf.h"
+static int slice(double x, double y, double z, double Delta) {
+  double epsilon = Delta / 10;
+  return z <= -epsilon && z + Delta + epsilon >= 0;
+}
+static scalar l2[];
+static vector omega[];
 static scalar phi[];
 int main(int argc, char **argv) {
   char *dump_path;
   FILE *dump_file;
   int Verbose;
+  astats s;
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
@@ -33,13 +43,22 @@ int main(int argc, char **argv) {
     fprintf(stderr, "tree_check: error: failed to open '%s'\n", dump_path);
     exit(1);
   }
-  init_grid(1 << 3);
-  dump("dump");
-  restore(fp = dump_file, list = {phi});
+  periodic(top);
+  for (scalar s in all)
+    fprintf(stderr, "tree_check: %s\n", s.name);
+  restore(fp = dump_file);
   if (fclose(dump_file) != 0) {
     fprintf(stderr, "tree_check: error: failed to close '%s'\n", dump_path);
     exit(1);
   }
+  fractions(phi, cs, fs);
+  if (Verbose)
+    fields_stats();
+  s = adapt_wavelet({phi}, (double[]){0}, minlevel = 6, maxlevel = 8);
+  if (Verbose)
+    fprintf(stderr, "tree_check: refined %d cells, coarsened %d cells\n", s.nf,
+            s.nc);
+  output_xdmf(t, {p, l2}, {u, omega}, slice, "o");
   if (Verbose)
     fprintf(stderr, "tree_check: done\n");
 }

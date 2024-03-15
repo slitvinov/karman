@@ -433,9 +433,10 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code, code_ch;
-
-  values = malloc(config->header.len * sizeof *values);
-
+  if ((values = malloc(config->header.len * sizeof *values)) == NULL) {
+    fprintf(stderr, "stl2dump: error: malloc failed\n");
+    exit(1);
+  }
   code = morton(x, y, z);
   delta = config->L / (1ul << level);
   s[0] = config->R[0] + delta * (x + 0.5);
@@ -475,7 +476,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
       minimum = dist2;
     intersect += predicate_ray(s, e, a, b, c);
   }
-  for (i = 0; i < sizeof fields / sizeof *fields; i++)
+  for (i = 0; i < config->header.len; i++)
     values[i] = 0.0;
   values[config->phi_index] =
       intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
