@@ -4402,22 +4402,7 @@ static int event_cond (Event * ev, int i, double t)
     return true;
   return (* ev->expr[1]) (&i, &t, ev);
 }
-
-
-static void event_print (Event * ev, FILE * fp)
-{
-  char * root = strstr (ev->file, "/home/lisergey/basilisk/src");
-  fprintf (fp, "  %-25s %s%s:%d\n", ev->name,
-    root ? "src" : "",
-    root ? &ev->file[strlen("/home/lisergey/basilisk/src")] : ev->file,
-    ev->line);
-}
-
-
-
-
-
-
+#line 136 "/home/lisergey/basilisk/src/grid/events.h"
 static bool overload_event() { return true; }
 
 static int event_do (Event * ev, bool action)
@@ -4429,7 +4414,7 @@ static int event_do (Event * ev, bool action)
       bool finished = false;
       for (Event * e = ev; e; e = e->next) {
 
- event_print (e, ferr);
+
 
  if ((* e->action) (iter, t, e))
    finished = true;
@@ -4466,14 +4451,14 @@ static int event_do (Event * ev, bool action)
 static void end_event_do (bool action)
 {
 
-  if (action)
-    fprintf (ferr, "\nend events (i = %d, t = %g)\n", iter, t);
+
+
 
   for (Event * ev = Events; !ev->last; ev++)
     if (ev->i == END_EVENT && action)
       for (Event * e = ev; e; e = e->next) {
 
- event_print (e, ferr);
+
 
  e->action (iter, t, e);
       }
@@ -4482,8 +4467,8 @@ static void end_event_do (bool action)
 int events (bool action)
 {
 
-  if (action)
-    fprintf (ferr, "\nevents (i = %d, t = %g)\n", iter, t);
+
+
 
 
   if (iter == 0)
@@ -4524,7 +4509,7 @@ void event (const char * name)
     if (!strcmp (ev->name, name))
       for (Event * e = ev; e; e = e->next) {
 
- event_print (e, ferr);
+
 
  (* e->action) (0, 0, e);
       }
@@ -20533,23 +20518,25 @@ static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
 #line 456
       static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",456); {
   double re;
-  re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
-  if (Verbose && pid() == 0)
-    fprintf(ferr, "re[%d]: %g\n", i, re);
-  foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
-  
-#line 461
+  if (i > 0) {
+    re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
+    if (Verbose && pid() == 0)
+      fprintf(ferr, "re[%d]: %g\n", i, re);
+    foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
+    
+#line 462
 if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / re;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
-  {
-#line 461
+    {
+#line 462
 foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / re;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / re;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / re;}end_is_face_z()}end_foreach_face_generic();}}
-}{end_tracing("properties_0","cylinder.c",462);return 0;}end_tracing("properties_0","cylinder.c",462);}
+  }
+}{end_tracing("properties_0","cylinder.c",464);return 0;}end_tracing("properties_0","cylinder.c",464);}
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
 
-#line 464
-      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",464); {
+#line 466
+      static int dump_0(const int i,const double t,Event *_ev){tracing("dump_0","cylinder.c",466); {
   char path[FILENAME_MAX];
   coord Fp, Fmu;
   static FILE *fp;
@@ -20607,7 +20594,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       fprintf(ferr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
               s.nc);
   }
-}{end_tracing("dump_0","cylinder.c",522);return 0;}end_tracing("dump_0","cylinder.c",522);}
+}{end_tracing("dump_0","cylinder.c",524);return 0;}end_tracing("dump_0","cylinder.c",524);}
 #line 2 "ast/init_solver.h"
 
 static void _init_solver (void)
@@ -20651,8 +20638,8 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
 #line 411 "cylinder.c"
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",411,"init"});  
-#line 464
-event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",464,"dump"});
+#line 466
+event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",466,"dump"});
 	
 	
 	
