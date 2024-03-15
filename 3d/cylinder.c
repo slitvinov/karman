@@ -448,11 +448,10 @@ event init(t = 0) {
       u.y[] = 0;
       u.z[] = 0;
     }
-    event("defaults");
+    //    event("defaults");
     event("dump");
   }
 }
-
 
 event properties(i++) {
   double re;
