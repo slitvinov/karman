@@ -17,15 +17,6 @@ struct Hash {
     void *value;
   } * nodes;
 };
-struct Config {
-  double R[3], L, dgrid;
-  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, phi_index, Verbose;
-  char *stl_path, *dump_path;
-  FILE *dump_file;
-  struct Hash **hash;
-  int32_t stl_nt, **grid, *max_grid;
-  float *stl_ver;
-};
 struct coord {
   double x, y, z;
 };
@@ -34,6 +25,16 @@ struct DumpHeader {
   long len;
   int i, depth, npe, version;
   struct coord n;
+};
+struct Config {
+  double R[3], L, dgrid;
+  int minlevel, maxlevel, outlevel, npe, ngrid, size_grid, phi_index, Verbose;
+  char *stl_path, *dump_path;
+  FILE *dump_file;
+  struct Hash **hash;
+  int32_t stl_nt, **grid, *max_grid;
+  float *stl_ver;
+  struct DumpHeader header;
 };
 static uint64_t morton(uint64_t, uint64_t, uint64_t);
 static int hash_ini(size_t, void *, struct Hash *);
@@ -63,9 +64,12 @@ static const struct {
 };
 static const int shift[][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
                                {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
-static char *fields[] = {"size",    "cs",      "u.x", "u.y", "u.z",
-                         "g.x",     "g.y",     "g.z", "l2",  "omega.x",
-                         "omega.y", "omega.z", "phi"};
+static char *fields_full[] = {"size",    "cs",      "u.x", "u.y", "u.z",
+                              "g.x",     "g.y",     "g.z", "l2",  "omega.x",
+                              "omega.y", "omega.z", "phi", NULL};
+static char *fields_minimal[] = {"size", "phi", NULL};
+static char **fields;
+
 int main(int argc, char **argv) {
   char *end;
   double lo[3], hi[3], r, d2, d2max;
@@ -77,12 +81,12 @@ int main(int argc, char **argv) {
   int index, iy, iz, iv, iw, d, j;
   size_t nbytes, nfull, nmax;
   struct Config config;
-  struct DumpHeader header;
   unsigned len;
   void **work;
 
   config.Verbose = 0;
   OutletFlag = 0;
+  fields = fields_full;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -91,6 +95,7 @@ int main(int argc, char **argv) {
               "file.stl basilisk.dump\n"
               "Options:\n"
               "  -o  outlevel\n"
+              "  -m          values are size and phi (minimal output)\n"
               "  -h          print help message and exit\n"
               "  -v          verbose\n");
       exit(1);
@@ -99,6 +104,9 @@ int main(int argc, char **argv) {
       break;
     case 'o':
       OutletFlag = 1;
+      break;
+    case 'm':
+      fields = fields_minimal;
       break;
     case '-':
       argv++;
@@ -282,18 +290,20 @@ positional:
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.dump_path);
     exit(1);
   }
-  header.t = 0;
-  header.len = sizeof fields / sizeof *fields;
-  header.i = 0;
-  header.depth = 8;
-  header.npe = config.npe;
-  header.version = 170901;
-  header.n.x = 0;
-  header.n.y = 0;
-  header.n.z = 0;
+  config.header.t = 0;
+  for (config.header.len = 0; fields[config.header.len] != NULL;
+       config.header.len++)
+    ;
+  config.header.i = 0;
+  config.header.depth = 8;
+  config.header.npe = config.npe;
+  config.header.version = 170901;
+  config.header.n.x = 0;
+  config.header.n.y = 0;
+  config.header.n.z = 0;
 
   config.phi_index = -1;
-  for (i = 0; i < header.len; i++)
+  for (i = 0; i < config.header.len; i++)
     if (strcmp(fields[i], "phi") == 0)
       config.phi_index = i;
   if (config.phi_index == -1) {
@@ -301,11 +311,11 @@ positional:
     exit(1);
   }
   fprintf(stderr, "config.phi_index: %d\n", config.phi_index);
-  if (fwrite(&header, sizeof(header), 1, config.dump_file) != 1) {
+  if (fwrite(&config.header, sizeof(config.header), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
   }
-  for (i = 0; i < header.len; i++) {
+  for (i = 0; i < config.header.len; i++) {
     len = strlen(fields[i]);
     if (fwrite(&len, sizeof(len), 1, config.dump_file) != 1) {
       fprintf(stderr, "stl2dump: error: fail to write '%s'\n",
@@ -418,11 +428,13 @@ static int hash_search(struct Hash *set, int64_t key, void **pvalue) {
 
 static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
                          struct Config *config) {
-  double delta, values[sizeof fields / sizeof *fields], minimum, s[3];
+  double delta, minimum, s[3], *values;
   int leaf, i, intersect, iy, iz, index;
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
   long pos, curr, code, code_ch;
+
+  values = malloc(config->header.len * sizeof *values);
 
   code = morton(x, y, z);
   delta = config->L / (1ul << level);
@@ -476,7 +488,8 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
     exit(1);
   }
   pos = ftell(config->dump_file);
-  if (fwrite(values, sizeof(values), 1, config->dump_file) != 1) {
+  if (fwrite(values, config->header.len * sizeof *values, 1,
+             config->dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
     exit(1);
   }
@@ -496,6 +509,7 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config->dump_path);
     exit(1);
   }
+  free(values);
   fseek(config->dump_file, curr, SEEK_SET);
   return cell_size;
 }

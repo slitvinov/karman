@@ -1,6 +1,8 @@
 .POSIX:
 .SUFFIXES:
 .SUFFIXES: .c
+MPICC = mpicc
+MPICCFLAGS = -O2 -g
 QCC = qcc
 QCC_DISABLE_DIMENSIONS = -disable-dimensions
 PREFIX = $(HOME)/.local
@@ -19,9 +21,10 @@ all: $M
 stl2dump: stl2dump.c
 	$(CC) $< -fopenmp $(CFLAGS) -o $@ -lm
 tree_check: tree_check.c
-	$(QCC) $< $(QCC_DISABLE_DIMENSIONS) -o $@ -lm
+	$(QCC) $(QCC_DISABLE_DIMENSIONS) -source -D_MPI=1 $<
+	$(MPICC) $(MPICCFLAGS) _$< -o $@ -lm
 
-clean:; -rm $M
+clean:; -rm $M _tree_check.c
 
 install: all
 	mkdir -p -- '$(PREFIX)/bin' && cp -- sdf2lmp split '$(PREFIX)/bin'
