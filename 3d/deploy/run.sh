@@ -1,7 +1,7 @@
 #!/bin/sh
 
-m=8
-l=11
+l=8
+m=11
 (cd ../paraview && make dump2xdmf stl2dump)
 #../stl/cylinder.py
  ../stl/center.py $HOME/cfd.stl

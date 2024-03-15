@@ -142,6 +142,10 @@ positional:
     }
     argv++;
   }
+  if (!(config.minimal <= config.maxlevel)) {
+    fprintf(stderr, "stl2dump: error: fail to open minlevel should be <= maxlevel\n");
+    exit(1);
+  }
   if ((stl_file = fopen(config.stl_path, "r")) == NULL) {
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.stl_path);
     exit(1);
