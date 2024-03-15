@@ -455,10 +455,12 @@ event init(t = 0) {
 
 event properties(i++) {
   double re;
-  re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
-  if (Verbose && pid() == 0)
-    fprintf(stderr, "re[%d]: %g\n", i, re);
-  foreach_face() muv.x[] = fm.x[] / re;
+  if (i > 0) {
+    re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "re[%d]: %g\n", i, re);
+    foreach_face() muv.x[] = fm.x[] / re;
+  }
 }
 
 event dump(i++; t <= tend) {
