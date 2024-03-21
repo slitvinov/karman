@@ -452,11 +452,8 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
 	      dump_path, t, i);
-    if (i == 0) {
-      foreach ()
-	phi[] = -phi[];
+    if (i == 0)
       fractions(phi, cs, fs);
-    }
     fractions_cleanup(cs, fs);
     if (Verbose)
       fields_stats();
