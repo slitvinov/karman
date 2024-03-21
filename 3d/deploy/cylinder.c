@@ -20601,7 +20601,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       }
     }
   }
-  if (AdaptFlag) {
+  if (AdaptFlag && i > 1) {
     astats s = adapt_wavelet((struct Adapt){(scalar *)((scalar[]){cs, u.x, u.y, u.z,{-1}}), (double[]){0, 0.01, 0.01, 0.01},
                              .maxlevel = maxlevel, .minlevel = minlevel});
 
