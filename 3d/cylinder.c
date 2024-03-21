@@ -6,7 +6,7 @@
 @include <string.h>
 #include "grid/octree.h"
 #include "fractions.h"
-#include "embed.h"
+//#include "embed.h"
 #include "navier-stokes/centered.h"
 #include "navier-stokes/double-projection.h"
 #include "lambda2.h"
@@ -26,6 +26,7 @@ static double (*Shape[])(double, double, double) = {shape_cylinder,
 static const char *shape_names[] = {"cylinder", "sphere"};
 static double (*shape)(double, double, double);
 
+/*
 trace static double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
   if (cs[i, 0, 0] && cs[0, j, 0] && cs[i, j, 0] && cs[0, 0, k] && cs[i, 0, k] &&
@@ -85,7 +86,7 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   Fmu->x = Fmus.x;
   Fmu->y = Fmus.y;
   Fmu->z = Fmus.z;
-}
+  } */
 
 static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -128,8 +129,9 @@ u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
 
+/*
 u.n[embed] = dirichlet(0);
-u.t[embed] = dirichlet(0);
+u.t[embed] = dirichlet(0); */
 int main(int argc, char **argv) {
   char *end;
   const char *periodic_boundaries;
@@ -417,9 +419,10 @@ int main(int argc, char **argv) {
       }
   if (DTFlag)
     DT = dt_min;
+  /*
   TOLERANCE = 1e-4;
   NITERMIN = 2;
-  NITERMAX = 5;
+  NITERMAX = 5; */
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
@@ -471,6 +474,12 @@ event init(t = 0) {
   }
 }
 
+event velocity (i++) {
+  foreach()
+    foreach_dimension()
+      u.x[] = cs[]*u.x[];
+}
+
 event properties(i++) {
   double re;
   if (i > 0) {
@@ -507,7 +516,7 @@ event dump(i++; t <= tend) {
       }
     }
     if (force_path) {
-      embed_force3(p, u, mu, &Fp, &Fmu);
+      /* embed_force3(p, u, mu, &Fp, &Fmu); */
       if (pid() == 0) {
 	if (fp == NULL) {
 	  if ((fp = fopen(force_path, "w")) == NULL) {
