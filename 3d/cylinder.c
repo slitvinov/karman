@@ -401,6 +401,8 @@ int main(int argc, char **argv) {
         break;
       }
   DT = 0.05;
+  TOLERANCE = 1e-4;
+  NITERMIN = 2;
   /* NITERMAX = 20; */
   init_grid(1 << outlevel);
   run();
