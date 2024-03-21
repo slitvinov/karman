@@ -20479,7 +20479,7 @@ char *end;
     DT = dt_min;
   TOLERANCE = 1e-4;
   NITERMIN = 2;
-
+  NITERMAX = 5;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
