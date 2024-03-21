@@ -529,7 +529,7 @@ event dump(i++; t <= tend) {
       }
     }
   }
-  if (AdaptFlag && i > 1) {
+  if (AdaptFlag) {
     astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
 			     maxlevel = maxlevel, minlevel = minlevel);
     //fractions_cleanup(cs, fs);
