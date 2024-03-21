@@ -11,6 +11,8 @@
 #include "lambda2.h"
 #include "output_xdmf.h"
 
+#ifdef 0
+
 #include "embed.h"
 trace static double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
@@ -72,6 +74,27 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   Fmu->y = Fmus.y;
   Fmu->z = Fmus.z;
 }
+tract static event velocity (i++) {
+  foreach()
+    foreach_dimension()
+      u.x[] = cs[] * u.x[];
+}
+u.n[embed] = dirichlet(0);
+u.t[embed] = dirichlet(0);
+#else
+
+scalar cs[];
+face vector fs[];
+trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
+                               coord *Fmu) { }
+struct Cleanup {
+  scalar c;
+  face vector s;
+  double smin;   // minimum surface fraction (optional)
+  bool opposite; // whether to eliminate 'thin tubes' (optional)
+};
+trace static int fractions_cleanup (struct Cleanup u) { }
+#endif
 
 static double dot3(const double *a, const double *b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -129,8 +152,6 @@ u.n[right] = neumann(0);
 p[right] = dirichlet(0);
 pf[right] = dirichlet(0);
 
-u.n[embed] = dirichlet(0);
-u.t[embed] = dirichlet(0);
 int main(int argc, char **argv) {
   char *end;
   const char *periodic_boundaries;
