@@ -439,9 +439,8 @@ int main(int argc, char **argv) {
       }
   if (DTFlag)
     DT = dt_min;
-  TOLERANCE = 1e-4;
   NITERMIN = 2;
-  NITERMAX = 5;
+  NITERMAX = 10;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
