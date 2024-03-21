@@ -20446,7 +20446,7 @@ char *end;
         break;
       }
   DT = 0.05;
-  NITERMAX = 20;
+
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
