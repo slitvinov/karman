@@ -452,8 +452,11 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
 	      dump_path, t, i);
-    if (i == 0)
+    if (i == 0) {
+      foreach ()
+	phi[] = -phi[];
       fractions(phi, cs, fs);
+    }
     fractions_cleanup(cs, fs);
     if (Verbose)
       fields_stats();
@@ -462,7 +465,7 @@ event init(t = 0) {
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: initialize velocity\n");
     foreach () {
-      u.x[] = 0;
+      u.x[] = cs[];
       u.y[] = 0;
       u.z[] = 0;
     }
