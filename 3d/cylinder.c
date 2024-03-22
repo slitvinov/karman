@@ -77,7 +77,7 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
 tract static event velocity (i++) {
   foreach()
     foreach_dimension()
-    u.x[] = (1 - cs[]) * u.x[];
+    u.x[] = cs[] * u.x[];
 }
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
