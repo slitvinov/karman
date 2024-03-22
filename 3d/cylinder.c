@@ -74,11 +74,6 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
   Fmu->y = Fmus.y;
   Fmu->z = Fmus.z;
 }
-tract static event velocity (i++) {
-  foreach()
-    foreach_dimension()
-    u.x[] = cs[] * u.x[];
-}
 u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 #else
@@ -90,10 +85,15 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
 struct Cleanup {
   scalar c;
   face vector s;
-  double smin;   // minimum surface fraction (optional)
-  bool opposite; // whether to eliminate 'thin tubes' (optional)
+  double smin;
+  bool opposite;
 };
 trace static int fractions_cleanup (struct Cleanup u) { }
+tract static event velocity (i++) {
+  foreach()
+    foreach_dimension()
+    u.x[] = cs[] * u.x[];
+}
 #endif
 
 static double dot3(const double *a, const double *b) {
