@@ -89,7 +89,7 @@ struct Cleanup {
   bool opposite;
 };
 trace static int fractions_cleanup (struct Cleanup u) { }
-tract static event velocity (i++) {
+event velocity (i++) {
   foreach()
     foreach_dimension()
     u.x[] = cs[] * u.x[];

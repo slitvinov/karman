@@ -17006,18 +17006,43 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
   return 0;
 }
 #line 13 "cylinder.c"
-#line 86 "cylinder.c"
+#line 81 "cylinder.c"
 scalar  cs={12};
 vector  fs={{13},{14},{15}};
       static void embed_force3(scalar p, vector u, vector mu, coord *Fp,
-                               coord *Fmu) {tracing("embed_force3","cylinder.c",88); end_tracing("embed_force3","cylinder.c",89);}
+                               coord *Fmu) {tracing("embed_force3","cylinder.c",83); end_tracing("embed_force3","cylinder.c",84);}
 struct Cleanup {
   scalar c;
   vector s;
   double smin;
   bool opposite;
 };
-      static int fractions_cleanup (struct Cleanup u) {tracing("fractions_cleanup","cylinder.c",96); end_tracing("fractions_cleanup","cylinder.c",96);}
+      static int fractions_cleanup (struct Cleanup u) {tracing("fractions_cleanup","cylinder.c",91); end_tracing("fractions_cleanup","cylinder.c",91);}
+static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
+
+#line 92
+      static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",92); {
+  foreach_stencil()
+    {
+    {_stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0,0,0);  }
+    
+#line 95
+{_stencil_val_a(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0,0);  }
+    
+#line 95
+{_stencil_val_a(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0);  }}end_foreach_stencil();
+  {
+#line 93
+foreach()
+    {
+    val(u.x,0,0,0) = val(cs,0,0,0) * val(u.x,0,0,0);
+    
+#line 95
+val(u.y,0,0,0) = val(cs,0,0,0) * val(u.y,0,0,0);
+    
+#line 95
+val(u.z,0,0,0) = val(cs,0,0,0) * val(u.z,0,0,0);}end_foreach();}
+}{end_tracing("velocity","cylinder.c",96);return 0;}end_tracing("velocity","cylinder.c",96);}
 
 
 static double dot3(const double *a, const double *b) {
@@ -17631,7 +17656,9 @@ event_register((Event){0,1,default_display,{default_display_expr0},((int *)0),((
 
 
 event_register((Event){0,1,init,{init_expr0},((int *)0),((double *)0),"/home/lisergey/basilisk/src/navier-stokes/centered.h",196,"init"});  
-#line 450 "cylinder.c"
+#line 92 "cylinder.c"
+event_register((Event){0,1,velocity,{velocity_expr0},((int *)0),((double *)0),"cylinder.c",92,"velocity"});  
+#line 450
 event_register((Event){0,1,init_0,{init_0_expr0},((int *)0),((double *)0),"cylinder.c",450,"init"});  
 #line 507
 event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((double *)0),"cylinder.c",507,"dump"});
