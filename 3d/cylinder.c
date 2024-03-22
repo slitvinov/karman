@@ -461,6 +461,8 @@ event init(t = 0) {
         break;
     }
   } else {
+    if (Verbose && pid() == 0)
+      fprintf(stderr, "cylinder: reading dump from '%s'\n", dump_path);
     if ((dump_file = fopen(dump_path, "r")) == NULL) {
       fprintf(stderr, "cylinder: error: failed to open '%s'\n", dump_path);
       exit(1);
