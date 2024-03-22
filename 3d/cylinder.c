@@ -552,7 +552,7 @@ event dump(i++; t <= tend) {
     }
   }
   if (AdaptFlag) {
-    astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.01, 0.01, 0.01},
+    astats s = adapt_wavelet((scalar *){cs, u}, (double[]){0, 0.1, 0.1, 0.1},
                              maxlevel = maxlevel, minlevel = minlevel);
     // fractions_cleanup(cs, fs);
     unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
