@@ -7,7 +7,6 @@
 #include "grid/octree.h"
 #include "fractions.h"
 #include "navier-stokes/centered.h"
-#include "navier-stokes/double-projection.h"
 #include "lambda2.h"
 #include "output_xdmf.h"
 
