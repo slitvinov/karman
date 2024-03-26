@@ -1,7 +1,7 @@
 import math
 import re
 import sys
-
+import xml.etree.ElementTree as ET
 
 def transform(Data):
     t = 100 / 47, -10 / 47, 0
@@ -21,8 +21,8 @@ def transform(Data):
     Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
 
 
-sys.pop()
-path = sys.pop()
+sys.argv.pop(0)
+path = sys.argv.pop(0)
 with open(path, "r") as f:
     title = re.sub('TITLE[ \t]*=[\ t]*"', '', f.readline())
     title = re.sub('"[ \t]*\n', '', title)
@@ -44,6 +44,14 @@ with open(path, "r") as f:
             d.append(x)
 Data = dict(zip(variables, data))
 transform(Data)
+
+for path in sys.argv:
+    root = ET.parse(path)
+    time = float(root.find("Domain/Grid/Time").get("Value"))
+    xyz = root.find("Domain/Grid/DataItem")
+    print(time, xyz)
+exit(0)
+
 
 xdmf_path = "o.xdmf2"
 with open(xdmf_path, "w") as f:
