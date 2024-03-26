@@ -3,11 +3,23 @@ import re
 import sys
 
 # Re = 2120
-t = 100 / 47, -10 / 47, 0
-r = 0, 0, -90
-s = 2 / 47, 2 / 47, 2 / 47
-p = math.radians(r[2])
-T = [[math.cos(p), -math.sin(p)], [math.sin(p), math.cos(p)]]
+
+def transform(Data):
+    t = 100 / 47, -10 / 47, 0
+    r = 0, 0, -90
+    s = 2 / 47, 2 / 47, 2 / 47
+    p = math.radians(r[2])
+    T = [[math.cos(p), -math.sin(p)], [math.sin(p), math.cos(p)]]
+    # rotate
+    Data["x"], Data["y"] = zip(*[(T[0][0] * x + T[0][1] * y,
+                                  T[1][0] * x + T[1][1] * y)
+                                 for x, y in zip(Data["x"], Data["y"])])
+    # scale and translate
+    Data["x"] = [s[0] * r + t[0] for r in Data["x"]]
+    Data["y"] = [s[1] * r + t[1] for r in Data["y"]]
+    Data["z"] = [s[2] * r + t[2] for r in Data["z"]]
+
+    Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
 
 for path in sys.argv[1:]:
     with open(path, "r") as f:
@@ -31,17 +43,6 @@ for path in sys.argv[1:]:
                 d.append(x)
         assert len(data[0]) == nx * ny
         Data = dict(zip(variables, data))
-
-    # rotate
-    Data["x"], Data["y"] = zip(*[(T[0][0] * x + T[0][1] * y,
-                                  T[1][0] * x + T[1][1] * y)
-                                 for x, y in zip(Data["x"], Data["y"])])
-    # scale and translate
-    Data["x"] = [s[0] * r + t[0] for r in Data["x"]]
-    Data["y"] = [s[1] * r + t[1] for r in Data["y"]]
-    Data["z"] = [s[2] * r + t[2] for r in Data["z"]]
-
-    Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
 
     xdmf_path = re.sub("\.dat$", "", path) + ".xdmf2"
     with open(xdmf_path, "w") as f:
