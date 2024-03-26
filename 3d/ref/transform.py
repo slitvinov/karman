@@ -43,8 +43,8 @@ for path in sys.argv[1:]:
                 d.append(x)
     Data = dict(zip(variables, data))
     transform(Data)
-
     xdmf_path = re.sub("\.dat$", "", path) + ".xdmf2"
+    sys.stderr.write("transform.py: %s\n" % xdmf_path)
     with open(xdmf_path, "w") as f:
         f.write("""\
     <Xdmf
