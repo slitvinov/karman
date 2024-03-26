@@ -2,7 +2,6 @@ import math
 import re
 import sys
 
-# Re = 2120
 
 def transform(Data):
     t = 100 / 47, -10 / 47, 0
@@ -20,6 +19,7 @@ def transform(Data):
     Data["z"] = [s[2] * r + t[2] for r in Data["z"]]
 
     Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
+
 
 for path in sys.argv[1:]:
     with open(path, "r") as f:
@@ -41,8 +41,8 @@ for path in sys.argv[1:]:
             for d, x in zip(data, line.split()):
                 x = float(x)
                 d.append(x)
-        assert len(data[0]) == nx * ny
-        Data = dict(zip(variables, data))
+    Data = dict(zip(variables, data))
+    transform(Data)
 
     xdmf_path = re.sub("\.dat$", "", path) + ".xdmf2"
     with open(xdmf_path, "w") as f:
