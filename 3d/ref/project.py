@@ -59,11 +59,11 @@ def process(Data, path):
 
     suffix = os.path.basename(path).split(".")[-2:]
     output_path = os.path.join(dirname, ".".join(["project", *suffix]))
-    sys.stderr.write("project.py: %s\n" % output_path)
+    sys.stderr.write("project.py: %ld: %s\n" % (os.getpid(), output_path))
     for i, (x, y) in enumerate(zip(Data["x"], Data["y"])):
         if i % 100 == 0:
-            sys.stderr.write("project.py: warning: %ld/%ld\n" %
-                             (i, len(Data["x"])))
+            sys.stderr.write("project.py: %ld: warning: %ld/%ld\n" %
+                             (os.getpid(), i, len(Data["x"])))
         for h, u0 in zip(hexa, u):
             xl, yl, zl = h[0]
             xh, yh, zh = h[6]
@@ -75,44 +75,44 @@ def process(Data, path):
             Data["Vx"][i], Data["Vy"][i], Data["Vz"][i] = 0, 0, 0
     with open(output_path, "w") as f:
         f.write("""\
-    <Xdmf
-        Version="2">
-      <Domain>
-        <Grid>
-          <Topology
-              TopologyType="3DSMesh"
-              Dimensions="%ld %ld %ld"/>
-          <Geometry
-              GeometryType="XYZ">
-            <DataItem
-                Dimensions="%ld 3">
-    """ % (nz, ny, nx, nx * ny * nz))
+<Xdmf
+    Version="2">
+  <Domain>
+    <Grid>
+      <Topology
+          TopologyType="3DSMesh"
+          Dimensions="%ld %ld %ld"/>
+      <Geometry
+          GeometryType="XYZ">
+        <DataItem
+            Dimensions="%ld 3">
+""" % (nz, ny, nx, nx * ny * nz))
         for x, y, z in zip(Data["x"], Data["y"], Data["z"]):
             f.write("""\
               %.16e %.16e %.16e
-    """ % (x, y, z))
+""" % (x, y, z))
         f.write("""\
-            </DataItem>
-          </Geometry>
-    """)
+        </DataItem>
+      </Geometry>
+""")
         f.write("""\
-          <Attribute
-              Name="u"
-              AttributeType="Vector">
-            <DataItem
-                Dimensions="1 %ld %ld 3">
-    """ % (ny, nx))
+      <Attribute
+          Name="u"
+          AttributeType="Vector">
+        <DataItem
+            Dimensions="1 %ld %ld 3">
+""" % (ny, nx))
         for x, y, z in zip(Data["Vx"], Data["Vy"], Data["Vz"]):
             f.write("""\
             %.16e %.16e %.16e
-    """ % (x, y, z))
+""" % (x, y, z))
         f.write("""\
-            </DataItem>
-          </Attribute>
-        </Grid>
-      </Domain>
-    </Xdmf>
-    """)
+        </DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>
+""")
 
 
 sys.argv.pop(0)
