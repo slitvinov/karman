@@ -4,6 +4,8 @@ import os
 import re
 import sys
 import xml.etree.ElementTree as ET
+import multiprocessing
+import copy
 
 
 def transform(Data):
@@ -24,31 +26,12 @@ def transform(Data):
     Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
 
 
-sys.argv.pop(0)
-path = sys.argv.pop(0)
-with open(path, "r") as f:
-    title = re.sub('TITLE[ \t]*=[\ t]*"', '', f.readline())
-    title = re.sub('"[ \t]*\n', '', title)
-    variables = re.sub('VARIABLES[ \t]=[ \t]*', '', f.readline())
-    variables = re.sub('[ \t]*\n', '', variables)
-    variables = re.split(",[ \t]*", variables)
-    variables = [re.sub('(^")|("$)', "", x) for x in variables]
-    zone = re.sub('ZONE[ \t]*', '', f.readline())
-    zone = re.sub('[ \t]*\n', '', zone)
-    zone = re.split(",[ \t]*", zone)
-    zone = dict(x.split("=") for x in zone)
-    nx = int(zone["I"])
-    ny = int(zone["J"])
-    nz = int(zone["K"])
-    data = [[] for x in variables]
-    for line in f:
-        for d, x in zip(data, line.split()):
-            x = float(x)
-            d.append(x)
-Data = dict(zip(variables, data))
-transform(Data)
+def process0(path):
+    return process(Data, path)
 
-for path in sys.argv:
+
+def process(Data, path):
+    Data = copy.deepcopy(Data)
     dirname = os.path.dirname(path)
     root = ET.parse(path)
     time = float(root.find("Domain/Grid/Time").get("Value"))
@@ -130,3 +113,31 @@ for path in sys.argv:
       </Domain>
     </Xdmf>
     """)
+
+
+sys.argv.pop(0)
+path = sys.argv.pop(0)
+with open(path, "r") as f:
+    title = re.sub('TITLE[ \t]*=[\ t]*"', '', f.readline())
+    title = re.sub('"[ \t]*\n', '', title)
+    variables = re.sub('VARIABLES[ \t]=[ \t]*', '', f.readline())
+    variables = re.sub('[ \t]*\n', '', variables)
+    variables = re.split(",[ \t]*", variables)
+    variables = [re.sub('(^")|("$)', "", x) for x in variables]
+    zone = re.sub('ZONE[ \t]*', '', f.readline())
+    zone = re.sub('[ \t]*\n', '', zone)
+    zone = re.split(",[ \t]*", zone)
+    zone = dict(x.split("=") for x in zone)
+    nx = int(zone["I"])
+    ny = int(zone["J"])
+    nz = int(zone["K"])
+    data = [[] for x in variables]
+    for line in f:
+        for d, x in zip(data, line.split()):
+            x = float(x)
+            d.append(x)
+Data = dict(zip(variables, data))
+transform(Data)
+
+with multiprocessing.Pool() as p:
+    p.map(process0, sys.argv)
