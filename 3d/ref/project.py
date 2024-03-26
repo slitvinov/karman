@@ -1,7 +1,10 @@
 import math
+import numpy as np
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
+
 
 def transform(Data):
     t = 100 / 47, -10 / 47, 0
@@ -46,51 +49,84 @@ Data = dict(zip(variables, data))
 transform(Data)
 
 for path in sys.argv:
+    dirname = os.path.dirname(path)
     root = ET.parse(path)
     time = float(root.find("Domain/Grid/Time").get("Value"))
-    xyz = root.find("Domain/Grid/DataItem")
-    print(time, xyz)
-exit(0)
+    xyz_path = root.find("Domain/Grid/Geometry/DataItem").text
+    xyz_path = re.sub("^[\n\t ]*", "", xyz_path)
+    xyz_path = re.sub("[\n\t ]*$", "", xyz_path)
+    xyz_path = os.path.join(dirname, xyz_path)
 
+    nhex = root.find("Domain/Grid/Topology").get("Dimensions")
+    nhex = int(nhex)
+    hexa = np.fromfile(xyz_path, np.dtype("float32"))
+    hexa = np.reshape(hexa, (nhex, 8, 3))
 
-xdmf_path = "o.xdmf2"
-with open(xdmf_path, "w") as f:
-    f.write("""\
-<Xdmf
-    Version="2">
-  <Domain>
-    <Grid>
-      <Topology
-          TopologyType="3DSMesh"
-          Dimensions="%ld %ld %ld"/>
-      <Geometry
-          GeometryType="XYZ">
-        <DataItem
-            Dimensions="%ld 3">
-""" % (nz, ny, nx, nx * ny * nz))
-    for x, y, z in zip(Data["x"], Data["y"], Data["z"]):
+    attr_path, = (x for x in root.findall("Domain/Grid/Attribute")
+                  if x.get("Name") == "u")
+    attr_dims, attr_path = attr_path.findall("DataItem/DataItem")
+    attr_path = re.sub("^[\n\t ]*", "", attr_path.text)
+    attr_path = re.sub("[\n\t ]*$", "", attr_path)
+    attr_path = os.path.join(dirname, attr_path)
+    attr = np.fromfile(attr_path, np.dtype("float32"))
+    attr = np.reshape(attr, (nhex, -1))
+    ilo, jlo, istride, jstride, icount, jcount, *rest = map(
+        int, attr_dims.text.split())
+    u = attr[:, jlo:jlo + jcount]
+
+    suffix = os.path.basename(path).split(".")[-2:]
+    output_path = os.path.join(dirname, ".".join(["project", *suffix]))
+    sys.stderr.write("project.py: %s\n" % output_path)
+    for i, (x, y) in enumerate(zip(Data["x"], Data["y"])):
+        if i % 100 == 0:
+            sys.stderr.write("project.py: warning: %ld/%ld\n" %
+                             (i, len(Data["x"])))
+        for h, u0 in zip(hexa, u):
+            xl, yl, zl = h[0]
+            xh, yh, zh = h[6]
+            if xl <= x <= xh and yl <= y <= yh:
+                Data["Vx"][i], Data["Vy"][i], Data["Vz"][i] = u0
+                break
+        else:
+            sys.stderr.write("project: warning: no cell for %g, %g\n" % (x, y))
+            Data["Vx"][i], Data["Vy"][i], Data["Vz"][i] = 0, 0, 0
+    with open(output_path, "w") as f:
         f.write("""\
-          %.16e %.16e %.16e
-""" % (x, y, z))
-    f.write("""\
-        </DataItem>
-      </Geometry>
-""")
-    f.write("""\
-      <Attribute
-          Name="u"
-          AttributeType="Vector">
-        <DataItem
-            Dimensions="1 %ld %ld 3">
-""" % (ny, nx))
-    for x, y, z in zip(Data["Vx"], Data["Vy"], Data["Vz"]):
+    <Xdmf
+        Version="2">
+      <Domain>
+        <Grid>
+          <Topology
+              TopologyType="3DSMesh"
+              Dimensions="%ld %ld %ld"/>
+          <Geometry
+              GeometryType="XYZ">
+            <DataItem
+                Dimensions="%ld 3">
+    """ % (nz, ny, nx, nx * ny * nz))
+        for x, y, z in zip(Data["x"], Data["y"], Data["z"]):
+            f.write("""\
+              %.16e %.16e %.16e
+    """ % (x, y, z))
         f.write("""\
-        %.16e %.16e %.16e
-""" % (x, y, z))
-    f.write("""\
-        </DataItem>
-      </Attribute>
-    </Grid>
-  </Domain>
-</Xdmf>
-""")
+            </DataItem>
+          </Geometry>
+    """)
+        f.write("""\
+          <Attribute
+              Name="u"
+              AttributeType="Vector">
+            <DataItem
+                Dimensions="1 %ld %ld 3">
+    """ % (ny, nx))
+        for x, y, z in zip(Data["Vx"], Data["Vy"], Data["Vz"]):
+            f.write("""\
+            %.16e %.16e %.16e
+    """ % (x, y, z))
+        f.write("""\
+            </DataItem>
+          </Attribute>
+        </Grid>
+      </Domain>
+    </Xdmf>
+    """)
