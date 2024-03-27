@@ -4,12 +4,13 @@ import sys
 
 
 def transform(Data):
-    t = 100 / 47, -10 / 47, 0
+    t = 1.9781, -0.1814, 0
     r = 0, 0, -90
-    s = 2 / 47, 2 / 47, 2 / 47
+    s0 = 10 / 251
+    s = s0, s0, s0
     p = math.radians(r[2])
     T = [[math.cos(p), -math.sin(p)], [math.sin(p), math.cos(p)]]
-    scale = 1 / 3.7641568085106378e+00
+    scale = 1.2 / 0.14992
 
     # rotate
     Data["x"], Data["y"] = zip(*[(T[0][0] * x + T[0][1] * y,
@@ -20,7 +21,7 @@ def transform(Data):
     Data["y"] = [s[1] * r + t[1] for r in Data["y"]]
     Data["z"] = [s[2] * r + t[2] for r in Data["z"]]
 
-    Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
+    Data["Vx"], Data["Vy"], Data["Vz"] = Data["Vy"], Data["Vz"], Data["Vx"]
 
     for f in "Vx", "Vy", "Vz":
         Data[f] = [scale * x for x in Data[f]]
