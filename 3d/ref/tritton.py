@@ -21,14 +21,13 @@ y0, y1 = 1e2, 1e-1
 lx0, lx1 = math.log10(x0), math.log10(x1)
 ly0, ly1 = math.log10(y0), math.log10(y1)
 
-
 b[i1, :, 1] = 255
 b[i0, :, 1] = 255
 b[:, j0, 2] = 255
 b[:, j1, 2] = 255
 for (i, j), v in np.ndenumerate(a):
     if not v:
-        x = (j - j0)/(j1 - j0) * (lx1 - lx0) + lx0
-        y = (i - i0)/(i1 - i0) * (ly1 - ly0) + ly0
+        x = (j - j0) / (j1 - j0) * (lx1 - lx0) + lx0
+        y = (i - i0) / (i1 - i0) * (ly1 - ly0) + ly0
         print("%.16e %.16e" % (10**x, 10**y))
 matplotlib.image.imsave("o.png", b)

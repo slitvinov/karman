@@ -9,6 +9,8 @@ def transform(Data):
     s = 2 / 47, 2 / 47, 2 / 47
     p = math.radians(r[2])
     T = [[math.cos(p), -math.sin(p)], [math.sin(p), math.cos(p)]]
+    scale = 1 / 3.7641568085106378e+00
+
     # rotate
     Data["x"], Data["y"] = zip(*[(T[0][0] * x + T[0][1] * y,
                                   T[1][0] * x + T[1][1] * y)
@@ -19,6 +21,9 @@ def transform(Data):
     Data["z"] = [s[2] * r + t[2] for r in Data["z"]]
 
     Data["Vx"], Data["Vy"] = Data["Vy"], Data["Vx"]
+
+    for f in "Vx", "Vy", "Vz":
+        Data[f] = [scale * x for x in Data[f]]
 
 
 for path in sys.argv[1:]:
