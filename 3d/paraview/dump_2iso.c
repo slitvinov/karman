@@ -83,19 +83,19 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: scalar is not given\n");
     exit(1);
   }
-  if ((field_name = argv[1]) == NULL) {
-    fprintf(stderr, "dump_2iso: error: scalar is not given\n");
+  if ((field_name = argv[2]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: field is not given\n");
     exit(1);
   }
-  if ((context.cells_path = argv[2]) == NULL) {
+  if ((context.cells_path = argv[3]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.cells is not given\n");
     exit(1);
   }
-  if ((context.scalars_path = argv[3]) == NULL) {
+  if ((context.scalars_path = argv[4]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.scalars is not given\n");
     exit(1);
   }
-  if ((context.field_path = argv[4]) == NULL) {
+  if ((context.field_path = argv[5]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.field is not given\n");
     exit(1);
   }
@@ -156,9 +156,9 @@ int main(int argc, char **argv) {
             "dump_2iso: size: %g\n"
             "dump_2iso: origin: [%g %g %g]\n"
             "dump_2iso: scalar_index:  %d\n"
-            "dump_2iso: field_index:  %d\n", context.L0,
-            context.X0, context.Y0, context.Z0, context.scalar_index,
-            context.field_index);
+            "dump_2iso: field_index:  %d\n",
+            context.L0, context.X0, context.Y0, context.Z0,
+            context.scalar_index, context.field_index);
   context.malloc_level = 0;
   context.index = NULL;
   if ((context.values = malloc(context.header.len * sizeof *context.values)) ==
