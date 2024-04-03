@@ -34,7 +34,7 @@ static void process(int, void *);
 static void counter(int, void *);
 struct Context {
   struct DumpHeader header;
-  int *index, malloc_level, m_level;
+  int *index, malloc_level, m_level, field_index, scalar_index;
   double *values, X0, Y0, Z0, L0;
   FILE *input_file, *cells_file, *scalars_file, *field_file;
   char *input_path, *cells_path, *scalars_path, *field_path;
@@ -50,20 +50,22 @@ int main(int argc, char **argv) {
   int Verbose;
   double o[4];
   char **names;
-  const char *scalar;
+  const char *scalar_name, *field_name;
   struct Context context;
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-              "Usage: dump_2iso [-h] [-v] file.dump scalar in.cells in.scalar "
-              "in.field\n"
+              "Usage: dump_2iso [-h] [-v] file.dump scalar_name field_name "
+              "in.cells in.scalar in.field\n"
               "Options:\n"
               "  -h                             print help message and exit\n"
               "  -v                             verbose\n"
               "  file.dump                      Basilisk dump\n"
-              "  scalar                         name of a scalar to output\n"
+              "  scalar_name                    name of the scalar to build "
+              "isosurface\n"
+              "  field_name                     name of the field to output\n"
               "  in.cells, in.scalar, in.field  output files\n");
       exit(1);
     case 'v':
@@ -77,7 +79,11 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: file.dump is not given\n");
     exit(1);
   }
-  if ((scalar = argv[1]) == NULL) {
+  if ((scalar_name = argv[1]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: scalar is not given\n");
+    exit(1);
+  }
+  if ((field_name = argv[1]) == NULL) {
     fprintf(stderr, "dump_2iso: error: scalar is not given\n");
     exit(1);
   }
@@ -115,6 +121,8 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: malloc failed\n");
     exit(1);
   }
+  context.scalar_index = -1;
+  context.field_index = -1;
   for (i = 0; i < context.header.len; i++) {
     FREAD0(&len, sizeof len, 1);
     names[i] = malloc((len + 1) * sizeof *names[i]);
@@ -122,16 +130,35 @@ int main(int argc, char **argv) {
     names[i][len] = '\0';
     if (Verbose)
       fprintf(stderr, "dump_2iso: name[%ld]: %s\n", i, names[i]);
+    if (strcmp(scalar_name, names[i]) == 0)
+      context.scalar_index = i;
+    if (strcmp(field_name, names[i]) == 0)
+      context.field_index = i;
   }
+  if (context.scalar_index == -1) {
+    fprintf(stderr, "dump_2iso: error: not field '%s' in '%s'\n", scalar_name,
+            context.input_path);
+    exit(1);
+  }
+  if (context.field_index == -1) {
+    fprintf(stderr, "dump_2iso: error: not field '%s' in '%s'\n", field_name,
+            context.input_path);
+    exit(1);
+  }
+
   FREAD0(o, sizeof o, 1);
-  if (Verbose)
-    fprintf(stderr, "dump_2iso: origin: [%g %g %g]\n", o[0], o[1], o[2]);
   context.X0 = o[0];
   context.Y0 = o[1];
   context.Z0 = o[2];
   context.L0 = o[3];
   if (Verbose)
-    fprintf(stderr, "dump_2iso: size: %g\n", o[3]);
+    fprintf(stderr,
+            "dump_2iso: size: %g\n"
+            "dump_2iso: origin: [%g %g %g]\n"
+            "dump_2iso: scalar_index:  %d\n"
+            "dump_2iso: field_index:  %d\n", context.L0,
+            context.X0, context.Y0, context.Z0, context.scalar_index,
+            context.field_index);
   context.malloc_level = 0;
   context.index = NULL;
   if ((context.values = malloc(context.header.len * sizeof *context.values)) ==
@@ -221,14 +248,14 @@ static void process(int level, void *context_v) {
     exit(1);
   }
 
-  val = context->values[8];
+  val = context->values[context->scalar_index];
   if (fwrite(&val, sizeof(val), 1, context->scalars_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
             context->scalars_path);
     exit(1);
   }
 
-  val = context->values[9];
+  val = context->values[context->field_index];
   if (fwrite(&val, sizeof(val), 1, context->field_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
             context->field_path);
