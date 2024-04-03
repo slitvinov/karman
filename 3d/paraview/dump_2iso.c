@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if ((context.scalars_path = argv[4]) == NULL) {
-    fprintf(stderr, "dump_2iso: error: in.scalars is not given\n");
+    fprintf(stderr, "dump_2iso: error: in.scalar is not given\n");
     exit(1);
   }
   if ((context.field_path = argv[5]) == NULL) {
