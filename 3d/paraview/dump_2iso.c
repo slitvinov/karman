@@ -120,7 +120,8 @@ int main(int argc, char **argv) {
     names[i] = malloc((len + 1) * sizeof *names[i]);
     FREAD0(names[i], sizeof *names[i], len);
     names[i][len] = '\0';
-    fprintf(stderr, "name: %s\n", names[i]);
+    if (Verbose)
+      fprintf(stderr, "dump_2iso: name[%ld]: %s\n", i, names[i]);
   }
   FREAD0(o, sizeof o, 1);
   if (Verbose)
