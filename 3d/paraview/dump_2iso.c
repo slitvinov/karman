@@ -50,18 +50,21 @@ int main(int argc, char **argv) {
   int Verbose;
   double o[4];
   char **names;
+  const char *scalar;
   struct Context context;
   Verbose = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
-      fprintf(
-          stderr,
-          "Usage: dump_2iso [-h] [-v] file.dump in.cells in.scalar in.field\n"
-          "Options:\n"
-          "  -h                          Print help message and exit\n"
-          "  -v                          Verbose\n"
-          "  file.dump                   basilisk dump\n");
+      fprintf(stderr,
+              "Usage: dump_2iso [-h] [-v] file.dump scalar in.cells in.scalar "
+              "in.field\n"
+              "Options:\n"
+              "  -h                             print help message and exit\n"
+              "  -v                             verbose\n"
+              "  file.dump                      Basilisk dump\n"
+              "  scalar                         name of a scalar to output\n"
+              "  in.cells, in.scalar, in.field  output files\n");
       exit(1);
     case 'v':
       Verbose = 1;
@@ -74,15 +77,19 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: file.dump is not given\n");
     exit(1);
   }
-  if ((context.cells_path = argv[1]) == NULL) {
+  if ((scalar = argv[1]) == NULL) {
+    fprintf(stderr, "dump_2iso: error: scalar is not given\n");
+    exit(1);
+  }
+  if ((context.cells_path = argv[2]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.cells is not given\n");
     exit(1);
   }
-  if ((context.scalars_path = argv[2]) == NULL) {
+  if ((context.scalars_path = argv[3]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.scalars is not given\n");
     exit(1);
   }
-  if ((context.field_path = argv[3]) == NULL) {
+  if ((context.field_path = argv[4]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.field is not given\n");
     exit(1);
   }
@@ -92,14 +99,18 @@ int main(int argc, char **argv) {
     exit(1);
   }
   FREAD0(&context.header, sizeof context.header, 1);
-  fprintf(stderr, "version: %d\n", context.header.version);
-  fprintf(stderr, "t: %.16e\n", context.header.t);
-  fprintf(stderr, "len: %ld\n", context.header.len);
-  fprintf(stderr, "npe: %d\n", context.header.npe);
-  fprintf(stderr, "depth: %d\n", context.header.depth);
-  fprintf(stderr, "i: %d\n", context.header.i);
-  fprintf(stderr, "n: [%g %g %g]\n", context.header.n.x, context.header.n.y,
-          context.header.n.z);
+  if (Verbose)
+    fprintf(stderr,
+            "dump_2iso: version: %d\n"
+            "dump_2iso: t: %.16e\n"
+            "dump_2iso: len: %ld\n"
+            "dump_2iso: npe: %d\n"
+            "dump_2iso: depth: %d\n"
+            "dump_2iso: i: %d\n"
+            "dump_2iso: n: [%g %g %g]\n",
+            context.header.version, context.header.t, context.header.len,
+            context.header.npe, context.header.depth, context.header.i,
+            context.header.n.x, context.header.n.y, context.header.n.z);
   if ((names = malloc(context.header.len * sizeof *names)) == NULL) {
     fprintf(stderr, "dump_2iso: error: malloc failed\n");
     exit(1);
@@ -112,12 +123,14 @@ int main(int argc, char **argv) {
     fprintf(stderr, "name: %s\n", names[i]);
   }
   FREAD0(o, sizeof o, 1);
-  fprintf(stderr, "origin: [%g %g %g]\n", o[0], o[1], o[2]);
+  if (Verbose)
+    fprintf(stderr, "dump_2iso: origin: [%g %g %g]\n", o[0], o[1], o[2]);
   context.X0 = o[0];
   context.Y0 = o[1];
   context.Z0 = o[2];
   context.L0 = o[3];
-  fprintf(stderr, "size: %g\n", o[3]);
+  if (Verbose)
+    fprintf(stderr, "dump_2iso: size: %g\n", o[3]);
   context.malloc_level = 0;
   context.index = NULL;
   if ((context.values = malloc(context.header.len * sizeof *context.values)) ==
@@ -129,7 +142,8 @@ int main(int argc, char **argv) {
 
   input_offset = ftell(context.input_file);
   traverse(0, counter, &context);
-  fprintf(stderr, "m_level: %d\n", context.m_level);
+  if (Verbose)
+    fprintf(stderr, "dump_2iso: m_level: %d\n", context.m_level);
 
   fseek(context.input_file, input_offset, SEEK_SET);
   if ((context.cells_file = fopen(context.cells_path, "w")) == NULL) {
