@@ -36,8 +36,8 @@ struct Context {
   struct DumpHeader header;
   int *index, malloc_level, m_level, field_index, scalar_index;
   double *values, X0, Y0, Z0, L0;
-  FILE *input_file, *cells_file, *scalars_file, *field_file;
-  char *input_path, *cells_path, *scalars_path, *field_path;
+  FILE *input_file, *cells_file, *scalar_file, *field_file;
+  char *input_path, *cells_path, *scalar_path, *field_path;
 };
 static const int shift[8][3] = {
     {0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1},
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump_2iso: error: in.cells is not given\n");
     exit(1);
   }
-  if ((context.scalars_path = argv[4]) == NULL) {
+  if ((context.scalar_path = argv[4]) == NULL) {
     fprintf(stderr, "dump_2iso: error: in.scalar is not given\n");
     exit(1);
   }
@@ -181,9 +181,9 @@ int main(int argc, char **argv) {
             context.cells_path);
     exit(1);
   }
-  if ((context.scalars_file = fopen(context.scalars_path, "w")) == NULL) {
+  if ((context.scalar_file = fopen(context.scalar_path, "w")) == NULL) {
     fprintf(stderr, "dump_2iso: error: fail to open '%s'\n",
-            context.scalars_path);
+            context.scalar_path);
     exit(1);
   }
   if ((context.field_file = fopen(context.field_path, "w")) == NULL) {
@@ -208,9 +208,9 @@ int main(int argc, char **argv) {
             context.cells_path);
     exit(1);
   }
-  if (fclose(context.scalars_file) != 0) {
+  if (fclose(context.scalar_file) != 0) {
     fprintf(stderr, "dump_2iso: error: fail to close '%s'\n",
-            context.scalars_path);
+            context.scalar_path);
     exit(1);
   }
   if (fclose(context.field_file) != 0) {
@@ -251,9 +251,9 @@ static void process(int level, void *context_v) {
   }
 
   val = context->values[context->scalar_index];
-  if (fwrite(&val, sizeof(val), 1, context->scalars_file) != 1) {
+  if (fwrite(&val, sizeof(val), 1, context->scalar_file) != 1) {
     fprintf(stderr, "dump_2iso: error: fail to write '%s'\n",
-            context->scalars_path);
+            context->scalar_path);
     exit(1);
   }
 
