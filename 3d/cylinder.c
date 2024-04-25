@@ -10,7 +10,7 @@
 #include "lambda2.h"
 #include "output_xdmf.h"
 
-#ifdef 1
+#if 1
 #include "embed.h"
 trace static double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
