@@ -1,5 +1,5 @@
-#include "../predicate.h"
-#include "../predicate_c.h"
+#include "predicate.h"
+#include "predicate_c.h"
 #include <assert.h>
 #include <float.h>
 #include <inttypes.h>

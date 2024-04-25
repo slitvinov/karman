@@ -16,5 +16,3 @@ clean:
 	rm -f _cylinder.c cylinder
 
 _cylinder.c: output_xdmf.h
-_cylinder.c: predicate.h
-_cylinder.c: predicate_c.h
