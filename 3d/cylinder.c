@@ -424,8 +424,6 @@ int main(int argc, char **argv) {
       }
   if (DTFlag)
     DT = dt_min;
-  NITERMIN = 2;
-  NITERMAX = 10;
   init_grid(1 << outlevel);
   run();
   if (Verbose && pid() == 0)
