@@ -135,7 +135,7 @@ static double (*shape)(double, double, double);
 static const char *force_path, *output_prefix;
 static char *dump_path;
 static const int outlevel = 5;
-static double reynolds, trelax, tend;
+static double reynolds, tend;
 static int maxlevel, minlevel, period, Verbose, FullOutput, AdaptFlag;
 static face vector muv[];
 static scalar l2[];
@@ -171,7 +171,6 @@ int main(int argc, char **argv) {
   dump_path = NULL;
   shape = NULL;
   periodic_boundaries = NULL;
-  trelax = 0;
   while (*++argv != NULL && argv[0][0] == '-')
     switch (argv[0][1]) {
     case 'h':
@@ -344,18 +343,6 @@ int main(int argc, char **argv) {
       }
       output_prefix = *argv;
       break;
-    case 'x':
-      argv++;
-      if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -x needs an argument\n");
-        exit(1);
-      }
-      trelax = strtod(*argv, &end);
-      if (*end != '\0') {
-        fprintf(stderr, "cylinder: error: '%s' is not a number\n", *argv);
-        exit(1);
-      }
-      break;
     case 'z':
       argv++;
       if (*argv == NULL) {
@@ -493,13 +480,7 @@ event init(t = 0) {
 }
 
 event properties(i++) {
-  double re;
-  if (i > 0) {
-    re = t >= trelax ? reynolds : max(1, reynolds * t / trelax);
-    if (Verbose && pid() == 0)
-      fprintf(stderr, "re[%d]: %g\n", i, re);
-    foreach_face() muv.x[] = fm.x[] / re;
-  }
+  foreach_face() muv.x[] = fm.x[] / reynolds;
 }
 
 event dump(i++; t <= tend) {
