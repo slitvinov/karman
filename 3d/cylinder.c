@@ -534,7 +534,7 @@ event dump(i++; t <= tend) {
                              maxlevel = maxlevel, minlevel = minlevel);
     // fractions_cleanup(cs, fs);
     unrefine(!(x < X0 + 0.9 * L0) && level > outlevel);
-    // fractions_cleanup(cs, fs);
+    fractions_cleanup(cs, fs);
     if (Verbose && i % period == 0 && pid() == 0)
       fprintf(stderr, "cylinder: refined %d cells, coarsened %d cells\n", s.nf,
               s.nc);
