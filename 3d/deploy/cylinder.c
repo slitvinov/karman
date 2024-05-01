@@ -16865,7 +16865,7 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
      {
       _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0,0,0); 
 _stencil_val(u.x,0,0,0);_stencil_val(cs,0,0,0);   
-          
+                
     
 #line 102
 } 
@@ -16873,7 +16873,7 @@ _stencil_val(u.x,0,0,0);_stencil_val(cs,0,0,0);
 {
       _stencil_val_a(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0,0); 
 _stencil_val(u.y,0,0,0);_stencil_val(cs,0,0,0);   
-          
+                
     
 #line 102
 } 
@@ -16881,7 +16881,7 @@ _stencil_val(u.y,0,0,0);_stencil_val(cs,0,0,0);
 {
       _stencil_val_a(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0); 
 _stencil_val(u.z,0,0,0);_stencil_val(cs,0,0,0);   
-          
+                
     
 #line 102
 }
@@ -16894,17 +16894,17 @@ OMP(omp parallel reduction(+ : Force)){
 foreach () {
      {
       val(u.x,0,0,0) = val(cs,0,0,0) * val(u.x,0,0,0);
-      Force.x += val(u.x,0,0,0) * (val(cs,0,0,0) - 1);
+      Force.x += val(u.x,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;
     } 
 #line 99
 {
       val(u.y,0,0,0) = val(cs,0,0,0) * val(u.y,0,0,0);
-      Force.y += val(u.y,0,0,0) * (val(cs,0,0,0) - 1);
+      Force.y += val(u.y,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;
     } 
 #line 99
 {
       val(u.z,0,0,0) = val(cs,0,0,0) * val(u.z,0,0,0);
-      Force.z += val(u.z,0,0,0) * (val(cs,0,0,0) - 1);
+      Force.z += val(u.z,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;
     }
   }end_foreach();mpi_all_reduce_array(&Force.x,double,MPI_SUM,3);
 #undef OMP_PARALLEL

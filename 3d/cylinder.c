@@ -98,7 +98,7 @@ event velocity(i++) {
   foreach (reduction(+ : Force)) {
     foreach_dimension() {
       u.x[] = cs[] * u.x[];
-      Force.x += u.x[] * (cs[] - 1);
+      Force.x += u.x[] * (cs[] - 1) * Delta * Delta * Delta;
     }
   }
   foreach_dimension() Force.x /= dt;
