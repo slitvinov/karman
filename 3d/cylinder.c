@@ -10,7 +10,7 @@
 #include "lambda2.h"
 #include "output_xdmf.h"
 
-#if 1
+#if 0
 #include "embed.h"
 trace static double embed_interpolate3(Point point, scalar s, coord p) {
   int i = sign(p.x), j = sign(p.y), k = sign(p.z);
@@ -18,29 +18,29 @@ trace static double embed_interpolate3(Point point, scalar s, coord p) {
       cs[0, j, k] && cs[i, j, k]) {
     double val_0, val_k;
     val_0 =
-        (s[0, 0, 0] * (1. - fabs(p.x)) + s[i, 0, 0] * fabs(p.x)) *
-            (1. - fabs(p.y)) +
-        (s[0, j, 0] * (1. - fabs(p.x)) + s[i, j, 0] * fabs(p.x)) * fabs(p.y);
+	(s[0, 0, 0] * (1. - fabs(p.x)) + s[i, 0, 0] * fabs(p.x)) *
+	    (1. - fabs(p.y)) +
+	(s[0, j, 0] * (1. - fabs(p.x)) + s[i, j, 0] * fabs(p.x)) * fabs(p.y);
     val_k =
-        (s[0, 0, k] * (1. - fabs(p.x)) + s[i, 0, k] * fabs(p.x)) *
-            (1. - fabs(p.y)) +
-        (s[0, j, k] * (1. - fabs(p.x)) + s[i, j, k] * fabs(p.x)) * fabs(p.y);
+	(s[0, 0, k] * (1. - fabs(p.x)) + s[i, 0, k] * fabs(p.x)) *
+	    (1. - fabs(p.y)) +
+	(s[0, j, k] * (1. - fabs(p.x)) + s[i, j, k] * fabs(p.x)) * fabs(p.y);
     return (val_0 * (1. - fabs(p.z)) + val_k * fabs(p.z));
   } else {
     double val = s[];
     foreach_dimension() {
       int i = sign(p.x);
       if (cs[i])
-        val += fabs(p.x) * (s[i] - s[]);
+	val += fabs(p.x) * (s[i] - s[]);
       else if (cs[-i])
-        val += fabs(p.x) * (s[] - s[-i]);
+	val += fabs(p.x) * (s[] - s[-i]);
     }
     return val;
   }
 }
 
 trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
-                               coord *Fmu) {
+			       coord *Fmu) {
   coord Fps = {0}, Fmus = {0};
   foreach (reduction(+ : Fps) reduction(+ : Fmus)) {
     if (cs[] > 0. && cs[] < 1.) {
@@ -50,16 +50,16 @@ trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
       double Fn = area * embed_interpolate3(point, p, b);
       foreach_dimension() Fps.x += Fn * n.x;
       if (constant(mu.x) != 0.) {
-        double mua = 0., fa = 0.;
-        foreach_dimension() {
-          mua += mu.x[] + mu.x[1];
-          fa += fs.x[] + fs.x[1];
-        }
-        mua /= fa;
-        coord dudn = embed_gradient(point, u, b, n);
-        foreach_dimension() Fmus.x -=
-            area * mua *
-            (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z);
+	double mua = 0., fa = 0.;
+	foreach_dimension() {
+	  mua += mu.x[] + mu.x[1];
+	  fa += fs.x[] + fs.x[1];
+	}
+	mua /= fa;
+	coord dudn = embed_gradient(point, u, b, n);
+	foreach_dimension() Fmus.x -=
+	    area * mua *
+	    (dudn.x * (sq(n.x) + 1.) + dudn.y * n.x * n.y + dudn.z * n.x * n.z);
       }
     }
   }
@@ -76,21 +76,32 @@ u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 #else
 
+static coord Force = {0};
 scalar cs[];
 face vector fs[];
 trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,
-                               coord *Fmu) { }
+                               coord *Fmu) {
+  foreach_dimension() {
+    Fmu->x = Force.x;
+    Fp->x = 0;
+  }
+}
 struct Cleanup {
   scalar c;
   face vector s;
   double smin;
   bool opposite;
 };
-trace static int fractions_cleanup (struct Cleanup u) { }
-event velocity (i++) {
-  foreach()
-    foreach_dimension()
-    u.x[] = cs[] * u.x[];
+trace static int fractions_cleanup(struct Cleanup u) {}
+event velocity(i++) {
+  foreach_dimension() Force.x = 0;
+  foreach (reduction(+ : Force)) {
+    foreach_dimension() {
+      u.x[] = cs[] * u.x[];
+      Force.x += u.x[] * (cs[] - 1);
+    }
+  }
+  foreach_dimension() Force.x /= dt;
 }
 #endif
 
@@ -477,9 +488,7 @@ event init(t = 0) {
   }
 }
 
-event properties(i++) {
-  foreach_face() muv.x[] = fm.x[] / reynolds;
-}
+event properties(i++) { foreach_face() muv.x[] = fm.x[] / reynolds; }
 
 event dump(i++; t <= tend) {
   char path[FILENAME_MAX];
