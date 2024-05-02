@@ -5,9 +5,8 @@
 #include "navier-stokes/centered.h"
 #include "output_xdmf.h"
 static const double diameter = 0.125;
-static const int minlevel = 7;
 static double reynolds, tend;
-static int maxlevel, period, Image, Surface, Verbose;
+static int maxlevel, minlevel, period, Image, Surface, Verbose;
 static const char *output_prefix;
 u.n[left] = dirichlet(1);
 p[left] = neumann(0);
@@ -20,9 +19,10 @@ u.t[embed] = fabs(y) > 0.45 ? neumann(0) : dirichlet(0);
 face vector muv[];
 int main(int argc, char **argv) {
   char *end;
-  int LevelFlag, PeriodFlag, ReynoldsFlag, TendFlag;
+  int MaxLevelFlag, MinLevelFlag, PeriodFlag, ReynoldsFlag, TendFlag;
   ReynoldsFlag = 0;
-  LevelFlag = 0;
+  MaxLevelFlag = 0;
+  MinLevelFlag = 0;
   PeriodFlag = 0;
   Image = 0;
   Verbose = 0;
@@ -40,14 +40,15 @@ int main(int argc, char **argv) {
           "  -v     Verbose\n"
           "  -i     Enable PPM image dumping\n"
           "  -r <Reynolds number>     the Reynolds number (a decimal number)\n"
-          "  -l <resolution level>    the resolution level (positive integer)\n"
+          "  -l <num>    Minimum resolution level (positive integer)\n"
+          "  -m <num>    Maximum resolution level (positive integer)\n"
           "  -o <preifx>              a prefix for the output files\n"
           "  -p <dump period>         the dump period (positive integer)\n"
           "  -e <end time>            end time of the simulation (decimal "
           "number)\n"
           "\n"
           "Example usage:\n"
-          "  ./cylinder -v -i -r 100 -l 10 -p 100 -e 2 -o h\n");
+          "  ./cylinder -v -i -r 100 -l 7 -m 10 -p 100 -e 2 -o h\n");
       exit(1);
     case 'r':
       argv++;
@@ -62,10 +63,10 @@ int main(int argc, char **argv) {
       }
       ReynoldsFlag = 1;
       break;
-    case 'l':
+    case 'm':
       argv++;
       if (*argv == NULL) {
-        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        fprintf(stderr, "cylinder: error: -m needs an argument\n");
         exit(1);
       }
       maxlevel = strtol(*argv, &end, 10);
@@ -74,7 +75,21 @@ int main(int argc, char **argv) {
                 *argv);
         exit(1);
       }
-      LevelFlag = 1;
+      MaxLevelFlag = 1;
+      break;
+    case 'l':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "cylinder: error: -l needs an argument\n");
+        exit(1);
+      }
+      minlevel = strtol(*argv, &end, 10);
+      if (*end != '\0' || minlevel <= 0) {
+        fprintf(stderr, "cylinder: error: '%s' is not a positive integer\n",
+                *argv);
+        exit(1);
+      }
+      MinLevelFlag = 1;
       break;
     case 'p':
       argv++;
@@ -125,8 +140,12 @@ int main(int argc, char **argv) {
     fprintf(stderr, "cylinder: error: -r is not set\n");
     exit(1);
   }
-  if (!LevelFlag) {
+  if (!MinLevelFlag) {
     fprintf(stderr, "cylinder: error: -l is not set\n");
+    exit(1);
+  }
+  if (!MaxLevelFlag) {
+    fprintf(stderr, "cylinder: error: -m is not set\n");
     exit(1);
   }
   if (!PeriodFlag) {
