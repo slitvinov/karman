@@ -201,7 +201,7 @@ event dump(i++; t <= tend) {
         foreach ()
           m[] = cs[] - 0.5;
         sprintf(path, "%s.%09d.png", output_prefix, i);
-        output_ppm(omega, file = path, n = 512,
+        output_ppm(omega, file = path, n = 1024,
                    box = {{-0.5, -0.5}, {L0 - 0.5, 0.5}}, min = -2 / diameter,
                    max = 2 / diameter, linear = false, mask = m);
       }
