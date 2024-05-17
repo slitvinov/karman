@@ -210,10 +210,11 @@ int main(int argc, char **argv) {
           "  -S <string> Specify shape (cylinder|sphere)\n"
           "  -d <file>   Restart simulation from the dump file\n"
           "  -z <num>    Domain size\n\n"
+	  "  npe: %d\n"
           "Example usage:\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -z 2.5 -S sphere\n"
           "  ./cylinder -v -r 100 -l 7 -m 10 -p 100 -e 2 -f force.dat -z 2.5 "
-          "-S cylinder -o h -b t\n");
+          "-S cylinder -o h -b t\n", npe());
       exit(1);
     case 'r':
       argv++;
