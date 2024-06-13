@@ -28,7 +28,7 @@ $ cp qcc $HOME/.local/bin/
 
 See [deploy/README.md](deploy/README.md).
 
-Two dimensional
+Two-dimensional
 <pre>
 Usage: cylinder [-h] [-i] [-v] -r <Reynolds number> -l <resolution level> -p <dump period> -e <end time>
 Options:
