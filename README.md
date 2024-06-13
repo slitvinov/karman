@@ -76,4 +76,5 @@ Example usage:
 
 <h2>Results</h2>
 
+<p align="center"><img src="img/worms.png"/></p>
 <p align="center"><img src="img/karman.gif"/></p>
