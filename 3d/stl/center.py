@@ -20,8 +20,8 @@ def create(path, nt):
 
 
 def read(path):
-    with open(path, "rb+") as file:
-        mm = mmap.mmap(file.fileno(), 0)
+    with open(path, "rb") as file:
+        mm = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
         nt, = struct.unpack('<i', mm[80:80 + 4])
         return np.ndarray((nt, 3, 3), np.dtype("<f4"), mm, 80 + 4 + 12,
                           (36 + 12 + 2, 12, 4))
