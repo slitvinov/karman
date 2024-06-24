@@ -1,6 +1,6 @@
 .POSIX:
-.SUFFIX:
-.SUFFIX: .c
+.SUFFIXES:
+.SUFFIXES: .c
 
 CFLAGS = -O2 -g
 QCC = qcc
