@@ -92,7 +92,7 @@ struct Cleanup {
   double smin;
   bool opposite;
 };
-trace static int fractions_cleanup(struct Cleanup u) {}
+trace static int fractions_cleanup(struct Cleanup u) { return 0; }
 event velocity(i++) {
   foreach_dimension() Force.x = 0;
   foreach (reduction(+ : Force)) {
@@ -102,7 +102,6 @@ event velocity(i++) {
     }
   }
   foreach_dimension() Force.x /= dt;
-  return 0;
 }
 #endif
 
