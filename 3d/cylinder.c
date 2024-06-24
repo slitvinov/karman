@@ -76,7 +76,7 @@ u.n[embed] = dirichlet(0);
 u.t[embed] = dirichlet(0);
 #else
 
-static coord Force = {0};
+coord Force = {0};
 scalar cs[];
 face vector fs[];
 trace static void embed_force3(scalar p, vector u, face vector mu, coord *Fp,

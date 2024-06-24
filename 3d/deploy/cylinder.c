@@ -720,7 +720,7 @@ end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",684);}
 
 #define mpi_all_reduce_array(v,type,op,elem) {\
   prof_start ("mpi_all_reduce");\
-  type global[elem], tmp[elem];\
+  type * global = malloc ((elem)*sizeof(type)), * tmp = malloc ((elem)*sizeof(type));\
   for (int i = 0; i < elem; i++)\
     tmp[i] = (v)[i];\
   MPI_Datatype datatype;\
@@ -728,6 +728,7 @@ end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",684);}
   else if (!strcmp(#type, "int")) datatype = MPI_INT;\
   else if (!strcmp(#type, "long")) datatype = MPI_LONG;\
   else if (!strcmp(#type, "bool")) datatype = MPI_C_BOOL;\
+  else if (!strcmp(#type, "unsigned char")) datatype = MPI_UNSIGNED_CHAR;\
   else {\
     fprintf (stderr, "unknown reduction type '%s'\n", #type);\
     fflush (stderr);\
@@ -736,10 +737,11 @@ end_tracing("mpi_all_reduce0","/home/lisergey/basilisk/src/common.h",684);}
   mpi_all_reduce0 (tmp, global, elem, datatype, op, MPI_COMM_WORLD);\
   for (int i = 0; i < elem; i++)\
     (v)[i] = global[i];\
+  free (global), free (tmp);\
   prof_stop();\
 }\
 
-#line 713
+#line 715
 
 
 #endif
@@ -843,7 +845,7 @@ void mpi_init()
 #define val(a,k,l,m) data(k,l,m)[_index(a,m)]
 
 double _val_higher_dimension = 0.;
-#line 824 "/home/lisergey/basilisk/src/common.h"
+#line 826 "/home/lisergey/basilisk/src/common.h"
 #if (_GNU_SOURCE || __APPLE__) && !_OPENMP && !_CADNA
 double undefined;
 # if __APPLE__
@@ -854,7 +856,7 @@ double undefined;
 # define disable_fpe(flags) fedisableexcept (flags)
 static void set_fpe (void) {
   int64_t lnan = 0x7ff0000000000001;
-  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/home/lisergey/basilisk/src/common.h", 834, "sizeof (int64_t) == sizeof (double)");
+  if (!(sizeof (int64_t) == sizeof (double))) qassert ("/home/lisergey/basilisk/src/common.h", 836, "sizeof (int64_t) == sizeof (double)");
   memcpy (&undefined, &lnan, sizeof (double));
   enable_fpe (FE_DIVBYZERO|FE_INVALID);
 }
@@ -926,26 +928,26 @@ OMP(omp declare reduction (+ : coord :
       omp_out.x += omp_in.x,
       omp_out.y += omp_in.y,
       omp_out.z += omp_in.z))
-#line 918 "/home/lisergey/basilisk/src/common.h"
+#line 920 "/home/lisergey/basilisk/src/common.h"
 void normalize (coord * n)
 {
   double norm = 0.;
   
     norm += sq(n->x);
     
-#line 922
+#line 924
 norm += sq(n->y);
     
-#line 922
+#line 924
 norm += sq(n->z);
   norm = sqrt(norm);
   
     n->x /= norm;
     
-#line 925
+#line 927
 n->y /= norm;
     
-#line 925
+#line 927
 n->z /= norm;
 }
 
@@ -958,7 +960,7 @@ void size (double L) {
 }
 
 double zero (double s0, double s1, double s2) { return 0.; }
-#line 945 "/home/lisergey/basilisk/src/common.h"
+#line 947 "/home/lisergey/basilisk/src/common.h"
   enum { right, left, top, bottom, front, back };
 
 int nboundary = 2*3;
@@ -1018,7 +1020,7 @@ typedef struct {
   Boundary parent;
   int d;
 } BoxBoundary;
-#line 963 "/home/lisergey/basilisk/src/common.h"
+#line 965 "/home/lisergey/basilisk/src/common.h"
 
 
 
@@ -1062,7 +1064,7 @@ void (* coarsen) (Point, scalar);
 #line 81 "/home/lisergey/basilisk/src/fractions.h"
 vector n;
 
-#line 986 "/home/lisergey/basilisk/src/common.h"
+#line 988 "/home/lisergey/basilisk/src/common.h"
 } _Attributes;
 
 static _Attributes * _attribute = NULL;
@@ -1167,11 +1169,11 @@ vector * vectors_add (vector * list, vector v)
       if (w.x.i != v.x.i)
  id = false;
       
-#line 1087
+#line 1089
 if (w.y.i != v.y.i)
  id = false;
       
-#line 1087
+#line 1089
 if (w.z.i != v.z.i)
  id = false;
     if (id)
@@ -1195,17 +1197,17 @@ vector * vectors_from_scalars (scalar * s)
   while (s->i >= 0) {
     vector v;
      {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1112, "s->i >= 0");
       v.x = *s++;
     } 
-#line 1109
+#line 1111
 {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1112, "s->i >= 0");
       v.y = *s++;
     } 
-#line 1109
+#line 1111
 {
-      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1110, "s->i >= 0");
+      if (!(s->i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1112, "s->i >= 0");
       v.z = *s++;
     }
     list = vectors_append (list, v);
@@ -1236,17 +1238,17 @@ tensor * tensors_from_vectors (vector * v)
   while (v->x.i >= 0) {
     tensor t;
      {
-      if (!(v->x.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
+      if (!(v->x.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1143, "v->x.i >= 0");
       t.x = *v++;
     } 
-#line 1140
+#line 1142
 {
-      if (!(v->y.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
+      if (!(v->y.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1143, "v->x.i >= 0");
       t.y = *v++;
     } 
-#line 1140
+#line 1142
 {
-      if (!(v->z.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1141, "v->x.i >= 0");
+      if (!(v->z.i >= 0)) qassert ("/home/lisergey/basilisk/src/common.h", 1143, "v->x.i >= 0");
       t.z = *v++;
     }
     list = tensors_append (list, t);
@@ -1260,11 +1262,11 @@ static inline bool is_vertex_scalar (scalar s)
     if (_attribute[s.i].d.x != -1)
       return false;
     
-#line 1152
+#line 1154
 if (_attribute[s.i].d.y != -1)
       return false;
     
-#line 1152
+#line 1154
 if (_attribute[s.i].d.z != -1)
       return false;
   return true;
@@ -1278,8 +1280,9 @@ scalar * baseblock = NULL;
 scalar (* init_scalar) (scalar, const char *);
 scalar (* init_vertex_scalar) (scalar, const char *);
 vector (* init_vector) (vector, const char *);
-tensor (* init_tensor) (tensor, const char *);
 vector (* init_face_vector) (vector, const char *);
+tensor (* init_tensor) (tensor, const char *);
+void (* scalar_clone) (scalar, scalar);
 
 
 
@@ -1378,7 +1381,7 @@ const vector unityf0 = {{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}};
 const scalar unity0 = {_NVARMAX+11};
         vector fm = {{_NVARMAX+8},{_NVARMAX+9},{_NVARMAX+10}};
         scalar cm = {_NVARMAX+11};
-#line 1278 "/home/lisergey/basilisk/src/common.h"
+#line 1281 "/home/lisergey/basilisk/src/common.h"
 static FILE ** qpopen_pipes = NULL;
 
 FILE * qpopen (const char * command, const char * type)
@@ -1545,6 +1548,16 @@ void display (const char * commands, bool overwrite)
 
 
 
+typedef struct {
+  double x;
+
+  double y;
+
+
+  double z;
+
+} _coord;
+
 
 
 
@@ -1562,18 +1575,33 @@ void display (const char * commands, bool overwrite)
 
 
 typedef struct {
+  char * name;
+  char * type;
+  void * pointer;
+  int * dimensions;
+  int nd;
+  char reduct;
+  scalar data;
+} NonLocal;
+
+typedef struct {
   const char * fname;
   int line;
   int first;
   int face;
   bool vertex;
+  int parallel;
+  scalar * listc;
+  vectorl listf;
+  scalar * dirty;
+  void * data;
 } ForeachData;
 
 
-#define foreach_stencil() {\
-  static ForeachData _loop = {\
-    __FILE__, __LINE__,\
-    1, 0, 0\
+#define foreach_stencil(...) {\
+  static int _first = 1.;\
+  ForeachData _loop = {\
+    .fname = __FILE__, .line = __LINE__, .first = _first\
   };\
   if (baseblock) for (scalar s = baseblock[0], * i = baseblock;\
   s.i >= 0; i++, s = *i) {\
@@ -1583,25 +1611,32 @@ typedef struct {
   int ig = 0, jg = 0, kg = 0; NOT_UNUSED(ig); NOT_UNUSED(jg); NOT_UNUSED(kg);\
   Point point = {0}; NOT_UNUSED (point);\
 
-#line 48
+#line 63
 
 
 #define end_foreach_stencil()\
-  end_stencil (&_loop);\
-  _loop.first = 0;\
+  check_stencil (&_loop);\
+  boundary_stencil (&_loop);\
+  _first = 0;\
 }\
 
-#line 54
+#line 70
 
 
-#define foreach_vertex_stencil() foreach_stencil() _loop.vertex = true;
+#define foreach_vertex_stencil(...) foreach_stencil(__VA_ARGS__) _loop.vertex = true;
 #define end_foreach_vertex_stencil() end_foreach_stencil()
 
-#define foreach_face_stencil() foreach_stencil()
+#define foreach_face_stencil(...) foreach_stencil(__VA_ARGS__)
 #define end_foreach_face_stencil() end_foreach_stencil()
 
-#define foreach_visible_stencil(...) foreach_stencil()
-#define end_foreach_visible_stencil(...) end_foreach_stencil()
+#define foreach_visible_stencil(...) foreach_stencil(__VA_ARGS__)
+#define end_foreach_visible_stencil() end_foreach_stencil()
+
+#define foreach_point_stencil(...) foreach_stencil(__VA_ARGS__)
+#define end_foreach_point_stencil() end_foreach_stencil()
+
+#define foreach_region_stencil(...) foreach_stencil(__VA_ARGS__)
+#define end_foreach_region_stencil() end_foreach_stencil()
 
 #define _stencil_is_face_x() { _loop.face |= (1 << 0);
 #define end__stencil_is_face_x() }
@@ -1618,22 +1653,22 @@ void stencil_val_a (Point p, scalar s, int i, int j, int k, bool input,
 #define _stencil_val(a,_i,_j,_k)\
   stencil_val (point, a, _i, _j, _k, __FILE__, __LINE__, false)\
 
-#line 79
+#line 101
 
 #define _stencil_val_o(a,_i,_j,_k)\
   stencil_val (point, a, _i, _j, _k, __FILE__, __LINE__, true)\
 
-#line 82
+#line 104
 
 #define _stencil_val_a(a,_i,_j,_k)\
   stencil_val_a (point, a, _i, _j, _k, false, __FILE__, __LINE__)\
 
-#line 85
+#line 107
 
 #define _stencil_val_r(a,_i,_j,_k)\
   stencil_val_a (point, a, _i, _j, _k, true, __FILE__, __LINE__)\
 
-#line 88
+#line 110
 
 
 #define _stencil_fine(a,_i,_j,_k) _stencil_val(a,_i,_j,_k)
@@ -1707,11 +1742,9 @@ void (* boundary_face) (vectorl);
 
 
 
-void end_stencil (ForeachData * loop)
+void check_stencil (ForeachData * loop)
 {
-  scalar * listc = NULL, * dirty = NULL;
-  vectorl listf = {NULL};
-  bool flux = false;
+  loop->listf = (vectorl){NULL};
 
 
 
@@ -1736,7 +1769,7 @@ void end_stencil (ForeachData * loop)
 
  if (_attribute[s.i].face) {
    if (_attribute[s.i].width > 0)
-     listc = list_append (listc, s);
+     loop->listc = list_append (loop->listc, s);
    else if (!write) {
      scalar sn = _attribute[s.i].v.x.i >= 0 ? _attribute[s.i].v.x : s;
      
@@ -1746,39 +1779,33 @@ void end_stencil (ForeachData * loop)
 
 
   if (_attribute[sn.i].boundary[left] || _attribute[sn.i].boundary[right])
-    listc = list_append (listc, s);
-  else if (_attribute[s.i].dirty != 2) {
-    listf.x = list_append (listf.x, s);
-    flux = true;
-  }
+    loop->listc = list_append (loop->listc, s);
+  else if (_attribute[s.i].dirty != 2)
+    loop->listf.x = list_append (loop->listf.x, s);
        }
        
-#line 194
+#line 214
 if (_attribute[s.i].v.y.i == s.i) {
 
 
 
 
   if (_attribute[sn.i].boundary[bottom] || _attribute[sn.i].boundary[top])
-    listc = list_append (listc, s);
-  else if (_attribute[s.i].dirty != 2) {
-    listf.y = list_append (listf.y, s);
-    flux = true;
-  }
+    loop->listc = list_append (loop->listc, s);
+  else if (_attribute[s.i].dirty != 2)
+    loop->listf.y = list_append (loop->listf.y, s);
        }
        
-#line 194
+#line 214
 if (_attribute[s.i].v.z.i == s.i) {
 
 
 
 
   if (_attribute[sn.i].boundary[back] || _attribute[sn.i].boundary[front])
-    listc = list_append (listc, s);
-  else if (_attribute[s.i].dirty != 2) {
-    listf.z = list_append (listf.z, s);
-    flux = true;
-  }
+    loop->listc = list_append (loop->listc, s);
+  else if (_attribute[s.i].dirty != 2)
+    loop->listf.z = list_append (loop->listf.z, s);
        }
    }
  }
@@ -1788,7 +1815,7 @@ if (_attribute[s.i].v.z.i == s.i) {
 
 
  else if (_attribute[s.i].width > 0)
-   listc = list_append (listc, s);
+   loop->listc = list_append (loop->listc, s);
       }
 
 
@@ -1802,11 +1829,11 @@ if (_attribute[s.i].v.z.i == s.i) {
      if (_attribute[s.i].d.x != -1)
        vertex = false;
      
-#line 225
+#line 243
 if (_attribute[s.i].d.y != -1)
        vertex = false;
      
-#line 225
+#line 243
 if (_attribute[s.i].d.z != -1)
        vertex = false;
    if (vertex)
@@ -1837,7 +1864,7 @@ if (_attribute[s.i].d.z != -1)
        }
        d *= 2, i++;
      } 
-#line 243
+#line 261
 {
        if (loop->face == d) {
   _attribute[s.i].face = 2, _attribute[s.i].v.y.i = s.i;
@@ -1850,7 +1877,7 @@ if (_attribute[s.i].d.z != -1)
        }
        d *= 2, i++;
      } 
-#line 243
+#line 261
 {
        if (loop->face == d) {
   _attribute[s.i].face = 2, _attribute[s.i].v.z.i = s.i;
@@ -1883,10 +1910,10 @@ if (_attribute[s.i].d.z != -1)
      
        input.x = _attribute[v.x.i].input, output.x = _attribute[v.x.i].output;
        
-#line 273
+#line 291
 input.y = _attribute[v.y.i].input, output.y = _attribute[v.y.i].output;
        
-#line 273
+#line 291
 input.z = _attribute[v.z.i].input, output.z = _attribute[v.z.i].output;
 
      init_face_vector (v, name);
@@ -1895,10 +1922,10 @@ input.z = _attribute[v.z.i].input, output.z = _attribute[v.z.i].output;
      
        _attribute[v.x.i].input = input.x, _attribute[v.x.i].output = output.x;
        
-#line 279
+#line 297
 _attribute[v.y.i].input = input.y, _attribute[v.y.i].output = output.y;
        
-#line 279
+#line 297
 _attribute[v.z.i].input = input.z, _attribute[v.z.i].output = output.z;
 
 
@@ -1914,11 +1941,11 @@ _attribute[v.z.i].input = input.z, _attribute[v.z.i].output = output.z;
      if (_attribute[s.i].d.x != -1)
        vertex = false;
      
-#line 291
+#line 309
 if (_attribute[s.i].d.y != -1)
        vertex = false;
      
-#line 291
+#line 309
 if (_attribute[s.i].d.z != -1)
        vertex = false;
    if (!vertex) {
@@ -1928,10 +1955,10 @@ if (_attribute[s.i].d.z != -1)
      
        _attribute[s.i].v.x.i = -1;
        
-#line 298
+#line 316
 _attribute[s.i].v.y.i = -1;
        
-#line 298
+#line 316
 _attribute[s.i].v.z.i = -1;
 
 
@@ -1945,61 +1972,96 @@ _attribute[s.i].v.z.i = -1;
 
 
 
- dirty = list_append (dirty, s);
+ loop->dirty = list_append (loop->dirty, s);
  {scalar*_i=(scalar*)( baseblock);if(_i)for(scalar d=*_i;(&d)->i>=0;d=*++_i){
    if (scalar_depends_from (d, s))
-     dirty = list_append (dirty, d);}}
+     loop->dirty = list_append (loop->dirty, d);}}
       }
     }
   }}}
+}
 
 
 
 
-  if (flux) {
-#line 335 "/home/lisergey/basilisk/src/grid/stencils.h"
-    boundary_face (listf);
+void boundary_stencil (ForeachData * loop)
+{
+  bool flux = false;
+  
+    if (loop->listf.x)
+      flux = true;
     
-      pfree (listf.x,__func__,__FILE__,__LINE__);
+#line 345
+if (loop->listf.y)
+      flux = true;
+    
+#line 345
+if (loop->listf.z)
+      flux = true;
+  if (flux) {
+#line 360 "/home/lisergey/basilisk/src/grid/stencils.h"
+    boundary_face (loop->listf);
+    
+      pfree (loop->listf.x,__func__,__FILE__,__LINE__), loop->listf.x = NULL;
       
-#line 337
-pfree (listf.y,__func__,__FILE__,__LINE__);
+#line 362
+pfree (loop->listf.y,__func__,__FILE__,__LINE__), loop->listf.y = NULL;
       
-#line 337
-pfree (listf.z,__func__,__FILE__,__LINE__);
+#line 362
+pfree (loop->listf.z,__func__,__FILE__,__LINE__), loop->listf.z = NULL;
   }
 
 
 
 
-  if (listc) {
+  if (loop->listc) {
 
 
 
 
 
 
-    boundary_internal (listc, loop->fname, loop->line);
-    pfree (listc,__func__,__FILE__,__LINE__);
+    boundary_internal (loop->listc, loop->fname, loop->line);
+    pfree (loop->listc,__func__,__FILE__,__LINE__), loop->listc = NULL;
   }
 
 
 
 
 
-  if (dirty) {
+  if (loop->dirty) {
 
 
 
 
 
 
-    {scalar*_i=(scalar*)( dirty);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+    {scalar*_i=(scalar*)( loop->dirty);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = true;}}
-    pfree (dirty,__func__,__FILE__,__LINE__);
+    pfree (loop->dirty,__func__,__FILE__,__LINE__), loop->dirty = NULL;
   }
 }
-#line 1449 "/home/lisergey/basilisk/src/common.h"
+#line 1462 "/home/lisergey/basilisk/src/common.h"
+
+
+
+
+
+typedef struct {
+  coord x, y, z;
+} mat3;
+
+OMP(omp declare reduction (+ : mat3 :
+      omp_out.x.x += omp_in.x.x,
+      omp_out.x.y += omp_in.x.y,
+      omp_out.x.z += omp_in.x.z,
+      omp_out.y.x += omp_in.y.x,
+      omp_out.y.y += omp_in.y.y,
+      omp_out.y.z += omp_in.y.z,
+      omp_out.z.x += omp_in.z.x,
+      omp_out.z.y += omp_in.z.y,
+      omp_out.z.z += omp_in.z.z
+      ))
 #line 14 "cylinder-cpp.c"
 #line 1 "cylinder.c"
 #include <float.h>
@@ -4626,6 +4688,37 @@ void catch_fpe (void)
 
 #define end_foreach_face()
 
+#define foreach_point(...)\
+{\
+  int ig = 0, jg = 0, kg = 0; NOT_UNUSED(ig); NOT_UNUSED(jg); NOT_UNUSED(kg);\
+  coord _p = { __VA_ARGS__ };\
+  Point point = locate (_p.x, _p.y, _p.z);\
+  if (point.level >= 0) {\
+    POINT_VARIABLES\
+
+#line 57
+
+#define end_foreach_point() }}
+
+#define foreach_region(p, box, n)\
+  OMP_PARALLEL() { NOT_UNUSED (p);\
+    coord p = {0, 0, box[0].z};\
+    OMP(omp for schedule(static))\
+      for (int _i = 0; _i < (int) n.x; _i++) {\
+ p.x = box[0].x + (box[1].x - box[0].x)/n.x*(_i + 0.5);\
+ for (int _j = 0; _j < (int) n.y; _j++) {\
+   p.y = box[0].y + (box[1].y - box[0].y)/n.y*(_j + 0.5);\
+   Point point = locate (p.x, p.y, p.z);\
+   if (point.level >= 0) {\
+     int ig = 0, jg = 0, kg = 0; NOT_UNUSED(ig); NOT_UNUSED(jg); NOT_UNUSED(kg);\
+     POINT_VARIABLES\
+
+#line 72
+
+#define end_foreach_region() }}}}
+
+
+
 
 
 static void init_block_scalar (scalar sb, const char * name, const char * ext,
@@ -4633,22 +4726,22 @@ static void init_block_scalar (scalar sb, const char * name, const char * ext,
 {
   char bname[strlen(name) + strlen(ext) + 10];
   if (n == 0) {
-    strcat (strcpy (bname, name), ext);
+    sprintf (bname, "%s%s", name, ext);
     _attribute[sb.i].block = block;
-    init_scalar (sb, bname);
     baseblock = list_append (baseblock, sb);
   }
   else {
     sprintf (bname, "%s%d%s", name, n, ext);
     _attribute[sb.i].block = - n;
-    init_scalar (sb, bname);
   }
+  _attribute[sb.i].name = pstrdup (bname,__func__,__FILE__,__LINE__);
   all = list_append (all, sb);
 }
 
 #define interpreter_set_int(...)
+#define interpreter_reset_scalar(...)
 
-scalar new_block_scalar (const char * name, const char * ext, int block)
+scalar alloc_block_scalar (const char * name, const char * ext, int block)
 {
   interpreter_set_int (&block);
   int nvar = datasize/sizeof(double);
@@ -4660,8 +4753,11 @@ scalar new_block_scalar (const char * name, const char * ext, int block)
     while (sb.i < nvar && n < block && _attribute[sb.i].freed)
       n++, sb.i++;
     if (n >= block) {
-      for (sb.i = s.i, n = 0; n < block; n++, sb.i++)
+      memset (&_attribute[s.i], 0, block*sizeof (_Attributes));
+      for (sb.i = s.i, n = 0; n < block; n++, sb.i++) {
  init_block_scalar (sb, name, ext, n, block);
+ interpreter_reset_scalar (sb);
+      }
       trash (((scalar []){s, {-1}}));
       return s;
     }
@@ -4670,39 +4766,41 @@ scalar new_block_scalar (const char * name, const char * ext, int block)
 
 
   s = (scalar){nvar};
-  if (!(nvar + block <= _NVARMAX)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 94, "nvar + block <= _NVARMAX");
-  _attribute = (_Attributes *) prealloc (_attribute, (nvar + block)*sizeof(_Attributes),__func__,__FILE__,__LINE__);
-  memset (&_attribute[nvar], 0, block*sizeof (_Attributes));
+  if (!(nvar + block <= _NVARMAX)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 124, "nvar + block <= _NVARMAX");
 
-  realloc_scalar (block*sizeof(double));
-  trash (((scalar []){s, {-1}}));
+  if (_attribute == NULL)
+    _attribute = (_Attributes *) pcalloc (nvar + block + 1, sizeof (_Attributes),__func__,__FILE__,__LINE__);
+  else
+    _attribute = (_Attributes *)
+      prealloc (_attribute, (nvar + block + 1)*sizeof (_Attributes),__func__,__FILE__,__LINE__);
+  memset (&_attribute[nvar], 0, block*sizeof (_Attributes));
   for (int n = 0; n < block; n++, nvar++) {
     scalar sb = (scalar){nvar};
     init_block_scalar (sb, name, ext, n, block);
   }
+
+  realloc_scalar (block*sizeof(double));
+  trash (((scalar []){s, {-1}}));
+  return s;
+}
+
+scalar new_block_scalar (const char * name, const char * ext, int block)
+{
+  scalar s = alloc_block_scalar (name, ext, block), sb;
+  int n = 0;
+  for (sb.i = s.i, n = 0; n < block; n++, sb.i++)
+    init_scalar (sb, NULL);
   return s;
 }
 
 scalar new_scalar (const char * name)
 {
-  return new_block_scalar (name, "", 1);
+  return init_scalar (alloc_block_scalar (name, "", 1), NULL);
 }
 
 scalar new_vertex_scalar (const char * name)
 {
-  scalar s = new_block_scalar (name, "", 1);
-  init_vertex_scalar (s, NULL);
-  return s;
-}
-
-scalar new_block_vertex_scalar (const char * name, int block)
-{
-  scalar s = new_block_scalar (name, "", block);
-  for (int i = 0; i < block; i++) {
-    scalar sb = {s.i + i};
-    init_vertex_scalar (sb, NULL);
-  }
-  return s;
+  return init_vertex_scalar (alloc_block_scalar (name, "", 1), NULL);
 }
 
 static vector alloc_block_vector (const char * name, int block)
@@ -4710,13 +4808,13 @@ static vector alloc_block_vector (const char * name, int block)
   vector v;
   struct { char * x, * y, * z; } ext = {".x", ".y", ".z"};
   
-    v.x = new_block_scalar (name, ext.x, block);
+    v.x = alloc_block_scalar (name, ext.x, block);
     
-#line 134
-v.y = new_block_scalar (name, ext.y, block);
+#line 166
+v.y = alloc_block_scalar (name, ext.y, block);
     
-#line 134
-v.z = new_block_scalar (name, ext.z, block);
+#line 166
+v.z = alloc_block_scalar (name, ext.z, block);
   return v;
 }
 
@@ -4742,28 +4840,28 @@ vector new_block_vector (const char * name, int block)
     
       vb.x.i = v.x.i + i;
       
-#line 158
+#line 190
 vb.y.i = v.y.i + i;
       
-#line 158
+#line 190
 vb.z.i = v.z.i + i;
     init_vector (vb, NULL);
     
       _attribute[vb.x.i].block = - i;
       
-#line 161
+#line 193
 _attribute[vb.y.i].block = - i;
       
-#line 161
+#line 193
 _attribute[vb.z.i].block = - i;
   }
   
     _attribute[v.x.i].block = block;
     
-#line 164
+#line 196
 _attribute[v.y.i].block = block;
     
-#line 164
+#line 196
 _attribute[v.z.i].block = block;
   return v;
 }
@@ -4776,28 +4874,28 @@ vector new_block_face_vector (const char * name, int block)
     
       vb.x.i = v.x.i + i;
       
-#line 174
+#line 206
 vb.y.i = v.y.i + i;
       
-#line 174
+#line 206
 vb.z.i = v.z.i + i;
     init_face_vector (vb, NULL);
     
       _attribute[vb.x.i].block = - i;
       
-#line 177
+#line 209
 _attribute[vb.y.i].block = - i;
       
-#line 177
+#line 209
 _attribute[vb.z.i].block = - i;
   }
   
     _attribute[v.x.i].block = block;
     
-#line 180
+#line 212
 _attribute[v.y.i].block = block;
     
-#line 180
+#line 212
 _attribute[v.z.i].block = block;
   return v;
 }
@@ -4805,21 +4903,21 @@ _attribute[v.z.i].block = block;
 tensor new_tensor (const char * name)
 {
   char cname[strlen(name) + 3];
-  struct { char * x, * y, * z; } ext = {".x", ".y", ".z"};
+  struct { char * x, * y, * z; } ext = {"%s.x", "%s.y", "%s.z"};
   tensor t;
    {
-    strcat (strcpy (cname, name), ext.x);
-    t.x = new_vector (cname);
+    sprintf (cname, ext.x, name);
+    t.x = alloc_block_vector (cname, 1);
   } 
-#line 189
+#line 221
 {
-    strcat (strcpy (cname, name), ext.y);
-    t.y = new_vector (cname);
+    sprintf (cname, ext.y, name);
+    t.y = alloc_block_vector (cname, 1);
   } 
-#line 189
+#line 221
 {
-    strcat (strcpy (cname, name), ext.z);
-    t.z = new_vector (cname);
+    sprintf (cname, ext.z, name);
+    t.z = alloc_block_vector (cname, 1);
   }
   init_tensor (t, NULL);
   return t;
@@ -4827,34 +4925,24 @@ tensor new_tensor (const char * name)
 
 tensor new_symmetric_tensor (const char * name)
 {
-  char cname[strlen(name) + 5];
   struct { char * x, * y, * z; } ext = {".x.x", ".y.y", ".z.z"};
   tensor t;
-   {
-    strcat (strcpy (cname, name), ext.x);
-    t.x.x = new_scalar(cname);
-  } 
-#line 202
-{
-    strcat (strcpy (cname, name), ext.y);
-    t.y.y = new_scalar(cname);
-  } 
-#line 202
-{
-    strcat (strcpy (cname, name), ext.z);
-    t.z.z = new_scalar(cname);
-  }
+  
+    t.x.x = alloc_block_scalar (name, ext.x, 1);
+    
+#line 234
+t.y.y = alloc_block_scalar (name, ext.y, 1);
+    
+#line 234
+t.z.z = alloc_block_scalar (name, ext.z, 1);
 
-    strcat (strcpy (cname, name), "x.y");
-    t.x.y = new_scalar(cname);
+    t.x.y = alloc_block_scalar (name, ".x.y", 1);
     t.y.x = t.x.y;
 
 
-    strcat (strcpy (cname, name), "x.z");
-    t.x.z = new_scalar(cname);
+    t.x.z = alloc_block_scalar (name, ".x.z", 1);
     t.z.x = t.x.z;
-    strcat (strcpy (cname, name), "y.z");
-    t.y.z = new_scalar(cname);
+    t.y.z = alloc_block_scalar (name, ".y.z", 1);
     t.z.y = t.y.z;
 
 
@@ -4887,10 +4975,10 @@ void init_const_vector (vector v, const char * name, double * val)
   
     init_const_scalar (v.x, name, *val++);
     
-#line 247
+#line 273
 init_const_scalar (v.y, name, *val++);
     
-#line 247
+#line 273
 init_const_scalar (v.z, name, *val++);
 }
 
@@ -4900,32 +4988,32 @@ vector new_const_vector (const char * name, int i, double * val)
   
     v.x.i = _NVARMAX + i++;
     
-#line 254
+#line 280
 v.y.i = _NVARMAX + i++;
     
-#line 254
+#line 280
 v.z.i = _NVARMAX + i++;
   init_const_vector (v, name, val);
   return v;
 }
 
-void scalar_clone (scalar a, scalar b)
+static void cartesian_scalar_clone (scalar clone, scalar src)
 {
-  char * name = _attribute[a.i].name;
-  double (** boundary) (Point, Point, scalar, void *) = _attribute[a.i].boundary;
+  char * cname = _attribute[clone.i].name;
+  double (** boundary) (Point, Point, scalar, void *) = _attribute[clone.i].boundary;
   double (** boundary_homogeneous) (Point, Point, scalar, void *) =
-    _attribute[a.i].boundary_homogeneous;
-  if (!(_attribute[b.i].block > 0 && _attribute[a.i].block == _attribute[b.i].block)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 265, "b.block > 0 && a.block == b.block");
-  pfree (_attribute[a.i].depends,__func__,__FILE__,__LINE__);
-  _attribute[a.i] = _attribute[b.i];
-  _attribute[a.i].name = name;
-  _attribute[a.i].boundary = boundary;
-  _attribute[a.i].boundary_homogeneous = boundary_homogeneous;
+    _attribute[clone.i].boundary_homogeneous;
+  if (!(_attribute[src.i].block > 0 && _attribute[clone.i].block == _attribute[src.i].block)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 291, "src.block > 0 && clone.block == src.block");
+  pfree (_attribute[clone.i].depends,__func__,__FILE__,__LINE__);
+  _attribute[clone.i] = _attribute[src.i];
+  _attribute[clone.i].name = cname;
+  _attribute[clone.i].boundary = boundary;
+  _attribute[clone.i].boundary_homogeneous = boundary_homogeneous;
   for (int i = 0; i < nboundary; i++) {
-    _attribute[a.i].boundary[i] = _attribute[b.i].boundary[i];
-    _attribute[a.i].boundary_homogeneous[i] = _attribute[b.i].boundary_homogeneous[i];
+    _attribute[clone.i].boundary[i] = _attribute[src.i].boundary[i];
+    _attribute[clone.i].boundary_homogeneous[i] = _attribute[src.i].boundary_homogeneous[i];
   }
-  _attribute[a.i].depends = list_copy (_attribute[b.i].depends);
+  _attribute[clone.i].depends = list_copy (_attribute[src.i].depends);
 }
 
 scalar * list_clone (scalar * l)
@@ -4935,8 +5023,7 @@ scalar * list_clone (scalar * l)
   for (int i = 0; i < nvar; i++)
     map[i] = -1;
   {scalar*_i=(scalar*)( l);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){ {
-    scalar c = _attribute[s.i].block > 1 ? new_block_scalar("c", "", _attribute[s.i].block) :
-      new_scalar("c");
+    scalar c = _attribute[s.i].block > 1 ? new_block_scalar("c", "", _attribute[s.i].block) : new_scalar("c");
     scalar_clone (c, s);
     map[s.i] = c.i;
     list = list_append (list, c);
@@ -4946,11 +5033,11 @@ scalar * list_clone (scalar * l)
       if (_attribute[s.i].v.x.i >= 0 && map[_attribute[s.i].v.x.i] >= 0)
  _attribute[s.i].v.x.i = map[_attribute[s.i].v.x.i];
       
-#line 293
+#line 318
 if (_attribute[s.i].v.y.i >= 0 && map[_attribute[s.i].v.y.i] >= 0)
  _attribute[s.i].v.y.i = map[_attribute[s.i].v.y.i];
       
-#line 293
+#line 318
 if (_attribute[s.i].v.z.i >= 0 && map[_attribute[s.i].v.z.i] >= 0)
  _attribute[s.i].v.z.i = map[_attribute[s.i].v.z.i];}}}
   return list;
@@ -4983,8 +5070,8 @@ void delete (scalar * list)
   trash (list);
   {scalar*_i=(scalar*)( list);if(_i)for(scalar f=*_i;(&f)->i>=0;f=*++_i){ {
     if (_attribute[f.i].block > 0) {
-      scalar * s = all;
-      for (; s->i >= 0 && s->i != f.i; s++);
+      scalar * s;
+      for (s = all; s->i >= 0 && s->i != f.i; s++);
       if (s->i == f.i) {
  for (; s[_attribute[f.i].block].i >= 0; s++)
    s[0] = s[_attribute[f.i].block];
@@ -5002,7 +5089,7 @@ void delete (scalar * list)
 
 void free_solver()
 {
-  if (!(_val_higher_dimension == 0.)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 344, "_val_higher_dimension == 0.");
+  if (!(_val_higher_dimension == 0.)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 369, "_val_higher_dimension == 0.");
 
   if (free_solver_funcs) {
     free_solver_func * a = (free_solver_func *) free_solver_funcs->p;
@@ -5056,19 +5143,19 @@ void boundary_flux (vector * list)
     {
       list1.x = list_append (list1.x, v.x);
       
-#line 396
+#line 421
 list1.y = list_append (list1.y, v.y);
       
-#line 396
+#line 421
 list1.z = list_append (list1.z, v.z);}}}
   boundary_face (list1);
   
     pfree (list1.x,__func__,__FILE__,__LINE__);
     
-#line 399
+#line 424
 pfree (list1.y,__func__,__FILE__,__LINE__);
     
-#line 399
+#line 424
 pfree (list1.z,__func__,__FILE__,__LINE__);
 }
 
@@ -5086,9 +5173,9 @@ static scalar * list_add_depends (scalar * list, scalar s)
 
      
 void boundary_internal (scalar * list, const char * fname, int line)
-{tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",415);
+{tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",440);
   if (list == NULL)
-    {end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",418);return;}
+    {end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",443);return;}
   scalar * listc = NULL;
   vectorl listf = {NULL};
   bool flux = false;
@@ -5100,11 +5187,11 @@ void boundary_internal (scalar * list, const char * fname, int line)
      if (_attribute[s.i].v.x.i == s.i)
        listf.x = list_add (listf.x, s), flux = true;
      
-#line 427
+#line 452
 if (_attribute[s.i].v.y.i == s.i)
        listf.y = list_add (listf.y, s), flux = true;
      
-#line 427
+#line 452
 if (_attribute[s.i].v.z.i == s.i)
        listf.z = list_add (listf.z, s), flux = true;}
  if (!is_constant(cm) && _attribute[cm.i].dirty)
@@ -5122,10 +5209,10 @@ if (_attribute[s.i].v.z.i == s.i)
     
       pfree (listf.x,__func__,__FILE__,__LINE__);
       
-#line 442
+#line 467
 pfree (listf.y,__func__,__FILE__,__LINE__);
       
-#line 442
+#line 467
 pfree (listf.z,__func__,__FILE__,__LINE__);
   }
   if (listc) {
@@ -5134,7 +5221,7 @@ pfree (listf.z,__func__,__FILE__,__LINE__);
       _attribute[s.i].dirty = false;}}
     pfree (listc,__func__,__FILE__,__LINE__);
   }
-end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",450);}
+end_tracing("boundary_internal","/home/lisergey/basilisk/src/grid/cartesian-common.h",475);}
 
 void cartesian_boundary_level (scalar * list, int l)
 {
@@ -5147,11 +5234,11 @@ void cartesian_boundary_face (vectorl list)
     {scalar*_i=(scalar*)( list.x);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
     
-#line 460
+#line 485
 {scalar*_i=(scalar*)( list.y);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
     
-#line 460
+#line 485
 {scalar*_i=(scalar*)( list.z);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       _attribute[s.i].dirty = 2;}}
 }
@@ -5184,10 +5271,11 @@ scalar cartesian_init_scalar (scalar s, const char * name)
   double (** boundary) (Point, Point, scalar, void *) = _attribute[s.i].boundary;
   double (** boundary_homogeneous) (Point, Point, scalar, void *) =
     _attribute[s.i].boundary_homogeneous;
-
-  _attribute[s.i] = (const _Attributes){0};
   _attribute[s.i].name = pname;
-  _attribute[s.i].block = block == 0 ? 1 : block;
+  if (block < 0)
+    _attribute[s.i].block = block;
+  else
+    _attribute[s.i].block = block > 0 ? block : 1;
 
   _attribute[s.i].boundary = boundary ? boundary :
     (double (**)(Point, Point, scalar, void *))
@@ -5203,12 +5291,12 @@ scalar cartesian_init_scalar (scalar s, const char * name)
     _attribute[s.i].d.x = 0;
     _attribute[s.i].v.x.i = -1;
   } 
-#line 507
+#line 533
 {
     _attribute[s.i].d.y = 0;
     _attribute[s.i].v.y.i = -1;
   } 
-#line 507
+#line 533
 {
     _attribute[s.i].d.z = 0;
     _attribute[s.i].v.z.i = -1;
@@ -5219,14 +5307,14 @@ scalar cartesian_init_scalar (scalar s, const char * name)
 
 scalar cartesian_init_vertex_scalar (scalar s, const char * name)
 {
-  s = cartesian_init_scalar (s, name);
+  cartesian_init_scalar (s, name);
   
     _attribute[s.i].d.x = -1;
     
-#line 519
+#line 545
 _attribute[s.i].d.y = -1;
     
-#line 519
+#line 545
 _attribute[s.i].d.z = -1;
   for (int d = 0; d < nboundary; d++)
     _attribute[s.i].boundary[d] = _attribute[s.i].boundary_homogeneous[d] = NULL;
@@ -5245,33 +5333,33 @@ vector cartesian_init_vector (vector v, const char * name)
    {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.x);
-      init_scalar (v.x, cname);
+      sprintf (cname, "%s%s", name, ext.x);
+      cartesian_init_scalar (v.x, cname);
     }
     else
-      init_scalar (v.x, NULL);
+      cartesian_init_scalar (v.x, NULL);
     _attribute[v.x.i].v = v;
   } 
-#line 534
+#line 560
 {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.y);
-      init_scalar (v.y, cname);
+      sprintf (cname, "%s%s", name, ext.y);
+      cartesian_init_scalar (v.y, cname);
     }
     else
-      init_scalar (v.y, NULL);
+      cartesian_init_scalar (v.y, NULL);
     _attribute[v.y.i].v = v;
   } 
-#line 534
+#line 560
 {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.z);
-      init_scalar (v.z, cname);
+      sprintf (cname, "%s%s", name, ext.z);
+      cartesian_init_scalar (v.z, cname);
     }
     else
-      init_scalar (v.z, NULL);
+      cartesian_init_scalar (v.z, NULL);
     _attribute[v.z.i].v = v;
   }
 
@@ -5288,12 +5376,12 @@ vector cartesian_init_face_vector (vector v, const char * name)
     _attribute[v.x.i].d.x = -1;
     _attribute[v.x.i].face = true;
   } 
-#line 554
+#line 580
 {
     _attribute[v.y.i].d.y = -1;
     _attribute[v.y.i].face = true;
   } 
-#line 554
+#line 580
 {
     _attribute[v.z.i].d.z = -1;
     _attribute[v.z.i].face = true;
@@ -5309,34 +5397,34 @@ tensor cartesian_init_tensor (tensor t, const char * name)
    {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.x);
-      init_vector (t.x, cname);
+      sprintf (cname, "%s%s", name, ext.x);
+      cartesian_init_vector (t.x, cname);
     }
     else
-      init_vector (t.x, NULL);
+      cartesian_init_vector (t.x, NULL);
   } 
-#line 566
+#line 592
 {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.y);
-      init_vector (t.y, cname);
+      sprintf (cname, "%s%s", name, ext.y);
+      cartesian_init_vector (t.y, cname);
     }
     else
-      init_vector (t.y, NULL);
+      cartesian_init_vector (t.y, NULL);
   } 
-#line 566
+#line 592
 {
     if (name) {
       char cname[strlen(name) + 3];
-      strcat (strcpy (cname, name), ext.z);
-      init_vector (t.z, cname);
+      sprintf (cname, "%s%s", name, ext.z);
+      cartesian_init_vector (t.z, cname);
     }
     else
-      init_vector (t.z, NULL);
+      cartesian_init_vector (t.z, NULL);
   }
-#line 590 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
-    if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 590, "false");
+#line 616 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+    if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 616, "false");
 
   return t;
 }
@@ -5351,18 +5439,18 @@ void output_cells (FILE * fp, coord c, double size)
    (o.x > c.x + size || o.x < c.x - size))
  inside = false;
       
-#line 601
+#line 627
 if (inside && size > 0. &&
    (o.y > c.y + size || o.y < c.y - size))
  inside = false;
       
-#line 601
+#line 627
 if (inside && size > 0. &&
    (o.z > c.z + size || o.z < c.z - size))
  inside = false;
     if (inside) {
       Delta /= 2.;
-#line 616 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 642 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
       for (int i = -1; i <= 1; i += 2) {
  fprintf (fp, "%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n%g %g %g\n\n",
    x - Delta, y - Delta, z + i*Delta,
@@ -5385,9 +5473,9 @@ if (inside && size > 0. &&
 static void output_cells_internal (FILE * fp)
 {
   output_cells (fp
-#line 595
+#line 621
 ,( coord) {0}, 0.
-#line 637
+#line 663
 );
 }
 
@@ -5447,7 +5535,7 @@ void cartesian_debug (Point point)
     fprintf (fp, "x y z %s ", _attribute[v.i].name);}}
 
   fputc ('\n', fp);
-#line 722 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 748 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
     for (int k = -2; k <= 2; k++)
       for (int l = -2; l <= 2; l++)
  for (int m = -2; m <= 2; m++) {
@@ -5492,10 +5580,11 @@ void cartesian_methods()
   init_scalar = cartesian_init_scalar;
   init_vertex_scalar = cartesian_init_vertex_scalar;
   init_vector = cartesian_init_vector;
-  init_tensor = cartesian_init_tensor;
   init_face_vector = cartesian_init_face_vector;
+  init_tensor = cartesian_init_tensor;
   boundary_level = cartesian_boundary_level;
   boundary_face = cartesian_boundary_face;
+  scalar_clone = cartesian_scalar_clone;
   debug = cartesian_debug;
 }
 
@@ -5507,7 +5596,7 @@ tensor init_symmetric_tensor (tensor t, const char * name)
 static double interpolate_linear (Point point, scalar v,
       double xp, double yp, double zp)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-#line 796 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 823 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
   x = (xp - x)/Delta - _attribute[v.i].d.x/2.;
   y = (yp - y)/Delta - _attribute[v.i].d.y/2.;
   z = (zp - z)/Delta - _attribute[v.i].d.z/2.;
@@ -5521,42 +5610,88 @@ static double interpolate_linear (Point point, scalar v,
 
 }
 
+
+#line 805
+static void _stencil_interpolate_linear (Point point, scalar v,
+_stencil_undefined * xp,_stencil_undefined * yp,_stencil_undefined * zp)
+{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;         
+#line 823 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+        
+        
+        
+  
+          
+
+_stencil_val(v,0,0,0);_stencil_val(v, o_stencil,0,0);
+_stencil_val(v,0,o_stencil,0); _stencil_val(v,o_stencil,o_stencil,0);
+_stencil_val(v,0,0,o_stencil); _stencil_val(v,o_stencil,0,o_stencil);
+_stencil_val(v,0,o_stencil,o_stencil); _stencil_val(v,o_stencil,o_stencil,o_stencil);
+
+  
+#line 829
+return           
+              
+    
+    ;
+
+}
+
      
-double interpolate (scalar v, double xp, double yp, double zp)
-{tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",810);
-  boundary_internal ((scalar *)((scalar[]){v,{-1}}), "/home/lisergey/basilisk/src/grid/cartesian-common.h", 812);
-  Point point = locate (xp, yp, zp);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-  if (point.level < 0)
-    {end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",815);return 1e30;}
-  { double _ret= interpolate_linear (point, v, xp, yp, zp);end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",816);return _ret;}
-end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",817);}
+double interpolate (scalar v, double xp, double yp, double zp,
+      bool linear)
+{tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",837);
+  double val = 1e30;
+  foreach_point_stencil (1,{(NonLocal[]){{"v","scalar",(void *)&v,NULL,0},{"linear","bool",(void *)&linear,NULL,0},{"val","double",(void *)&val,NULL,0,'m'},{"zp","double",(void *)&zp,NULL,0},{"yp","double",(void *)&yp,NULL,0},{"xp","double",(void *)&xp,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n// #line 805 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\nstatic real interpolate_linear (Point point, scalar v,\n      real xp, real yp, real zp)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n// # 823 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\n  x = (xp - x)/Delta - v.d.x/2.;\n  y = (yp - y)/Delta - v.d.y/2.;\n  z = (zp - z)/Delta - v.d.z/2.;\n  int i = sign(x), j = sign(y), k = sign(z);\n  x = fabs(x); y = fabs(y); z = fabs(z);\n\n  return (((val(v,0,0,0)*(1. - x) + val(v,i,0,0)*x)*(1. - y) +\n    (val(v,0,j,0)*(1. - x) + val(v,i,j,0)*x)*y)*(1. - z) +\n   ((val(v,0,0,k)*(1. - x) + val(v,i,0,k)*x)*(1. - y) +\n    (val(v,0,j,k)*(1. - x) + val(v,i,j,k)*x)*y)*z);\n\n}","\n    \n// #line 842 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\nval = linear ? interpolate_linear (point, v, xp, yp, zp) : val(v,0,0,0);"})
+    { _stencil_interpolate_linear (point, v, NULL, NULL, NULL); _stencil_val(v,0,0,0);    }end_foreach_point_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction (min:val)){
+#line 841
+foreach_point (xp, yp, zp)
+    val = linear ? interpolate_linear (point, v, xp, yp, zp) : val(v,0,0,0);end_foreach_point();mpi_all_reduce_array(&val,double,MPI_MIN,1);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+  
+#line 843
+{end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",843);return val;}
+end_tracing("interpolate","/home/lisergey/basilisk/src/grid/cartesian-common.h",844);}
 
      
 void interpolate_array (scalar * list, coord * a, int n, double * v,
    bool linear)
-{tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",820);
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/cartesian-common.h", 823);
-  int j = 0;
+{tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",847);
+  int len = 0;
+  {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+    len++;}}
   for (int i = 0; i < n; i++) {
-    Point point = locate (a[i].x, a[i].y, a[i].z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-    if (point.level >= 0) {
+    double * w = v;
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      *(w++) = 1e30;}}
+    foreach_point_stencil (1,{(NonLocal[]){{"linear","bool",(void *)&linear,NULL,0},{"v","double",(void *)v,NULL,1},{"list","scalar",(void *)list,NULL,1},{"len","int",(void *)&len,NULL,0},{"i","int",(void *)&i,NULL,0},{"a","coord",(void *)a,NULL,1},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n// #line 805 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\nstatic real interpolate_linear (Point point, scalar v,\n      real xp, real yp, real zp)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n// # 823 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\n  x = (xp - x)/Delta - v.d.x/2.;\n  y = (yp - y)/Delta - v.d.y/2.;\n  z = (zp - z)/Delta - v.d.z/2.;\n  int i = sign(x), j = sign(y), k = sign(z);\n  x = fabs(x); y = fabs(y); z = fabs(z);\n\n  return (((val(v,0,0,0)*(1. - x) + val(v,i,0,0)*x)*(1. - y) +\n    (val(v,0,j,0)*(1. - x) + val(v,i,j,0)*x)*y)*(1. - z) +\n   ((val(v,0,0,k)*(1. - x) + val(v,i,0,k)*x)*(1. - y) +\n    (val(v,0,j,k)*(1. - x) + val(v,i,j,k)*x)*y)*z);\n\n}"," \n// #line 857 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\n{\n      int j = 0;\n      {forin (scalar, s , list)\n v[j++] = !linear ? val(s,0,0,0) : interpolate_linear (point, s, a[i].x, a[i].y, a[i].z); endforin()}\n    }"}) {   
+      
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
- v[j++] = !linear ? val(s,0,0,0) :
-   interpolate_linear (point, s, a[i].x, a[i].y, a[i].z);}}
-    }
-    else
+ { _stencil_val(s,0,0,0); _stencil_interpolate_linear (point, s, NULL, NULL, NULL);    }}}
+    }end_foreach_point_stencil();
+    
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(min:v[:len])){
+#line 857
+foreach_point (a[i].x, a[i].y, a[i].z) {
+      int j = 0;
       {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
- v[j++] = 1e30;}}
+ v[j++] = !linear ? val(s,0,0,0) : interpolate_linear (point, s, a[i].x, a[i].y, a[i].z);}}
+    }end_foreach_point();mpi_all_reduce_array(v,double,MPI_MIN,len);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+    
+#line 862
+v = w;
   }
-#if 1
-  if (pid() == 0)
-    MPI_Reduce (MPI_IN_PLACE, v, n*list_len(list), MPI_DOUBLE,
-  MPI_MIN, 0, MPI_COMM_WORLD);
-  else
-    MPI_Reduce (v, v, n*list_len(list), MPI_DOUBLE,
-  MPI_MIN, 0, MPI_COMM_WORLD);
-#endif
-end_tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",844);}
+end_tracing("interpolate_array","/home/lisergey/basilisk/src/grid/cartesian-common.h",864);}
 
 
 
@@ -5579,10 +5714,10 @@ bid new_bid()
       
  _attribute[v.y.i].boundary[b] = _attribute[v.y.i].boundary_homogeneous[b] = symmetry;
  
-#line 865
+#line 885
 _attribute[v.z.i].boundary[b] = _attribute[v.z.i].boundary_homogeneous[b] = symmetry;
  
-#line 865
+#line 885
 _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] = symmetry;
       _attribute[v.x.i].boundary[b] = _attribute[v.x.i].boundary_homogeneous[b] =
  _attribute[v.x.i].face ? NULL : antisymmetry;
@@ -5624,7 +5759,7 @@ void periodic (int dir)
 
 
 
-    if (!(dir <= back)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 906, "dir <= back");
+    if (!(dir <= back)) qassert ("/home/lisergey/basilisk/src/grid/cartesian-common.h", 926, "dir <= back");
 
 
   int c = dir/2;
@@ -5689,13 +5824,13 @@ void stencil_val (Point p, scalar s, int i, int j, int k,
  _attribute[s.i].width = abs(index[d]);
       d++;
     } 
-#line 966
+#line 986
 {
       if ((!_attribute[s.i].face || _attribute[s.i].v.y.i != s.i) && abs(index[d]) > _attribute[s.i].width)
  _attribute[s.i].width = abs(index[d]);
       d++;
     } 
-#line 966
+#line 986
 {
       if ((!_attribute[s.i].face || _attribute[s.i].v.z.i != s.i) && abs(index[d]) > _attribute[s.i].width)
  _attribute[s.i].width = abs(index[d]);
@@ -6065,19 +6200,58 @@ static scalar multigrid_init_vertex_scalar (scalar s, const char * name)
   return s;
 }
 
+static void multigrid_setup_vector (vector v)
+{
+   {
+    _attribute[v.x.i].prolongation = refine_bilinear;
+    _attribute[v.x.i].restriction = restriction_average;
+  } 
+#line 243
+{
+    _attribute[v.y.i].prolongation = refine_bilinear;
+    _attribute[v.y.i].restriction = restriction_average;
+  } 
+#line 243
+{
+    _attribute[v.z.i].prolongation = refine_bilinear;
+    _attribute[v.z.i].restriction = restriction_average;
+  }
+}
+
+static vector multigrid_init_vector (vector v, const char * name)
+{
+  v = cartesian_init_vector (v, name);
+  multigrid_setup_vector (v);
+  return v;
+}
+
 static vector multigrid_init_face_vector (vector v, const char * name)
 {
   v = cartesian_init_face_vector (v, name);
   
     _attribute[v.y.i].restriction = no_restriction;
     
-#line 245
+#line 260
 _attribute[v.z.i].restriction = no_restriction;
     
-#line 245
+#line 260
 _attribute[v.x.i].restriction = no_restriction;
   _attribute[v.x.i].restriction = restriction_face;
   return v;
+}
+
+static tensor multigrid_init_tensor (tensor t, const char * name)
+{
+  t = cartesian_init_tensor (t, name);
+  
+    multigrid_setup_vector (t.x);
+    
+#line 269
+multigrid_setup_vector (t.y);
+    
+#line 269
+multigrid_setup_vector (t.z);
+  return t;
 }
 
 void multigrid_debug (Point point)
@@ -6090,7 +6264,7 @@ void multigrid_debug (Point point)
     if (pid() > 0)
       sprintf (name, "coarse-%d", pid());
     FILE * fp = fopen (name, "w");
-#line 284 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
+#line 307 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
       double xc = x - child.x*Delta/2., yc = y - child.y*Delta/2.;
       double zc = z - child.z*Delta/2.;
       for (int k = 0; k <= 1; k++)
@@ -6117,7 +6291,7 @@ void multigrid_debug (Point point)
     if (pid() > 0)
       sprintf (name, "fine-%d", pid());
     FILE * fp = fopen (name, "w");
-#line 341 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
+#line 364 "/home/lisergey/basilisk/src/grid/multigrid-common.h"
       double xf = x - Delta/4., yf = y - Delta/4., zf = z - Delta/4.;
       for (int k = -2; k <= 3; k++)
  for (int l = -2; l <= 3; l++)
@@ -6160,10 +6334,10 @@ static void multigrid_restriction (scalar * list)
    {
      list2 = list_add (list2, _attribute[s.i].v.x);
      
-#line 381
+#line 404
 list2 = list_add (list2, _attribute[s.i].v.y);
      
-#line 381
+#line 404
 list2 = list_add (list2, _attribute[s.i].v.z);}
  else
    list2 = list_add (list2, s);
@@ -6192,11 +6366,13 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
 void multigrid_methods()
 {
   cartesian_methods();
-  debug = multigrid_debug;
   init_scalar = multigrid_init_scalar;
   init_vertex_scalar = multigrid_init_vertex_scalar;
+  init_vector = multigrid_init_vector;
   init_face_vector = multigrid_init_face_vector;
+  init_tensor = multigrid_init_tensor;
   restriction = multigrid_restriction;
+  debug = multigrid_debug;
 }
 
 
@@ -6211,14 +6387,14 @@ void subtree_size (scalar size, bool leaves)
 
 
 
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"size","scalar",(void *)&size,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 454 \"/home/lisergey/basilisk/src/grid/multigrid-common.h\"\nval_out_(size,0,0,0) = 1;"})
     {_stencil_val_a(size,0,0,0);  }end_foreach_stencil();
 
 
 
 
   {
-#line 428
+#line 453
 foreach()
     val(size,0,0,0) = 1;end_foreach();}
 
@@ -6704,11 +6880,30 @@ static scalar tree_init_vertex_scalar (scalar s, const char * name)
   return s;
 }
 
+static void tree_setup_vector (vector v)
+{
+  
+    _attribute[v.x.i].refine = _attribute[v.x.i].prolongation;
+    
+#line 478
+_attribute[v.y.i].refine = _attribute[v.y.i].prolongation;
+    
+#line 478
+_attribute[v.z.i].refine = _attribute[v.z.i].prolongation;
+}
+
+static vector tree_init_vector (vector v, const char * name)
+{
+  v = multigrid_init_vector (v, name);
+  tree_setup_vector (v);
+  return v;
+}
+
 
 static void refine_face_x (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 511 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(-1,0,0)))) {
     double g1 = (val(v.x,0,+1,0) - val(v.x,0,-1,0))/8.;
@@ -6735,11 +6930,11 @@ static void refine_face_x (Point point, scalar s)
 
 }
 
-#line 476
+#line 489
 static void refine_face_y (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 511 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(0,-1,0)))) {
     double g1 = (val(v.y,0,0,+1) - val(v.y,0,0,-1))/8.;
@@ -6766,11 +6961,11 @@ static void refine_face_y (Point point, scalar s)
 
 }
 
-#line 476
+#line 489
 static void refine_face_z (Point point, scalar s)
 {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   vector v = _attribute[s.i].v;
-#line 498 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 511 "/home/lisergey/basilisk/src/grid/tree-common.h"
   if (!(!is_leaf (neighbor(0,0,-1)) && neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0) &&
       (is_local(cell) || is_local(neighbor(0,0,-1)))) {
     double g1 = (val(v.z,+1,0,0) - val(v.z,-1,0,0))/8.;
@@ -6803,10 +6998,10 @@ void refine_face (Point point, scalar s)
   
     _attribute[v.x.i].prolongation (point, v.x);
     
-#line 528
+#line 541
 _attribute[v.y.i].prolongation (point, v.y);
     
-#line 528
+#line 541
 _attribute[v.z.i].prolongation (point, v.z);
 }
 
@@ -6824,14 +7019,14 @@ void refine_face_solenoidal (Point point, scalar s)
       
  d[i] += val(v.x,1,0,0) - val(v.x,0,0,0);
  
-#line 543
+#line 556
 d[i] += val(v.y,0,1,0) - val(v.y,0,0,0);
  
-#line 543
+#line 556
 d[i] += val(v.z,0,0,1) - val(v.z,0,0,0);
       i++;
     }end_foreach_child()}
-#line 556 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 569 "/home/lisergey/basilisk/src/grid/tree-common.h"
     static double m[7][7] = {
       {7./12,5./24,3./8,5./24,3./8,1./4,1./3},
       {5./24,7./12,3./8,5./24,1./4,3./8,1./3},
@@ -6862,38 +7057,52 @@ d[i] += val(v.z,0,0,1) - val(v.z,0,0,0);
 
 }
 
-vector tree_init_face_vector (vector v, const char * name)
+static vector tree_init_face_vector (vector v, const char * name)
 {
   v = cartesian_init_face_vector (v, name);
   
     _attribute[v.x.i].restriction = _attribute[v.x.i].refine = no_restriction;
     
-#line 590
+#line 603
 _attribute[v.y.i].restriction = _attribute[v.y.i].refine = no_restriction;
     
-#line 590
+#line 603
 _attribute[v.z.i].restriction = _attribute[v.z.i].refine = no_restriction;
   _attribute[v.x.i].restriction = restriction_face;
   _attribute[v.x.i].refine = refine_face;
   
     _attribute[v.x.i].prolongation = refine_face_x;
     
-#line 594
+#line 607
 _attribute[v.y.i].prolongation = refine_face_y;
     
-#line 594
+#line 607
 _attribute[v.z.i].prolongation = refine_face_z;
   return v;
 }
 
+static tensor tree_init_tensor (tensor t, const char * name)
+{
+  t = multigrid_init_tensor (t, name);
+  
+    tree_setup_vector (t.x);
+    
+#line 615
+tree_setup_vector (t.y);
+    
+#line 615
+tree_setup_vector (t.z);
+  return t;
+}
+
      
 static void tree_boundary_level (scalar * list, int l)
-{tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",599);
+{tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",620);
   int depth = l < 0 ? depth() : l;
 
   if (tree_is_full()) {
     { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, list, depth); };
-    {end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",605);return;}
+    {end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",626);return;}
   }
 
   scalar * listdef = NULL, * listc = NULL, * list2 = NULL, * vlist = NULL;
@@ -6909,10 +7118,10 @@ static void tree_boundary_level (scalar * list, int l)
    {
      list2 = list_add (list2, _attribute[s.i].v.x);
      
-#line 619
+#line 640
 list2 = list_add (list2, _attribute[s.i].v.y);
      
-#line 619
+#line 640
 list2 = list_add (list2, _attribute[s.i].v.z);}
  else {
    list2 = list_add (list2, s);
@@ -6923,7 +7132,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
     }}}
 
   if (vlist)
-#line 653 "/home/lisergey/basilisk/src/grid/tree-common.h"
+#line 674 "/home/lisergey/basilisk/src/grid/tree-common.h"
     {foreach_vertex () {
       if ((!is_leaf (cell) && cell.neighbors && cell.pid >= 0) || (!is_leaf (neighbor(-1,0,0)) && neighbor(-1,0,0).neighbors && neighbor(-1,0,0).pid >= 0) ||
    (!is_leaf (neighbor(0,-1,0)) && neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0) || (!is_leaf (neighbor(-1,-1,0)) && neighbor(-1,-1,0).neighbors && neighbor(-1,-1,0).pid >= 0) ||
@@ -6953,7 +7162,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
   (val(s,0,-1,0) + val(s,0,1,0))/2. : 1e30;}}
    }
  } 
-#line 663
+#line 684
 {
    if (child.z == 1 && child.x == 1 &&
        ((!is_leaf(cell) && !cell.neighbors && cell.pid >= 0) || (!is_leaf(neighbor(0,-1,0)) && !neighbor(0,-1,0).neighbors && neighbor(0,-1,0).pid >= 0))) {
@@ -6973,7 +7182,7 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
   (val(s,0,0,-1) + val(s,0,0,1))/2. : 1e30;}}
    }
  } 
-#line 663
+#line 684
 {
    if (child.x == 1 && child.y == 1 &&
        ((!is_leaf(cell) && !cell.neighbors && cell.pid >= 0) || (!is_leaf(neighbor(0,0,-1)) && !neighbor(0,0,-1).neighbors && neighbor(0,0,-1).pid >= 0))) {
@@ -7033,10 +7242,10 @@ list2 = list_add (list2, _attribute[s.i].v.z);}
    {
      _attribute[v.x.i].prolongation (point, v.x);
      
-#line 720
+#line 741
 _attribute[v.y.i].prolongation (point, v.y);
      
-#line 720
+#line 741
 _attribute[v.z.i].prolongation (point, v.z);}}}
       }end_foreach_halo();}
       { Boundary ** _i = boundaries, * _b; while (_i && (_b = *_i++)) if (_b->level) _b->level (_b, list, i + 1); };
@@ -7044,7 +7253,7 @@ _attribute[v.z.i].prolongation (point, v.z);}}}
     pfree (listr,__func__,__FILE__,__LINE__);
     pfree (listf,__func__,__FILE__,__LINE__);
   }
-end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",727);}
+end_tracing("tree_boundary_level","/home/lisergey/basilisk/src/grid/tree-common.h",748);}
 
 double treex (Point point) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
   if (level == 0)
@@ -7053,7 +7262,7 @@ double treex (Point point) {int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int 
 
 
 
-  if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 736, "false");
+  if (!(false)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 757, "false");
   double i = 0;
 
   return treex(parent) + i/(1 << 2*(level - 1));
@@ -7077,17 +7286,17 @@ void output_tree (FILE * fp)
 
      
 void tree_check()
-{tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",759);
+{tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",780);
 
 
   long nleaves = 0, nactive = 0;
   {foreach_cell_all() {
     if (is_leaf(cell)) {
-      if (!(cell.pid >= 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 766, "cell.pid >= 0");
+      if (!(cell.pid >= 0)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 787, "cell.pid >= 0");
       nleaves++;
     }
     if (is_local(cell))
-      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 770, "is_active(cell) || is_prolongation(cell)");
+      if (!(is_active(cell) || (!is_leaf(cell) && !cell.neighbors && cell.pid >= 0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 791, "is_active(cell) || is_prolongation(cell)");
     if (is_active(cell))
       nactive++;
 
@@ -7095,11 +7304,11 @@ void tree_check()
     {foreach_neighbor(1)
       if (allocated(0,0,0) && (!is_leaf (cell) && cell.neighbors && cell.pid >= 0))
  neighbors++;end_foreach_neighbor()}
-    if (!(cell.neighbors == neighbors)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 778, "cell.neighbors == neighbors");
+    if (!(cell.neighbors == neighbors)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 799, "cell.neighbors == neighbors");
 
 
     if (!cell.neighbors)
-      if (!(!allocated_child(0,0,0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 782, "!allocated_child(0)");
+      if (!(!allocated_child(0,0,0))) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 803, "!allocated_child(0)");
   }end_foreach_cell_all();}
 
 
@@ -7110,7 +7319,7 @@ void tree_check()
     else
       continue;
   }end_foreach_cell();}
-  if (!(nactive == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 793, "nactive == reachable");
+  if (!(nactive == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 814, "nactive == reachable");
 
 
   reachable = 0;
@@ -7119,22 +7328,24 @@ void tree_check()
       reachable++;
       continue;
     }end_foreach_cell();}
-  if (!(nleaves == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 802, "nleaves == reachable");
-end_tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",803);}
+  if (!(nleaves == reachable)) qassert ("/home/lisergey/basilisk/src/grid/tree-common.h", 823, "nleaves == reachable");
+end_tracing("tree_check","/home/lisergey/basilisk/src/grid/tree-common.h",824);}
 
      
-static void tree_restriction (scalar * list) {tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",806);
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 807);
+static void tree_restriction (scalar * list) {tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",827);
+  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/grid/tree-common.h", 828);
   if (tree_is_full())
     multigrid_restriction (list);
-end_tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",810);}
+end_tracing("tree_restriction","/home/lisergey/basilisk/src/grid/tree-common.h",831);}
 
 void tree_methods()
 {
   multigrid_methods();
   init_scalar = tree_init_scalar;
   init_vertex_scalar = tree_init_vertex_scalar;
+  init_vector = tree_init_vector;
   init_face_vector = tree_init_face_vector;
+  init_tensor = tree_init_tensor;
   boundary_level = tree_boundary_level;
   boundary_face = halo_face;
   restriction = tree_restriction;
@@ -10208,7 +10419,7 @@ void fractions (scalar Phi, scalar c,
 #line 134 "/home/lisergey/basilisk/src/fractions.h"
   vector  p=new_vector("p");
 #line 146 "/home/lisergey/basilisk/src/fractions.h"
-  foreach_vertex_stencil() { {_stencil_neighbor(1,0,0); {
+  foreach_vertex_stencil(1,{(NonLocal[]){{"p","vector",(void *)&p,NULL,0},{"Phi","scalar",(void *)&Phi,NULL,0},{"val","double",(void *)&val,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 146 \"/home/lisergey/basilisk/src/fractions.h\"\n{ if (is_vertex(neighbor(1,0,0))) {\n\n\n\n\n\n    if ((val(Phi,0,0,0) - val)*(val(Phi,1,0,0) - val) < 0.) {\n\n\n\n\n\n\n      val_out_(p.x,0,0,0) = (val(Phi,0,0,0) - val)/(val(Phi,0,0,0) - val(Phi,1,0,0));\n      if (val(Phi,0,0,0) < val)\n val_out_(p.x,0,0,0) = 1. - val(p.x,0,0,0);\n    }\n// # 171 \"/home/lisergey/basilisk/src/fractions.h\"\n    else\n      val_out_(p.x,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,1,0,0) > val);\n  } \n// #line 146\nif (is_vertex(neighbor(0,1,0))) {\n\n\n\n\n\n    if ((val(Phi,0,0,0) - val)*(val(Phi,0,1,0) - val) < 0.) {\n\n\n\n\n\n\n      val_out_(p.y,0,0,0) = (val(Phi,0,0,0) - val)/(val(Phi,0,0,0) - val(Phi,0,1,0));\n      if (val(Phi,0,0,0) < val)\n val_out_(p.y,0,0,0) = 1. - val(p.y,0,0,0);\n    }\n// # 171 \"/home/lisergey/basilisk/src/fractions.h\"\n    else\n      val_out_(p.y,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,1,0) > val);\n  } \n// #line 146\nif (is_vertex(neighbor(0,0,1))) {\n\n\n\n\n\n    if ((val(Phi,0,0,0) - val)*(val(Phi,0,0,1) - val) < 0.) {\n\n\n\n\n\n\n      val_out_(p.z,0,0,0) = (val(Phi,0,0,0) - val)/(val(Phi,0,0,0) - val(Phi,0,0,1));\n      if (val(Phi,0,0,0) < val)\n val_out_(p.z,0,0,0) = 1. - val(p.z,0,0,0);\n    }\n// # 171 \"/home/lisergey/basilisk/src/fractions.h\"\n    else\n      val_out_(p.z,0,0,0) = (val(Phi,0,0,0) > val || val(Phi,0,0,1) > val);\n  }}"}) { {_stencil_neighbor(1,0,0); {
 
 
 
@@ -10221,9 +10432,18 @@ _stencil_val(Phi,0,0,0);_stencil_val(Phi,1,0,0);{ {
 
 
 
-      _stencil_val_a(p.x,0,0,0);_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,1,0,0);
+_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,1,0,0);
+
+
+
+
+
+
+      
+#line 159
+_stencil_val_a(p.x,0,0,0);
 _stencil_val(Phi,0,0,0);
- {_stencil_val_a(p.x,0,0,0); _stencil_val(p.x,0,0,0);   }     
+ { _stencil_val(p.x,0,0,0);_stencil_val_a(p.x,0,0,0);   }     
          
     
 #line 162
@@ -10237,7 +10457,7 @@ _stencil_val(Phi,0,0,0);
 
 
 
-{_stencil_val_a(p.x,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,1,0,0);       }}
+{_stencil_val(Phi,0,0,0); _stencil_val(Phi,1,0,0);_stencil_val_a(p.x,0,0,0);       }}
 
 
 
@@ -10249,7 +10469,7 @@ _stencil_val(Phi,0,0,0);
   
 } } 
 #line 146
-{_stencil_neighbor(1,0,0); {
+{_stencil_neighbor(0,1,0); {
 
 
 
@@ -10262,9 +10482,18 @@ _stencil_val(Phi,0,0,0);_stencil_val(Phi,0,1,0);{ {
 
 
 
-      _stencil_val_a(p.y,0,0,0);_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,1,0);
+_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,1,0);
+
+
+
+
+
+
+      
+#line 159
+_stencil_val_a(p.y,0,0,0);
 _stencil_val(Phi,0,0,0);
- {_stencil_val_a(p.y,0,0,0); _stencil_val(p.y,0,0,0);   }     
+ { _stencil_val(p.y,0,0,0);_stencil_val_a(p.y,0,0,0);   }     
          
     
 #line 162
@@ -10278,7 +10507,7 @@ _stencil_val(Phi,0,0,0);
 
 
 
-{_stencil_val_a(p.y,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,1,0);       }}
+{_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,1,0);_stencil_val_a(p.y,0,0,0);       }}
 
 
 
@@ -10290,7 +10519,7 @@ _stencil_val(Phi,0,0,0);
   
 } } 
 #line 146
-{_stencil_neighbor(1,0,0); {
+{_stencil_neighbor(0,0,1); {
 
 
 
@@ -10303,9 +10532,18 @@ _stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,1);{ {
 
 
 
-      _stencil_val_a(p.z,0,0,0);_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,0,1);
+_stencil_val(Phi,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,0,1);
+
+
+
+
+
+
+      
+#line 159
+_stencil_val_a(p.z,0,0,0);
 _stencil_val(Phi,0,0,0);
- {_stencil_val_a(p.z,0,0,0); _stencil_val(p.z,0,0,0);   }     
+ { _stencil_val(p.z,0,0,0);_stencil_val_a(p.z,0,0,0);   }     
          
     
 #line 162
@@ -10319,7 +10557,7 @@ _stencil_val(Phi,0,0,0);
 
 
 
-{_stencil_val_a(p.z,0,0,0);_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,0,1);       }}
+{_stencil_val(Phi,0,0,0); _stencil_val(Phi,0,0,1);_stencil_val_a(p.z,0,0,0);       }}
 
 
 
@@ -10407,7 +10645,7 @@ _attribute[p.y.i].dirty = false;
 _attribute[p.z.i].dirty = false;
 
   scalar s_x = as.x, s_y = as.y, s_z = as.z;
-  foreach_face_stencil(){_stencil_is_face_z(){
+  foreach_face_stencil(1,{(NonLocal[]){{"s_y","scalar",(void *)&s_y,NULL,0},{"s_x","scalar",(void *)&s_x,NULL,0},{"Phi","scalar",(void *)&Phi,NULL,0},{"s_z","scalar",(void *)&s_z,NULL,0},{"p","vector",(void *)&p,NULL,0},{"val","double",(void *)&val,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n// # 163 \"/home/lisergey/basilisk/src/geometry.h\"\nreal line_area (real nx, real ny, real alpha)\n{\n  real a, v, area;\n\n  alpha += (nx + ny)/2.;\n  if (nx < 0.) {\n    alpha -= nx;\n    nx = - nx;\n  }\n  if (ny < 0.) {\n    alpha -= ny;\n    ny = - ny;\n  }\n\n  if (alpha <= 0.)\n    return 0.;\n\n  if (alpha >= nx + ny)\n    return 1.;\n\n  if (nx < 1e-10)\n    area = alpha/ny;\n  else if (ny < 1e-10)\n    area = alpha/nx;\n  else {\n    v = sq(alpha);\n\n    a = alpha - nx;\n    if (a > 0.)\n      v -= a*a;\n\n    a = alpha - ny;\n    if (a > 0.)\n      v -= a*a;\n\n    area = v/(2.*nx*ny);\n  }\n\n  return clamp (area, 0., 1.);\n}","\n// #line 194 \"/home/lisergey/basilisk/src/fractions.h\"\n{is_face_z(){\n\n\n\n\n  {\n// # 231 \"/home/lisergey/basilisk/src/fractions.h\"\n    coord n;\n    real nn = 0.;\n     {\n      n.x = val(p.y,0,0,0) - val(p.y,1,0,0);\n      nn += fabs(n.x);\n    } \n// #line 233\n{\n      n.y = val(p.x,0,0,0) - val(p.x,0,1,0);\n      nn += fabs(n.y);\n    }\n\n\n\n\n\n    if (nn == 0.)\n      val_out_(s_z,0,0,0) = val(p.x,0,0,0);\n    else {\n\n\n\n\n\n      \n n.x /= nn;\n \n// #line 251\nn.y /= nn;\n\n\n\n\n\n\n      real alpha = 0., ni = 0.;\n      for (int i = 0; i <= 1; i++)\n {\n   if (val(p.x,0,i,0) > 0. && val(p.x,0,i,0) < 1.) {\n     real a = sign(val(Phi,0,i,0) - val)*(val(p.x,0,i,0) - 0.5);\n     alpha += n.x*a + n.y*(i - 0.5);\n     ni++;\n   }\n   \n// #line 261\nif (val(p.y,i,0,0) > 0. && val(p.y,i,0,0) < 1.) {\n     real a = sign(val(Phi,i,0,0) - val)*(val(p.y,i,0,0) - 0.5);\n     alpha += n.y*a + n.x*(i - 0.5);\n     ni++;\n   }}\n// # 274 \"/home/lisergey/basilisk/src/fractions.h\"\n      if (ni == 0)\n val_out_(s_z,0,0,0) = max (val(p.x,0,0,0), val(p.y,0,0,0));\n      else if (ni != 4)\n val_out_(s_z,0,0,0) = line_area (n.x, n.y, alpha/ni);\n      else {\n\n val_out_(s_z,0,0,0) = (val(p.x,0,0,0) + val(p.x,0,1,0) + val(p.y,0,0,0) + val(p.y,1,0,0) > 2.);\n\n\n\n      }\n    }\n  }}end_is_face_z()\n// #line 194\nis_face_x(){\n\n\n\n\n  {\n// # 231 \"/home/lisergey/basilisk/src/fractions.h\"\n    coord n;\n    real nn = 0.;\n     {\n      n.y = val(p.z,0,0,0) - val(p.z,0,1,0);\n      nn += fabs(n.y);\n    } \n// #line 233\n{\n      n.z = val(p.y,0,0,0) - val(p.y,0,0,1);\n      nn += fabs(n.z);\n    }\n\n\n\n\n\n    if (nn == 0.)\n      val_out_(s_x,0,0,0) = val(p.y,0,0,0);\n    else {\n\n\n\n\n\n      \n n.y /= nn;\n \n// #line 251\nn.z /= nn;\n\n\n\n\n\n\n      real alpha = 0., ni = 0.;\n      for (int i = 0; i <= 1; i++)\n {\n   if (val(p.y,0,0,i) > 0. && val(p.y,0,0,i) < 1.) {\n     real a = sign(val(Phi,0,0,i) - val)*(val(p.y,0,0,i) - 0.5);\n     alpha += n.y*a + n.z*(i - 0.5);\n     ni++;\n   }\n   \n// #line 261\nif (val(p.z,0,i,0) > 0. && val(p.z,0,i,0) < 1.) {\n     real a = sign(val(Phi,0,i,0) - val)*(val(p.z,0,i,0) - 0.5);\n     alpha += n.z*a + n.y*(i - 0.5);\n     ni++;\n   }}\n// # 274 \"/home/lisergey/basilisk/src/fractions.h\"\n      if (ni == 0)\n val_out_(s_x,0,0,0) = max (val(p.y,0,0,0), val(p.z,0,0,0));\n      else if (ni != 4)\n val_out_(s_x,0,0,0) = line_area (n.y, n.z, alpha/ni);\n      else {\n\n val_out_(s_x,0,0,0) = (val(p.y,0,0,0) + val(p.y,0,0,1) + val(p.z,0,0,0) + val(p.z,0,1,0) > 2.);\n\n\n\n      }\n    }\n  }}end_is_face_x()\n// #line 194\nis_face_y(){\n\n\n\n\n  {\n// # 231 \"/home/lisergey/basilisk/src/fractions.h\"\n    coord n;\n    real nn = 0.;\n     {\n      n.z = val(p.x,0,0,0) - val(p.x,0,0,1);\n      nn += fabs(n.z);\n    } \n// #line 233\n{\n      n.x = val(p.z,0,0,0) - val(p.z,1,0,0);\n      nn += fabs(n.x);\n    }\n\n\n\n\n\n    if (nn == 0.)\n      val_out_(s_y,0,0,0) = val(p.z,0,0,0);\n    else {\n\n\n\n\n\n      \n n.z /= nn;\n \n// #line 251\nn.x /= nn;\n\n\n\n\n\n\n      real alpha = 0., ni = 0.;\n      for (int i = 0; i <= 1; i++)\n {\n   if (val(p.z,i,0,0) > 0. && val(p.z,i,0,0) < 1.) {\n     real a = sign(val(Phi,i,0,0) - val)*(val(p.z,i,0,0) - 0.5);\n     alpha += n.z*a + n.x*(i - 0.5);\n     ni++;\n   }\n   \n// #line 261\nif (val(p.x,0,0,i) > 0. && val(p.x,0,0,i) < 1.) {\n     real a = sign(val(Phi,0,0,i) - val)*(val(p.x,0,0,i) - 0.5);\n     alpha += n.x*a + n.z*(i - 0.5);\n     ni++;\n   }}\n// # 274 \"/home/lisergey/basilisk/src/fractions.h\"\n      if (ni == 0)\n val_out_(s_y,0,0,0) = max (val(p.z,0,0,0), val(p.x,0,0,0));\n      else if (ni != 4)\n val_out_(s_y,0,0,0) = line_area (n.z, n.x, alpha/ni);\n      else {\n\n val_out_(s_y,0,0,0) = (val(p.z,0,0,0) + val(p.z,1,0,0) + val(p.x,0,0,0) + val(p.x,0,0,1) > 2.);\n\n\n\n      }\n    }\n  }}end_is_face_y()}"}){_stencil_is_face_z(){
 
 
 
@@ -10437,7 +10675,7 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
 
 
 {
-      {_stencil_val_a(s_z,0,0,0); _stencil_val(p.x,0,0,0); } 
+      { _stencil_val(p.x,0,0,0);_stencil_val_a(s_z,0,0,0); } 
 {      
 
 
@@ -10476,12 +10714,16 @@ _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0);
 
 
 {
- {_stencil_val_a(s_z,0,0,0);_stencil_val(p.x,0,0,0); _stencil_val(p.y,0,0,0);   }
+ {_stencil_val(p.x,0,0,0); _stencil_val(p.y,0,0,0);_stencil_val_a(s_z,0,0,0);   }
 {
  {_stencil_val_a(s_z,0,0,0);     } 
 {
 
- _stencil_val_a(s_z,0,0,0);_stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0); _stencil_val(p.y,0,0,0); _stencil_val(p.y,1,0,0);       
+_stencil_val(p.x,0,0,0); _stencil_val(p.x,0,1,0); _stencil_val(p.y,0,0,0); _stencil_val(p.y,1,0,0);
+
+ 
+#line 280
+_stencil_val_a(s_z,0,0,0);       
 
 
 
@@ -10540,7 +10782,7 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
 
 
 {
-      {_stencil_val_a(s_x,0,0,0); _stencil_val(p.y,0,0,0); } 
+      { _stencil_val(p.y,0,0,0);_stencil_val_a(s_x,0,0,0); } 
 {      
 
 
@@ -10579,12 +10821,16 @@ _stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1);
 
 
 {
- {_stencil_val_a(s_x,0,0,0);_stencil_val(p.y,0,0,0); _stencil_val(p.z,0,0,0);   }
+ {_stencil_val(p.y,0,0,0); _stencil_val(p.z,0,0,0);_stencil_val_a(s_x,0,0,0);   }
 {
  {_stencil_val_a(s_x,0,0,0);     } 
 {
 
- _stencil_val_a(s_x,0,0,0);_stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1); _stencil_val(p.z,0,0,0); _stencil_val(p.z,0,1,0);       
+_stencil_val(p.y,0,0,0); _stencil_val(p.y,0,0,1); _stencil_val(p.z,0,0,0); _stencil_val(p.z,0,1,0);
+
+ 
+#line 280
+_stencil_val_a(s_x,0,0,0);       
 
 
 
@@ -10643,7 +10889,7 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
 
 
 {
-      {_stencil_val_a(s_y,0,0,0); _stencil_val(p.z,0,0,0); } 
+      { _stencil_val(p.z,0,0,0);_stencil_val_a(s_y,0,0,0); } 
 {      
 
 
@@ -10682,12 +10928,16 @@ _stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0);
 
 
 {
- {_stencil_val_a(s_y,0,0,0);_stencil_val(p.z,0,0,0); _stencil_val(p.x,0,0,0);   }
+ {_stencil_val(p.z,0,0,0); _stencil_val(p.x,0,0,0);_stencil_val_a(s_y,0,0,0);   }
 {
  {_stencil_val_a(s_y,0,0,0);     } 
 {
 
- _stencil_val_a(s_y,0,0,0);_stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0); _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,0,1);       
+_stencil_val(p.z,0,0,0); _stencil_val(p.z,1,0,0); _stencil_val(p.x,0,0,0); _stencil_val(p.x,0,0,1);
+
+ 
+#line 280
+_stencil_val_a(s_y,0,0,0);       
 
 
 
@@ -10939,7 +11189,7 @@ if (val(p.x,0,0,i) > 0. && val(p.x,0,0,i) < 1.) {
 
 
 
-  foreach_stencil() {    
+  foreach_stencil(1,{(NonLocal[]){{"Phi","scalar",(void *)&Phi,NULL,0},{"p","vector",(void *)&p,NULL,0},{"c","scalar",(void *)&c,NULL,0},{"as","vector",(void *)&as,NULL,0},{"val","double",(void *)&val,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n\n// #line 206 \"/home/lisergey/basilisk/src/geometry.h\"\nreal plane_volume (coord n, real alpha)\n{\n  real al = alpha + (n.x + n.y + n.z)/2. +\n    max(0., -n.x) + max(0., -n.y) + max(0., -n.z);\n  if (al <= 0.)\n    return 0.;\n  real tmp = fabs(n.x) + fabs(n.y) + fabs(n.z);\n  if (al >= tmp)\n    return 1.;\n  if (tmp < 1e-10)\n    return 0.;\n  real n1 = fabs(n.x)/tmp;\n  real n2 = fabs(n.y)/tmp;\n  real n3 = fabs(n.z)/tmp;\n  al = max(0., min(1., al/tmp));\n  real al0 = min(al, 1. - al);\n  real b1 = min(n1, n2);\n  real b3 = max(n1, n2);\n  real b2 = n3;\n  if (b2 < b1) {\n    tmp = b1;\n    b1 = b2;\n    b2 = tmp;\n  }\n  else if (b2 > b3) {\n    tmp = b3;\n    b3 = b2;\n    b2 = tmp;\n  }\n  real b12 = b1 + b2;\n  real bm = min(b12, b3);\n  real pr = max(6.*b1*b2*b3, 1e-50);\n  if (al0 < b1)\n    tmp = al0*al0*al0/pr;\n  else if (al0 < b2)\n    tmp = 0.5*al0*(al0 - b1)/(b2*b3) + b1*b1*b1/pr;\n  else if (al0 < bm)\n    tmp = (al0*al0*(3.*b12 - al0) + b1*b1*(b1 - 3.*al0) +\n    b2*b2*(b2 - 3.*al0))/pr;\n  else if (b12 < b3)\n    tmp = (al0 - 0.5*bm)/b3;\n  else\n    tmp = (al0*al0*(3. - 2.*al0) + b1*b1*(b1 - 3.*al0) +\n    b2*b2*(b2 - 3.*al0) + b3*b3*(b3 - 3.*al0))/pr;\n\n  real volume = al <= 0.5 ? tmp : 1. - tmp;\n  return clamp (volume, 0., 1.);\n}"," \n// #line 294 \"/home/lisergey/basilisk/src/fractions.h\"\n{\n\n\n\n\n    coord n;\n    real nn = 0.;\n     {\n      n.x = val(as.x,0,0,0) - val(as.x,1,0,0);\n      nn += fabs(n.x);\n    } \n// #line 301\n{\n      n.y = val(as.y,0,0,0) - val(as.y,0,1,0);\n      nn += fabs(n.y);\n    } \n// #line 301\n{\n      n.z = val(as.z,0,0,0) - val(as.z,0,0,1);\n      nn += fabs(n.z);\n    }\n    if (nn == 0.)\n      val_out_(c,0,0,0) = val(as.x,0,0,0);\n    else {\n      \n n.x /= nn;\n \n// #line 309\nn.y /= nn;\n \n// #line 309\nn.z /= nn;\n\n\n\n\n\n\n      real alpha = 0., ni = 0.;\n      for (int i = 0; i <= 1; i++)\n for (int j = 0; j <= 1; j++)\n   {\n     if (val(p.x,0,i,j) > 0. && val(p.x,0,i,j) < 1.) {\n       real a = sign(val(Phi,0,i,j) - val)*(val(p.x,0,i,j) - 0.5);\n       alpha += n.x*a + n.y*(i - 0.5) + n.z*(j - 0.5);\n       ni++;\n     }\n     \n// #line 320\nif (val(p.y,j,0,i) > 0. && val(p.y,j,0,i) < 1.) {\n       real a = sign(val(Phi,j,0,i) - val)*(val(p.y,j,0,i) - 0.5);\n       alpha += n.y*a + n.z*(i - 0.5) + n.x*(j - 0.5);\n       ni++;\n     }\n     \n// #line 320\nif (val(p.z,i,j,0) > 0. && val(p.z,i,j,0) < 1.) {\n       real a = sign(val(Phi,i,j,0) - val)*(val(p.z,i,j,0) - 0.5);\n       alpha += n.z*a + n.x*(i - 0.5) + n.y*(j - 0.5);\n       ni++;\n     }}\n\n\n\n\n      if (ni == 0)\n val_out_(c,0,0,0) = val(as.x,0,0,0);\n      else if (ni < 3 || ni > 6)\n val_out_(c,0,0,0) = 0.;\n      else\n val_out_(c,0,0,0) = plane_volume (n, alpha/ni);\n    }\n  }"}) {    
 
 
 
@@ -10970,7 +11220,7 @@ _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);
 #line 304
 }
 {
-      {_stencil_val_a(c,0,0,0); _stencil_val(as.x,0,0,0); } 
+      { _stencil_val(as.x,0,0,0);_stencil_val_a(c,0,0,0); } 
 {      
       
    
@@ -11008,7 +11258,7 @@ _stencil_val(as.z,0,0,0); _stencil_val(as.z,0,0,1);
 
 
 {
- {_stencil_val_a(c,0,0,0); _stencil_val(as.x,0,0,0); }
+ { _stencil_val(as.x,0,0,0);_stencil_val_a(c,0,0,0); }
 {
  {_stencil_val_a(c,0,0,0);  }
  
@@ -11247,7 +11497,7 @@ return;
      
 void reconstruction (const scalar c, vector n, scalar alpha)
 {tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",446);
-  foreach_stencil() {
+  foreach_stencil(1,{(NonLocal[]){{"n","vector",(void *)&n,NULL,0},{"alpha","scalar",(void *)&alpha,NULL,0},{"c","scalar",(void *)&c,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n\n// #line 62 \"/home/lisergey/basilisk/src/geometry.h\"\nreal plane_alpha (real c, coord n)\n{\n  real alpha;\n  coord n1;\n\n  n1.x = fabs (n.x); n1.y = fabs (n.y); n1.z = fabs (n.z);\n\n  real m1, m2, m3;\n  m1 = min(n1.x, n1.y);\n  m3 = max(n1.x, n1.y);\n  m2 = n1.z;\n  if (m2 < m1) {\n    real tmp = m1;\n    m1 = m2;\n    m2 = tmp;\n  }\n  else if (m2 > m3) {\n    real tmp = m3;\n    m3 = m2;\n    m2 = tmp;\n  }\n  real m12 = m1 + m2;\n  real pr = max(6.*m1*m2*m3, 1e-50);\n  real V1 = m1*m1*m1/pr;\n  real V2 = V1 + (m2 - m1)/(2.*m3), V3;\n  real mm;\n  if (m3 < m12) {\n    mm = m3;\n    V3 = (m3*m3*(3.*m12 - m3) + m1*m1*(m1 - 3.*m3) + m2*m2*(m2 - 3.*m3))/pr;\n  }\n  else {\n    mm = m12;\n    V3 = mm/(2.*m3);\n  }\n\n  c = clamp (c, 0., 1.);\n  real ch = min(c, 1. - c);\n  if (ch < V1)\n    alpha = pow (pr*ch, 1./3.);\n  else if (ch < V2)\n    alpha = (m1 + sqrt(m1*m1 + 8.*m2*m3*(ch - V1)))/2.;\n  else if (ch < V3) {\n    real p12 = sqrt (2.*m1*m2);\n    real q = 3.*(m12 - 2.*m3*ch)/(4.*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + m12;\n  }\n  else if (m12 <= m3)\n    alpha = m3*ch + mm/2.;\n  else {\n    real p = m1*(m2 + m3) + m2*m3 - 1./4., p12 = sqrt(p);\n    real q = 3.*m1*m2*m3*(1./2. - ch)/(2.*p*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + 1./2.;\n  }\n  if (c > 1./2.) alpha = 1. - alpha;\n\n  if (n.x < 0.)\n    alpha += n.x;\n  if (n.y < 0.)\n    alpha += n.y;\n  if (n.z < 0.)\n    alpha += n.z;\n\n  return alpha - (n.x + n.y + n.z)/2.;;\n}\n// # 13 \"/home/lisergey/basilisk/src/fractions.h\" 2\n\n\n\n\n\n\n\n// # 1 \"myc.h\" 1\n// # 1 \"/home/lisergey/basilisk/src/myc.h\"\n// # 16 \"/home/lisergey/basilisk/src/myc.h\"\ncoord mycs (Point point, scalar c)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n  real m1,m2,m[4][3],t0,t1,t2;\n  int cn;\n\n\n\n  m1 = val(c,-1,0,-1) + val(c,-1,0,1) + val(c,-1,-1,0) + val(c,-1,1,0) +\n       val(c,-1,0,0);\n  m2 = val(c,1,0,-1) + val(c,1,0,1) + val(c,1,-1,0) + val(c,1,1,0) +\n       val(c,1,0,0);\n  m[0][0] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,-1,-1,0)+ val(c,1,-1,0)+ val(c,0,-1,0);\n  m2 = val(c,-1,1,0)+ val(c,1,1,0)+ val(c,0,1,0);\n  m[0][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1)+ val(c,1,0,-1)+ val(c,0,0,-1);\n  m2 = val(c,-1,0,1)+ val(c,1,0,1)+ val(c,0,0,1);\n  m[0][2] = 0.5*(m1-m2);\n\n\n\n  m1 = val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,0);\n  m2 = val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,0);\n  m[1][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1) + val(c,0,-1,1) + val(c,1,-1,0) + val(c,-1,-1,0) +\n       val(c,0,-1,0);\n  m2 = val(c,0,1,-1) + val(c,0,1,1) + val(c,1,1,0) + val(c,-1,1,0) +\n       val(c,0,1,0);\n  m[1][1] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,0,-1,-1)+ val(c,0,0,-1)+ val(c,0,1,-1);\n  m2 = val(c,0,-1,1)+ val(c,0,0,1)+ val(c,0,1,1);\n  m[1][2] = 0.5*(m1-m2);\n\n\n\n\n  m1 = val(c,-1,0,-1)+ val(c,-1,0,1)+ val(c,-1,0,0);\n  m2 = val(c,1,0,-1)+ val(c,1,0,1)+ val(c,1,0,0);\n  m[2][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1)+ val(c,0,-1,1)+ val(c,0,-1,0);\n  m2 = val(c,0,1,-1)+ val(c,0,1,1)+ val(c,0,1,0);\n  m[2][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1) +\n       val(c,0,0,-1);\n  m2 = val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1) +\n       val(c,0,0,1);\n  m[2][2] = m1 > m2 ? 1. : -1.;\n\n\n  t0 = fabs(m[0][0]) + fabs(m[0][1]) + fabs(m[0][2]);\n  m[0][0] /= t0;\n  m[0][1] /= t0;\n  m[0][2] /= t0;\n\n  t0 = fabs(m[1][0]) + fabs(m[1][1]) + fabs(m[1][2]);\n  m[1][0] /= t0;\n  m[1][1] /= t0;\n  m[1][2] /= t0;\n\n  t0 = fabs(m[2][0]) + fabs(m[2][1]) + fabs(m[2][2]);\n  m[2][0] /= t0;\n  m[2][1] /= t0;\n  m[2][2] /= t0;\n\n\n  t0 = fabs(m[0][0]);\n  t1 = fabs(m[1][1]);\n  t2 = fabs(m[2][2]);\n\n  cn = 0;\n  if (t1 > t0) {\n    t0 = t1;\n    cn = 1;\n  }\n  if (t2 > t0)\n    cn = 2;\n\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,-1,-1,1) + val(c,-1,1,1) +\n       2.*(val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,-1) + val(c,-1,0,1)) +\n       4.*val(c,-1,0,0);\n  m2 = val(c,1,-1,-1) + val(c,1,1,-1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,-1) + val(c,1,0,1)) +\n       4.*val(c,1,0,0);\n  m[3][0] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,-1,1) + val(c,1,-1,-1) + val(c,1,-1,1) +\n       2.*( val(c,-1,-1,0) + val(c,1,-1,0) + val(c,0,-1,-1) + val(c,0,-1,1)) +\n       4.*val(c,0,-1,0);\n  m2 = val(c,-1,1,-1) + val(c,-1,1,1) + val(c,1,1,-1) + val(c,1,1,1) +\n       2.*(val(c,-1,1,0) + val(c,1,1,0) + val(c,0,1,-1) + val(c,0,1,1)) +\n       4.*val(c,0,1,0);\n  m[3][1] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,1,-1,-1) + val(c,1,1,-1) +\n       2.*(val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1)) +\n       4.*val(c,0,0,-1);\n  m2 = val(c,-1,-1,1) + val(c,-1,1,1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1)) +\n       4.*val(c,0,0,1);\n  m[3][2] = m1 - m2;\n\n\n  t0 = fabs(m[3][0]) + fabs(m[3][1]) + fabs(m[3][2]);\n  if (t0 < 1e-30) {\n    coord mxyz = {1., 0., 0.};\n    return mxyz;\n  }\n\n  m[3][0] /= t0;\n  m[3][1] /= t0;\n  m[3][2] /= t0;\n\n\n  t0 = fabs (m[3][0]);\n  t1 = fabs (m[3][1]);\n  t2 = fabs (m[3][2]);\n  if (t1 > t0)\n    t0 = t1;\n  if (t2 > t0)\n    t0 = t2;\n\n  if (fabs(m[cn][cn]) > t0)\n    cn = 3;\n\n\n  coord mxyz = {m[cn][0], m[cn][1], m[cn][2]};\n  return mxyz;\n}"," \n// #line 448 \"/home/lisergey/basilisk/src/fractions.h\"\n{\n\n\n\n\n\n    if (val(c,0,0,0) <= 0. || val(c,0,0,0) >= 1.) {\n      val_out_(alpha,0,0,0) = 0.;\n      \n val_out_(n.x,0,0,0) = 0.;\n \n// #line 457\nval_out_(n.y,0,0,0) = 0.;\n \n// #line 457\nval_out_(n.z,0,0,0) = 0.;\n    }\n    else {\n\n\n\n\n\n\n      coord m = mycs (point, c);\n      \n val_out_(n.x,0,0,0) = m.x;\n \n// #line 468\nval_out_(n.y,0,0,0) = m.y;\n \n// #line 468\nval_out_(n.z,0,0,0) = m.z;\n      val_out_(alpha,0,0,0) = plane_alpha (val(c,0,0,0), m);\n    }\n  }"}) {
 
 
 
@@ -11280,7 +11530,10 @@ _stencil_val(c,0,0,0); _stencil_val(c,0,0,0);{ {
  
 #line 468
 {_stencil_val_a(n.z,0,0,0);  }
-      _stencil_val_a(alpha,0,0,0);_stencil_val(c,0,0,0);    
+_stencil_val(c,0,0,0);
+      
+#line 469
+_stencil_val_a(alpha,0,0,0);    
     }}
 
 
@@ -11351,7 +11604,7 @@ end_tracing("reconstruction","/home/lisergey/basilisk/src/fractions.h",489);}
      
 void output_facets (scalar c, FILE * fp, vector s)
 {tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",510);
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"fp","not implemented yet",(void *)fp,NULL,1},{"cube_connect","int",(void *)cube_connect,(int[]){1224,0},0},{"cube_edge","coord",(void *)cube_edge,(int[]){122,0},0},{"s","vector",(void *)&s,NULL,0},{"c","scalar",(void *)&c,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n// #line 334 \"/home/lisergey/basilisk/src/geometry.h\"\nint facets (coord n, real alpha, coord v[12], real h)\n{\n  coord a[12];\n  int orient[12];\n\n  for (int i = 0; i < 12; i++) {\n    coord e, d;\n    real den = 0., t = alpha;\n     {\n      d.x = h*(cube_edge[i][0].x - 0.5);\n      e.x = h*(cube_edge[i][1].x - 0.5);\n      den += n.x*(e.x - d.x);\n      t -= n.x*d.x;\n    } \n// #line 342\n{\n      d.y = h*(cube_edge[i][0].y - 0.5);\n      e.y = h*(cube_edge[i][1].y - 0.5);\n      den += n.y*(e.y - d.y);\n      t -= n.y*d.y;\n    } \n// #line 342\n{\n      d.z = h*(cube_edge[i][0].z - 0.5);\n      e.z = h*(cube_edge[i][1].z - 0.5);\n      den += n.z*(e.z - d.z);\n      t -= n.z*d.z;\n    }\n    orient[i] = -1;\n    if (fabs (den) > 1e-10) {\n      t /= den;\n      if (t >= 0. && t < 1.) {\n real s = - alpha;\n  {\n   a[i].x = d.x + t*(e.x - d.x);\n   s += n.x*e.x;\n } \n// #line 353\n{\n   a[i].y = d.y + t*(e.y - d.y);\n   s += n.y*e.y;\n } \n// #line 353\n{\n   a[i].z = d.z + t*(e.z - d.z);\n   s += n.z*e.z;\n }\n orient[i] = (s > 0.);\n      }\n    }\n  }\n\n  for (int i = 0; i < 12; i++) {\n    int nv = 0, e = i;\n    while (orient[e] >= 0) {\n      int m = 0, * ne = cube_connect[e][orient[e]];\n      v[nv++] = a[e];\n      orient[e] = -1;\n      while (m < 3 && orient[e] < 0)\n e = ne[m++];\n    }\n    if (nv > 2)\n      return nv;\n  }\n  return 0;\n}\n\n\n\n\n// #line 62 \"/home/lisergey/basilisk/src/geometry.h\"\nreal plane_alpha (real c, coord n)\n{\n  real alpha;\n  coord n1;\n\n  n1.x = fabs (n.x); n1.y = fabs (n.y); n1.z = fabs (n.z);\n\n  real m1, m2, m3;\n  m1 = min(n1.x, n1.y);\n  m3 = max(n1.x, n1.y);\n  m2 = n1.z;\n  if (m2 < m1) {\n    real tmp = m1;\n    m1 = m2;\n    m2 = tmp;\n  }\n  else if (m2 > m3) {\n    real tmp = m3;\n    m3 = m2;\n    m2 = tmp;\n  }\n  real m12 = m1 + m2;\n  real pr = max(6.*m1*m2*m3, 1e-50);\n  real V1 = m1*m1*m1/pr;\n  real V2 = V1 + (m2 - m1)/(2.*m3), V3;\n  real mm;\n  if (m3 < m12) {\n    mm = m3;\n    V3 = (m3*m3*(3.*m12 - m3) + m1*m1*(m1 - 3.*m3) + m2*m2*(m2 - 3.*m3))/pr;\n  }\n  else {\n    mm = m12;\n    V3 = mm/(2.*m3);\n  }\n\n  c = clamp (c, 0., 1.);\n  real ch = min(c, 1. - c);\n  if (ch < V1)\n    alpha = pow (pr*ch, 1./3.);\n  else if (ch < V2)\n    alpha = (m1 + sqrt(m1*m1 + 8.*m2*m3*(ch - V1)))/2.;\n  else if (ch < V3) {\n    real p12 = sqrt (2.*m1*m2);\n    real q = 3.*(m12 - 2.*m3*ch)/(4.*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + m12;\n  }\n  else if (m12 <= m3)\n    alpha = m3*ch + mm/2.;\n  else {\n    real p = m1*(m2 + m3) + m2*m3 - 1./4., p12 = sqrt(p);\n    real q = 3.*m1*m2*m3*(1./2. - ch)/(2.*p*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + 1./2.;\n  }\n  if (c > 1./2.) alpha = 1. - alpha;\n\n  if (n.x < 0.)\n    alpha += n.x;\n  if (n.y < 0.)\n    alpha += n.y;\n  if (n.z < 0.)\n    alpha += n.z;\n\n  return alpha - (n.x + n.y + n.z)/2.;;\n}\n// # 13 \"/home/lisergey/basilisk/src/fractions.h\" 2\n\n\n\n\n\n\n\n// # 1 \"myc.h\" 1\n// # 1 \"/home/lisergey/basilisk/src/myc.h\"\n// # 16 \"/home/lisergey/basilisk/src/myc.h\"\ncoord mycs (Point point, scalar c)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n  real m1,m2,m[4][3],t0,t1,t2;\n  int cn;\n\n\n\n  m1 = val(c,-1,0,-1) + val(c,-1,0,1) + val(c,-1,-1,0) + val(c,-1,1,0) +\n       val(c,-1,0,0);\n  m2 = val(c,1,0,-1) + val(c,1,0,1) + val(c,1,-1,0) + val(c,1,1,0) +\n       val(c,1,0,0);\n  m[0][0] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,-1,-1,0)+ val(c,1,-1,0)+ val(c,0,-1,0);\n  m2 = val(c,-1,1,0)+ val(c,1,1,0)+ val(c,0,1,0);\n  m[0][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1)+ val(c,1,0,-1)+ val(c,0,0,-1);\n  m2 = val(c,-1,0,1)+ val(c,1,0,1)+ val(c,0,0,1);\n  m[0][2] = 0.5*(m1-m2);\n\n\n\n  m1 = val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,0);\n  m2 = val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,0);\n  m[1][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1) + val(c,0,-1,1) + val(c,1,-1,0) + val(c,-1,-1,0) +\n       val(c,0,-1,0);\n  m2 = val(c,0,1,-1) + val(c,0,1,1) + val(c,1,1,0) + val(c,-1,1,0) +\n       val(c,0,1,0);\n  m[1][1] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,0,-1,-1)+ val(c,0,0,-1)+ val(c,0,1,-1);\n  m2 = val(c,0,-1,1)+ val(c,0,0,1)+ val(c,0,1,1);\n  m[1][2] = 0.5*(m1-m2);\n\n\n\n\n  m1 = val(c,-1,0,-1)+ val(c,-1,0,1)+ val(c,-1,0,0);\n  m2 = val(c,1,0,-1)+ val(c,1,0,1)+ val(c,1,0,0);\n  m[2][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1)+ val(c,0,-1,1)+ val(c,0,-1,0);\n  m2 = val(c,0,1,-1)+ val(c,0,1,1)+ val(c,0,1,0);\n  m[2][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1) +\n       val(c,0,0,-1);\n  m2 = val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1) +\n       val(c,0,0,1);\n  m[2][2] = m1 > m2 ? 1. : -1.;\n\n\n  t0 = fabs(m[0][0]) + fabs(m[0][1]) + fabs(m[0][2]);\n  m[0][0] /= t0;\n  m[0][1] /= t0;\n  m[0][2] /= t0;\n\n  t0 = fabs(m[1][0]) + fabs(m[1][1]) + fabs(m[1][2]);\n  m[1][0] /= t0;\n  m[1][1] /= t0;\n  m[1][2] /= t0;\n\n  t0 = fabs(m[2][0]) + fabs(m[2][1]) + fabs(m[2][2]);\n  m[2][0] /= t0;\n  m[2][1] /= t0;\n  m[2][2] /= t0;\n\n\n  t0 = fabs(m[0][0]);\n  t1 = fabs(m[1][1]);\n  t2 = fabs(m[2][2]);\n\n  cn = 0;\n  if (t1 > t0) {\n    t0 = t1;\n    cn = 1;\n  }\n  if (t2 > t0)\n    cn = 2;\n\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,-1,-1,1) + val(c,-1,1,1) +\n       2.*(val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,-1) + val(c,-1,0,1)) +\n       4.*val(c,-1,0,0);\n  m2 = val(c,1,-1,-1) + val(c,1,1,-1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,-1) + val(c,1,0,1)) +\n       4.*val(c,1,0,0);\n  m[3][0] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,-1,1) + val(c,1,-1,-1) + val(c,1,-1,1) +\n       2.*( val(c,-1,-1,0) + val(c,1,-1,0) + val(c,0,-1,-1) + val(c,0,-1,1)) +\n       4.*val(c,0,-1,0);\n  m2 = val(c,-1,1,-1) + val(c,-1,1,1) + val(c,1,1,-1) + val(c,1,1,1) +\n       2.*(val(c,-1,1,0) + val(c,1,1,0) + val(c,0,1,-1) + val(c,0,1,1)) +\n       4.*val(c,0,1,0);\n  m[3][1] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,1,-1,-1) + val(c,1,1,-1) +\n       2.*(val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1)) +\n       4.*val(c,0,0,-1);\n  m2 = val(c,-1,-1,1) + val(c,-1,1,1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1)) +\n       4.*val(c,0,0,1);\n  m[3][2] = m1 - m2;\n\n\n  t0 = fabs(m[3][0]) + fabs(m[3][1]) + fabs(m[3][2]);\n  if (t0 < 1e-30) {\n    coord mxyz = {1., 0., 0.};\n    return mxyz;\n  }\n\n  m[3][0] /= t0;\n  m[3][1] /= t0;\n  m[3][2] /= t0;\n\n\n  t0 = fabs (m[3][0]);\n  t1 = fabs (m[3][1]);\n  t2 = fabs (m[3][2]);\n  if (t1 > t0)\n    t0 = t1;\n  if (t2 > t0)\n    t0 = t2;\n\n  if (fabs(m[cn][cn]) > t0)\n    cn = 3;\n\n\n  coord mxyz = {m[cn][0], m[cn][1], m[cn][2]};\n  return mxyz;\n}\n\n\n\n\n\n\n// #line 418 \"/home/lisergey/basilisk/src/fractions.h\"\ncoord facet_normal (Point point, scalar c, vector s)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n  if (s.x.i >= 0) {\n    coord n;\n    real nn = 0.;\n     {\n      n.x = val(s.x,0,0,0) - val(s.x,1,0,0);\n      nn += fabs(n.x);\n    } \n// #line 423\n{\n      n.y = val(s.y,0,0,0) - val(s.y,0,1,0);\n      nn += fabs(n.y);\n    } \n// #line 423\n{\n      n.z = val(s.z,0,0,0) - val(s.z,0,0,1);\n      nn += fabs(n.z);\n    }\n    if (nn > 0.)\n      {\n n.x /= nn;\n \n// #line 429\nn.y /= nn;\n \n// #line 429\nn.z /= nn;}\n    else\n      {\n n.x = 1./3;\n \n// #line 432\nn.y = 1./3;\n \n// #line 432\nn.z = 1./3;}\n    return n;\n  }\n  return mycs (point, c);\n}","\n    \n// #line 513 \"/home/lisergey/basilisk/src/fractions.h\"\nif (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {\n      coord n = facet_normal (point, c, s);\n      real alpha = plane_alpha (val(c,0,0,0), n);\n// # 525 \"/home/lisergey/basilisk/src/fractions.h\"\n      coord v[12];\n      int m = facets (n, alpha, v, 1.);\n      for (int i = 0; i < m; i++)\n fprintf (fp, \"%g %g %g\\n\",\n   x + v[i].x*Delta, y + v[i].y*Delta, z + v[i].z*Delta);\n      if (m > 0)\n fputc ('\\n', fp);\n\n    }"})
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {  
        _stencil_facet_normal (point, c, s);     
       _stencil_val(c,0,0,0);        
@@ -11395,7 +11648,7 @@ end_tracing("output_facets","/home/lisergey/basilisk/src/fractions.h",536);}
 double interface_area (scalar c)
 {tracing("interface_area","/home/lisergey/basilisk/src/fractions.h",545);
   double area = 0.;
-  foreach_stencil ()
+  foreach_stencil (1,{(NonLocal[]){{"area","double",(void *)&area,NULL,0,'+'},{"c","scalar",(void *)&c,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n\n\n\n\n// #line 382 \"/home/lisergey/basilisk/src/geometry.h\"\nreal line_length_center (coord m, real alpha, coord * p)\n{\n  alpha += (m.x + m.y)/2.;\n\n  coord n = m;\n  \n    if (n.x < 0.) {\n      alpha -= n.x;\n      n.x = - n.x;\n    }\n    \n// #line 388\nif (n.y < 0.) {\n      alpha -= n.y;\n      n.y = - n.y;\n    }\n\n  p->x = p->y = p->z = 0.;\n\n  if (alpha <= 0. || alpha >= n.x + n.y)\n    return 0.;\n\n  \n    if (n.x < 1e-4) {\n      p->x = 0.;\n      p->y = (m.y < 0. ? 1. - alpha : alpha) - 0.5;\n      return 1.;\n    }\n    \n// #line 399\nif (n.y < 1e-4) {\n      p->y = 0.;\n      p->x = (m.x < 0. ? 1. - alpha : alpha) - 0.5;\n      return 1.;\n    }\n\n  if (alpha >= n.x) {\n    p->x += 1.;\n    p->y += (alpha - n.x)/n.y;\n  }\n  else\n    p->x += alpha/n.x;\n\n  real ax = p->x, ay = p->y;\n  if (alpha >= n.y) {\n    p->y += 1.;\n    ay -= 1.;\n    p->x += (alpha - n.y)/n.x;\n    ax -= (alpha - n.y)/n.x;\n  }\n  else {\n    p->y += alpha/n.y;\n    ay -= alpha/n.y;\n  }\n\n   {\n    p->x /= 2.;\n    p->x = clamp (p->x, 0., 1.);\n    if (m.x < 0.)\n      p->x = 1. - p->x;\n    p->x -= 0.5;\n  } \n// #line 424\n{\n    p->y /= 2.;\n    p->y = clamp (p->y, 0., 1.);\n    if (m.y < 0.)\n      p->y = 1. - p->y;\n    p->y -= 0.5;\n  }\n\n  return sqrt (ax*ax + ay*ay);\n}\n\n\n\n\n\n// #line 438 \"/home/lisergey/basilisk/src/geometry.h\"\nreal plane_area_center (coord m, real alpha, coord * p)\n{\n  \n    if (fabs (m.x) < 1e-4) {\n      coord n, q;\n      ((real *)&n)[0] = m.y;\n      ((real *)&n)[1] = m.z;\n      real length = line_length_center (n, alpha, &q);\n      p->x = 0.;\n      p->y = ((real *)&q)[0];\n      p->z = ((real *)&q)[1];\n      return length;\n    }\n    \n// #line 441\nif (fabs (m.y) < 1e-4) {\n      coord n, q;\n      ((real *)&n)[0] = m.z;\n      ((real *)&n)[1] = m.x;\n      real length = line_length_center (n, alpha, &q);\n      p->y = 0.;\n      p->z = ((real *)&q)[0];\n      p->x = ((real *)&q)[1];\n      return length;\n    }\n    \n// #line 441\nif (fabs (m.z) < 1e-4) {\n      coord n, q;\n      ((real *)&n)[0] = m.x;\n      ((real *)&n)[1] = m.y;\n      real length = line_length_center (n, alpha, &q);\n      p->z = 0.;\n      p->x = ((real *)&q)[0];\n      p->y = ((real *)&q)[1];\n      return length;\n    }\n\n  alpha += (m.x + m.y + m.z)/2.;\n  coord n = m;\n  \n    if (n.x < 0.) {\n      alpha -= n.x;\n      n.x = - n.x;\n    }\n    \n// #line 455\nif (n.y < 0.) {\n      alpha -= n.y;\n      n.y = - n.y;\n    }\n    \n// #line 455\nif (n.z < 0.) {\n      alpha -= n.z;\n      n.z = - n.z;\n    }\n\n  real amax = n.x + n.y + n.z;\n  if (alpha < 0. || alpha > amax) {\n    p->x = p->y = p->z = 0.;\n    return 0.;\n  }\n\n  real area = sq(alpha);\n  p->x = p->y = p->z = area*alpha;\n\n   {\n    real b = alpha - n.x;\n    if (b > 0.) {\n      area -= b*b;\n      p->x -= b*b*(2.*n.x + alpha);\n      p->y -= b*b*b;\n      p->z -= b*b*b;\n    }\n  } \n// #line 469\n{\n    real b = alpha - n.y;\n    if (b > 0.) {\n      area -= b*b;\n      p->y -= b*b*(2.*n.y + alpha);\n      p->z -= b*b*b;\n      p->x -= b*b*b;\n    }\n  } \n// #line 469\n{\n    real b = alpha - n.z;\n    if (b > 0.) {\n      area -= b*b;\n      p->z -= b*b*(2.*n.z + alpha);\n      p->x -= b*b*b;\n      p->y -= b*b*b;\n    }\n  }\n\n  amax = alpha - amax;\n   {\n    real b = amax + n.x;\n    if (b > 0.) {\n      area += b*b;\n      p->y += b*b*(2.*n.y + alpha - n.z);\n      p->z += b*b*(2.*n.z + alpha - n.y);\n      p->x += b*b*b;\n    }\n  } \n// #line 480\n{\n    real b = amax + n.y;\n    if (b > 0.) {\n      area += b*b;\n      p->z += b*b*(2.*n.z + alpha - n.x);\n      p->x += b*b*(2.*n.x + alpha - n.z);\n      p->y += b*b*b;\n    }\n  } \n// #line 480\n{\n    real b = amax + n.z;\n    if (b > 0.) {\n      area += b*b;\n      p->x += b*b*(2.*n.x + alpha - n.y);\n      p->y += b*b*(2.*n.y + alpha - n.x);\n      p->z += b*b*b;\n    }\n  }\n\n  area *= 3.;\n   {\n    if (area) {\n      p->x /= area*n.x;\n      p->x = clamp (p->x, 0., 1.);\n    }\n    else\n      p->x = 0.;\n    if (m.x < 0.) p->x = 1. - p->x;\n    p->x -= 0.5;\n  } \n// #line 491\n{\n    if (area) {\n      p->y /= area*n.y;\n      p->y = clamp (p->y, 0., 1.);\n    }\n    else\n      p->y = 0.;\n    if (m.y < 0.) p->y = 1. - p->y;\n    p->y -= 0.5;\n  } \n// #line 491\n{\n    if (area) {\n      p->z /= area*n.z;\n      p->z = clamp (p->z, 0., 1.);\n    }\n    else\n      p->z = 0.;\n    if (m.z < 0.) p->z = 1. - p->z;\n    p->z -= 0.5;\n  }\n\n  return area*sqrt (1./(sq(n.x)*sq(n.y)) +\n      1./(sq(n.x)*sq(n.z)) +\n      1./(sq(n.z)*sq(n.y)))/6.;\n}\n\n\n\n\n// #line 62 \"/home/lisergey/basilisk/src/geometry.h\"\nreal plane_alpha (real c, coord n)\n{\n  real alpha;\n  coord n1;\n\n  n1.x = fabs (n.x); n1.y = fabs (n.y); n1.z = fabs (n.z);\n\n  real m1, m2, m3;\n  m1 = min(n1.x, n1.y);\n  m3 = max(n1.x, n1.y);\n  m2 = n1.z;\n  if (m2 < m1) {\n    real tmp = m1;\n    m1 = m2;\n    m2 = tmp;\n  }\n  else if (m2 > m3) {\n    real tmp = m3;\n    m3 = m2;\n    m2 = tmp;\n  }\n  real m12 = m1 + m2;\n  real pr = max(6.*m1*m2*m3, 1e-50);\n  real V1 = m1*m1*m1/pr;\n  real V2 = V1 + (m2 - m1)/(2.*m3), V3;\n  real mm;\n  if (m3 < m12) {\n    mm = m3;\n    V3 = (m3*m3*(3.*m12 - m3) + m1*m1*(m1 - 3.*m3) + m2*m2*(m2 - 3.*m3))/pr;\n  }\n  else {\n    mm = m12;\n    V3 = mm/(2.*m3);\n  }\n\n  c = clamp (c, 0., 1.);\n  real ch = min(c, 1. - c);\n  if (ch < V1)\n    alpha = pow (pr*ch, 1./3.);\n  else if (ch < V2)\n    alpha = (m1 + sqrt(m1*m1 + 8.*m2*m3*(ch - V1)))/2.;\n  else if (ch < V3) {\n    real p12 = sqrt (2.*m1*m2);\n    real q = 3.*(m12 - 2.*m3*ch)/(4.*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + m12;\n  }\n  else if (m12 <= m3)\n    alpha = m3*ch + mm/2.;\n  else {\n    real p = m1*(m2 + m3) + m2*m3 - 1./4., p12 = sqrt(p);\n    real q = 3.*m1*m2*m3*(1./2. - ch)/(2.*p*p12);\n    real teta = acos(clamp(q,-1.,1.))/3.;\n    real cs = cos(teta);\n    alpha = p12*(sqrt(3.*(1. - cs*cs)) - cs) + 1./2.;\n  }\n  if (c > 1./2.) alpha = 1. - alpha;\n\n  if (n.x < 0.)\n    alpha += n.x;\n  if (n.y < 0.)\n    alpha += n.y;\n  if (n.z < 0.)\n    alpha += n.z;\n\n  return alpha - (n.x + n.y + n.z)/2.;;\n}\n// # 13 \"/home/lisergey/basilisk/src/fractions.h\" 2\n\n\n\n\n\n\n\n// # 1 \"myc.h\" 1\n// # 1 \"/home/lisergey/basilisk/src/myc.h\"\n// # 16 \"/home/lisergey/basilisk/src/myc.h\"\ncoord mycs (Point point, scalar c)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n  real m1,m2,m[4][3],t0,t1,t2;\n  int cn;\n\n\n\n  m1 = val(c,-1,0,-1) + val(c,-1,0,1) + val(c,-1,-1,0) + val(c,-1,1,0) +\n       val(c,-1,0,0);\n  m2 = val(c,1,0,-1) + val(c,1,0,1) + val(c,1,-1,0) + val(c,1,1,0) +\n       val(c,1,0,0);\n  m[0][0] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,-1,-1,0)+ val(c,1,-1,0)+ val(c,0,-1,0);\n  m2 = val(c,-1,1,0)+ val(c,1,1,0)+ val(c,0,1,0);\n  m[0][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1)+ val(c,1,0,-1)+ val(c,0,0,-1);\n  m2 = val(c,-1,0,1)+ val(c,1,0,1)+ val(c,0,0,1);\n  m[0][2] = 0.5*(m1-m2);\n\n\n\n  m1 = val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,0);\n  m2 = val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,0);\n  m[1][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1) + val(c,0,-1,1) + val(c,1,-1,0) + val(c,-1,-1,0) +\n       val(c,0,-1,0);\n  m2 = val(c,0,1,-1) + val(c,0,1,1) + val(c,1,1,0) + val(c,-1,1,0) +\n       val(c,0,1,0);\n  m[1][1] = m1 > m2 ? 1. : -1.;\n\n  m1 = val(c,0,-1,-1)+ val(c,0,0,-1)+ val(c,0,1,-1);\n  m2 = val(c,0,-1,1)+ val(c,0,0,1)+ val(c,0,1,1);\n  m[1][2] = 0.5*(m1-m2);\n\n\n\n\n  m1 = val(c,-1,0,-1)+ val(c,-1,0,1)+ val(c,-1,0,0);\n  m2 = val(c,1,0,-1)+ val(c,1,0,1)+ val(c,1,0,0);\n  m[2][0] = 0.5*(m1-m2);\n\n  m1 = val(c,0,-1,-1)+ val(c,0,-1,1)+ val(c,0,-1,0);\n  m2 = val(c,0,1,-1)+ val(c,0,1,1)+ val(c,0,1,0);\n  m[2][1] = 0.5*(m1-m2);\n\n  m1 = val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1) +\n       val(c,0,0,-1);\n  m2 = val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1) +\n       val(c,0,0,1);\n  m[2][2] = m1 > m2 ? 1. : -1.;\n\n\n  t0 = fabs(m[0][0]) + fabs(m[0][1]) + fabs(m[0][2]);\n  m[0][0] /= t0;\n  m[0][1] /= t0;\n  m[0][2] /= t0;\n\n  t0 = fabs(m[1][0]) + fabs(m[1][1]) + fabs(m[1][2]);\n  m[1][0] /= t0;\n  m[1][1] /= t0;\n  m[1][2] /= t0;\n\n  t0 = fabs(m[2][0]) + fabs(m[2][1]) + fabs(m[2][2]);\n  m[2][0] /= t0;\n  m[2][1] /= t0;\n  m[2][2] /= t0;\n\n\n  t0 = fabs(m[0][0]);\n  t1 = fabs(m[1][1]);\n  t2 = fabs(m[2][2]);\n\n  cn = 0;\n  if (t1 > t0) {\n    t0 = t1;\n    cn = 1;\n  }\n  if (t2 > t0)\n    cn = 2;\n\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,-1,-1,1) + val(c,-1,1,1) +\n       2.*(val(c,-1,-1,0) + val(c,-1,1,0) + val(c,-1,0,-1) + val(c,-1,0,1)) +\n       4.*val(c,-1,0,0);\n  m2 = val(c,1,-1,-1) + val(c,1,1,-1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,1,-1,0) + val(c,1,1,0) + val(c,1,0,-1) + val(c,1,0,1)) +\n       4.*val(c,1,0,0);\n  m[3][0] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,-1,1) + val(c,1,-1,-1) + val(c,1,-1,1) +\n       2.*( val(c,-1,-1,0) + val(c,1,-1,0) + val(c,0,-1,-1) + val(c,0,-1,1)) +\n       4.*val(c,0,-1,0);\n  m2 = val(c,-1,1,-1) + val(c,-1,1,1) + val(c,1,1,-1) + val(c,1,1,1) +\n       2.*(val(c,-1,1,0) + val(c,1,1,0) + val(c,0,1,-1) + val(c,0,1,1)) +\n       4.*val(c,0,1,0);\n  m[3][1] = m1 - m2;\n\n  m1 = val(c,-1,-1,-1) + val(c,-1,1,-1) + val(c,1,-1,-1) + val(c,1,1,-1) +\n       2.*(val(c,-1,0,-1) + val(c,1,0,-1) + val(c,0,-1,-1) + val(c,0,1,-1)) +\n       4.*val(c,0,0,-1);\n  m2 = val(c,-1,-1,1) + val(c,-1,1,1) + val(c,1,-1,1) + val(c,1,1,1) +\n       2.*(val(c,-1,0,1) + val(c,1,0,1) + val(c,0,-1,1) + val(c,0,1,1)) +\n       4.*val(c,0,0,1);\n  m[3][2] = m1 - m2;\n\n\n  t0 = fabs(m[3][0]) + fabs(m[3][1]) + fabs(m[3][2]);\n  if (t0 < 1e-30) {\n    coord mxyz = {1., 0., 0.};\n    return mxyz;\n  }\n\n  m[3][0] /= t0;\n  m[3][1] /= t0;\n  m[3][2] /= t0;\n\n\n  t0 = fabs (m[3][0]);\n  t1 = fabs (m[3][1]);\n  t2 = fabs (m[3][2]);\n  if (t1 > t0)\n    t0 = t1;\n  if (t2 > t0)\n    t0 = t2;\n\n  if (fabs(m[cn][cn]) > t0)\n    cn = 3;\n\n\n  coord mxyz = {m[cn][0], m[cn][1], m[cn][2]};\n  return mxyz;\n}","\n    \n// #line 549 \"/home/lisergey/basilisk/src/fractions.h\"\nif (val(c,0,0,0) > 1e-6 && val(c,0,0,0) < 1. - 1e-6) {\n      coord n = mycs (point, c), p;\n      real alpha = plane_alpha (val(c,0,0,0), n);\n      area += pow(Delta, 3 - 1)*plane_area_center (n, alpha, &p);\n    }"})
     {_stencil_val(c,0,0,0); _stencil_val(c,0,0,0); {   
        _stencil_mycs (point, c);     
       _stencil_val(c,0,0,0); 
@@ -11574,7 +11827,10 @@ typedef struct {
 norm normf (scalar f)
 {
   double avg = 0., rms = 0., max = 0., volume = 0.;
-  foreach_stencil(
+  if(!is_constant(cm)){
+  
+#line 135
+foreach_stencil(1,{(NonLocal[]){{"rms","double",(void *)&rms,NULL,0,'+'},{"avg","double",(void *)&avg,NULL,0,'+'},{"volume","double",(void *)&volume,NULL,0,'+'},{"max","double",(void *)&max,NULL,0,'M'},{"cm","scalar",(void *)&cm,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 137 \"/home/lisergey/basilisk/src/utils.h\"\nif (val(f,0,0,0) != 1e30 && (cube(Delta)*val(cm,0,0,0)) > 0.) {\n      real v = fabs(val(f,0,0,0));\n      if (v > max) max = v;\n      volume += (cube(Delta)*val(cm,0,0,0));\n      avg += (cube(Delta)*val(cm,0,0,0))*v;\n      rms += (cube(Delta)*val(cm,0,0,0))*sq(v);\n    }"}
 )
     {_stencil_val(f,0,0,0);_stencil_val(cm,0,0,0); {   
       _stencil_val(f,0,0,0);   
@@ -11586,9 +11842,6 @@ _stencil_val(cm,0,0,0);
     
 #line 143
 }       }end_foreach_stencil();
-  
-#line 135
-if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(+:volume)
@@ -11608,6 +11861,20 @@ foreach(
 }
 #line 143
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 135
+foreach_stencil(1,{(NonLocal[]){{"rms","double",(void *)&rms,NULL,0,'+'},{"avg","double",(void *)&avg,NULL,0,'+'},{"volume","double",(void *)&volume,NULL,0,'+'},{"max","double",(void *)&max,NULL,0,'M'},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 137 \"/home/lisergey/basilisk/src/utils.h\"\nif (val(f,0,0,0) != 1e30 && (cube(Delta)*_const_cm) > 0.) {\n      real v = fabs(val(f,0,0,0));\n      if (v > max) max = v;\n      volume += (cube(Delta)*_const_cm);\n      avg += (cube(Delta)*_const_cm)*v;\n      rms += (cube(Delta)*_const_cm)*sq(v);\n    }"}
+)
+    {_stencil_val(f,0,0,0);; {   
+      _stencil_val(f,0,0,0);
+
+;
+;
+; 
+       
+    
+#line 143
+}       }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
@@ -11647,7 +11914,10 @@ typedef struct {
 stats statsf (scalar f)
 {
   double min = 1e100, max = -1e100, sum = 0., sum2 = 0., volume = 0.;
-  foreach_stencil(
+  if(!is_constant(cm)){
+  
+#line 163
+foreach_stencil(1,{(NonLocal[]){{"min","double",(void *)&min,NULL,0,'m'},{"max","double",(void *)&max,NULL,0,'M'},{"sum2","double",(void *)&sum2,NULL,0,'+'},{"sum","double",(void *)&sum,NULL,0,'+'},{"volume","double",(void *)&volume,NULL,0,'+'},{"f","scalar",(void *)&f,NULL,0},{"cm","scalar",(void *)&cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 165 \"/home/lisergey/basilisk/src/utils.h\"\nif ((cube(Delta)*val(cm,0,0,0)) > 0. && val(f,0,0,0) != 1e30) {\n      volume += (cube(Delta)*val(cm,0,0,0));\n      sum += (cube(Delta)*val(cm,0,0,0))*val(f,0,0,0);\n      sum2 += (cube(Delta)*val(cm,0,0,0))*sq(val(f,0,0,0));\n      if (val(f,0,0,0) > max) max = val(f,0,0,0);\n      if (val(f,0,0,0) < min) min = val(f,0,0,0);\n    }"}
 )
     {_stencil_val(cm,0,0,0); _stencil_val(f,0,0,0); {
 _stencil_val(cm,0,0,0); 
@@ -11660,9 +11930,6 @@ _stencil_val(f,0,0,0); { _stencil_val(f,0,0,0); }
     
 #line 171
 }      }end_foreach_stencil();
-  
-#line 163
-if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel  reduction(min:min)
@@ -11682,6 +11949,21 @@ foreach(
 }
 #line 171
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 163
+foreach_stencil(1,{(NonLocal[]){{"min","double",(void *)&min,NULL,0,'m'},{"max","double",(void *)&max,NULL,0,'M'},{"sum2","double",(void *)&sum2,NULL,0,'+'},{"sum","double",(void *)&sum,NULL,0,'+'},{"volume","double",(void *)&volume,NULL,0,'+'},{"f","scalar",(void *)&f,NULL,0},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 165 \"/home/lisergey/basilisk/src/utils.h\"\nif ((cube(Delta)*_const_cm) > 0. && val(f,0,0,0) != 1e30) {\n      volume += (cube(Delta)*_const_cm);\n      sum += (cube(Delta)*_const_cm)*val(f,0,0,0);\n      sum2 += (cube(Delta)*_const_cm)*sq(val(f,0,0,0));\n      if (val(f,0,0,0) > max) max = val(f,0,0,0);\n      if (val(f,0,0,0) < min) min = val(f,0,0,0);\n    }"}
+)
+    {; _stencil_val(f,0,0,0); {
+;
+;_stencil_val(f,0,0,0);
+;_stencil_val(f,0,0,0); 
+       _stencil_val(f,0,0,0); { _stencil_val(f,0,0,0); }
+_stencil_val(f,0,0,0); { _stencil_val(f,0,0,0); }
+         
+         
+    
+#line 171
+}      }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
@@ -11749,7 +12031,7 @@ double minmod2 (double s0, double s1, double s2)
 void gradients (scalar * f, vector * g)
 {
   if (!(list_len(f) == vectors_len(g))) qassert ("/home/lisergey/basilisk/src/utils.h", 239, "list_len(f) == vectors_len(g)");
-  foreach_stencil() {
+  foreach_stencil(1,{(NonLocal[]){{"g","vector",(void *)g,NULL,1},{"f","scalar",(void *)f,NULL,1},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 240 \"/home/lisergey/basilisk/src/utils.h\"\n{\n    scalar s; vector v;\n    {forin2 (s,v , f,g) {\n      if (s.gradient)\n { {\n\n\n\n\n\n     val_out_(v.x,0,0,0) = s.gradient (val(s,-1,0,0), val(s,0,0,0), val(s,1,0,0))/Delta;\n } \n// #line 244\n{\n\n\n\n\n\n     val_out_(v.y,0,0,0) = s.gradient (val(s,0,-1,0), val(s,0,0,0), val(s,0,1,0))/Delta;\n } \n// #line 244\n{\n\n\n\n\n\n     val_out_(v.z,0,0,0) = s.gradient (val(s,0,0,-1), val(s,0,0,0), val(s,0,0,1))/Delta;\n }}\n      else\n { {\n\n\n\n\n\n     val_out_(v.x,0,0,0) = (val(s,1,0,0) - val(s,-1,0,0))/(2.*Delta);\n } \n// #line 253\n{\n\n\n\n\n\n     val_out_(v.y,0,0,0) = (val(s,0,1,0) - val(s,0,-1,0))/(2.*Delta);\n } \n// #line 253\n{\n\n\n\n\n\n     val_out_(v.z,0,0,0) = (val(s,0,0,1) - val(s,0,0,-1))/(2.*Delta);\n }}\n    } endforin2()}\n  }"}) {
     scalar s; vector v;
     {vector*_i0=g;scalar*_i1= f;if(_i0)for(v=*_i0,s=*_i1;_i0->x.i>= 0;v=*++_i0,s=*++_i1){ {
       if (_attribute[s.i].gradient)
@@ -11759,7 +12041,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.x,0,0,0);_stencil_val(s,-1,0,0); _stencil_val(s,0,0,0); _stencil_val(s,1,0,0);   
+_stencil_val(s,-1,0,0); _stencil_val(s,0,0,0); _stencil_val(s,1,0,0);
+
+
+
+
+
+     
+#line 250
+_stencil_val_a(v.x,0,0,0);   
  } 
 #line 244
 {
@@ -11768,7 +12058,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.y,0,0,0);_stencil_val(s,0,-1,0); _stencil_val(s,0,0,0); _stencil_val(s,0,1,0);   
+_stencil_val(s,0,-1,0); _stencil_val(s,0,0,0); _stencil_val(s,0,1,0);
+
+
+
+
+
+     
+#line 250
+_stencil_val_a(v.y,0,0,0);   
  } 
 #line 244
 {
@@ -11777,7 +12075,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.z,0,0,0);_stencil_val(s,0,0,-1); _stencil_val(s,0,0,0); _stencil_val(s,0,0,1);   
+_stencil_val(s,0,0,-1); _stencil_val(s,0,0,0); _stencil_val(s,0,0,1);
+
+
+
+
+
+     
+#line 250
+_stencil_val_a(v.z,0,0,0);   
  }}
       else
  { {
@@ -11786,7 +12092,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.x,0,0,0);_stencil_val(s,1,0,0); _stencil_val(s,-1,0,0);   
+_stencil_val(s,1,0,0); _stencil_val(s,-1,0,0);
+
+
+
+
+
+     
+#line 259
+_stencil_val_a(v.x,0,0,0);   
  } 
 #line 253
 {
@@ -11795,7 +12109,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.y,0,0,0);_stencil_val(s,0,1,0); _stencil_val(s,0,-1,0);   
+_stencil_val(s,0,1,0); _stencil_val(s,0,-1,0);
+
+
+
+
+
+     
+#line 259
+_stencil_val_a(v.y,0,0,0);   
  } 
 #line 253
 {
@@ -11804,7 +12126,15 @@ void gradients (scalar * f, vector * g)
 
 
 
-     _stencil_val_a(v.z,0,0,0);_stencil_val(s,0,0,1); _stencil_val(s,0,0,-1);   
+_stencil_val(s,0,0,1); _stencil_val(s,0,0,-1);
+
+
+
+
+
+     
+#line 259
+_stencil_val_a(v.z,0,0,0);   
  }}
     }}}
   }end_foreach_stencil();
@@ -11873,21 +12203,37 @@ foreach() {
 #line 280 "/home/lisergey/basilisk/src/utils.h"
 void vorticity (const vector u, scalar omega)
 {
-  foreach_stencil()
-    {_stencil_val_a(omega,0,0,0);_stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,0,0,0);
-        _stencil_val(fm.x,1,0,0);_stencil_val(u.y,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,-1,0,0);
-_stencil_val(fm.y,0,1,0); _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,0,0);
-        _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,-1,0); _stencil_val(fm.y,0,1,0);_stencil_val(u.x,0,1,0);_stencil_val(cm,0,0,0);      
-             
-#line 286
-}end_foreach_stencil();
+  if(!is_constant(fm.x) && !is_constant(cm)){
   
 #line 282
-if(!is_constant(fm.x) && !is_constant(cm)){{foreach()
+foreach_stencil(1,{(NonLocal[]){{"cm","scalar",(void *)&cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"omega","scalar",(void *)&omega,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 283 \"/home/lisergey/basilisk/src/utils.h\"\nval_out_(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +\n        val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -\n        (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +\n        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 0.)*Delta);"})
+    {_stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,0,0,0);
+        _stencil_val(fm.x,1,0,0);_stencil_val(u.y,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,-1,0,0);
+_stencil_val(fm.y,0,1,0); _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,0,0);
+        _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,-1,0); _stencil_val(fm.y,0,1,0);_stencil_val(u.x,0,1,0);_stencil_val(cm,0,0,0);
+#line 283
+_stencil_val_a(omega,0,0,0);      
+             
+
+}end_foreach_stencil();{
+#line 282
+foreach()
     val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +
         val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -
         (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +
-        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 0.)*Delta);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 0.)*Delta);end_foreach();}}else if(is_constant(fm.x) && !is_constant(cm)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 282
+foreach_stencil(1,{(NonLocal[]){{"cm","scalar",(void *)&cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"omega","scalar",(void *)&omega,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 283 \"/home/lisergey/basilisk/src/utils.h\"\nval_out_(omega,0,0,0) = ((_const_fm.x - _const_fm.x)*val(u.y,0,0,0) +\n        _const_fm.x*val(u.y,1,0,0) - _const_fm.x*val(u.y,-1,0,0) -\n        (_const_fm.y - _const_fm.y)*val(u.x,0,0,0) +\n        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 0.)*Delta);"})
+    {;;_stencil_val(u.y,0,0,0);
+;_stencil_val(u.y,1,0,0);;_stencil_val(u.y,-1,0,0);
+;;_stencil_val(u.x,0,0,0);
+;_stencil_val(u.x,0,-1,0);;_stencil_val(u.x,0,1,0);_stencil_val(cm,0,0,0);
+#line 283
+_stencil_val_a(omega,0,0,0);      
+             
+
+}end_foreach_stencil();
   {
 #line 282
 foreach()
@@ -11895,13 +12241,37 @@ foreach()
         _const_fm.x*val(u.y,1,0,0) - _const_fm.x*val(u.y,-1,0,0) -
         (_const_fm.y - _const_fm.y)*val(u.x,0,0,0) +
         _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*(val(cm,0,0,0) + 0.)*Delta);end_foreach();}}else if(!is_constant(fm.x) && is_constant(cm)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 282
+foreach_stencil(1,{(NonLocal[]){{"_const_cm","double",(void *)&_const_cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"omega","scalar",(void *)&omega,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 283 \"/home/lisergey/basilisk/src/utils.h\"\nval_out_(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +\n        val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -\n        (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +\n        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(_const_cm + 0.)*Delta);"})
+    {_stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,0,0,0);
+        _stencil_val(fm.x,1,0,0);_stencil_val(u.y,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.y,-1,0,0);
+_stencil_val(fm.y,0,1,0); _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,0,0);
+        _stencil_val(fm.y,0,0,0);_stencil_val(u.x,0,-1,0); _stencil_val(fm.y,0,1,0);_stencil_val(u.x,0,1,0);;
+#line 283
+_stencil_val_a(omega,0,0,0);      
+             
+
+}end_foreach_stencil();
   {
 #line 282
 foreach()
     val(omega,0,0,0) = ((val(fm.x,1,0,0) - val(fm.x,0,0,0))*val(u.y,0,0,0) +
         val(fm.x,1,0,0)*val(u.y,1,0,0) - val(fm.x,0,0,0)*val(u.y,-1,0,0) -
         (val(fm.y,0,1,0) - val(fm.y,0,0,0))*val(u.x,0,0,0) +
-        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(_const_cm + 0.)*Delta);end_foreach();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+        val(fm.y,0,0,0)*val(u.x,0,-1,0) - val(fm.y,0,1,0)*val(u.x,0,1,0))/(2.*(_const_cm + 0.)*Delta);end_foreach();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 282
+foreach_stencil(1,{(NonLocal[]){{"_const_cm","double",(void *)&_const_cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"omega","scalar",(void *)&omega,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 283 \"/home/lisergey/basilisk/src/utils.h\"\nval_out_(omega,0,0,0) = ((_const_fm.x - _const_fm.x)*val(u.y,0,0,0) +\n        _const_fm.x*val(u.y,1,0,0) - _const_fm.x*val(u.y,-1,0,0) -\n        (_const_fm.y - _const_fm.y)*val(u.x,0,0,0) +\n        _const_fm.y*val(u.x,0,-1,0) - _const_fm.y*val(u.x,0,1,0))/(2.*(_const_cm + 0.)*Delta);"})
+    {;;_stencil_val(u.y,0,0,0);
+;_stencil_val(u.y,1,0,0);;_stencil_val(u.y,-1,0,0);
+;;_stencil_val(u.x,0,0,0);
+;_stencil_val(u.x,0,-1,0);;_stencil_val(u.x,0,1,0);;
+#line 283
+_stencil_val_a(omega,0,0,0);      
+             
+
+}end_foreach_stencil();
   {
 #line 282
 foreach()
@@ -11918,20 +12288,21 @@ foreach()
 double change (scalar s, scalar sn)
 {
   double max = 0.;
-  foreach_stencil() {
+  if(!is_constant(cm)){
+  
+#line 296
+foreach_stencil(1,{(NonLocal[]){{"max","double",(void *)&max,NULL,0,'M'},{"sn","scalar",(void *)&sn,NULL,0},{"s","scalar",(void *)&s,NULL,0},{"cm","scalar",(void *)&cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 296 \"/home/lisergey/basilisk/src/utils.h\"\n{\n    if ((cube(Delta)*val(cm,0,0,0)) > 0.) {\n      real ds = fabs (val(s,0,0,0) - val(sn,0,0,0));\n      if (ds > max)\n max = ds;\n    }\n    val_out_(sn,0,0,0) = val(s,0,0,0);\n  }"}) {
 _stencil_val(cm,0,0,0); {     
        _stencil_val(sn,0,0,0);_stencil_val(s,0,0,0);   
        
   
-    }
+    } 
+_stencil_val(s,0,0,0);
        
     
 #line 302
-_stencil_val_a(sn,0,0,0); _stencil_val(s,0,0,0); 
+_stencil_val_a(sn,0,0,0); 
   }end_foreach_stencil();
-  
-#line 296
-if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:max)){
@@ -11949,6 +12320,20 @@ foreach() {
 }
 #line 303
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 296
+foreach_stencil(1,{(NonLocal[]){{"max","double",(void *)&max,NULL,0,'M'},{"sn","scalar",(void *)&sn,NULL,0},{"s","scalar",(void *)&s,NULL,0},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 296 \"/home/lisergey/basilisk/src/utils.h\"\n{\n    if ((cube(Delta)*_const_cm) > 0.) {\n      real ds = fabs (val(s,0,0,0) - val(sn,0,0,0));\n      if (ds > max)\n max = ds;\n    }\n    val_out_(sn,0,0,0) = val(s,0,0,0);\n  }"}) {
+; {     
+       _stencil_val(sn,0,0,0);_stencil_val(s,0,0,0);   
+       
+  
+    } 
+_stencil_val(s,0,0,0);
+       
+    
+#line 302
+_stencil_val_a(sn,0,0,0); 
+  }end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
@@ -12068,54 +12453,65 @@ void output_field (scalar * list,
      FILE * fp,
      int n,
      bool linear,
-     double box[2][2])
+     coord box[2])
 {tracing("output_field","/home/lisergey/basilisk/src/output.h",38);
   n++;
-  boundary_internal ((scalar *)list, "/home/lisergey/basilisk/src/output.h", 45);
-  int len = list_len(list);
-  double Delta = 0.999999*(box[1][0] - box[0][0])/(n - 1);
-  int ny = (box[1][1] - box[0][1])/Delta + 1;
-  double ** field = (double **) matrix_new (n, ny, len*sizeof(double));
-  for (int i = 0; i < n; i++) {
-    double x = Delta*i + box[0][0];
-    for (int j = 0; j < ny; j++) {
-      double y = Delta*j + box[0][1];
-      if (linear) {
- int k = 0;
- {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   field[i][len*j + k++] = interpolate (s, x, y
-#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
-, 0.
-#line 57 "/home/lisergey/basilisk/src/output.h"
-);}}
-      }
-      else {
- Point point = locate (x, y
-#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
-, 0.
-#line 60 "/home/lisergey/basilisk/src/output.h"
-);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
- int k = 0;
- {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
-   field[i][len*j + k++] = point.level >= 0 ? val(s,0,0,0) : 1e30;}}
-      }
-    }
-  }
+  int len = list_len (list);
+  double Delta = 0.999999*(box[1].x - box[0].x)/(n - 1);
+  int ny = (box[1].y - box[0].y)/Delta + 1;
+  double ** field = (double **) matrix_new (n, ny, len*sizeof(double)), * v = field[0];
+  for (int i = 0; i < n*ny*len; i++, v++)
+    *v = 1e30;
+  coord box1[2] = {{box[0].x - Delta/2., box[0].y - Delta/2.},
+     {box[0].x + (n - 0.5)*Delta, box[0].y + (ny - 0.5)*Delta}};
+  coord cn = {n, ny}, p;
 
-  if (pid() == 0) {
-#if 1
-    MPI_Reduce (MPI_IN_PLACE, field[0], len*n*ny, MPI_DOUBLE, MPI_MIN, 0,
-  MPI_COMM_WORLD);
-#endif
+  v = field[0];
+  foreach_region_stencil (1,{(NonLocal[]){{"linear","bool",(void *)&linear,NULL,0},{"list","scalar",(void *)list,NULL,1},{"field","double",(void *)field,NULL,2},{"len","int",(void *)&len,NULL,0},{"ny","int",(void *)&ny,NULL,0},{"n","int",(void *)&n,NULL,0},{"cn","coord",(void *)&cn,NULL,0},{"box1","coord",(void *)box1,(int[]){2,0},0},{"p","coord",(void *)&p,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n// #line 805 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\nstatic real interpolate_linear (Point point, scalar v,\n      real xp, real yp, real zp)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n// # 823 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\n  x = (xp - x)/Delta - v.d.x/2.;\n  y = (yp - y)/Delta - v.d.y/2.;\n  z = (zp - z)/Delta - v.d.z/2.;\n  int i = sign(x), j = sign(y), k = sign(z);\n  x = fabs(x); y = fabs(y); z = fabs(z);\n\n  return (((val(v,0,0,0)*(1. - x) + val(v,i,0,0)*x)*(1. - y) +\n    (val(v,0,j,0)*(1. - x) + val(v,i,j,0)*x)*y)*(1. - z) +\n   ((val(v,0,0,k)*(1. - x) + val(v,i,0,k)*x)*(1. - y) +\n    (val(v,0,j,k)*(1. - x) + val(v,i,j,k)*x)*y)*z);\n\n}","\n\n\n\n  \n// #line 60 \"/home/lisergey/basilisk/src/output.h\"\n{\n    real ** alias = field;\n    int i = (p.x - box1[0].x)/(box1[1].x - box1[0].x)*cn.x;\n    int j = (p.y - box1[0].y)/(box1[1].y - box1[0].y)*cn.y;\n    int k = 0;\n    {forin (scalar, s , list)\n      alias[i][len*j + k++] = linear ? interpolate_linear (point, s, p.x, p.y, p.z) : val(s,0,0,0); endforin()}\n  }"})
+
+
+
+  {                     
+    
+    
+    
+    
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      { _stencil_interpolate_linear (point, s, NULL, NULL, NULL); _stencil_val(s,0,0,0);      }}}
+  }end_foreach_region_stencil();
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(min:v[:n*ny*len])){
+#line 56
+foreach_region (p, box1, cn)
+
+
+
+  {
+    double ** alias = field;
+    int i = (p.x - box1[0].x)/(box1[1].x - box1[0].x)*cn.x;
+    int j = (p.y - box1[0].y)/(box1[1].y - box1[0].y)*cn.y;
+    int k = 0;
+    {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
+      alias[i][len*j + k++] = linear ? interpolate_linear (point, s, p.x, p.y, p.z) : val(s,0,0,0);}}
+  }end_foreach_region();mpi_all_reduce_array(v,double,MPI_MIN,n*ny*len);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 69
+if (pid() == 0) {
     fprintf (fp, "# 1:x 2:y");
     int i = 3;
     {scalar*_i=(scalar*)( list);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
       fprintf (fp, " %d:%s", i++, _attribute[s.i].name);}}
     fputc('\n', fp);
     for (int i = 0; i < n; i++) {
-      double x = Delta*i + box[0][0];
+      double x = Delta*i + box[0].x;
       for (int j = 0; j < ny; j++) {
- double y = Delta*j + box[0][1];
+ double y = Delta*j + box[0].y;
 
  fprintf (fp, "%g %g", x, y);
  int k = 0;
@@ -12127,20 +12523,13 @@ void output_field (scalar * list,
     }
     fflush (fp);
   }
-#if 1
-  else
-    MPI_Reduce (field[0], NULL, len*n*ny, MPI_DOUBLE, MPI_MIN, 0,
-  MPI_COMM_WORLD);
-#endif
 
   matrix_free (field);
-end_tracing("output_field","/home/lisergey/basilisk/src/output.h",100);}
-#line 128 "/home/lisergey/basilisk/src/output.h"
+end_tracing("output_field","/home/lisergey/basilisk/src/output.h",92);}
+#line 120 "/home/lisergey/basilisk/src/output.h"
      
 void output_matrix (scalar f, FILE * fp, int n, bool linear)
-{tracing("output_matrix","/home/lisergey/basilisk/src/output.h",129);
-  if (linear)
-    boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 132);
+{tracing("output_matrix","/home/lisergey/basilisk/src/output.h",121);
   float fn = n;
   float Delta = (float) L0/fn;
   fwrite (&fn, sizeof(float), 1, fp);
@@ -12153,27 +12542,17 @@ void output_matrix (scalar f, FILE * fp, int n, bool linear)
     fwrite (&xp, sizeof(float), 1, fp);
     for (int j = 0; j < n; j++) {
       float yp = (float)(Delta*j + Y0 + Delta/2.), v;
-      if (linear)
- v = interpolate (f, xp, yp
-#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+      v = interpolate (f, xp, yp
+#line 837 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 , 0.
-#line 146 "/home/lisergey/basilisk/src/output.h"
-);
-      else {
- Point point = locate (xp, yp
-#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
-, 0.
-#line 148 "/home/lisergey/basilisk/src/output.h"
-);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
- if (!(point.level >= 0)) qassert ("/home/lisergey/basilisk/src/output.h", 149, "point.level >= 0");
- v = val(f,0,0,0);
-      }
+#line 135 "/home/lisergey/basilisk/src/output.h"
+, linear);
       fwrite (&v, sizeof(float), 1, fp);
     }
   }
   fflush (fp);
-end_tracing("output_matrix","/home/lisergey/basilisk/src/output.h",156);}
-#line 165 "/home/lisergey/basilisk/src/output.h"
+end_tracing("output_matrix","/home/lisergey/basilisk/src/output.h",140);}
+#line 149 "/home/lisergey/basilisk/src/output.h"
 typedef void (* Colormap) (double cmap[127][3]);
 
 void jet (double cmap[127][3])
@@ -12306,13 +12685,13 @@ Color colormap_color (double cmap[127][3],
     i = val*(127 - 1);
     coef = val*(127 - 1) - i;
   }
-  if (!(i >= 0 && i < 127 - 1)) qassert ("/home/lisergey/basilisk/src/output.h", 297, "i >= 0 && i < NCMAP - 1");
+  if (!(i >= 0 && i < 127 - 1)) qassert ("/home/lisergey/basilisk/src/output.h", 281, "i >= 0 && i < NCMAP - 1");
   unsigned char * c1 = (unsigned char *) &c;
   for (int j = 0; j < 3; j++)
     c1[j] = 255*(cmap[i][j]*(1. - coef) + cmap[i + 1][j]*coef);
   return c;
 }
-#line 316 "/home/lisergey/basilisk/src/output.h"
+#line 300 "/home/lisergey/basilisk/src/output.h"
 static const char * extension (const char * file, const char * ext) {
   int len = strlen(file);
   return len > 4 && !strcmp (file + len - 4, ext) ? file + len - 4 : NULL;
@@ -12395,7 +12774,7 @@ static FILE * ppm_fallback (const char * file, const char * mode)
 
 FILE * open_image (const char * file, const char * options)
 {
-  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 398, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 382, "pid() == 0");
   const char * ext;
   if ((ext = is_animation (file))) {
     FILE * fp = open_image_lookup (file);
@@ -12469,7 +12848,7 @@ FILE * open_image (const char * file, const char * options)
 
 void close_image (const char * file, FILE * fp)
 {
-  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 472, "pid() == 0");
+  if (!(pid() == 0)) qassert ("/home/lisergey/basilisk/src/output.h", 456, "pid() == 0");
   if (is_animation (file)) {
     if (!open_image_lookup (file))
       fclose (fp);
@@ -12479,7 +12858,7 @@ void close_image (const char * file, FILE * fp)
   else
     fclose (fp);
 }
-#line 550 "/home/lisergey/basilisk/src/output.h"
+#line 534 "/home/lisergey/basilisk/src/output.h"
      
 void output_ppm (scalar f,
    FILE * fp,
@@ -12488,11 +12867,11 @@ void output_ppm (scalar f,
    double min, double max, double spread,
    double z,
    bool linear,
-   double box[2][2],
+   coord box[2],
    scalar mask,
    Colormap map,
    char * opt)
-{tracing("output_ppm","/home/lisergey/basilisk/src/output.h",551);
+{tracing("output_ppm","/home/lisergey/basilisk/src/output.h",535);
 
   if (!min && !max) {
     stats s = statsf (f);
@@ -12503,80 +12882,118 @@ void output_ppm (scalar f,
       min = avg - spread*s.stddev; max = avg + spread*s.stddev;
     }
   }
-  if (linear) {
-    scalar f = f, mask = mask;
-    if (mask.i >= 0)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 576);
-    else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 578);
-  }
+  box[0].z = z, box[1].z = z;
 
-  double fn = n;
-  double Delta = (box[1][0] - box[0][0])/fn;
-  int ny = (box[1][1] - box[0][1])/Delta;
-  if (ny % 2) ny++;
+  coord cn = {n}, p;
+  double delta = (box[1].x - box[0].x)/n;
+  cn.y = (int)((box[1].y - box[0].y)/delta);
+  if (((int)cn.y) % 2) cn.y++;
 
-  Color ** ppm = (Color **) matrix_new (ny, n, sizeof(Color));
+  Color ** ppm = (Color **) matrix_new (cn.y, cn.x, sizeof(Color));
+  unsigned char * ppm0 = &ppm[0][0].r;
+  int len = 3*cn.x*cn.y;
+  memset (ppm0, 0, len*sizeof (unsigned char));
   double cmap[127][3];
   (* map) (cmap);
-  OMP_PARALLEL() {
-    OMP(omp for schedule(static))
-      for (int j = 0; j < ny; j++) {
- double yp = Delta*j + box[0][1] + Delta/2.;
- for (int i = 0; i < n; i++) {
-   double xp = Delta*i + box[0][0] + Delta/2., v;
-   if (mask.i >= 0) {
-     if (linear) {
-       double m = interpolate (mask, xp, yp, z);
-       if (m < 0.)
-  v = 1e30;
-       else
-  v = interpolate (f, xp, yp, z);
-     }
-     else {
-       Point point = locate (xp, yp, z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-       if (point.level < 0 || val(mask,0,0,0) < 0.)
-  v = 1e30;
-       else
-  v = val(f,0,0,0);
-     }
-   }
-   else if (linear)
-     v = interpolate (f, xp, yp, z);
-   else {
-     Point point = locate (xp, yp, z);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-     v = point.level >= 0 ? val(f,0,0,0) : 1e30;
-   }
-   ppm[ny - 1 - j][i] = colormap_color (cmap, v, min, max);
- }
-      }
-  }
 
-  if (pid() == 0) {
-#if 1
-    MPI_Reduce (MPI_IN_PLACE, ppm[0], 3*ny*n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
-  MPI_COMM_WORLD);
-#endif
+
+  foreach_region_stencil (1,{(NonLocal[]){{"max","double",(void *)&max,NULL,0},{"min","double",(void *)&min,NULL,0},{"cmap","double",(void *)cmap,(int[]){1273,0},0},{"ferr","not implemented yet",(void *)ferr,NULL,1},{"ppm","Color",(void *)ppm,NULL,2},{"f","scalar",(void *)&f,NULL,0},{"linear","bool",(void *)&linear,NULL,0},{"mask","scalar",(void *)&mask,NULL,0},{"len","int",(void *)&len,NULL,0},{"cn","coord",(void *)&cn,NULL,0},{"box","coord",(void *)box,(int[]){2,0},0},{"p","coord",(void *)&p,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n@ def not_mpi_compatible()\ndo {\n  if (npe() > 1) {\n    fprintf (ferr, \"%s() is not compatible with MPI (yet)\\n\", __func__);\n    exit (1);\n  }\n} while(0)\n@\n@ define system(command) (pid() == 0 ? system(command) : 0)\n@else\n@ define qstderr() stderr\n@ define qstdout() stdout\n@ define ferr stderr\n@ define fout stdout\n@ define not_mpi_compatible()\n@endif\n\n\n\n\n// #line 93 \"/home/lisergey/basilisk/src/common.h\"\nstatic inline void qassert (const char * file, int line, const char * cond) {\n  fprintf (ferr, \"%s:%d: Assertion `%s' failed.\\n\", file, line, cond);\n  abort();\n}\n\n\n// #line 261 \"/home/lisergey/basilisk/src/output.h\"\nColor colormap_color (real cmap[127][3],\n        real val, real min, real max)\n{\n  Color c;\n  if (val == 1e30) {\n    c.r = c.g = c.b = 0;\n    return c;\n  }\n  int i;\n  real coef;\n  if (max != min)\n    val = (val - min)/(max - min);\n  else\n    val = 0.;\n  if (val <= 0.) i = 0, coef = 0.;\n  else if (val >= 1.) i = 127 - 2, coef = 1.;\n  else {\n    i = val*(127 - 1);\n    coef = val*(127 - 1) - i;\n  }\n  if (!(i >= 0 && i < 127 - 1)) qassert (\"/home/lisergey/basilisk/src/output.h\", 281, \"i >= 0 && i < NCMAP - 1\");\n  unsigned char * c1 = (unsigned char *) &c;\n  for (int j = 0; j < 3; j++)\n    c1[j] = 255*(cmap[i][j]*(1. - coef) + cmap[i + 1][j]*coef);\n  return c;\n}\n\n\n// #line 805 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\nstatic real interpolate_linear (Point point, scalar v,\n      real xp, real yp, real zp)\n{int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;\n// # 823 \"/home/lisergey/basilisk/src/grid/cartesian-common.h\"\n  x = (xp - x)/Delta - v.d.x/2.;\n  y = (yp - y)/Delta - v.d.y/2.;\n  z = (zp - z)/Delta - v.d.z/2.;\n  int i = sign(x), j = sign(y), k = sign(z);\n  x = fabs(x); y = fabs(y); z = fabs(z);\n\n  return (((val(v,0,0,0)*(1. - x) + val(v,i,0,0)*x)*(1. - y) +\n    (val(v,0,j,0)*(1. - x) + val(v,i,j,0)*x)*y)*(1. - z) +\n   ((val(v,0,0,k)*(1. - x) + val(v,i,0,k)*x)*(1. - y) +\n    (val(v,0,j,k)*(1. - x) + val(v,i,j,k)*x)*y)*z);\n\n}","\n\n\n\n  \n// #line 576 \"/home/lisergey/basilisk/src/output.h\"\n{\n    real v;\n    if (mask.i >= 0) {\n      if (linear) {\n real m = interpolate_linear (point, mask, p.x, p.y, p.z);\n if (m < 0.)\n   v = 1e30;\n else\n   v = interpolate_linear (point, f, p.x, p.y, p.z);\n      }\n      else {\n if (val(mask,0,0,0) < 0.)\n   v = 1e30;\n else\n   v = val(f,0,0,0);\n      }\n    }\n    else if (linear)\n      v = interpolate_linear (point, f, p.x, p.y, p.z);\n    else\n      v = val(f,0,0,0);\n    int i = (p.x - box[0].x)/(box[1].x - box[0].x)*cn.x;\n    int j = (p.y - box[0].y)/(box[1].y - box[0].y)*cn.y;\n    Color ** alias = ppm;\n    alias[(int)cn.y - 1 - j][i] = colormap_color (cmap, v, min, max);\n  }"})
+
+
+
+  { 
+    
+    if (mask.i >= 0) {
+      if (linear) {  
+  _stencil_interpolate_linear (point, mask, NULL, NULL, NULL);
+{ 
+    
+   
+{ _stencil_interpolate_linear (point, f, NULL, NULL, NULL); }}
+    
+ 
+      
+#line 585
+}
+      else {
+_stencil_val(mask,0,0,0);{
+     
+   
+{ _stencil_val(f,0,0,0); }}
+    
+ 
+      
+#line 591
+}
+    }
+    else if (linear)
+      { _stencil_interpolate_linear (point, f, NULL, NULL, NULL); }
+    else
+      { _stencil_val(f,0,0,0); }                  
+    
+    
+         
+         
+  }end_foreach_region_stencil();
+
+
+  
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel  reduction(max:ppm0[:len])){
+#line 572
+foreach_region (p, box, cn)
+
+
+
+  {
+    double v;
+    if (mask.i >= 0) {
+      if (linear) {
+ double m = interpolate_linear (point, mask, p.x, p.y, p.z);
+ if (m < 0.)
+   v = 1e30;
+ else
+   v = interpolate_linear (point, f, p.x, p.y, p.z);
+      }
+      else {
+ if (val(mask,0,0,0) < 0.)
+   v = 1e30;
+ else
+   v = val(f,0,0,0);
+      }
+    }
+    else if (linear)
+      v = interpolate_linear (point, f, p.x, p.y, p.z);
+    else
+      v = val(f,0,0,0);
+    int i = (p.x - box[0].x)/(box[1].x - box[0].x)*cn.x;
+    int j = (p.y - box[0].y)/(box[1].y - box[0].y)*cn.y;
+    Color ** alias = ppm;
+    alias[(int)cn.y - 1 - j][i] = colormap_color (cmap, v, min, max);
+  }end_foreach_region();mpi_all_reduce_array(ppm0,unsigned char,MPI_MAX,len);
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
+}
+
+  
+#line 603
+if (pid() == 0) {
     if (file)
       fp = open_image (file, opt);
 
-    fprintf (fp, "P6\n%u %u 255\n", n, ny);
-    fwrite (((void **) ppm)[0], sizeof(Color), ny*n, fp);
+    fprintf (fp, "P6\n%g %g 255\n", cn.x, cn.y);
+    fwrite (ppm0, sizeof(unsigned char), 3*cn.x*cn.y, fp);
 
     if (file)
       close_image (file, fp);
     else
       fflush (fp);
   }
-#if 1
-  else
-    MPI_Reduce (ppm[0], NULL, 3*ny*n, MPI_UNSIGNED_CHAR, MPI_MAX, 0,
-  MPI_COMM_WORLD);
-#endif
 
   matrix_free (ppm);
-end_tracing("output_ppm","/home/lisergey/basilisk/src/output.h",645);}
-#line 677 "/home/lisergey/basilisk/src/output.h"
+end_tracing("output_ppm","/home/lisergey/basilisk/src/output.h",617);}
+#line 649 "/home/lisergey/basilisk/src/output.h"
      
 void output_grd (scalar f,
    FILE * fp,
@@ -12584,14 +13001,7 @@ void output_grd (scalar f,
    bool linear,
    double box[2][2],
    scalar mask)
-{tracing("output_grd","/home/lisergey/basilisk/src/output.h",678);
-  if (linear) {
-    if (mask.i >= 0)
-      boundary_internal ((scalar *)((scalar[]){f, mask,{-1}}), "/home/lisergey/basilisk/src/output.h", 687);
-    else
-      boundary_internal ((scalar *)((scalar[]){f,{-1}}), "/home/lisergey/basilisk/src/output.h", 689);
-  }
-
+{tracing("output_grd","/home/lisergey/basilisk/src/output.h",650);
   int nx = (box[1][0] - box[0][0])/Delta;
   int ny = (box[1][1] - box[0][1])/Delta;
 
@@ -12609,47 +13019,26 @@ void output_grd (scalar f,
     for (int i = 0; i < nx; i++) {
       double xp = Delta*i + box[0][0] + Delta/2., v;
       if (mask.i >= 0) {
- if (linear) {
-   double m = interpolate (mask, xp, yp
-#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+ double m = interpolate (mask, xp, yp
+#line 837 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 , 0.
-#line 710 "/home/lisergey/basilisk/src/output.h"
-);
-   if (m < 0.)
-     v = 1e30;
-   else
-     v = interpolate (f, xp, yp
-#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 674 "/home/lisergey/basilisk/src/output.h"
+, linear);
+ if (m < 0.)
+   v = 1e30;
+ else
+   v = interpolate (f, xp, yp
+#line 837 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 , 0.
-#line 714 "/home/lisergey/basilisk/src/output.h"
-);
- }
- else {
-   Point point = locate (xp, yp
-#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
-, 0.
-#line 717 "/home/lisergey/basilisk/src/output.h"
-);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
-   if (point.level < 0 || val(mask,0,0,0) < 0.)
-     v = 1e30;
-   else
-     v = val(f,0,0,0);
- }
+#line 678 "/home/lisergey/basilisk/src/output.h"
+, linear);
       }
-      else if (linear)
+      else
  v = interpolate (f, xp, yp
-#line 810 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
+#line 837 "/home/lisergey/basilisk/src/grid/cartesian-common.h"
 , 0.
-#line 725 "/home/lisergey/basilisk/src/output.h"
-);
-      else {
- Point point = locate (xp, yp
-#line 1629 "/home/lisergey/basilisk/src/grid/tree.h"
-, 0.
-#line 727 "/home/lisergey/basilisk/src/output.h"
-);int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;
- v = point.level >= 0 ? val(f,0,0,0) : 1e30;
-      }
+#line 681 "/home/lisergey/basilisk/src/output.h"
+, linear);
       if (v == 1e30)
  fprintf (fp, "-9999 ");
       else
@@ -12659,8 +13048,8 @@ void output_grd (scalar f,
   }
 
   fflush (fp);
-end_tracing("output_grd","/home/lisergey/basilisk/src/output.h",739);}
-#line 766 "/home/lisergey/basilisk/src/output.h"
+end_tracing("output_grd","/home/lisergey/basilisk/src/output.h",691);}
+#line 718 "/home/lisergey/basilisk/src/output.h"
 static char * replace (const char * input, int target, int with,
          bool translate)
 {
@@ -12686,7 +13075,7 @@ void output_gfs (FILE * fp,
    scalar * list,
    char * file,
    bool translate)
-{tracing("output_gfs","/home/lisergey/basilisk/src/output.h",787);
+{tracing("output_gfs","/home/lisergey/basilisk/src/output.h",739);
   char * fname = file;
 
 #if 1
@@ -12777,7 +13166,7 @@ void output_gfs (FILE * fp,
 #endif
       unsigned flags =
  level == 0 ? 0 :
-#line 890 "/home/lisergey/basilisk/src/output.h"
+#line 842 "/home/lisergey/basilisk/src/output.h"
       child.x == -1 && child.y == -1 && child.z == -1 ? 0 :
  child.x == -1 && child.y == -1 && child.z == 1 ? 1 :
  child.x == -1 && child.y == 1 && child.z == -1 ? 2 :
@@ -12855,8 +13244,8 @@ void output_gfs (FILE * fp,
     pfree (fname,__func__,__FILE__,__LINE__);
   }
 #endif
-end_tracing("output_gfs","/home/lisergey/basilisk/src/output.h",967);}
-#line 991 "/home/lisergey/basilisk/src/output.h"
+end_tracing("output_gfs","/home/lisergey/basilisk/src/output.h",919);}
+#line 943 "/home/lisergey/basilisk/src/output.h"
 struct DumpHeader {
   double t;
   long len;
@@ -12907,7 +13296,7 @@ void dump (const char * file,
     scalar * list,
     FILE * fp,
     bool unbuffered)
-{tracing("dump","/home/lisergey/basilisk/src/output.h",1037);
+{tracing("dump","/home/lisergey/basilisk/src/output.h",989);
   char * name = NULL;
   if (!fp) {
     name = (char *) pmalloc (strlen(file) + 2,__func__,__FILE__,__LINE__);
@@ -12919,7 +13308,7 @@ void dump (const char * file,
       exit (1);
     }
   }
-  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1053, "fp");
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1005, "fp");
 
   scalar * dlist = dump_list (list);
   scalar  size=new_scalar("size");
@@ -12952,14 +13341,14 @@ void dump (const char * file,
       rename (name, file);
     pfree (name,__func__,__FILE__,__LINE__);
   }delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/home/lisergey/basilisk/src/output.h",1086);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",1038);}
 #else
      
 void dump (const char * file,
     scalar * list,
     FILE * fp,
     bool unbuffered)
-{tracing("dump","/home/lisergey/basilisk/src/output.h",1089);
+{tracing("dump","/home/lisergey/basilisk/src/output.h",1041);
   if (fp != NULL || file == NULL) {
     fprintf (ferr, "dump(): must specify a file name when using MPI\n");
     exit(1);
@@ -13026,17 +13415,17 @@ void dump (const char * file,
   fclose (fh);
   if (!unbuffered && pid() == 0)
     rename (name, file);delete((scalar*)((scalar[]){size,{-1}}));
-end_tracing("dump","/home/lisergey/basilisk/src/output.h",1160);}
+end_tracing("dump","/home/lisergey/basilisk/src/output.h",1112);}
 #endif
 
      
 bool restore (const char * file,
        scalar * list,
        FILE * fp)
-{tracing("restore","/home/lisergey/basilisk/src/output.h",1164);
+{tracing("restore","/home/lisergey/basilisk/src/output.h",1116);
   if (!fp && (fp = fopen (file, "r")) == NULL)
-    {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1169);return false;}
-  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1170, "fp");
+    {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1121);return false;}
+  if (!(fp)) qassert ("/home/lisergey/basilisk/src/output.h", 1122, "fp");
 
   struct DumpHeader header = {0};
   if (fread (&header, sizeof(header), 1, fp) < 1) {
@@ -13051,7 +13440,7 @@ bool restore (const char * file,
     cell.flags |= active;
   }end_foreach_cell();}
   ((Tree *)grid)->dirty = true;
-#line 1205 "/home/lisergey/basilisk/src/output.h"
+#line 1157 "/home/lisergey/basilisk/src/output.h"
   bool restore_all = (list == all);
   scalar * slist = dump_list (list ? list : all);
   if (header.version == 161020) {
@@ -13116,11 +13505,11 @@ bool restore (const char * file,
     origin (o[0], o[1], o[2]);
     size (o[3]);
   }
-#line 1280 "/home/lisergey/basilisk/src/output.h"
+#line 1232 "/home/lisergey/basilisk/src/output.h"
   scalar * listm = is_constant(cm) ? NULL : (scalar *)((vector[]){fm,{{-1},{-1},{-1}}});
 
   restore_mpi (fp, slist);
-#line 1310 "/home/lisergey/basilisk/src/output.h"
+#line 1262 "/home/lisergey/basilisk/src/output.h"
   scalar * other = NULL;
   {scalar*_i=(scalar*)( all);if(_i)for(scalar s=*_i;(&s)->i>=0;s=*++_i){
     if (!list_lookup (slist, s) && !list_lookup (listm, s))
@@ -13141,8 +13530,8 @@ bool restore (const char * file,
   t = header.t;
   events (false);
 
-  {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1330);return true;}
-end_tracing("restore","/home/lisergey/basilisk/src/output.h",1331);}
+  {end_tracing("restore","/home/lisergey/basilisk/src/output.h",1282);return true;}
+end_tracing("restore","/home/lisergey/basilisk/src/output.h",1283);}
 #line 431 "/home/lisergey/basilisk/src/utils.h"
 #line 12 "/home/lisergey/basilisk/src/run.h"
 
@@ -13184,7 +13573,7 @@ static int defaults_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 #line 42
       static int defaults(const int i,const double t,Event *_ev){tracing("defaults","/home/lisergey/basilisk/src/run.h",42); {
   display ("box();"
-#line 1422 "/home/lisergey/basilisk/src/common.h"
+#line 1425 "/home/lisergey/basilisk/src/common.h"
 , false
 #line 43 "/home/lisergey/basilisk/src/run.h"
 );
@@ -13213,7 +13602,10 @@ double timestep (const vector u, double dtmax)
 {
   static double previous = 0.;
   dtmax /= CFL;
-  foreach_face_stencil(){_stencil_is_face_x(){
+  if(!is_constant(cm)){
+  
+#line 6
+foreach_face_stencil(1,{(NonLocal[]){{"dtmax","double",(void *)&dtmax,NULL,0,'m'},{"cm","scalar",(void *)&cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 6 \"/home/lisergey/basilisk/src/timestep.h\"\n{is_face_x(){\n    if (val(u.x,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.x,0,0,0));\n\n\n\n\n      dt *= val(cm,0,0,0);\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_x()\n// #line 6\nis_face_y(){\n    if (val(u.y,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.y,0,0,0));\n\n\n\n\n      dt *= val(cm,0,0,0);\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_y()\n// #line 6\nis_face_z(){\n    if (val(u.z,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.z,0,0,0));\n\n\n\n\n      dt *= val(cm,0,0,0);\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_z()}"}){_stencil_is_face_x(){
     {_stencil_val(u.x,0,0,0); {   
       _stencil_val(u.x,0,0,0); 
 
@@ -13269,9 +13661,6 @@ _stencil_val(cm,0,0,0);
     
 #line 16
 }   }}end__stencil_is_face_z()}end_foreach_face_stencil();
-  
-#line 6
-if(!is_constant(cm)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(min:dtmax)){
@@ -13316,6 +13705,64 @@ is_face_z(){
 }
 #line 16
 }else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 6
+foreach_face_stencil(1,{(NonLocal[]){{"dtmax","double",(void *)&dtmax,NULL,0,'m'},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 6 \"/home/lisergey/basilisk/src/timestep.h\"\n{is_face_x(){\n    if (val(u.x,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.x,0,0,0));\n\n\n\n\n      dt *= _const_cm;\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_x()\n// #line 6\nis_face_y(){\n    if (val(u.y,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.y,0,0,0));\n\n\n\n\n      dt *= _const_cm;\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_y()\n// #line 6\nis_face_z(){\n    if (val(u.z,0,0,0) != 0.) {\n      real dt = Delta/fabs(val(u.z,0,0,0));\n\n\n\n\n      dt *= _const_cm;\n\n      if (dt < dtmax) dtmax = dt;\n    }}end_is_face_z()}"}){_stencil_is_face_x(){
+    {_stencil_val(u.x,0,0,0); {   
+      _stencil_val(u.x,0,0,0);
+
+
+
+
+;   
+
+
+
+
+       
+
+         
+    
+#line 16
+}   }}end__stencil_is_face_x()
+#line 6
+_stencil_is_face_y(){
+    {_stencil_val(u.y,0,0,0); {   
+      _stencil_val(u.y,0,0,0);
+
+
+
+
+;   
+
+
+
+
+       
+
+         
+    
+#line 16
+}   }}end__stencil_is_face_y()
+#line 6
+_stencil_is_face_z(){
+    {_stencil_val(u.z,0,0,0); {   
+      _stencil_val(u.z,0,0,0);
+
+
+
+
+;   
+
+
+
+
+       
+
+         
+    
+#line 16
+}   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
@@ -13388,7 +13835,14 @@ void tracer_fluxes (scalar f,
 
 
 
-  foreach_face_stencil(){_stencil_is_face_x(){ {        
+  if(!is_constant(fm.x) && !is_constant(src)){
+
+
+
+
+  
+#line 28
+foreach_face_stencil(1,{(NonLocal[]){{"flux","vector",(void *)&flux,NULL,0},{"g","vector",(void *)&g,NULL,0},{"src","scalar",(void *)&src,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 28 \"/home/lisergey/basilisk/src/bcg.h\"\n{is_face_x(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.x,0,0,0)/(val(fm.x,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,i,0,0) + (val(src,0,0,0) + val(src,-1,0,0))*dt/4. + s*(1. - s*un)*val(g.x,i,0,0)*Delta/2.;\n\n\n\n\n\n    if (val(fm.y,i,0,0) && val(fm.y,i,1,0)) {\n      real vn = (val(uf.y,i,0,0) + val(uf.y,i,1,0))/(val(fm.y,i,0,0) + val(fm.y,i,1,0));\n      real fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.z,i,0,0) && val(fm.z,i,0,1)) {\n      real wn = (val(uf.z,i,0,0) + val(uf.z,i,0,1))/(val(fm.z,i,0,0) + val(fm.z,i,0,1));\n      real fzz = wn < 0. ? val(f,i,0,1) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,0,-1);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.x,0,0,0) = f2*val(uf.x,0,0,0);\n  }}end_is_face_x()\n// #line 28\nis_face_y(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.y,0,0,0)/(val(fm.y,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,i,0) + (val(src,0,0,0) + val(src,0,-1,0))*dt/4. + s*(1. - s*un)*val(g.y,0,i,0)*Delta/2.;\n\n\n\n\n\n    if (val(fm.z,0,i,0) && val(fm.z,0,i,1)) {\n      real vn = (val(uf.z,0,i,0) + val(uf.z,0,i,1))/(val(fm.z,0,i,0) + val(fm.z,0,i,1));\n      real fyy = vn < 0. ? val(f,0,i,1) - val(f,0,i,0) : val(f,0,i,0) - val(f,0,i,-1);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.x,0,i,0) && val(fm.x,1,i,0)) {\n      real wn = (val(uf.x,0,i,0) + val(uf.x,1,i,0))/(val(fm.x,0,i,0) + val(fm.x,1,i,0));\n      real fzz = wn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.y,0,0,0) = f2*val(uf.y,0,0,0);\n  }}end_is_face_y()\n// #line 28\nis_face_z(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.z,0,0,0)/(val(fm.z,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,0,i) + (val(src,0,0,0) + val(src,0,0,-1))*dt/4. + s*(1. - s*un)*val(g.z,0,0,i)*Delta/2.;\n\n\n\n\n\n    if (val(fm.x,0,0,i) && val(fm.x,1,0,i)) {\n      real vn = (val(uf.x,0,0,i) + val(uf.x,1,0,i))/(val(fm.x,0,0,i) + val(fm.x,1,0,i));\n      real fyy = vn < 0. ? val(f,1,0,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,-1,0,i);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.y,0,0,i) && val(fm.y,0,1,i)) {\n      real wn = (val(uf.y,0,0,i) + val(uf.y,0,1,i))/(val(fm.y,0,0,i) + val(fm.y,0,1,i));\n      real fzz = wn < 0. ? val(f,0,1,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,0,-1,i);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.z,0,0,0) = f2*val(uf.z,0,0,0);\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {        
 
 
 
@@ -13418,6 +13872,9 @@ _stencil_val(fm.z,o_stencil,0,0); _stencil_val(fm.z,o_stencil,0,1); {
     }
 
 
+_stencil_val(uf.x,0,0,0);
+
+
 
 
 
@@ -13429,7 +13886,7 @@ _stencil_val(fm.z,o_stencil,0,0); _stencil_val(fm.z,o_stencil,0,1); {
 
     
 #line 58
-_stencil_val_a(flux.x,0,0,0);_stencil_val(uf.x,0,0,0);  
+_stencil_val_a(flux.x,0,0,0);  
   }}end__stencil_is_face_x()
 #line 28
 _stencil_is_face_y(){ {        
@@ -13462,6 +13919,9 @@ _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {
     }
 
 
+_stencil_val(uf.y,0,0,0);
+
+
 
 
 
@@ -13473,7 +13933,7 @@ _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {
 
     
 #line 58
-_stencil_val_a(flux.y,0,0,0);_stencil_val(uf.y,0,0,0);  
+_stencil_val_a(flux.y,0,0,0);  
   }}end__stencil_is_face_y()
 #line 28
 _stencil_is_face_z(){ {        
@@ -13506,6 +13966,9 @@ _stencil_val(fm.y,0,0,o_stencil); _stencil_val(fm.y,0,1,o_stencil); {
     }
 
 
+_stencil_val(uf.z,0,0,0);
+
+
 
 
 
@@ -13517,15 +13980,10 @@ _stencil_val(fm.y,0,0,o_stencil); _stencil_val(fm.y,0,1,o_stencil); {
 
     
 #line 58
-_stencil_val_a(flux.z,0,0,0);_stencil_val(uf.z,0,0,0);  
-  }}end__stencil_is_face_z()}end_foreach_face_stencil();
-
-
-
-
-  
+_stencil_val_a(flux.z,0,0,0);  
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();{
 #line 28
-if(!is_constant(fm.x) && !is_constant(src)){{foreach_face_generic(){is_face_x(){ {
+foreach_face_generic(){is_face_x(){ {
 
 
 
@@ -13622,7 +14080,153 @@ is_face_z(){ {
 
 
     val(flux.z,0,0,0) = f2*val(uf.z,0,0,0);
-  }}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(src)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  }}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(src)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+
+
+
+
+  
+#line 28
+foreach_face_stencil(1,{(NonLocal[]){{"flux","vector",(void *)&flux,NULL,0},{"g","vector",(void *)&g,NULL,0},{"src","scalar",(void *)&src,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 28 \"/home/lisergey/basilisk/src/bcg.h\"\n{is_face_x(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.x,0,0,0)/(_const_fm.x*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,i,0,0) + (val(src,0,0,0) + val(src,-1,0,0))*dt/4. + s*(1. - s*un)*val(g.x,i,0,0)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.y && _const_fm.y) {\n      real vn = (val(uf.y,i,0,0) + val(uf.y,i,1,0))/(_const_fm.y + _const_fm.y);\n      real fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.z && _const_fm.z) {\n      real wn = (val(uf.z,i,0,0) + val(uf.z,i,0,1))/(_const_fm.z + _const_fm.z);\n      real fzz = wn < 0. ? val(f,i,0,1) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,0,-1);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.x,0,0,0) = f2*val(uf.x,0,0,0);\n  }}end_is_face_x()\n// #line 28\nis_face_y(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.y,0,0,0)/(_const_fm.y*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,i,0) + (val(src,0,0,0) + val(src,0,-1,0))*dt/4. + s*(1. - s*un)*val(g.y,0,i,0)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.z && _const_fm.z) {\n      real vn = (val(uf.z,0,i,0) + val(uf.z,0,i,1))/(_const_fm.z + _const_fm.z);\n      real fyy = vn < 0. ? val(f,0,i,1) - val(f,0,i,0) : val(f,0,i,0) - val(f,0,i,-1);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.x && _const_fm.x) {\n      real wn = (val(uf.x,0,i,0) + val(uf.x,1,i,0))/(_const_fm.x + _const_fm.x);\n      real fzz = wn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.y,0,0,0) = f2*val(uf.y,0,0,0);\n  }}end_is_face_y()\n// #line 28\nis_face_z(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.z,0,0,0)/(_const_fm.z*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,0,i) + (val(src,0,0,0) + val(src,0,0,-1))*dt/4. + s*(1. - s*un)*val(g.z,0,0,i)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.x && _const_fm.x) {\n      real vn = (val(uf.x,0,0,i) + val(uf.x,1,0,i))/(_const_fm.x + _const_fm.x);\n      real fyy = vn < 0. ? val(f,1,0,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,-1,0,i);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.y && _const_fm.y) {\n      real wn = (val(uf.y,0,0,i) + val(uf.y,0,1,i))/(_const_fm.y + _const_fm.y);\n      real fzz = wn < 0. ? val(f,0,1,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,0,-1,i);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.z,0,0,0) = f2*val(uf.z,0,0,0);\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.x,0,0,0);              
+    
+    _stencil_val(g.x,o_stencil,0,0); _stencil_val(src,-1,0,0);_stencil_val(src,0,0,0);_stencil_val(f, o_stencil,0,0);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.y,o_stencil,1,0);_stencil_val(uf.y,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,-1,0);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,1,0);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.z,o_stencil,0,1);_stencil_val(uf.z,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,0,-1);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,0,1);
+        
+    }
+
+
+_stencil_val(uf.x,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.x,0,0,0);  
+  }}end__stencil_is_face_x()
+#line 28
+_stencil_is_face_y(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.y,0,0,0);              
+    
+    _stencil_val(g.y,0,o_stencil,0); _stencil_val(src,0,-1,0);_stencil_val(src,0,0,0);_stencil_val(f,0, o_stencil,0);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.z,0,o_stencil,1);_stencil_val(uf.z,0,o_stencil,0);         
+       _stencil_val(f,0,o_stencil,-1);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,0,o_stencil,1);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.x,1,o_stencil,0);_stencil_val(uf.x,0,o_stencil,0);         
+       _stencil_val(f,-1,o_stencil,0);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,1,o_stencil,0);
+        
+    }
+
+
+_stencil_val(uf.y,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.y,0,0,0);  
+  }}end__stencil_is_face_y()
+#line 28
+_stencil_is_face_z(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.z,0,0,0);              
+    
+    _stencil_val(g.z,0,0,o_stencil); _stencil_val(src,0,0,-1);_stencil_val(src,0,0,0);_stencil_val(f,0,0, o_stencil);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.x,1,0,o_stencil);_stencil_val(uf.x,0,0,o_stencil);         
+       _stencil_val(f,-1,0,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,1,0,o_stencil);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.y,0,1,o_stencil);_stencil_val(uf.y,0,0,o_stencil);         
+       _stencil_val(f,0,-1,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,0,1,o_stencil);
+        
+    }
+
+
+_stencil_val(uf.z,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.z,0,0,0);  
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();
 
 
 
@@ -13731,6 +14335,152 @@ is_face_z(){ {
 
 
 
+  
+#line 28
+foreach_face_stencil(1,{(NonLocal[]){{"flux","vector",(void *)&flux,NULL,0},{"g","vector",(void *)&g,NULL,0},{"_const_src","double",(void *)&_const_src,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 28 \"/home/lisergey/basilisk/src/bcg.h\"\n{is_face_x(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.x,0,0,0)/(val(fm.x,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,i,0,0) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.x,i,0,0)*Delta/2.;\n\n\n\n\n\n    if (val(fm.y,i,0,0) && val(fm.y,i,1,0)) {\n      real vn = (val(uf.y,i,0,0) + val(uf.y,i,1,0))/(val(fm.y,i,0,0) + val(fm.y,i,1,0));\n      real fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.z,i,0,0) && val(fm.z,i,0,1)) {\n      real wn = (val(uf.z,i,0,0) + val(uf.z,i,0,1))/(val(fm.z,i,0,0) + val(fm.z,i,0,1));\n      real fzz = wn < 0. ? val(f,i,0,1) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,0,-1);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.x,0,0,0) = f2*val(uf.x,0,0,0);\n  }}end_is_face_x()\n// #line 28\nis_face_y(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.y,0,0,0)/(val(fm.y,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,i,0) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.y,0,i,0)*Delta/2.;\n\n\n\n\n\n    if (val(fm.z,0,i,0) && val(fm.z,0,i,1)) {\n      real vn = (val(uf.z,0,i,0) + val(uf.z,0,i,1))/(val(fm.z,0,i,0) + val(fm.z,0,i,1));\n      real fyy = vn < 0. ? val(f,0,i,1) - val(f,0,i,0) : val(f,0,i,0) - val(f,0,i,-1);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.x,0,i,0) && val(fm.x,1,i,0)) {\n      real wn = (val(uf.x,0,i,0) + val(uf.x,1,i,0))/(val(fm.x,0,i,0) + val(fm.x,1,i,0));\n      real fzz = wn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.y,0,0,0) = f2*val(uf.y,0,0,0);\n  }}end_is_face_y()\n// #line 28\nis_face_z(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.z,0,0,0)/(val(fm.z,0,0,0)*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,0,i) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.z,0,0,i)*Delta/2.;\n\n\n\n\n\n    if (val(fm.x,0,0,i) && val(fm.x,1,0,i)) {\n      real vn = (val(uf.x,0,0,i) + val(uf.x,1,0,i))/(val(fm.x,0,0,i) + val(fm.x,1,0,i));\n      real fyy = vn < 0. ? val(f,1,0,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,-1,0,i);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.y,0,0,i) && val(fm.y,0,1,i)) {\n      real wn = (val(uf.y,0,0,i) + val(uf.y,0,1,i))/(val(fm.y,0,0,i) + val(fm.y,0,1,i));\n      real fzz = wn < 0. ? val(f,0,1,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,0,-1,i);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.z,0,0,0) = f2*val(uf.z,0,0,0);\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {        
+
+
+
+
+
+
+
+    _stencil_val(fm.x,0,0,0);_stencil_val(uf.x,0,0,0);              
+    
+    _stencil_val(g.x,o_stencil,0,0);;;_stencil_val(f, o_stencil,0,0);
+
+
+
+
+
+_stencil_val(fm.y,o_stencil,0,0); _stencil_val(fm.y,o_stencil,1,0); {     
+       _stencil_val(fm.y,o_stencil,1,0);_stencil_val(fm.y,o_stencil,0,0); _stencil_val(uf.y,o_stencil,1,0);_stencil_val(uf.y,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,-1,0);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,1,0);
+        
+    }
+
+
+_stencil_val(fm.z,o_stencil,0,0); _stencil_val(fm.z,o_stencil,0,1); {     
+       _stencil_val(fm.z,o_stencil,0,1);_stencil_val(fm.z,o_stencil,0,0); _stencil_val(uf.z,o_stencil,0,1);_stencil_val(uf.z,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,0,-1);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,0,1);
+        
+    }
+
+
+_stencil_val(uf.x,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.x,0,0,0);  
+  }}end__stencil_is_face_x()
+#line 28
+_stencil_is_face_y(){ {        
+
+
+
+
+
+
+
+    _stencil_val(fm.y,0,0,0);_stencil_val(uf.y,0,0,0);              
+    
+    _stencil_val(g.y,0,o_stencil,0);;;_stencil_val(f,0, o_stencil,0);
+
+
+
+
+
+_stencil_val(fm.z,0,o_stencil,0); _stencil_val(fm.z,0,o_stencil,1); {     
+       _stencil_val(fm.z,0,o_stencil,1);_stencil_val(fm.z,0,o_stencil,0); _stencil_val(uf.z,0,o_stencil,1);_stencil_val(uf.z,0,o_stencil,0);         
+       _stencil_val(f,0,o_stencil,-1);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,0,o_stencil,1);
+        
+    }
+
+
+_stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {     
+       _stencil_val(fm.x,1,o_stencil,0);_stencil_val(fm.x,0,o_stencil,0); _stencil_val(uf.x,1,o_stencil,0);_stencil_val(uf.x,0,o_stencil,0);         
+       _stencil_val(f,-1,o_stencil,0);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,1,o_stencil,0);
+        
+    }
+
+
+_stencil_val(uf.y,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.y,0,0,0);  
+  }}end__stencil_is_face_y()
+#line 28
+_stencil_is_face_z(){ {        
+
+
+
+
+
+
+
+    _stencil_val(fm.z,0,0,0);_stencil_val(uf.z,0,0,0);              
+    
+    _stencil_val(g.z,0,0,o_stencil);;;_stencil_val(f,0,0, o_stencil);
+
+
+
+
+
+_stencil_val(fm.x,0,0,o_stencil); _stencil_val(fm.x,1,0,o_stencil); {     
+       _stencil_val(fm.x,1,0,o_stencil);_stencil_val(fm.x,0,0,o_stencil); _stencil_val(uf.x,1,0,o_stencil);_stencil_val(uf.x,0,0,o_stencil);         
+       _stencil_val(f,-1,0,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,1,0,o_stencil);
+        
+    }
+
+
+_stencil_val(fm.y,0,0,o_stencil); _stencil_val(fm.y,0,1,o_stencil); {     
+       _stencil_val(fm.y,0,1,o_stencil);_stencil_val(fm.y,0,0,o_stencil); _stencil_val(uf.y,0,1,o_stencil);_stencil_val(uf.y,0,0,o_stencil);         
+       _stencil_val(f,0,-1,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,0,1,o_stencil);
+        
+    }
+
+
+_stencil_val(uf.z,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.z,0,0,0);  
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+
+
+
+
   {
 #line 28
 foreach_face_generic(){is_face_x(){ {
@@ -13830,7 +14580,153 @@ is_face_z(){ {
 
 
     val(flux.z,0,0,0) = f2*val(uf.z,0,0,0);
-  }}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_src=_constant[src.i-_NVARMAX];NOT_UNUSED(_const_src);
+  }}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);double _const_src=_constant[src.i-_NVARMAX];NOT_UNUSED(_const_src);
+
+
+
+
+  
+#line 28
+foreach_face_stencil(1,{(NonLocal[]){{"flux","vector",(void *)&flux,NULL,0},{"g","vector",(void *)&g,NULL,0},{"_const_src","double",(void *)&_const_src,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 28 \"/home/lisergey/basilisk/src/bcg.h\"\n{is_face_x(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.x,0,0,0)/(_const_fm.x*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,i,0,0) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.x,i,0,0)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.y && _const_fm.y) {\n      real vn = (val(uf.y,i,0,0) + val(uf.y,i,1,0))/(_const_fm.y + _const_fm.y);\n      real fyy = vn < 0. ? val(f,i,1,0) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,-1,0);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.z && _const_fm.z) {\n      real wn = (val(uf.z,i,0,0) + val(uf.z,i,0,1))/(_const_fm.z + _const_fm.z);\n      real fzz = wn < 0. ? val(f,i,0,1) - val(f,i,0,0) : val(f,i,0,0) - val(f,i,0,-1);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.x,0,0,0) = f2*val(uf.x,0,0,0);\n  }}end_is_face_x()\n// #line 28\nis_face_y(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.y,0,0,0)/(_const_fm.y*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,i,0) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.y,0,i,0)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.z && _const_fm.z) {\n      real vn = (val(uf.z,0,i,0) + val(uf.z,0,i,1))/(_const_fm.z + _const_fm.z);\n      real fyy = vn < 0. ? val(f,0,i,1) - val(f,0,i,0) : val(f,0,i,0) - val(f,0,i,-1);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.x && _const_fm.x) {\n      real wn = (val(uf.x,0,i,0) + val(uf.x,1,i,0))/(_const_fm.x + _const_fm.x);\n      real fzz = wn < 0. ? val(f,1,i,0) - val(f,0,i,0) : val(f,0,i,0) - val(f,-1,i,0);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.y,0,0,0) = f2*val(uf.y,0,0,0);\n  }}end_is_face_y()\n// #line 28\nis_face_z(){ {\n\n\n\n\n\n\n\n    real un = dt*val(uf.z,0,0,0)/(_const_fm.z*Delta + 0.), s = sign(un);\n    int i = -(s + 1.)/2.;\n    real f2 = val(f,0,0,i) + (_const_src + _const_src)*dt/4. + s*(1. - s*un)*val(g.z,0,0,i)*Delta/2.;\n\n\n\n\n\n    if (_const_fm.x && _const_fm.x) {\n      real vn = (val(uf.x,0,0,i) + val(uf.x,1,0,i))/(_const_fm.x + _const_fm.x);\n      real fyy = vn < 0. ? val(f,1,0,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,-1,0,i);\n      f2 -= dt*vn*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.y && _const_fm.y) {\n      real wn = (val(uf.y,0,0,i) + val(uf.y,0,1,i))/(_const_fm.y + _const_fm.y);\n      real fzz = wn < 0. ? val(f,0,1,i) - val(f,0,0,i) : val(f,0,0,i) - val(f,0,-1,i);\n      f2 -= dt*wn*fzz/(2.*Delta);\n    }\n\n\n    val_out_(flux.z,0,0,0) = f2*val(uf.z,0,0,0);\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.x,0,0,0);              
+    
+    _stencil_val(g.x,o_stencil,0,0);;;_stencil_val(f, o_stencil,0,0);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.y,o_stencil,1,0);_stencil_val(uf.y,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,-1,0);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,1,0);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.z,o_stencil,0,1);_stencil_val(uf.z,o_stencil,0,0);         
+       _stencil_val(f,o_stencil,0,-1);_stencil_val(f, o_stencil,0,0);_stencil_val(f, o_stencil,0,0); _stencil_val(f,o_stencil,0,1);
+        
+    }
+
+
+_stencil_val(uf.x,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.x,0,0,0);  
+  }}end__stencil_is_face_x()
+#line 28
+_stencil_is_face_y(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.y,0,0,0);              
+    
+    _stencil_val(g.y,0,o_stencil,0);;;_stencil_val(f,0, o_stencil,0);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.z,0,o_stencil,1);_stencil_val(uf.z,0,o_stencil,0);         
+       _stencil_val(f,0,o_stencil,-1);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,0,o_stencil,1);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.x,1,o_stencil,0);_stencil_val(uf.x,0,o_stencil,0);         
+       _stencil_val(f,-1,o_stencil,0);_stencil_val(f,0, o_stencil,0);_stencil_val(f,0, o_stencil,0); _stencil_val(f,1,o_stencil,0);
+        
+    }
+
+
+_stencil_val(uf.y,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.y,0,0,0);  
+  }}end__stencil_is_face_y()
+#line 28
+_stencil_is_face_z(){ {
+
+
+
+
+
+
+
+;_stencil_val(uf.z,0,0,0);              
+    
+    _stencil_val(g.z,0,0,o_stencil);;;_stencil_val(f,0,0, o_stencil);
+
+
+
+
+
+;; {
+;; _stencil_val(uf.x,1,0,o_stencil);_stencil_val(uf.x,0,0,o_stencil);         
+       _stencil_val(f,-1,0,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,1,0,o_stencil);
+        
+    }
+
+
+;; {
+;; _stencil_val(uf.y,0,1,o_stencil);_stencil_val(uf.y,0,0,o_stencil);         
+       _stencil_val(f,0,-1,o_stencil);_stencil_val(f,0,0, o_stencil);_stencil_val(f,0,0, o_stencil); _stencil_val(f,0,1,o_stencil);
+        
+    }
+
+
+_stencil_val(uf.z,0,0,0);
+
+
+
+
+
+      
+
+
+      
+
+
+    
+#line 58
+_stencil_val_a(flux.z,0,0,0);  
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();
 
 
 
@@ -13962,19 +14858,21 @@ void advection (scalar * tracers, vector u, double dt,
     vector  flux=new_face_vector("flux");
     tracer_fluxes (f, u, flux, dt, source);
 
-    foreach_stencil()
-      {
-        {_stencil_val_r(f,0,0,0);_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);_stencil_val(cm,0,0,0);   }
-        
-#line 89
-{_stencil_val_r(f,0,0,0);_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);_stencil_val(cm,0,0,0);   }
-        
-#line 89
-{_stencil_val_r(f,0,0,0);_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);_stencil_val(cm,0,0,0);   }}end_foreach_stencil();
+    if(!is_constant(cm)){
 
     
 #line 87
-if(!is_constant(cm)){{foreach()
+foreach_stencil(1,{(NonLocal[]){{"cm","scalar",(void *)&cm,NULL,0},{"flux","vector",(void *)&flux,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n      \n// #line 88 \"/home/lisergey/basilisk/src/bcg.h\"\n{\n        val_out_(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/(Delta*val(cm,0,0,0));\n        \n// #line 89\nval_out_(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/(Delta*val(cm,0,0,0));\n        \n// #line 89\nval_out_(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/(Delta*val(cm,0,0,0));}"})
+      {
+        {_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);_stencil_val(cm,0,0,0);_stencil_val_r(f,0,0,0);   }
+        
+#line 89
+{_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);_stencil_val(cm,0,0,0);_stencil_val_r(f,0,0,0);   }
+        
+#line 89
+{_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);_stencil_val(cm,0,0,0);_stencil_val_r(f,0,0,0);   }}end_foreach_stencil();{
+#line 87
+foreach()
       {
         val(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/(Delta*val(cm,0,0,0));
         
@@ -13983,6 +14881,18 @@ val(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/(Delta*val(cm,0,0,0))
         
 #line 89
 val(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/(Delta*val(cm,0,0,0));}end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+
+    
+#line 87
+foreach_stencil(1,{(NonLocal[]){{"_const_cm","double",(void *)&_const_cm,NULL,0},{"flux","vector",(void *)&flux,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"f","scalar",(void *)&f,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n      \n// #line 88 \"/home/lisergey/basilisk/src/bcg.h\"\n{\n        val_out_(f,0,0,0) += dt*(val(flux.x,0,0,0) - val(flux.x,1,0,0))/(Delta*_const_cm);\n        \n// #line 89\nval_out_(f,0,0,0) += dt*(val(flux.y,0,0,0) - val(flux.y,0,1,0))/(Delta*_const_cm);\n        \n// #line 89\nval_out_(f,0,0,0) += dt*(val(flux.z,0,0,0) - val(flux.z,0,0,1))/(Delta*_const_cm);}"})
+      {
+        {_stencil_val(flux.x,0,0,0); _stencil_val(flux.x,1,0,0);;_stencil_val_r(f,0,0,0);   }
+        
+#line 89
+{_stencil_val(flux.y,0,0,0); _stencil_val(flux.y,0,1,0);;_stencil_val_r(f,0,0,0);   }
+        
+#line 89
+{_stencil_val(flux.z,0,0,0); _stencil_val(flux.z,0,0,1);;_stencil_val_r(f,0,0,0);   }}end_foreach_stencil();
 
     {
 #line 87
@@ -14065,11 +14975,11 @@ void mg_cycle (scalar * a, scalar * res, scalar * da,
 
 
 
-  foreach_stencil() {
+  foreach_stencil(1,{(NonLocal[]){{"da","scalar",(void *)da,NULL,1},{"a","scalar",(void *)a,NULL,1},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 84 \"/home/lisergey/basilisk/src/poisson.h\"\n{\n    scalar s, ds;\n    {forin2 (s, ds , a, da)\n     \n val_out_(s,0,0,0) += val(ds,0,0,0); endforin2()}\n  }"}) {
     scalar s, ds;
     {scalar*_i0= da;scalar*_i1= a;if(_i0)for(ds=*_i0,s=*_i1;_i0->i>= 0;ds=*++_i0,s=*++_i1){
      
- {_stencil_val_r(s,0,0,0); _stencil_val(ds,0,0,0); }}}
+ { _stencil_val(ds,0,0,0);_stencil_val_r(s,0,0,0); }}}
   }end_foreach_stencil();
 
 
@@ -14134,7 +15044,7 @@ mgstats mg_solve (scalar * a, scalar * b,
   mgstats s = {0};
   double sum = 0.;
   scalar rhs = b[0];
-  foreach_stencil ()
+  foreach_stencil (1,{(NonLocal[]){{"rhs","scalar",(void *)&rhs,NULL,0},{"sum","double",(void *)&sum,NULL,0,'+'},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 161 \"/home/lisergey/basilisk/src/poisson.h\"\nsum += val(rhs,0,0,0);"})
     { _stencil_val(rhs,0,0,0); }end_foreach_stencil();
   
 #undef OMP_PARALLEL
@@ -14284,7 +15194,7 @@ foreach_level_or_leaf (l) {
     }
 #line 312 "/home/lisergey/basilisk/src/poisson.h"
       val(c,0,0,0) = n/d;
-  }end_foreach_level_or_leaf();}}else if(!is_constant(lambda) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  }end_foreach_level_or_leaf();}}else if(!is_constant(lambda) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
 
 
 
@@ -14311,7 +15221,7 @@ foreach_level_or_leaf (l) {
     }
 #line 312 "/home/lisergey/basilisk/src/poisson.h"
       val(c,0,0,0) = n/d;
-  }end_foreach_level_or_leaf();}}else {double _const_lambda=_constant[lambda.i-_NVARMAX];NOT_UNUSED(_const_lambda);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  }end_foreach_level_or_leaf();}}else {double _const_lambda=_constant[lambda.i-_NVARMAX];NOT_UNUSED(_const_lambda);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
 
 
 
@@ -14357,24 +15267,36 @@ static double residual (scalar * al, scalar * bl, scalar * resl, void * data)
 
 
   vector  g=new_face_vector("g");
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(g.x,0,0,0); _stencil_val(alpha.x,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0 -1,0,0);  }}end__stencil_is_face_x()
-#line 348
-_stencil_is_face_y(){
-    {_stencil_val_a(g.y,0,0,0); _stencil_val(alpha.y,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0,0 -1,0);  }}end__stencil_is_face_y()
-#line 348
-_stencil_is_face_z(){
-    {_stencil_val_a(g.z,0,0,0); _stencil_val(alpha.z,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0,0,0 -1);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  if(!is_constant(alpha.x)){
   
 #line 348
-if(!is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"a","scalar",(void *)&a,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"g","vector",(void *)&g,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 348 \"/home/lisergey/basilisk/src/poisson.h\"\n{is_face_x(){\n    val_out_(g.x,0,0,0) = val(alpha.x,0,0,0)*((val(a,0,0,0) - val(a,0 -1,0,0))/Delta);}end_is_face_x()\n// #line 348\nis_face_y(){\n    val_out_(g.y,0,0,0) = val(alpha.y,0,0,0)*((val(a,0,0,0) - val(a,0,0 -1,0))/Delta);}end_is_face_y()\n// #line 348\nis_face_z(){\n    val_out_(g.z,0,0,0) = val(alpha.z,0,0,0)*((val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(alpha.x,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0 -1,0,0);_stencil_val_a(g.x,0,0,0);  }}end__stencil_is_face_x()
+#line 348
+_stencil_is_face_y(){
+    { _stencil_val(alpha.y,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0,0 -1,0);_stencil_val_a(g.y,0,0,0);  }}end__stencil_is_face_y()
+#line 348
+_stencil_is_face_z(){
+    { _stencil_val(alpha.z,0,0,0);_stencil_val(a,0,0,0); _stencil_val(a,0,0,0 -1);_stencil_val_a(g.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 348
+foreach_face_generic(){is_face_x(){
     val(g.x,0,0,0) = val(alpha.x,0,0,0)*((val(a,0,0,0) - val(a,0 -1,0,0))/Delta);}end_is_face_x()
 #line 348
 is_face_y(){
     val(g.y,0,0,0) = val(alpha.y,0,0,0)*((val(a,0,0,0) - val(a,0,0 -1,0))/Delta);}end_is_face_y()
 #line 348
 is_face_z(){
-    val(g.z,0,0,0) = val(alpha.z,0,0,0)*((val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(g.z,0,0,0) = val(alpha.z,0,0,0)*((val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  
+#line 348
+foreach_face_stencil(1,{(NonLocal[]){{"a","scalar",(void *)&a,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"g","vector",(void *)&g,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 348 \"/home/lisergey/basilisk/src/poisson.h\"\n{is_face_x(){\n    val_out_(g.x,0,0,0) = _const_alpha.x*((val(a,0,0,0) - val(a,0 -1,0,0))/Delta);}end_is_face_x()\n// #line 348\nis_face_y(){\n    val_out_(g.y,0,0,0) = _const_alpha.y*((val(a,0,0,0) - val(a,0,0 -1,0))/Delta);}end_is_face_y()\n// #line 348\nis_face_z(){\n    val_out_(g.z,0,0,0) = _const_alpha.z*((val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(a,0,0,0); _stencil_val(a,0 -1,0,0);_stencil_val_a(g.x,0,0,0);  }}end__stencil_is_face_x()
+#line 348
+_stencil_is_face_y(){
+    {;_stencil_val(a,0,0,0); _stencil_val(a,0,0 -1,0);_stencil_val_a(g.y,0,0,0);  }}end__stencil_is_face_y()
+#line 348
+_stencil_is_face_z(){
+    {;_stencil_val(a,0,0,0); _stencil_val(a,0,0,0 -1);_stencil_val_a(g.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 348
 foreach_face_generic(){is_face_x(){
@@ -14385,16 +15307,22 @@ is_face_y(){
 #line 348
 is_face_z(){
     val(g.z,0,0,0) = _const_alpha.z*((val(a,0,0,0) - val(a,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}
-  foreach_stencil () {
-    _stencil_val_a(res,0,0,0); _stencil_val(b,0,0,0); _stencil_val(lambda,0,0,0);_stencil_val(a,0,0,0);  
+  if(!is_constant(lambda)){
+  
+#line 350
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"g","vector",(void *)&g,NULL,0},{"a","scalar",(void *)&a,NULL,0},{"lambda","scalar",(void *)&lambda,NULL,0},{"b","scalar",(void *)&b,NULL,0},{"res","scalar",(void *)&res,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 350 \"/home/lisergey/basilisk/src/poisson.h\"\n{\n    val_out_(res,0,0,0) = val(b,0,0,0) - val(lambda,0,0,0)*val(a,0,0,0);\n    \n      val_out_(res,0,0,0) -= (val(g.x,1,0,0) - val(g.x,0,0,0))/Delta;\n      \n// #line 353\nval_out_(res,0,0,0) -= (val(g.y,0,1,0) - val(g.y,0,0,0))/Delta;\n      \n// #line 353\nval_out_(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;\n\n\n\n\n\n\n    if (fabs (val(res,0,0,0)) > maxres)\n      maxres = fabs (val(res,0,0,0));\n  }"}) { 
+_stencil_val(b,0,0,0); _stencil_val(lambda,0,0,0);_stencil_val(a,0,0,0);
     
-      {_stencil_val_r(res,0,0,0);_stencil_val(g.x,1,0,0); _stencil_val(g.x,0,0,0);   }
+#line 351
+_stencil_val_a(res,0,0,0);  
+    
+      {_stencil_val(g.x,1,0,0); _stencil_val(g.x,0,0,0);_stencil_val_r(res,0,0,0);   }
       
 #line 353
-{_stencil_val_r(res,0,0,0);_stencil_val(g.y,0,1,0); _stencil_val(g.y,0,0,0);   }
+{_stencil_val(g.y,0,1,0); _stencil_val(g.y,0,0,0);_stencil_val_r(res,0,0,0);   }
       
 #line 353
-{_stencil_val_r(res,0,0,0);_stencil_val(g.z,0,0,1); _stencil_val(g.z,0,0,0);   }
+{_stencil_val(g.z,0,0,1); _stencil_val(g.z,0,0,0);_stencil_val_r(res,0,0,0);   }
 
 
 
@@ -14413,9 +15341,6 @@ _stencil_val(res,0,0,0);
   
 #line 362
 }end_foreach_stencil();
-  
-#line 350
-if(!is_constant(lambda)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
@@ -14444,6 +15369,39 @@ val(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;
 }
 #line 362
 }else {double _const_lambda=_constant[lambda.i-_NVARMAX];NOT_UNUSED(_const_lambda);
+  
+#line 350
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"g","vector",(void *)&g,NULL,0},{"a","scalar",(void *)&a,NULL,0},{"_const_lambda","double",(void *)&_const_lambda,NULL,0},{"b","scalar",(void *)&b,NULL,0},{"res","scalar",(void *)&res,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 350 \"/home/lisergey/basilisk/src/poisson.h\"\n{\n    val_out_(res,0,0,0) = val(b,0,0,0) - _const_lambda*val(a,0,0,0);\n    \n      val_out_(res,0,0,0) -= (val(g.x,1,0,0) - val(g.x,0,0,0))/Delta;\n      \n// #line 353\nval_out_(res,0,0,0) -= (val(g.y,0,1,0) - val(g.y,0,0,0))/Delta;\n      \n// #line 353\nval_out_(res,0,0,0) -= (val(g.z,0,0,1) - val(g.z,0,0,0))/Delta;\n\n\n\n\n\n\n    if (fabs (val(res,0,0,0)) > maxres)\n      maxres = fabs (val(res,0,0,0));\n  }"}) { 
+_stencil_val(b,0,0,0);;_stencil_val(a,0,0,0);
+    
+#line 351
+_stencil_val_a(res,0,0,0);  
+    
+      {_stencil_val(g.x,1,0,0); _stencil_val(g.x,0,0,0);_stencil_val_r(res,0,0,0);   }
+      
+#line 353
+{_stencil_val(g.y,0,1,0); _stencil_val(g.y,0,0,0);_stencil_val_r(res,0,0,0);   }
+      
+#line 353
+{_stencil_val(g.z,0,0,1); _stencil_val(g.z,0,0,0);_stencil_val_r(res,0,0,0);   }
+
+
+
+
+
+
+_stencil_val(res,0,0,0);
+      {_stencil_val(res,0,0,0);   }
+
+
+
+
+
+
+        
+  
+#line 362
+}end_foreach_stencil();
   
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
@@ -14560,16 +15518,16 @@ mgstats project (vector uf, scalar p,
 
 
   scalar  div=new_scalar("div");
-  foreach_stencil() {
+  foreach_stencil(1,{(NonLocal[]){{"dt","double",(void *)&dt,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"div","scalar",(void *)&div,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 476 \"/home/lisergey/basilisk/src/poisson.h\"\n{\n    val_out_(div,0,0,0) = 0.;\n    \n      val_out_(div,0,0,0) += val(uf.x,1,0,0) - val(uf.x,0,0,0);\n      \n// #line 479\nval_out_(div,0,0,0) += val(uf.y,0,1,0) - val(uf.y,0,0,0);\n      \n// #line 479\nval_out_(div,0,0,0) += val(uf.z,0,0,1) - val(uf.z,0,0,0);\n    val_out_(div,0,0,0) /= dt*Delta;\n  }"}) {
     _stencil_val_a(div,0,0,0);  
     
-      {_stencil_val_r(div,0,0,0); _stencil_val(uf.x,1,0,0); _stencil_val(uf.x,0,0,0);  }
+      { _stencil_val(uf.x,1,0,0); _stencil_val(uf.x,0,0,0);_stencil_val_r(div,0,0,0);  }
       
 #line 479
-{_stencil_val_r(div,0,0,0); _stencil_val(uf.y,0,1,0); _stencil_val(uf.y,0,0,0);  }
+{ _stencil_val(uf.y,0,1,0); _stencil_val(uf.y,0,0,0);_stencil_val_r(div,0,0,0);  }
       
 #line 479
-{_stencil_val_r(div,0,0,0); _stencil_val(uf.z,0,0,1); _stencil_val(uf.z,0,0,0);  }
+{ _stencil_val(uf.z,0,0,1); _stencil_val(uf.z,0,0,0);_stencil_val_r(div,0,0,0);  }
     _stencil_val_r(div,0,0,0);  
   }end_foreach_stencil();
   {
@@ -14604,28 +15562,44 @@ NULL
 
 
 
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_r(uf.x,0,0,0);_stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0 -1,0,0);   }}end__stencil_is_face_x()
-#line 498
-_stencil_is_face_y(){
-    {_stencil_val_r(uf.y,0,0,0);_stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0 -1,0);   }}end__stencil_is_face_y()
-#line 498
-_stencil_is_face_z(){
-    {_stencil_val_r(uf.z,0,0,0);_stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,0 -1);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  if(!is_constant(alpha.x)){
 
 
 
 
   
 #line 498
-if(!is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 498 \"/home/lisergey/basilisk/src/poisson.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) -= dt*val(alpha.x,0,0,0)*((val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()\n// #line 498\nis_face_y(){\n    val_out_(uf.y,0,0,0) -= dt*val(alpha.y,0,0,0)*((val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()\n// #line 498\nis_face_z(){\n    val_out_(uf.z,0,0,0) -= dt*val(alpha.z,0,0,0)*((val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}"}){_stencil_is_face_x(){
+    {_stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0 -1,0,0);_stencil_val_r(uf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 498
+_stencil_is_face_y(){
+    {_stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0 -1,0);_stencil_val_r(uf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 498
+_stencil_is_face_z(){
+    {_stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,0 -1);_stencil_val_r(uf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 498
+foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) -= dt*val(alpha.x,0,0,0)*((val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()
 #line 498
 is_face_y(){
     val(uf.y,0,0,0) -= dt*val(alpha.y,0,0,0)*((val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()
 #line 498
 is_face_z(){
-    val(uf.z,0,0,0) -= dt*val(alpha.z,0,0,0)*((val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(uf.z,0,0,0) -= dt*val(alpha.z,0,0,0)*((val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+
+
+
+
+  
+#line 498
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 498 \"/home/lisergey/basilisk/src/poisson.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) -= dt*_const_alpha.x*((val(p,0,0,0) - val(p,0 -1,0,0))/Delta);}end_is_face_x()\n// #line 498\nis_face_y(){\n    val_out_(uf.y,0,0,0) -= dt*_const_alpha.y*((val(p,0,0,0) - val(p,0,0 -1,0))/Delta);}end_is_face_y()\n// #line 498\nis_face_z(){\n    val_out_(uf.z,0,0,0) -= dt*_const_alpha.z*((val(p,0,0,0) - val(p,0,0,0 -1))/Delta);}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(p,0,0,0); _stencil_val(p,0 -1,0,0);_stencil_val_r(uf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 498
+_stencil_is_face_y(){
+    {;_stencil_val(p,0,0,0); _stencil_val(p,0,0 -1,0);_stencil_val_r(uf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 498
+_stencil_is_face_z(){
+    {;_stencil_val(p,0,0,0); _stencil_val(p,0,0,0 -1);_stencil_val_r(uf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
 
 
 
@@ -14838,7 +15812,7 @@ val(w.z,0,0,0) = (dt/_const_rho*(2.*val(mu.z,0,0,1)*val(u.z,0,0,1) + 2.*val(mu.z
           + val(mu.y,0,1,0) + val(mu.y,0,0,0)
 
         ));
-  }end_foreach_level_or_leaf();}}else if(!is_constant(rho) && is_constant(mu.x)){struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+  }end_foreach_level_or_leaf();}}else if(!is_constant(rho) && is_constant(mu.x)){_coord _const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
 
 
   {
@@ -14927,7 +15901,7 @@ val(w.z,0,0,0) = (dt/val(rho,0,0,0)*(2.*_const_mu.z*val(u.z,0,0,1) + 2.*_const_m
           + _const_mu.y + _const_mu.y
 
         ));
-  }end_foreach_level_or_leaf();}}else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+  }end_foreach_level_or_leaf();}}else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);_coord _const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
 
 
   {
@@ -15034,32 +16008,51 @@ static double residual_viscosity (scalar * a, scalar * b, scalar * resl,
 
    {
     vector  taux=new_face_vector("taux");
-    foreach_face_stencil()_stencil_is_face_x(){
-      {_stencil_val_a(taux.x,0,0,0);_stencil_val(mu.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,-1,0,0);   }}end__stencil_is_face_x()end_foreach_face_stencil();
+    if(!is_constant(mu.x)){
     
 #line 225
-if(!is_constant(mu.x)){{foreach_face_generic()is_face_x(){
-      val(taux.x,0,0,0) = 2.*val(mu.x,0,0,0)*(val(u.x,0,0,0) - val(u.x,-1,0,0))/Delta;}end_is_face_x()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n      val_out_(taux.x,0,0,0) = 2.*val(mu.x,0,0,0)*(val(u.x,0,0,0) - val(u.x,-1,0,0))/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+      {_stencil_val(mu.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,-1,0,0);_stencil_val_a(taux.x,0,0,0);   }}end__stencil_is_face_x()end_foreach_face_stencil();{
+#line 225
+foreach_face_generic()is_face_x(){
+      val(taux.x,0,0,0) = 2.*val(mu.x,0,0,0)*(val(u.x,0,0,0) - val(u.x,-1,0,0))/Delta;}end_is_face_x()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+    
+#line 225
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n      val_out_(taux.x,0,0,0) = 2.*_const_mu.x*(val(u.x,0,0,0) - val(u.x,-1,0,0))/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+      {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,-1,0,0);_stencil_val_a(taux.x,0,0,0);   }}end__stencil_is_face_x()end_foreach_face_stencil();
     {
 #line 225
 foreach_face_generic()is_face_x(){
       val(taux.x,0,0,0) = 2.*_const_mu.x*(val(u.x,0,0,0) - val(u.x,-1,0,0))/Delta;}end_is_face_x()end_foreach_face_generic();}}
 
-      foreach_face_stencil()_stencil_is_face_y(){
- {_stencil_val_a(taux.y,0,0,0); _stencil_val(mu.y,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,-1,0);
-_stencil_val(u.y,1,-1,0); _stencil_val(u.y,1,0,0);
-_stencil_val(u.y,-1,-1,0); _stencil_val(u.y,-1,0,0);    
-        
-      
-#line 231
-}}end__stencil_is_face_y()end_foreach_face_stencil();
+      if(!is_constant(mu.x)){
 
       
 #line 228
-if(!is_constant(mu.x)){{foreach_face_generic()is_face_y(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n val_out_(taux.y,0,0,0) = val(mu.y,0,0,0)*(val(u.x,0,0,0) - val(u.x,0,-1,0) +\n      (val(u.y,1,-1,0) + val(u.y,1,0,0))/4. -\n      (val(u.y,-1,-1,0) + val(u.y,-1,0,0))/4.)/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+ { _stencil_val(mu.y,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,-1,0);
+_stencil_val(u.y,1,-1,0); _stencil_val(u.y,1,0,0);
+_stencil_val(u.y,-1,-1,0); _stencil_val(u.y,-1,0,0);
+#line 229
+_stencil_val_a(taux.y,0,0,0);    
+        
+      }}end__stencil_is_face_y()end_foreach_face_stencil();{
+#line 228
+foreach_face_generic()is_face_y(){
  val(taux.y,0,0,0) = val(mu.y,0,0,0)*(val(u.x,0,0,0) - val(u.x,0,-1,0) +
       (val(u.y,1,-1,0) + val(u.y,1,0,0))/4. -
-      (val(u.y,-1,-1,0) + val(u.y,-1,0,0))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.y,-1,-1,0) + val(u.y,-1,0,0))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+      
+#line 228
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n val_out_(taux.y,0,0,0) = _const_mu.y*(val(u.x,0,0,0) - val(u.x,0,-1,0) +\n      (val(u.y,1,-1,0) + val(u.y,1,0,0))/4. -\n      (val(u.y,-1,-1,0) + val(u.y,-1,0,0))/4.)/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+ {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,-1,0);
+_stencil_val(u.y,1,-1,0); _stencil_val(u.y,1,0,0);
+_stencil_val(u.y,-1,-1,0); _stencil_val(u.y,-1,0,0);
+#line 229
+_stencil_val_a(taux.y,0,0,0);    
+        
+      }}end__stencil_is_face_y()end_foreach_face_stencil();
 
       {
 #line 228
@@ -15069,22 +16062,36 @@ foreach_face_generic()is_face_y(){
       (val(u.y,-1,-1,0) + val(u.y,-1,0,0))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}
 
 
-      foreach_face_stencil()_stencil_is_face_z(){
- {_stencil_val_a(taux.z,0,0,0); _stencil_val(mu.z,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,0,-1);
-_stencil_val(u.z,1,0,-1); _stencil_val(u.z,1,0,0);
-_stencil_val(u.z,-1,0,-1); _stencil_val(u.z,-1,0,0);    
-        
-      
-#line 237
-}}end__stencil_is_face_z()end_foreach_face_stencil();
+      if(!is_constant(mu.x)){
 
 
       
 #line 234
-if(!is_constant(mu.x)){{foreach_face_generic()is_face_z(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n val_out_(taux.z,0,0,0) = val(mu.z,0,0,0)*(val(u.x,0,0,0) - val(u.x,0,0,-1) +\n      (val(u.z,1,0,-1) + val(u.z,1,0,0))/4. -\n      (val(u.z,-1,0,-1) + val(u.z,-1,0,0))/4.)/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+ { _stencil_val(mu.z,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,0,-1);
+_stencil_val(u.z,1,0,-1); _stencil_val(u.z,1,0,0);
+_stencil_val(u.z,-1,0,-1); _stencil_val(u.z,-1,0,0);
+#line 235
+_stencil_val_a(taux.z,0,0,0);    
+        
+      }}end__stencil_is_face_z()end_foreach_face_stencil();{
+#line 234
+foreach_face_generic()is_face_z(){
  val(taux.z,0,0,0) = val(mu.z,0,0,0)*(val(u.x,0,0,0) - val(u.x,0,0,-1) +
       (val(u.z,1,0,-1) + val(u.z,1,0,0))/4. -
-      (val(u.z,-1,0,-1) + val(u.z,-1,0,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.z,-1,0,-1) + val(u.z,-1,0,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+
+      
+#line 234
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n val_out_(taux.z,0,0,0) = _const_mu.z*(val(u.x,0,0,0) - val(u.x,0,0,-1) +\n      (val(u.z,1,0,-1) + val(u.z,1,0,0))/4. -\n      (val(u.z,-1,0,-1) + val(u.z,-1,0,0))/4.)/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+ {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,0,0,-1);
+_stencil_val(u.z,1,0,-1); _stencil_val(u.z,1,0,0);
+_stencil_val(u.z,-1,0,-1); _stencil_val(u.z,-1,0,0);
+#line 235
+_stencil_val_a(taux.z,0,0,0);    
+        
+      }}end__stencil_is_face_z()end_foreach_face_stencil();
 
 
       {
@@ -15094,7 +16101,11 @@ foreach_face_generic()is_face_z(){
       (val(u.z,1,0,-1) + val(u.z,1,0,0))/4. -
       (val(u.z,-1,0,-1) + val(u.z,-1,0,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}
 
-    foreach_stencil () {   
+    if(!is_constant(rho)){
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"rho","scalar",(void *)&rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n \n// #line 242\nd += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n \n// #line 242\nd += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n      val_out_(res.x,0,0,0) = val(r.x,0,0,0) - ((coord){1.,1.,1.}).x*val(u.x,0,0,0) + dt/val(rho,0,0,0)*d/Delta;\n      if (fabs (val(res.x,0,0,0)) > maxres)\n maxres = fabs (val(res.x,0,0,0));\n    }"}) {   
       
       
  { _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  }
@@ -15103,18 +16114,17 @@ foreach_face_generic()is_face_z(){
 { _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  }
  
 #line 242
-{ _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  }
-      _stencil_val_a(res.x,0,0,0); _stencil_val(r.x,0,0,0);_stencil_val(u.x,0,0,0);_stencil_val(rho,0,0,0);
+{ _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  } 
+_stencil_val(r.x,0,0,0);_stencil_val(u.x,0,0,0);_stencil_val(rho,0,0,0);
+      
+#line 243
+_stencil_val_a(res.x,0,0,0);
 _stencil_val(res.x,0,0,0);
  {_stencil_val(res.x,0,0,0);   }     
           
     
 #line 246
 }end_foreach_stencil();
-
-    
-#line 239
-if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
@@ -15138,6 +16148,29 @@ d += val(taux.z,0,0,1) - val(taux.z,0,0,0);
 }
 #line 246
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"_const_rho","double",(void *)&_const_rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n \n// #line 242\nd += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n \n// #line 242\nd += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n      val_out_(res.x,0,0,0) = val(r.x,0,0,0) - ((coord){1.,1.,1.}).x*val(u.x,0,0,0) + dt/_const_rho*d/Delta;\n      if (fabs (val(res.x,0,0,0)) > maxres)\n maxres = fabs (val(res.x,0,0,0));\n    }"}) {   
+      
+      
+ { _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  } 
+_stencil_val(r.x,0,0,0);_stencil_val(u.x,0,0,0);;
+      
+#line 243
+_stencil_val_a(res.x,0,0,0);
+_stencil_val(res.x,0,0,0);
+ {_stencil_val(res.x,0,0,0);   }     
+          
+    
+#line 246
+}end_foreach_stencil();
 
     
 #undef OMP_PARALLEL
@@ -15167,32 +16200,51 @@ d += val(taux.z,0,0,1) - val(taux.z,0,0,0);
 #line 223
 {
     vector  taux=new_face_vector("taux");
-    foreach_face_stencil()_stencil_is_face_y(){
-      {_stencil_val_a(taux.y,0,0,0);_stencil_val(mu.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,-1,0);   }}end__stencil_is_face_y()end_foreach_face_stencil();
+    if(!is_constant(mu.y)){
     
 #line 225
-if(!is_constant(mu.y)){{foreach_face_generic()is_face_y(){
-      val(taux.y,0,0,0) = 2.*val(mu.y,0,0,0)*(val(u.y,0,0,0) - val(u.y,0,-1,0))/Delta;}end_is_face_y()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n      val_out_(taux.y,0,0,0) = 2.*val(mu.y,0,0,0)*(val(u.y,0,0,0) - val(u.y,0,-1,0))/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+      {_stencil_val(mu.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,-1,0);_stencil_val_a(taux.y,0,0,0);   }}end__stencil_is_face_y()end_foreach_face_stencil();{
+#line 225
+foreach_face_generic()is_face_y(){
+      val(taux.y,0,0,0) = 2.*val(mu.y,0,0,0)*(val(u.y,0,0,0) - val(u.y,0,-1,0))/Delta;}end_is_face_y()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+    
+#line 225
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n      val_out_(taux.y,0,0,0) = 2.*_const_mu.y*(val(u.y,0,0,0) - val(u.y,0,-1,0))/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+      {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,-1,0);_stencil_val_a(taux.y,0,0,0);   }}end__stencil_is_face_y()end_foreach_face_stencil();
     {
 #line 225
 foreach_face_generic()is_face_y(){
       val(taux.y,0,0,0) = 2.*_const_mu.y*(val(u.y,0,0,0) - val(u.y,0,-1,0))/Delta;}end_is_face_y()end_foreach_face_generic();}}
 
-      foreach_face_stencil()_stencil_is_face_z(){
- {_stencil_val_a(taux.z,0,0,0); _stencil_val(mu.z,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0,-1);
-_stencil_val(u.z,0,1,-1); _stencil_val(u.z,0,1,0);
-_stencil_val(u.z,0,-1,-1); _stencil_val(u.z,0,-1,0);    
-        
-      
-#line 231
-}}end__stencil_is_face_z()end_foreach_face_stencil();
+      if(!is_constant(mu.y)){
 
       
 #line 228
-if(!is_constant(mu.y)){{foreach_face_generic()is_face_z(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n val_out_(taux.z,0,0,0) = val(mu.z,0,0,0)*(val(u.y,0,0,0) - val(u.y,0,0,-1) +\n      (val(u.z,0,1,-1) + val(u.z,0,1,0))/4. -\n      (val(u.z,0,-1,-1) + val(u.z,0,-1,0))/4.)/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+ { _stencil_val(mu.z,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0,-1);
+_stencil_val(u.z,0,1,-1); _stencil_val(u.z,0,1,0);
+_stencil_val(u.z,0,-1,-1); _stencil_val(u.z,0,-1,0);
+#line 229
+_stencil_val_a(taux.z,0,0,0);    
+        
+      }}end__stencil_is_face_z()end_foreach_face_stencil();{
+#line 228
+foreach_face_generic()is_face_z(){
  val(taux.z,0,0,0) = val(mu.z,0,0,0)*(val(u.y,0,0,0) - val(u.y,0,0,-1) +
       (val(u.z,0,1,-1) + val(u.z,0,1,0))/4. -
-      (val(u.z,0,-1,-1) + val(u.z,0,-1,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.z,0,-1,-1) + val(u.z,0,-1,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+      
+#line 228
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n val_out_(taux.z,0,0,0) = _const_mu.z*(val(u.y,0,0,0) - val(u.y,0,0,-1) +\n      (val(u.z,0,1,-1) + val(u.z,0,1,0))/4. -\n      (val(u.z,0,-1,-1) + val(u.z,0,-1,0))/4.)/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+ {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0,-1);
+_stencil_val(u.z,0,1,-1); _stencil_val(u.z,0,1,0);
+_stencil_val(u.z,0,-1,-1); _stencil_val(u.z,0,-1,0);
+#line 229
+_stencil_val_a(taux.z,0,0,0);    
+        
+      }}end__stencil_is_face_z()end_foreach_face_stencil();
 
       {
 #line 228
@@ -15202,22 +16254,36 @@ foreach_face_generic()is_face_z(){
       (val(u.z,0,-1,-1) + val(u.z,0,-1,0))/4.)/Delta;}end_is_face_z()end_foreach_face_generic();}}
 
 
-      foreach_face_stencil()_stencil_is_face_x(){
- {_stencil_val_a(taux.x,0,0,0); _stencil_val(mu.x,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,-1,0,0);
-_stencil_val(u.x,-1,1,0); _stencil_val(u.x,0,1,0);
-_stencil_val(u.x,-1,-1,0); _stencil_val(u.x,0,-1,0);    
-        
-      
-#line 237
-}}end__stencil_is_face_x()end_foreach_face_stencil();
+      if(!is_constant(mu.y)){
 
 
       
 #line 234
-if(!is_constant(mu.y)){{foreach_face_generic()is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n val_out_(taux.x,0,0,0) = val(mu.x,0,0,0)*(val(u.y,0,0,0) - val(u.y,-1,0,0) +\n      (val(u.x,-1,1,0) + val(u.x,0,1,0))/4. -\n      (val(u.x,-1,-1,0) + val(u.x,0,-1,0))/4.)/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+ { _stencil_val(mu.x,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,-1,0,0);
+_stencil_val(u.x,-1,1,0); _stencil_val(u.x,0,1,0);
+_stencil_val(u.x,-1,-1,0); _stencil_val(u.x,0,-1,0);
+#line 235
+_stencil_val_a(taux.x,0,0,0);    
+        
+      }}end__stencil_is_face_x()end_foreach_face_stencil();{
+#line 234
+foreach_face_generic()is_face_x(){
  val(taux.x,0,0,0) = val(mu.x,0,0,0)*(val(u.y,0,0,0) - val(u.y,-1,0,0) +
       (val(u.x,-1,1,0) + val(u.x,0,1,0))/4. -
-      (val(u.x,-1,-1,0) + val(u.x,0,-1,0))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.x,-1,-1,0) + val(u.x,0,-1,0))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.y.i-_NVARMAX],_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+
+      
+#line 234
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n val_out_(taux.x,0,0,0) = _const_mu.x*(val(u.y,0,0,0) - val(u.y,-1,0,0) +\n      (val(u.x,-1,1,0) + val(u.x,0,1,0))/4. -\n      (val(u.x,-1,-1,0) + val(u.x,0,-1,0))/4.)/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+ {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,-1,0,0);
+_stencil_val(u.x,-1,1,0); _stencil_val(u.x,0,1,0);
+_stencil_val(u.x,-1,-1,0); _stencil_val(u.x,0,-1,0);
+#line 235
+_stencil_val_a(taux.x,0,0,0);    
+        
+      }}end__stencil_is_face_x()end_foreach_face_stencil();
 
 
       {
@@ -15227,7 +16293,11 @@ foreach_face_generic()is_face_x(){
       (val(u.x,-1,1,0) + val(u.x,0,1,0))/4. -
       (val(u.x,-1,-1,0) + val(u.x,0,-1,0))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}
 
-    foreach_stencil () {   
+    if(!is_constant(rho)){
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"rho","scalar",(void *)&rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n \n// #line 242\nd += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n \n// #line 242\nd += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n      val_out_(res.y,0,0,0) = val(r.y,0,0,0) - ((coord){1.,1.,1.}).y*val(u.y,0,0,0) + dt/val(rho,0,0,0)*d/Delta;\n      if (fabs (val(res.y,0,0,0)) > maxres)\n maxres = fabs (val(res.y,0,0,0));\n    }"}) {   
       
       
  { _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  }
@@ -15236,18 +16306,17 @@ foreach_face_generic()is_face_x(){
 { _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  }
  
 #line 242
-{ _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  }
-      _stencil_val_a(res.y,0,0,0); _stencil_val(r.y,0,0,0);_stencil_val(u.y,0,0,0);_stencil_val(rho,0,0,0);
+{ _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  } 
+_stencil_val(r.y,0,0,0);_stencil_val(u.y,0,0,0);_stencil_val(rho,0,0,0);
+      
+#line 243
+_stencil_val_a(res.y,0,0,0);
 _stencil_val(res.y,0,0,0);
  {_stencil_val(res.y,0,0,0);   }     
           
     
 #line 246
 }end_foreach_stencil();
-
-    
-#line 239
-if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
@@ -15271,6 +16340,29 @@ d += val(taux.x,1,0,0) - val(taux.x,0,0,0);
 }
 #line 246
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"_const_rho","double",(void *)&_const_rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n \n// #line 242\nd += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n \n// #line 242\nd += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n      val_out_(res.y,0,0,0) = val(r.y,0,0,0) - ((coord){1.,1.,1.}).y*val(u.y,0,0,0) + dt/_const_rho*d/Delta;\n      if (fabs (val(res.y,0,0,0)) > maxres)\n maxres = fabs (val(res.y,0,0,0));\n    }"}) {   
+      
+      
+ { _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  } 
+_stencil_val(r.y,0,0,0);_stencil_val(u.y,0,0,0);;
+      
+#line 243
+_stencil_val_a(res.y,0,0,0);
+_stencil_val(res.y,0,0,0);
+ {_stencil_val(res.y,0,0,0);   }     
+          
+    
+#line 246
+}end_foreach_stencil();
 
     
 #undef OMP_PARALLEL
@@ -15300,32 +16392,51 @@ d += val(taux.x,1,0,0) - val(taux.x,0,0,0);
 #line 223
 {
     vector  taux=new_face_vector("taux");
-    foreach_face_stencil()_stencil_is_face_z(){
-      {_stencil_val_a(taux.z,0,0,0);_stencil_val(mu.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,-1);   }}end__stencil_is_face_z()end_foreach_face_stencil();
+    if(!is_constant(mu.z)){
     
 #line 225
-if(!is_constant(mu.z)){{foreach_face_generic()is_face_z(){
-      val(taux.z,0,0,0) = 2.*val(mu.z,0,0,0)*(val(u.z,0,0,0) - val(u.z,0,0,-1))/Delta;}end_is_face_z()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n      val_out_(taux.z,0,0,0) = 2.*val(mu.z,0,0,0)*(val(u.z,0,0,0) - val(u.z,0,0,-1))/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+      {_stencil_val(mu.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,-1);_stencil_val_a(taux.z,0,0,0);   }}end__stencil_is_face_z()end_foreach_face_stencil();{
+#line 225
+foreach_face_generic()is_face_z(){
+      val(taux.z,0,0,0) = 2.*val(mu.z,0,0,0)*(val(u.z,0,0,0) - val(u.z,0,0,-1))/Delta;}end_is_face_z()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+    
+#line 225
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 225 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_z(){\n      val_out_(taux.z,0,0,0) = 2.*_const_mu.z*(val(u.z,0,0,0) - val(u.z,0,0,-1))/Delta;}end_is_face_z()"})_stencil_is_face_z(){
+      {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,-1);_stencil_val_a(taux.z,0,0,0);   }}end__stencil_is_face_z()end_foreach_face_stencil();
     {
 #line 225
 foreach_face_generic()is_face_z(){
       val(taux.z,0,0,0) = 2.*_const_mu.z*(val(u.z,0,0,0) - val(u.z,0,0,-1))/Delta;}end_is_face_z()end_foreach_face_generic();}}
 
-      foreach_face_stencil()_stencil_is_face_x(){
- {_stencil_val_a(taux.x,0,0,0); _stencil_val(mu.x,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,-1,0,0);
-_stencil_val(u.x,-1,0,1); _stencil_val(u.x,0,0,1);
-_stencil_val(u.x,-1,0,-1); _stencil_val(u.x,0,0,-1);    
-        
-      
-#line 231
-}}end__stencil_is_face_x()end_foreach_face_stencil();
+      if(!is_constant(mu.z)){
 
       
 #line 228
-if(!is_constant(mu.z)){{foreach_face_generic()is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n val_out_(taux.x,0,0,0) = val(mu.x,0,0,0)*(val(u.z,0,0,0) - val(u.z,-1,0,0) +\n      (val(u.x,-1,0,1) + val(u.x,0,0,1))/4. -\n      (val(u.x,-1,0,-1) + val(u.x,0,0,-1))/4.)/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+ { _stencil_val(mu.x,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,-1,0,0);
+_stencil_val(u.x,-1,0,1); _stencil_val(u.x,0,0,1);
+_stencil_val(u.x,-1,0,-1); _stencil_val(u.x,0,0,-1);
+#line 229
+_stencil_val_a(taux.x,0,0,0);    
+        
+      }}end__stencil_is_face_x()end_foreach_face_stencil();{
+#line 228
+foreach_face_generic()is_face_x(){
  val(taux.x,0,0,0) = val(mu.x,0,0,0)*(val(u.z,0,0,0) - val(u.z,-1,0,0) +
       (val(u.x,-1,0,1) + val(u.x,0,0,1))/4. -
-      (val(u.x,-1,0,-1) + val(u.x,0,0,-1))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.x,-1,0,-1) + val(u.x,0,0,-1))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+      
+#line 228
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 228 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_x(){\n val_out_(taux.x,0,0,0) = _const_mu.x*(val(u.z,0,0,0) - val(u.z,-1,0,0) +\n      (val(u.x,-1,0,1) + val(u.x,0,0,1))/4. -\n      (val(u.x,-1,0,-1) + val(u.x,0,0,-1))/4.)/Delta;}end_is_face_x()"})_stencil_is_face_x(){
+ {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,-1,0,0);
+_stencil_val(u.x,-1,0,1); _stencil_val(u.x,0,0,1);
+_stencil_val(u.x,-1,0,-1); _stencil_val(u.x,0,0,-1);
+#line 229
+_stencil_val_a(taux.x,0,0,0);    
+        
+      }}end__stencil_is_face_x()end_foreach_face_stencil();
 
       {
 #line 228
@@ -15335,22 +16446,36 @@ foreach_face_generic()is_face_x(){
       (val(u.x,-1,0,-1) + val(u.x,0,0,-1))/4.)/Delta;}end_is_face_x()end_foreach_face_generic();}}
 
 
-      foreach_face_stencil()_stencil_is_face_y(){
- {_stencil_val_a(taux.y,0,0,0); _stencil_val(mu.y,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,-1,0);
-_stencil_val(u.y,0,-1,1); _stencil_val(u.y,0,0,1);
-_stencil_val(u.y,0,-1,-1); _stencil_val(u.y,0,0,-1);    
-        
-      
-#line 237
-}}end__stencil_is_face_y()end_foreach_face_stencil();
+      if(!is_constant(mu.z)){
 
 
       
 #line 234
-if(!is_constant(mu.z)){{foreach_face_generic()is_face_y(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"mu","vector",(void *)&mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n val_out_(taux.y,0,0,0) = val(mu.y,0,0,0)*(val(u.z,0,0,0) - val(u.z,0,-1,0) +\n      (val(u.y,0,-1,1) + val(u.y,0,0,1))/4. -\n      (val(u.y,0,-1,-1) + val(u.y,0,0,-1))/4.)/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+ { _stencil_val(mu.y,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,-1,0);
+_stencil_val(u.y,0,-1,1); _stencil_val(u.y,0,0,1);
+_stencil_val(u.y,0,-1,-1); _stencil_val(u.y,0,0,-1);
+#line 235
+_stencil_val_a(taux.y,0,0,0);    
+        
+      }}end__stencil_is_face_y()end_foreach_face_stencil();{
+#line 234
+foreach_face_generic()is_face_y(){
  val(taux.y,0,0,0) = val(mu.y,0,0,0)*(val(u.z,0,0,0) - val(u.z,0,-1,0) +
       (val(u.y,0,-1,1) + val(u.y,0,0,1))/4. -
-      (val(u.y,0,-1,-1) + val(u.y,0,0,-1))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}else {struct{double x,y,z;}_const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+      (val(u.y,0,-1,-1) + val(u.y,0,0,-1))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}else {_coord _const_mu={_constant[mu.z.i-_NVARMAX],_constant[mu.x.i-_NVARMAX],_constant[mu.y.i-_NVARMAX]};NOT_UNUSED(_const_mu);
+
+
+      
+#line 234
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_mu","_coord",(void *)&_const_mu,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 234 \"/home/lisergey/basilisk/src/viscosity.h\"\nis_face_y(){\n val_out_(taux.y,0,0,0) = _const_mu.y*(val(u.z,0,0,0) - val(u.z,0,-1,0) +\n      (val(u.y,0,-1,1) + val(u.y,0,0,1))/4. -\n      (val(u.y,0,-1,-1) + val(u.y,0,0,-1))/4.)/Delta;}end_is_face_y()"})_stencil_is_face_y(){
+ {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,-1,0);
+_stencil_val(u.y,0,-1,1); _stencil_val(u.y,0,0,1);
+_stencil_val(u.y,0,-1,-1); _stencil_val(u.y,0,0,-1);
+#line 235
+_stencil_val_a(taux.y,0,0,0);    
+        
+      }}end__stencil_is_face_y()end_foreach_face_stencil();
 
 
       {
@@ -15360,7 +16485,11 @@ foreach_face_generic()is_face_y(){
       (val(u.y,0,-1,1) + val(u.y,0,0,1))/4. -
       (val(u.y,0,-1,-1) + val(u.y,0,0,-1))/4.)/Delta;}end_is_face_y()end_foreach_face_generic();}}
 
-    foreach_stencil () {   
+    if(!is_constant(rho)){
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"rho","scalar",(void *)&rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n \n// #line 242\nd += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n \n// #line 242\nd += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n      val_out_(res.z,0,0,0) = val(r.z,0,0,0) - ((coord){1.,1.,1.}).z*val(u.z,0,0,0) + dt/val(rho,0,0,0)*d/Delta;\n      if (fabs (val(res.z,0,0,0)) > maxres)\n maxres = fabs (val(res.z,0,0,0));\n    }"}) {   
       
       
  { _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  }
@@ -15369,18 +16498,17 @@ foreach_face_generic()is_face_y(){
 { _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  }
  
 #line 242
-{ _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  }
-      _stencil_val_a(res.z,0,0,0); _stencil_val(r.z,0,0,0);_stencil_val(u.z,0,0,0);_stencil_val(rho,0,0,0);
+{ _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  } 
+_stencil_val(r.z,0,0,0);_stencil_val(u.z,0,0,0);_stencil_val(rho,0,0,0);
+      
+#line 243
+_stencil_val_a(res.z,0,0,0);
 _stencil_val(res.z,0,0,0);
  {_stencil_val(res.z,0,0,0);   }     
           
     
 #line 246
 }end_foreach_stencil();
-
-    
-#line 239
-if(!is_constant(rho)){
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(max:maxres)){
@@ -15404,6 +16532,29 @@ d += val(taux.y,0,1,0) - val(taux.y,0,0,0);
 }
 #line 246
 }else {double _const_rho=_constant[rho.i-_NVARMAX];NOT_UNUSED(_const_rho);
+
+    
+#line 239
+foreach_stencil (1,{(NonLocal[]){{"maxres","double",(void *)&maxres,NULL,0,'M'},{"_const_rho","double",(void *)&_const_rho,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"res","vector",(void *)&res,NULL,0},{"taux","vector",(void *)&taux,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 239 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      real d = 0.;\n      \n d += val(taux.z,0,0,1) - val(taux.z,0,0,0);\n \n// #line 242\nd += val(taux.x,1,0,0) - val(taux.x,0,0,0);\n \n// #line 242\nd += val(taux.y,0,1,0) - val(taux.y,0,0,0);\n      val_out_(res.z,0,0,0) = val(r.z,0,0,0) - ((coord){1.,1.,1.}).z*val(u.z,0,0,0) + dt/_const_rho*d/Delta;\n      if (fabs (val(res.z,0,0,0)) > maxres)\n maxres = fabs (val(res.z,0,0,0));\n    }"}) {   
+      
+      
+ { _stencil_val(taux.z,0,0,1); _stencil_val(taux.z,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.x,1,0,0); _stencil_val(taux.x,0,0,0);  }
+ 
+#line 242
+{ _stencil_val(taux.y,0,1,0); _stencil_val(taux.y,0,0,0);  } 
+_stencil_val(r.z,0,0,0);_stencil_val(u.z,0,0,0);;
+      
+#line 243
+_stencil_val_a(res.z,0,0,0);
+_stencil_val(res.z,0,0,0);
+ {_stencil_val(res.z,0,0,0);   }     
+          
+    
+#line 246
+}end_foreach_stencil();
 
     
 #undef OMP_PARALLEL
@@ -15444,15 +16595,15 @@ mgstats viscosity (vector u, vector mu, scalar rho, double dt,
 
 
   vector  r=new_vector("r");
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"r","vector",(void *)&r,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 299 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      val_out_(r.x,0,0,0) = val(u.x,0,0,0);\n      \n// #line 300\nval_out_(r.y,0,0,0) = val(u.y,0,0,0);\n      \n// #line 300\nval_out_(r.z,0,0,0) = val(u.z,0,0,0);}"})
     {
-      {_stencil_val_a(r.x,0,0,0); _stencil_val(u.x,0,0,0); }
+      { _stencil_val(u.x,0,0,0);_stencil_val_a(r.x,0,0,0); }
       
 #line 300
-{_stencil_val_a(r.y,0,0,0); _stencil_val(u.y,0,0,0); }
+{ _stencil_val(u.y,0,0,0);_stencil_val_a(r.y,0,0,0); }
       
 #line 300
-{_stencil_val_a(r.z,0,0,0); _stencil_val(u.z,0,0,0); }}end_foreach_stencil();
+{ _stencil_val(u.z,0,0,0);_stencil_val_a(r.z,0,0,0); }}end_foreach_stencil();
   {
 #line 298
 foreach()
@@ -15490,15 +16641,15 @@ mgstats viscosity_explicit (vector u, vector mu, scalar rho, double dt)
   mgstats mg = {0};
   struct Viscosity p = { mu, rho, dt };
   mg.resb = residual_viscosity ((scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (scalar *)((vector[]){u,{{-1},{-1},{-1}}}), (scalar *)((vector[]){r,{{-1},{-1},{-1}}}), &p);
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"r","vector",(void *)&r,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 326 \"/home/lisergey/basilisk/src/viscosity.h\"\n{\n      val_out_(u.x,0,0,0) += val(r.x,0,0,0);\n      \n// #line 327\nval_out_(u.y,0,0,0) += val(r.y,0,0,0);\n      \n// #line 327\nval_out_(u.z,0,0,0) += val(r.z,0,0,0);}"})
     {
-      {_stencil_val_r(u.x,0,0,0); _stencil_val(r.x,0,0,0); }
+      { _stencil_val(r.x,0,0,0);_stencil_val_r(u.x,0,0,0); }
       
 #line 327
-{_stencil_val_r(u.y,0,0,0); _stencil_val(r.y,0,0,0); }
+{ _stencil_val(r.y,0,0,0);_stencil_val_r(u.y,0,0,0); }
       
 #line 327
-{_stencil_val_r(u.z,0,0,0); _stencil_val(r.z,0,0,0); }}end_foreach_stencil();
+{ _stencil_val(r.z,0,0,0);_stencil_val_r(u.z,0,0,0); }}end_foreach_stencil();
   {
 #line 325
 foreach()
@@ -15524,8 +16675,8 @@ vector  uf={{8},{9},{10}};
 mgstats mgp = {0}, mgpf = {0}, mgu = {0};
 bool stokes = false;
 #line 91
-static double _boundary0(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}static double _boundary0_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}
-static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}static double _boundary1_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}
+static double _boundary0(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.x,1,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}static double _boundary0_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*val(fm.x,1,0,0)/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*_const_fm.x/val(alpha.x,1,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*val(fm.x,1,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.x,1,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}
+static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.x,0,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}static double _boundary1_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*val(fm.x,0,0,0)/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*_const_fm.x/val(alpha.x,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*val(fm.x,0,0,0)/_const_alpha.x), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.x,0,0,0)*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.x*_const_fm.x/_const_alpha.x), point, neighbor, _s, data));}}}}}
 
 
 
@@ -15534,12 +16685,12 @@ static double _boundary1(Point point,Point neighbor,scalar _s,void *data){int ig
 
 
 
-static double _boundary2(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}static double _boundary2_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}
-static double _boundary3(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}static double _boundary3_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}
+static double _boundary2(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.y,0,1,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}static double _boundary2_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*val(fm.y,0,1,0)/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*_const_fm.y/val(alpha.y,0,1,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*val(fm.y,0,1,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.y,0,1,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}
+static double _boundary3(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.y,0,0,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}static double _boundary3_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*val(fm.y,0,0,0)/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*_const_fm.y/val(alpha.y,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*val(fm.y,0,0,0)/_const_alpha.y), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.y,0,0,0)*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.y*_const_fm.y/_const_alpha.y), point, neighbor, _s, data));}}}}}
 
 
-static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}
-static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}
+static double _boundary4(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((val(a.z,0,0,1)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann((_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}static double _boundary4_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*val(fm.z,0,0,1)/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*_const_fm.z/val(alpha.z,0,0,1)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*val(fm.z,0,0,1)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((val(a.z,0,0,1)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous((_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}
+static double _boundary5(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (val(a.z,0,0,0)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann(- (_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}static double _boundary5_homogeneous(Point point,Point neighbor,scalar _s,void *data){int ig=0;NOT_UNUSED(ig);int jg=0;NOT_UNUSED(jg);int kg=0;NOT_UNUSED(kg);POINT_VARIABLES;if(!is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*val(fm.z,0,0,0)/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && is_constant(fm.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*_const_fm.z/val(alpha.z,0,0,0)), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(is_constant(a.x) && !is_constant(fm.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*val(fm.z,0,0,0)/_const_alpha.z), point, neighbor, _s, data));}}}}else if(!is_constant(a.x) && is_constant(fm.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (val(a.z,0,0,0)*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}else {_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);{{int ig=neighbor.i-point.i;if(ig==0)ig=_attribute[_s.i].d.x;NOT_UNUSED(ig);int jg=neighbor.j-point.j;if(jg==0)jg=_attribute[_s.i].d.y;NOT_UNUSED(jg);int kg=neighbor.k-point.k;if(kg==0)kg=_attribute[_s.i].d.z;NOT_UNUSED(kg);POINT_VARIABLES;{return( _neumann_homogeneous(- (_const_a.z*_const_fm.z/_const_alpha.z), point, neighbor, _s, data));}}}}}
 #line 126
 static int defaults_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i = 0)!=0;*ip=i;*tp=t;return ret;}
 #line 126 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
@@ -15563,24 +16714,36 @@ static int defaults_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*t
   }
   else if (!is_constant(alpha.x)) {
     vector alphav = alpha;
-    foreach_face_stencil(){_stencil_is_face_x(){
-      {_stencil_val_a(alphav.x,0,0,0); _stencil_val(fm.x,0,0,0); }}end__stencil_is_face_x()
-#line 146
-_stencil_is_face_y(){
-      {_stencil_val_a(alphav.y,0,0,0); _stencil_val(fm.y,0,0,0); }}end__stencil_is_face_y()
-#line 146
-_stencil_is_face_z(){
-      {_stencil_val_a(alphav.z,0,0,0); _stencil_val(fm.z,0,0,0); }}end__stencil_is_face_z()}end_foreach_face_stencil();
+    if(!is_constant(fm.x)){
     
 #line 146
-if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"fm","vector",(void *)&fm,NULL,0},{"alphav","vector",(void *)&alphav,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 146 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n      val_out_(alphav.x,0,0,0) = val(fm.x,0,0,0);}end_is_face_x()\n// #line 146\nis_face_y(){\n      val_out_(alphav.y,0,0,0) = val(fm.y,0,0,0);}end_is_face_y()\n// #line 146\nis_face_z(){\n      val_out_(alphav.z,0,0,0) = val(fm.z,0,0,0);}end_is_face_z()}"}){_stencil_is_face_x(){
+      { _stencil_val(fm.x,0,0,0);_stencil_val_a(alphav.x,0,0,0); }}end__stencil_is_face_x()
+#line 146
+_stencil_is_face_y(){
+      { _stencil_val(fm.y,0,0,0);_stencil_val_a(alphav.y,0,0,0); }}end__stencil_is_face_y()
+#line 146
+_stencil_is_face_z(){
+      { _stencil_val(fm.z,0,0,0);_stencil_val_a(alphav.z,0,0,0); }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 146
+foreach_face_generic(){is_face_x(){
       val(alphav.x,0,0,0) = val(fm.x,0,0,0);}end_is_face_x()
 #line 146
 is_face_y(){
       val(alphav.y,0,0,0) = val(fm.y,0,0,0);}end_is_face_y()
 #line 146
 is_face_z(){
-      val(alphav.z,0,0,0) = val(fm.z,0,0,0);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+      val(alphav.z,0,0,0) = val(fm.z,0,0,0);}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+    
+#line 146
+foreach_face_stencil(1,{(NonLocal[]){{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"alphav","vector",(void *)&alphav,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 146 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n      val_out_(alphav.x,0,0,0) = _const_fm.x;}end_is_face_x()\n// #line 146\nis_face_y(){\n      val_out_(alphav.y,0,0,0) = _const_fm.y;}end_is_face_y()\n// #line 146\nis_face_z(){\n      val_out_(alphav.z,0,0,0) = _const_fm.z;}end_is_face_z()}"}){_stencil_is_face_x(){
+      {;_stencil_val_a(alphav.x,0,0,0); }}end__stencil_is_face_x()
+#line 146
+_stencil_is_face_y(){
+      {;_stencil_val_a(alphav.y,0,0,0); }}end__stencil_is_face_y()
+#line 146
+_stencil_is_face_z(){
+      {;_stencil_val_a(alphav.z,0,0,0); }}end__stencil_is_face_z()}end_foreach_face_stencil();
     {
 #line 146
 foreach_face_generic(){is_face_x(){
@@ -15600,7 +16763,7 @@ is_face_z(){
 
   _attribute[uf.x.i].refine = refine_face_solenoidal;
 #line 178 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"t","double",(void *)&t,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 179 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{\n      dimensional (val(u.x,0,0,0) == Delta/t);\n      \n// #line 180\ndimensional (val(u.y,0,0,0) == Delta/t);\n      \n// #line 180\ndimensional (val(u.z,0,0,0) == Delta/t);}"})
     {
       {_stencil_val(u.x,0,0,0);   }
       
@@ -15635,7 +16798,7 @@ static int default_display_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double
 #line 187
       static int default_display(const int i,const double t,Event *_ev){tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",187);
   display ("squares (color = 'u.x', spread = -1);"
-#line 1422 "/home/lisergey/basilisk/src/common.h"
+#line 1425 "/home/lisergey/basilisk/src/common.h"
 , false
 #line 188 "/home/lisergey/basilisk/src/navier-stokes/centered.h"
 );{end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);return 0;}end_tracing("default_display","/home/lisergey/basilisk/src/navier-stokes/centered.h",188);}
@@ -15653,24 +16816,36 @@ static int init_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int 
       static int init(const int i,const double t,Event *_ev){tracing("init","/home/lisergey/basilisk/src/navier-stokes/centered.h",196);
 {
   trash (((vector[]){uf,{{-1},{-1},{-1}}}));
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(uf.x,0,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);  }}end__stencil_is_face_x()
-#line 199
-_stencil_is_face_y(){
-    {_stencil_val_a(uf.y,0,0,0); _stencil_val(fm.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);  }}end__stencil_is_face_y()
-#line 199
-_stencil_is_face_z(){
-    {_stencil_val_a(uf.z,0,0,0); _stencil_val(fm.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  if(!is_constant(fm.x)){
   
 #line 199
-if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 199 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = val(fm.x,0,0,0)*((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.);}end_is_face_x()\n// #line 199\nis_face_y(){\n    val_out_(uf.y,0,0,0) = val(fm.y,0,0,0)*((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.);}end_is_face_y()\n// #line 199\nis_face_z(){\n    val_out_(uf.z,0,0,0) = val(fm.z,0,0,0)*((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.);}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);_stencil_val_a(uf.x,0,0,0);  }}end__stencil_is_face_x()
+#line 199
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);_stencil_val_a(uf.y,0,0,0);  }}end__stencil_is_face_y()
+#line 199
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);_stencil_val_a(uf.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 199
+foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = val(fm.x,0,0,0)*((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.);}end_is_face_x()
 #line 199
 is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.);}end_is_face_y()
 #line 199
 is_face_z(){
-    val(uf.z,0,0,0) = val(fm.z,0,0,0)*((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+    val(uf.z,0,0,0) = val(fm.z,0,0,0)*((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.);}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 199
+foreach_face_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 199 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = _const_fm.x*((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.);}end_is_face_x()\n// #line 199\nis_face_y(){\n    val_out_(uf.y,0,0,0) = _const_fm.y*((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.);}end_is_face_y()\n// #line 199\nis_face_z(){\n    val_out_(uf.z,0,0,0) = _const_fm.z*((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.);}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);_stencil_val_a(uf.x,0,0,0);  }}end__stencil_is_face_x()
+#line 199
+_stencil_is_face_y(){
+    {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);_stencil_val_a(uf.y,0,0,0);  }}end__stencil_is_face_y()
+#line 199
+_stencil_is_face_z(){
+    {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);_stencil_val_a(uf.z,0,0,0);  }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 199
 foreach_face_generic(){is_face_x(){
@@ -15778,14 +16953,22 @@ void prediction()
     {
     
 #line 264
-foreach_stencil()
+foreach_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"du","vector",(void *)&du,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n      \n// #line 265 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{ {\n\n\n\n\n\n   val_out_(du.x,0,0,0) = u.x.gradient (val(u.x,-1,0,0), val(u.x,0,0,0), val(u.x,1,0,0))/Delta;\n      } \n// #line 265\n{\n\n\n\n\n\n   val_out_(du.y,0,0,0) = u.y.gradient (val(u.y,0,-1,0), val(u.y,0,0,0), val(u.y,0,1,0))/Delta;\n      } \n// #line 265\n{\n\n\n\n\n\n   val_out_(du.z,0,0,0) = u.z.gradient (val(u.z,0,0,-1), val(u.z,0,0,0), val(u.z,0,0,1))/Delta;\n      }}"})
       { {
 
 
 
 
 
-   _stencil_val_a(du.x,0,0,0);_stencil_val(u.x,-1,0,0); _stencil_val(u.x,0,0,0); _stencil_val(u.x,1,0,0);   
+_stencil_val(u.x,-1,0,0); _stencil_val(u.x,0,0,0); _stencil_val(u.x,1,0,0);
+
+
+
+
+
+   
+#line 271
+_stencil_val_a(du.x,0,0,0);   
       } 
 #line 265
 {
@@ -15794,7 +16977,15 @@ foreach_stencil()
 
 
 
-   _stencil_val_a(du.y,0,0,0);_stencil_val(u.y,0,-1,0); _stencil_val(u.y,0,0,0); _stencil_val(u.y,0,1,0);   
+_stencil_val(u.y,0,-1,0); _stencil_val(u.y,0,0,0); _stencil_val(u.y,0,1,0);
+
+
+
+
+
+   
+#line 271
+_stencil_val_a(du.y,0,0,0);   
       } 
 #line 265
 {
@@ -15803,7 +16994,15 @@ foreach_stencil()
 
 
 
-   _stencil_val_a(du.z,0,0,0);_stencil_val(u.z,0,0,-1); _stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,1);   
+_stencil_val(u.z,0,0,-1); _stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,1);
+
+
+
+
+
+   
+#line 271
+_stencil_val_a(du.z,0,0,0);   
       }}end_foreach_stencil();{
 #line 264
 foreach()
@@ -15837,14 +17036,22 @@ foreach()
     {
     
 #line 274
-foreach_stencil()
+foreach_stencil(1,{(NonLocal[]){{"u","vector",(void *)&u,NULL,0},{"du","vector",(void *)&du,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n      \n// #line 275 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{ {\n\n\n\n\n\n   val_out_(du.x,0,0,0) = (val(u.x,1,0,0) - val(u.x,-1,0,0))/(2.*Delta);\n    } \n// #line 275\n{\n\n\n\n\n\n   val_out_(du.y,0,0,0) = (val(u.y,0,1,0) - val(u.y,0,-1,0))/(2.*Delta);\n    } \n// #line 275\n{\n\n\n\n\n\n   val_out_(du.z,0,0,0) = (val(u.z,0,0,1) - val(u.z,0,0,-1))/(2.*Delta);\n    }}"})
       { {
 
 
 
 
 
-   _stencil_val_a(du.x,0,0,0);_stencil_val(u.x,1,0,0); _stencil_val(u.x,-1,0,0);   
+_stencil_val(u.x,1,0,0); _stencil_val(u.x,-1,0,0);
+
+
+
+
+
+   
+#line 281
+_stencil_val_a(du.x,0,0,0);   
     } 
 #line 275
 {
@@ -15853,7 +17060,15 @@ foreach_stencil()
 
 
 
-   _stencil_val_a(du.y,0,0,0);_stencil_val(u.y,0,1,0); _stencil_val(u.y,0,-1,0);   
+_stencil_val(u.y,0,1,0); _stencil_val(u.y,0,-1,0);
+
+
+
+
+
+   
+#line 281
+_stencil_val_a(du.y,0,0,0);   
     } 
 #line 275
 {
@@ -15862,7 +17077,15 @@ foreach_stencil()
 
 
 
-   _stencil_val_a(du.z,0,0,0);_stencil_val(u.z,0,0,1); _stencil_val(u.z,0,0,-1);   
+_stencil_val(u.z,0,0,1); _stencil_val(u.z,0,0,-1);
+
+
+
+
+
+   
+#line 281
+_stencil_val_a(du.z,0,0,0);   
     }}end_foreach_stencil();{
 #line 274
 foreach()
@@ -15894,21 +17117,35 @@ foreach()
     }}end_foreach();}}
 
   trash (((vector[]){uf,{{-1},{-1},{-1}}}));
-  foreach_face_stencil(){_stencil_is_face_x(){ {       
+  if(!is_constant(fm.x)){
+  
+#line 285
+foreach_face_stencil(1,{(NonLocal[]){{"fm","vector",(void *)&fm,NULL,0},{"du","vector",(void *)&du,NULL,0},{"g","vector",(void *)&g,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"u","vector",(void *)&u,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 285 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){ {\n    real un = dt*(val(u.x,0,0,0) + val(u.x,-1,0,0))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.x,0,0,0) = val(u.x,i,0,0) + (val(g.x,0,0,0) + val(g.x,-1,0,0))*dt/4. + s*(1. - s*un)*val(du.x,i,0,0)*Delta/2.;\n\n    if (val(fm.y,i,0,0) && val(fm.y,i,1,0)) {\n      real fyy = val(u.y,i,0,0) < 0. ? val(u.x,i,1,0) - val(u.x,i,0,0) : val(u.x,i,0,0) - val(u.x,i,-1,0);\n      val_out_(uf.x,0,0,0) -= dt*val(u.y,i,0,0)*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.z,i,0,0) && val(fm.z,i,0,1)) {\n      real fzz = val(u.z,i,0,0) < 0. ? val(u.x,i,0,1) - val(u.x,i,0,0) : val(u.x,i,0,0) - val(u.x,i,0,-1);\n      val_out_(uf.x,0,0,0) -= dt*val(u.z,i,0,0)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.x,0,0,0) *= val(fm.x,0,0,0);\n  }}end_is_face_x()\n// #line 285\nis_face_y(){ {\n    real un = dt*(val(u.y,0,0,0) + val(u.y,0,-1,0))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.y,0,0,0) = val(u.y,0,i,0) + (val(g.y,0,0,0) + val(g.y,0,-1,0))*dt/4. + s*(1. - s*un)*val(du.y,0,i,0)*Delta/2.;\n\n    if (val(fm.z,0,i,0) && val(fm.z,0,i,1)) {\n      real fyy = val(u.z,0,i,0) < 0. ? val(u.y,0,i,1) - val(u.y,0,i,0) : val(u.y,0,i,0) - val(u.y,0,i,-1);\n      val_out_(uf.y,0,0,0) -= dt*val(u.z,0,i,0)*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.x,0,i,0) && val(fm.x,1,i,0)) {\n      real fzz = val(u.x,0,i,0) < 0. ? val(u.y,1,i,0) - val(u.y,0,i,0) : val(u.y,0,i,0) - val(u.y,-1,i,0);\n      val_out_(uf.y,0,0,0) -= dt*val(u.x,0,i,0)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.y,0,0,0) *= val(fm.y,0,0,0);\n  }}end_is_face_y()\n// #line 285\nis_face_z(){ {\n    real un = dt*(val(u.z,0,0,0) + val(u.z,0,0,-1))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.z,0,0,0) = val(u.z,0,0,i) + (val(g.z,0,0,0) + val(g.z,0,0,-1))*dt/4. + s*(1. - s*un)*val(du.z,0,0,i)*Delta/2.;\n\n    if (val(fm.x,0,0,i) && val(fm.x,1,0,i)) {\n      real fyy = val(u.x,0,0,i) < 0. ? val(u.z,1,0,i) - val(u.z,0,0,i) : val(u.z,0,0,i) - val(u.z,-1,0,i);\n      val_out_(uf.z,0,0,0) -= dt*val(u.x,0,0,i)*fyy/(2.*Delta);\n    }\n\n\n    if (val(fm.y,0,0,i) && val(fm.y,0,1,i)) {\n      real fzz = val(u.y,0,0,i) < 0. ? val(u.z,0,1,i) - val(u.z,0,0,i) : val(u.z,0,0,i) - val(u.z,0,-1,i);\n      val_out_(uf.z,0,0,0) -= dt*val(u.y,0,0,i)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.z,0,0,0) *= val(fm.z,0,0,0);\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {       
      _stencil_val(u.x,-1,0,0);_stencil_val(u.x,0,0,0);     
     
-    _stencil_val_a(uf.x,0,0,0);_stencil_val(u.x, o_stencil,0,0);_stencil_val(g.x,0,0,0); _stencil_val(g.x,-1,0,0);_stencil_val(du.x,o_stencil,0,0);
+_stencil_val(u.x, o_stencil,0,0);_stencil_val(g.x,0,0,0); _stencil_val(g.x,-1,0,0);_stencil_val(du.x,o_stencil,0,0);
+    
+#line 288
+_stencil_val_a(uf.x,0,0,0);
 
 _stencil_val(fm.y,o_stencil,0,0); _stencil_val(fm.y,o_stencil,1,0); {        
        _stencil_val(u.x,o_stencil,-1,0);_stencil_val(u.x, o_stencil,0,0);_stencil_val(u.x, o_stencil,0,0); _stencil_val(u.x,o_stencil,1,0);_stencil_val(u.y, o_stencil,0,0);
-      _stencil_val_r(uf.x,0,0,0);_stencil_val(u.y,o_stencil,0,0);  
+_stencil_val(u.y,o_stencil,0,0);
+      
+#line 292
+_stencil_val_r(uf.x,0,0,0);  
     }
 
 
 _stencil_val(fm.z,o_stencil,0,0); _stencil_val(fm.z,o_stencil,0,1); {        
        _stencil_val(u.x,o_stencil,0,-1);_stencil_val(u.x, o_stencil,0,0);_stencil_val(u.x, o_stencil,0,0); _stencil_val(u.x,o_stencil,0,1);_stencil_val(u.z, o_stencil,0,0);
-      _stencil_val_r(uf.x,0,0,0);_stencil_val(u.z,o_stencil,0,0);  
-    }        
+_stencil_val(u.z,o_stencil,0,0);
+      
+#line 298
+_stencil_val_r(uf.x,0,0,0);  
+    } 
+
+_stencil_val(fm.x,0,0,0);        
 
       
 
@@ -15917,24 +17154,35 @@ _stencil_val(fm.z,o_stencil,0,0); _stencil_val(fm.z,o_stencil,0,1); {
 
     
 #line 301
-_stencil_val_r(uf.x,0,0,0); _stencil_val(fm.x,0,0,0); 
+_stencil_val_r(uf.x,0,0,0); 
   }}end__stencil_is_face_x()
 #line 285
 _stencil_is_face_y(){ {       
      _stencil_val(u.y,0,-1,0);_stencil_val(u.y,0,0,0);     
     
-    _stencil_val_a(uf.y,0,0,0);_stencil_val(u.y,0, o_stencil,0);_stencil_val(g.y,0,0,0); _stencil_val(g.y,0,-1,0);_stencil_val(du.y,0,o_stencil,0);
+_stencil_val(u.y,0, o_stencil,0);_stencil_val(g.y,0,0,0); _stencil_val(g.y,0,-1,0);_stencil_val(du.y,0,o_stencil,0);
+    
+#line 288
+_stencil_val_a(uf.y,0,0,0);
 
 _stencil_val(fm.z,0,o_stencil,0); _stencil_val(fm.z,0,o_stencil,1); {        
        _stencil_val(u.y,0,o_stencil,-1);_stencil_val(u.y,0, o_stencil,0);_stencil_val(u.y,0, o_stencil,0); _stencil_val(u.y,0,o_stencil,1);_stencil_val(u.z,0, o_stencil,0);
-      _stencil_val_r(uf.y,0,0,0);_stencil_val(u.z,0,o_stencil,0);  
+_stencil_val(u.z,0,o_stencil,0);
+      
+#line 292
+_stencil_val_r(uf.y,0,0,0);  
     }
 
 
 _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {        
        _stencil_val(u.y,-1,o_stencil,0);_stencil_val(u.y,0, o_stencil,0);_stencil_val(u.y,0, o_stencil,0); _stencil_val(u.y,1,o_stencil,0);_stencil_val(u.x,0, o_stencil,0);
-      _stencil_val_r(uf.y,0,0,0);_stencil_val(u.x,0,o_stencil,0);  
-    }        
+_stencil_val(u.x,0,o_stencil,0);
+      
+#line 298
+_stencil_val_r(uf.y,0,0,0);  
+    } 
+
+_stencil_val(fm.y,0,0,0);        
 
       
 
@@ -15943,24 +17191,35 @@ _stencil_val(fm.x,0,o_stencil,0); _stencil_val(fm.x,1,o_stencil,0); {
 
     
 #line 301
-_stencil_val_r(uf.y,0,0,0); _stencil_val(fm.y,0,0,0); 
+_stencil_val_r(uf.y,0,0,0); 
   }}end__stencil_is_face_y()
 #line 285
 _stencil_is_face_z(){ {       
      _stencil_val(u.z,0,0,-1);_stencil_val(u.z,0,0,0);     
     
-    _stencil_val_a(uf.z,0,0,0);_stencil_val(u.z,0,0, o_stencil);_stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,-1);_stencil_val(du.z,0,0,o_stencil);
+_stencil_val(u.z,0,0, o_stencil);_stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,-1);_stencil_val(du.z,0,0,o_stencil);
+    
+#line 288
+_stencil_val_a(uf.z,0,0,0);
 
 _stencil_val(fm.x,0,0,o_stencil); _stencil_val(fm.x,1,0,o_stencil); {        
        _stencil_val(u.z,-1,0,o_stencil);_stencil_val(u.z,0,0, o_stencil);_stencil_val(u.z,0,0, o_stencil); _stencil_val(u.z,1,0,o_stencil);_stencil_val(u.x,0,0, o_stencil);
-      _stencil_val_r(uf.z,0,0,0);_stencil_val(u.x,0,0,o_stencil);  
+_stencil_val(u.x,0,0,o_stencil);
+      
+#line 292
+_stencil_val_r(uf.z,0,0,0);  
     }
 
 
 _stencil_val(fm.y,0,0,o_stencil); _stencil_val(fm.y,0,1,o_stencil); {        
        _stencil_val(u.z,0,-1,o_stencil);_stencil_val(u.z,0,0, o_stencil);_stencil_val(u.z,0,0, o_stencil); _stencil_val(u.z,0,1,o_stencil);_stencil_val(u.y,0,0, o_stencil);
-      _stencil_val_r(uf.z,0,0,0);_stencil_val(u.y,0,0,o_stencil);  
-    }        
+_stencil_val(u.y,0,0,o_stencil);
+      
+#line 298
+_stencil_val_r(uf.z,0,0,0);  
+    } 
+
+_stencil_val(fm.z,0,0,0);        
 
       
 
@@ -15969,11 +17228,10 @@ _stencil_val(fm.y,0,0,o_stencil); _stencil_val(fm.y,0,1,o_stencil); {
 
     
 #line 301
-_stencil_val_r(uf.z,0,0,0); _stencil_val(fm.z,0,0,0); 
-  }}end__stencil_is_face_z()}end_foreach_face_stencil();
-  
+_stencil_val_r(uf.z,0,0,0); 
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();{
 #line 285
-if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ {
+foreach_face_generic(){is_face_x(){ {
     double un = dt*(val(u.x,0,0,0) + val(u.x,-1,0,0))/(2.*Delta), s = sign(un);
     int i = -(s + 1.)/2.;
     val(uf.x,0,0,0) = val(u.x,i,0,0) + (val(g.x,0,0,0) + val(g.x,-1,0,0))*dt/4. + s*(1. - s*un)*val(du.x,i,0,0)*Delta/2.;
@@ -16028,7 +17286,119 @@ is_face_z(){ {
     }
 
     val(uf.z,0,0,0) *= val(fm.z,0,0,0);
-  }}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  }}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 285
+foreach_face_stencil(1,{(NonLocal[]){{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"du","vector",(void *)&du,NULL,0},{"g","vector",(void *)&g,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"u","vector",(void *)&u,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 285 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){ {\n    real un = dt*(val(u.x,0,0,0) + val(u.x,-1,0,0))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.x,0,0,0) = val(u.x,i,0,0) + (val(g.x,0,0,0) + val(g.x,-1,0,0))*dt/4. + s*(1. - s*un)*val(du.x,i,0,0)*Delta/2.;\n\n    if (_const_fm.y && _const_fm.y) {\n      real fyy = val(u.y,i,0,0) < 0. ? val(u.x,i,1,0) - val(u.x,i,0,0) : val(u.x,i,0,0) - val(u.x,i,-1,0);\n      val_out_(uf.x,0,0,0) -= dt*val(u.y,i,0,0)*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.z && _const_fm.z) {\n      real fzz = val(u.z,i,0,0) < 0. ? val(u.x,i,0,1) - val(u.x,i,0,0) : val(u.x,i,0,0) - val(u.x,i,0,-1);\n      val_out_(uf.x,0,0,0) -= dt*val(u.z,i,0,0)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.x,0,0,0) *= _const_fm.x;\n  }}end_is_face_x()\n// #line 285\nis_face_y(){ {\n    real un = dt*(val(u.y,0,0,0) + val(u.y,0,-1,0))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.y,0,0,0) = val(u.y,0,i,0) + (val(g.y,0,0,0) + val(g.y,0,-1,0))*dt/4. + s*(1. - s*un)*val(du.y,0,i,0)*Delta/2.;\n\n    if (_const_fm.z && _const_fm.z) {\n      real fyy = val(u.z,0,i,0) < 0. ? val(u.y,0,i,1) - val(u.y,0,i,0) : val(u.y,0,i,0) - val(u.y,0,i,-1);\n      val_out_(uf.y,0,0,0) -= dt*val(u.z,0,i,0)*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.x && _const_fm.x) {\n      real fzz = val(u.x,0,i,0) < 0. ? val(u.y,1,i,0) - val(u.y,0,i,0) : val(u.y,0,i,0) - val(u.y,-1,i,0);\n      val_out_(uf.y,0,0,0) -= dt*val(u.x,0,i,0)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.y,0,0,0) *= _const_fm.y;\n  }}end_is_face_y()\n// #line 285\nis_face_z(){ {\n    real un = dt*(val(u.z,0,0,0) + val(u.z,0,0,-1))/(2.*Delta), s = sign(un);\n    int i = -(s + 1.)/2.;\n    val_out_(uf.z,0,0,0) = val(u.z,0,0,i) + (val(g.z,0,0,0) + val(g.z,0,0,-1))*dt/4. + s*(1. - s*un)*val(du.z,0,0,i)*Delta/2.;\n\n    if (_const_fm.x && _const_fm.x) {\n      real fyy = val(u.x,0,0,i) < 0. ? val(u.z,1,0,i) - val(u.z,0,0,i) : val(u.z,0,0,i) - val(u.z,-1,0,i);\n      val_out_(uf.z,0,0,0) -= dt*val(u.x,0,0,i)*fyy/(2.*Delta);\n    }\n\n\n    if (_const_fm.y && _const_fm.y) {\n      real fzz = val(u.y,0,0,i) < 0. ? val(u.z,0,1,i) - val(u.z,0,0,i) : val(u.z,0,0,i) - val(u.z,0,-1,i);\n      val_out_(uf.z,0,0,0) -= dt*val(u.y,0,0,i)*fzz/(2.*Delta);\n    }\n\n    val_out_(uf.z,0,0,0) *= _const_fm.z;\n  }}end_is_face_z()}"}){_stencil_is_face_x(){ {       
+     _stencil_val(u.x,-1,0,0);_stencil_val(u.x,0,0,0);     
+    
+_stencil_val(u.x, o_stencil,0,0);_stencil_val(g.x,0,0,0); _stencil_val(g.x,-1,0,0);_stencil_val(du.x,o_stencil,0,0);
+    
+#line 288
+_stencil_val_a(uf.x,0,0,0);
+
+;; {        
+       _stencil_val(u.x,o_stencil,-1,0);_stencil_val(u.x, o_stencil,0,0);_stencil_val(u.x, o_stencil,0,0); _stencil_val(u.x,o_stencil,1,0);_stencil_val(u.y, o_stencil,0,0);
+_stencil_val(u.y,o_stencil,0,0);
+      
+#line 292
+_stencil_val_r(uf.x,0,0,0);  
+    }
+
+
+;; {        
+       _stencil_val(u.x,o_stencil,0,-1);_stencil_val(u.x, o_stencil,0,0);_stencil_val(u.x, o_stencil,0,0); _stencil_val(u.x,o_stencil,0,1);_stencil_val(u.z, o_stencil,0,0);
+_stencil_val(u.z,o_stencil,0,0);
+      
+#line 298
+_stencil_val_r(uf.x,0,0,0);  
+    }
+
+;        
+
+      
+
+
+      
+
+    
+#line 301
+_stencil_val_r(uf.x,0,0,0); 
+  }}end__stencil_is_face_x()
+#line 285
+_stencil_is_face_y(){ {       
+     _stencil_val(u.y,0,-1,0);_stencil_val(u.y,0,0,0);     
+    
+_stencil_val(u.y,0, o_stencil,0);_stencil_val(g.y,0,0,0); _stencil_val(g.y,0,-1,0);_stencil_val(du.y,0,o_stencil,0);
+    
+#line 288
+_stencil_val_a(uf.y,0,0,0);
+
+;; {        
+       _stencil_val(u.y,0,o_stencil,-1);_stencil_val(u.y,0, o_stencil,0);_stencil_val(u.y,0, o_stencil,0); _stencil_val(u.y,0,o_stencil,1);_stencil_val(u.z,0, o_stencil,0);
+_stencil_val(u.z,0,o_stencil,0);
+      
+#line 292
+_stencil_val_r(uf.y,0,0,0);  
+    }
+
+
+;; {        
+       _stencil_val(u.y,-1,o_stencil,0);_stencil_val(u.y,0, o_stencil,0);_stencil_val(u.y,0, o_stencil,0); _stencil_val(u.y,1,o_stencil,0);_stencil_val(u.x,0, o_stencil,0);
+_stencil_val(u.x,0,o_stencil,0);
+      
+#line 298
+_stencil_val_r(uf.y,0,0,0);  
+    }
+
+;        
+
+      
+
+
+      
+
+    
+#line 301
+_stencil_val_r(uf.y,0,0,0); 
+  }}end__stencil_is_face_y()
+#line 285
+_stencil_is_face_z(){ {       
+     _stencil_val(u.z,0,0,-1);_stencil_val(u.z,0,0,0);     
+    
+_stencil_val(u.z,0,0, o_stencil);_stencil_val(g.z,0,0,0); _stencil_val(g.z,0,0,-1);_stencil_val(du.z,0,0,o_stencil);
+    
+#line 288
+_stencil_val_a(uf.z,0,0,0);
+
+;; {        
+       _stencil_val(u.z,-1,0,o_stencil);_stencil_val(u.z,0,0, o_stencil);_stencil_val(u.z,0,0, o_stencil); _stencil_val(u.z,1,0,o_stencil);_stencil_val(u.x,0,0, o_stencil);
+_stencil_val(u.x,0,0,o_stencil);
+      
+#line 292
+_stencil_val_r(uf.z,0,0,0);  
+    }
+
+
+;; {        
+       _stencil_val(u.z,0,-1,o_stencil);_stencil_val(u.z,0,0, o_stencil);_stencil_val(u.z,0,0, o_stencil); _stencil_val(u.z,0,1,o_stencil);_stencil_val(u.y,0,0, o_stencil);
+_stencil_val(u.y,0,0,o_stencil);
+      
+#line 298
+_stencil_val_r(uf.z,0,0,0);  
+    }
+
+;        
+
+      
+
+
+      
+
+    
+#line 301
+_stencil_val_r(uf.z,0,0,0); 
+  }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 285
 foreach_face_generic(){is_face_x(){ {
@@ -16110,15 +17480,15 @@ static int advection_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double 
 
 static void correction (double dt)
 {
-  foreach_stencil()
+  foreach_stencil(1,{(NonLocal[]){{"g","vector",(void *)&g,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 334 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{\n      val_out_(u.x,0,0,0) += dt*val(g.x,0,0,0);\n      \n// #line 335\nval_out_(u.y,0,0,0) += dt*val(g.y,0,0,0);\n      \n// #line 335\nval_out_(u.z,0,0,0) += dt*val(g.z,0,0,0);}"})
     {
-      {_stencil_val_r(u.x,0,0,0);_stencil_val(g.x,0,0,0);  }
+      {_stencil_val(g.x,0,0,0);_stencil_val_r(u.x,0,0,0);  }
       
 #line 335
-{_stencil_val_r(u.y,0,0,0);_stencil_val(g.y,0,0,0);  }
+{_stencil_val(g.y,0,0,0);_stencil_val_r(u.y,0,0,0);  }
       
 #line 335
-{_stencil_val_r(u.z,0,0,0);_stencil_val(g.z,0,0,0);  }}end_foreach_stencil();
+{_stencil_val(g.z,0,0,0);_stencil_val_r(u.z,0,0,0);  }}end_foreach_stencil();
   {
 #line 333
 foreach()
@@ -16159,7 +17529,7 @@ static int viscous_term_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
   if (!is_constant(a.x)) {
     vector af = a;
     trash (((vector[]){af,{{-1},{-1},{-1}}}));
-    foreach_face_stencil(){_stencil_is_face_x(){
+    foreach_face_stencil(1,{(NonLocal[]){{"af","vector",(void *)&af,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 359 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n      val_out_(af.x,0,0,0) = 0.;}end_is_face_x()\n// #line 359\nis_face_y(){\n      val_out_(af.y,0,0,0) = 0.;}end_is_face_y()\n// #line 359\nis_face_z(){\n      val_out_(af.z,0,0,0) = 0.;}end_is_face_z()}"}){_stencil_is_face_x(){
       {_stencil_val_a(af.x,0,0,0);  }}end__stencil_is_face_x()
 #line 359
 _stencil_is_face_y(){
@@ -16185,24 +17555,36 @@ static int acceleration_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
       static int acceleration(const int i,const double t,Event *_ev){tracing("acceleration","/home/lisergey/basilisk/src/navier-stokes/centered.h",381);
 {
   trash (((vector[]){uf,{{-1},{-1},{-1}}}));
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(uf.x,0,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);_stencil_val(a.x,0,0,0);    }}end__stencil_is_face_x()
-#line 384
-_stencil_is_face_y(){
-    {_stencil_val_a(uf.y,0,0,0); _stencil_val(fm.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);_stencil_val(a.y,0,0,0);    }}end__stencil_is_face_y()
-#line 384
-_stencil_is_face_z(){
-    {_stencil_val_a(uf.z,0,0,0); _stencil_val(fm.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);_stencil_val(a.z,0,0,0);    }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  if(!is_constant(fm.x) && !is_constant(a.x)){
   
 #line 384
-if(!is_constant(fm.x) && !is_constant(a.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"a","vector",(void *)&a,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 384 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = val(fm.x,0,0,0)*(((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.) + dt*val(a.x,0,0,0));}end_is_face_x()\n// #line 384\nis_face_y(){\n    val_out_(uf.y,0,0,0) = val(fm.y,0,0,0)*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*val(a.y,0,0,0));}end_is_face_y()\n// #line 384\nis_face_z(){\n    val_out_(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);_stencil_val(a.x,0,0,0);_stencil_val_a(uf.x,0,0,0);    }}end__stencil_is_face_x()
+#line 384
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);_stencil_val(a.y,0,0,0);_stencil_val_a(uf.y,0,0,0);    }}end__stencil_is_face_y()
+#line 384
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);_stencil_val(a.z,0,0,0);_stencil_val_a(uf.z,0,0,0);    }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 384
+foreach_face_generic(){is_face_x(){
     val(uf.x,0,0,0) = val(fm.x,0,0,0)*(((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.) + dt*val(a.x,0,0,0));}end_is_face_x()
 #line 384
 is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*val(a.y,0,0,0));}end_is_face_y()
 #line 384
 is_face_z(){
-    val(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+    val(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 384
+foreach_face_stencil(1,{(NonLocal[]){{"a","vector",(void *)&a,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 384 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = _const_fm.x*(((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.) + dt*val(a.x,0,0,0));}end_is_face_x()\n// #line 384\nis_face_y(){\n    val_out_(uf.y,0,0,0) = _const_fm.y*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*val(a.y,0,0,0));}end_is_face_y()\n// #line 384\nis_face_z(){\n    val_out_(uf.z,0,0,0) = _const_fm.z*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);_stencil_val(a.x,0,0,0);_stencil_val_a(uf.x,0,0,0);    }}end__stencil_is_face_x()
+#line 384
+_stencil_is_face_y(){
+    {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);_stencil_val(a.y,0,0,0);_stencil_val_a(uf.y,0,0,0);    }}end__stencil_is_face_y()
+#line 384
+_stencil_is_face_z(){
+    {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);_stencil_val(a.z,0,0,0);_stencil_val_a(uf.z,0,0,0);    }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 384
 foreach_face_generic(){is_face_x(){
@@ -16212,7 +17594,17 @@ is_face_y(){
     val(uf.y,0,0,0) = _const_fm.y*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*val(a.y,0,0,0));}end_is_face_y()
 #line 384
 is_face_z(){
-    val(uf.z,0,0,0) = _const_fm.z*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+    val(uf.z,0,0,0) = _const_fm.z*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*val(a.z,0,0,0));}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  
+#line 384
+foreach_face_stencil(1,{(NonLocal[]){{"_const_a","_coord",(void *)&_const_a,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 384 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = val(fm.x,0,0,0)*(((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.) + dt*_const_a.x);}end_is_face_x()\n// #line 384\nis_face_y(){\n    val_out_(uf.y,0,0,0) = val(fm.y,0,0,0)*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*_const_a.y);}end_is_face_y()\n// #line 384\nis_face_z(){\n    val_out_(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*_const_a.z);}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);;_stencil_val_a(uf.x,0,0,0);    }}end__stencil_is_face_x()
+#line 384
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);;_stencil_val_a(uf.y,0,0,0);    }}end__stencil_is_face_y()
+#line 384
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);;_stencil_val_a(uf.z,0,0,0);    }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 384
 foreach_face_generic(){is_face_x(){
@@ -16222,7 +17614,17 @@ is_face_y(){
     val(uf.y,0,0,0) = val(fm.y,0,0,0)*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*_const_a.y);}end_is_face_y()
 #line 384
 is_face_z(){
-    val(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*_const_a.z);}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+    val(uf.z,0,0,0) = val(fm.z,0,0,0)*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*_const_a.z);}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  
+#line 384
+foreach_face_stencil(1,{(NonLocal[]){{"_const_a","_coord",(void *)&_const_a,NULL,0},{"dt","double",(void *)&dt,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"uf","vector",(void *)&uf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 384 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(uf.x,0,0,0) = _const_fm.x*(((val(u.x,0,0,0) + val(u.x,0 -1,0,0))/2.) + dt*_const_a.x);}end_is_face_x()\n// #line 384\nis_face_y(){\n    val_out_(uf.y,0,0,0) = _const_fm.y*(((val(u.y,0,0,0) + val(u.y,0,0 -1,0))/2.) + dt*_const_a.y);}end_is_face_y()\n// #line 384\nis_face_z(){\n    val_out_(uf.z,0,0,0) = _const_fm.z*(((val(u.z,0,0,0) + val(u.z,0,0,0 -1))/2.) + dt*_const_a.z);}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(u.x,0,0,0); _stencil_val(u.x,0 -1,0,0);;_stencil_val_a(uf.x,0,0,0);    }}end__stencil_is_face_x()
+#line 384
+_stencil_is_face_y(){
+    {;_stencil_val(u.y,0,0,0); _stencil_val(u.y,0,0 -1,0);;_stencil_val_a(uf.y,0,0,0);    }}end__stencil_is_face_y()
+#line 384
+_stencil_is_face_z(){
+    {;_stencil_val(u.z,0,0,0); _stencil_val(u.z,0,0,0 -1);;_stencil_val_a(uf.z,0,0,0);    }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 384
 foreach_face_generic(){is_face_x(){
@@ -16243,24 +17645,36 @@ void centered_gradient (scalar p, vector g)
 
 
   vector  gf=new_face_vector("gf");
-  foreach_face_stencil(){_stencil_is_face_x(){
-    {_stencil_val_a(gf.x,0,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(a.x,0,0,0); _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);   }}end__stencil_is_face_x()
-#line 403
-_stencil_is_face_y(){
-    {_stencil_val_a(gf.y,0,0,0); _stencil_val(fm.y,0,0,0);_stencil_val(a.y,0,0,0); _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);   }}end__stencil_is_face_y()
-#line 403
-_stencil_is_face_z(){
-    {_stencil_val_a(gf.z,0,0,0); _stencil_val(fm.z,0,0,0);_stencil_val(a.z,0,0,0); _stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
+  if(!is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){
   
 #line 403
-if(!is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){{foreach_face_generic(){is_face_x(){
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"a","vector",(void *)&a,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = val(fm.x,0,0,0)*val(a.x,0,0,0) - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);_stencil_val(a.x,0,0,0); _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);_stencil_val(a.y,0,0,0); _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);_stencil_val(a.z,0,0,0); _stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();{
+#line 403
+foreach_face_generic(){is_face_x(){
     val(gf.x,0,0,0) = val(fm.x,0,0,0)*val(a.x,0,0,0) - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()
 #line 403
 is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+    val(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"a","vector",(void *)&a,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = _const_fm.x*val(a.x,0,0,0) - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(a.x,0,0,0); _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    {;_stencil_val(a.y,0,0,0); _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    {;_stencil_val(a.z,0,0,0); _stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16270,7 +17684,17 @@ is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+    val(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"_const_a","_coord",(void *)&_const_a,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = val(fm.x,0,0,0)*_const_a.x - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);; _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);; _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);; _stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16280,7 +17704,17 @@ is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+    val(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && is_constant(a.x) && !is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"alpha","vector",(void *)&alpha,NULL,0},{"_const_a","_coord",(void *)&_const_a,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = _const_fm.x*_const_a.x - val(alpha.x,0,0,0)*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = _const_fm.y*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = _const_fm.z*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;; _stencil_val(alpha.x,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    {;; _stencil_val(alpha.y,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    {;; _stencil_val(alpha.z,0,0,0);_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16290,7 +17724,17 @@ is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*_const_a.y - val(alpha.y,0,0,0)*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = _const_fm.z*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(gf.z,0,0,0) = _const_fm.z*_const_a.z - val(alpha.z,0,0,0)*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"a","vector",(void *)&a,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = val(fm.x,0,0,0)*val(a.x,0,0,0) - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);_stencil_val(a.x,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);_stencil_val(a.y,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);_stencil_val(a.z,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16300,7 +17744,17 @@ is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(gf.z,0,0,0) = val(fm.z,0,0,0)*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(is_constant(fm.x) && !is_constant(a.x) && is_constant(alpha.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"a","vector",(void *)&a,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = _const_fm.x*val(a.x,0,0,0) - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;_stencil_val(a.x,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    {;_stencil_val(a.y,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    {;_stencil_val(a.z,0,0,0);;_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16310,7 +17764,17 @@ is_face_y(){
     val(gf.y,0,0,0) = _const_fm.y*val(a.y,0,0,0) - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && is_constant(alpha.x)){struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(gf.z,0,0,0) = _const_fm.z*val(a.z,0,0,0) - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else if(!is_constant(fm.x) && is_constant(a.x) && is_constant(alpha.x)){_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"_const_a","_coord",(void *)&_const_a,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = val(fm.x,0,0,0)*_const_a.x - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    { _stencil_val(fm.x,0,0,0);;;_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    { _stencil_val(fm.y,0,0,0);;;_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    { _stencil_val(fm.z,0,0,0);;;_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16320,7 +17784,17 @@ is_face_y(){
     val(gf.y,0,0,0) = val(fm.y,0,0,0)*_const_a.y - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()
 #line 403
 is_face_z(){
-    val(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);struct{double x,y,z;}_const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);struct{double x,y,z;}_const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+    val(gf.z,0,0,0) = val(fm.z,0,0,0)*_const_a.z - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);_coord _const_a={_constant[a.x.i-_NVARMAX],_constant[a.y.i-_NVARMAX],_constant[a.z.i-_NVARMAX]};NOT_UNUSED(_const_a);_coord _const_alpha={_constant[alpha.x.i-_NVARMAX],_constant[alpha.y.i-_NVARMAX],_constant[alpha.z.i-_NVARMAX]};NOT_UNUSED(_const_alpha);
+  
+#line 403
+foreach_face_stencil(1,{(NonLocal[]){{"p","scalar",(void *)&p,NULL,0},{"_const_alpha","_coord",(void *)&_const_alpha,NULL,0},{"_const_a","_coord",(void *)&_const_a,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 403 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{is_face_x(){\n    val_out_(gf.x,0,0,0) = _const_fm.x*_const_a.x - _const_alpha.x*(val(p,0,0,0) - val(p,-1,0,0))/Delta;}end_is_face_x()\n// #line 403\nis_face_y(){\n    val_out_(gf.y,0,0,0) = _const_fm.y*_const_a.y - _const_alpha.y*(val(p,0,0,0) - val(p,0,-1,0))/Delta;}end_is_face_y()\n// #line 403\nis_face_z(){\n    val_out_(gf.z,0,0,0) = _const_fm.z*_const_a.z - _const_alpha.z*(val(p,0,0,0) - val(p,0,0,-1))/Delta;}end_is_face_z()}"}){_stencil_is_face_x(){
+    {;;;_stencil_val(p,0,0,0); _stencil_val(p,-1,0,0);_stencil_val_a(gf.x,0,0,0);   }}end__stencil_is_face_x()
+#line 403
+_stencil_is_face_y(){
+    {;;;_stencil_val(p,0,0,0); _stencil_val(p,0,-1,0);_stencil_val_a(gf.y,0,0,0);   }}end__stencil_is_face_y()
+#line 403
+_stencil_is_face_z(){
+    {;;;_stencil_val(p,0,0,0); _stencil_val(p,0,0,-1);_stencil_val_a(gf.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();
   {
 #line 403
 foreach_face_generic(){is_face_x(){
@@ -16337,18 +17811,20 @@ is_face_z(){
 
 
   trash (((vector[]){g,{{-1},{-1},{-1}}}));
-  foreach_stencil()
-    {
-      {_stencil_val_a(g.x,0,0,0);_stencil_val(gf.x,0,0,0); _stencil_val(gf.x,1,0,0);_stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0);      }
-      
-#line 413
-{_stencil_val_a(g.y,0,0,0);_stencil_val(gf.y,0,0,0); _stencil_val(gf.y,0,1,0);_stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0);      }
-      
-#line 413
-{_stencil_val_a(g.z,0,0,0);_stencil_val(gf.z,0,0,0); _stencil_val(gf.z,0,0,1);_stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0,0,1);      }}end_foreach_stencil();
+  if(!is_constant(fm.x)){
   
 #line 411
-if(!is_constant(fm.x)){{foreach()
+foreach_stencil(1,{(NonLocal[]){{"fm","vector",(void *)&fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"g","vector",(void *)&g,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 412 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{\n      val_out_(g.x,0,0,0) = (val(gf.x,0,0,0) + val(gf.x,1,0,0))/(val(fm.x,0,0,0) + val(fm.x,1,0,0) + 0.);\n      \n// #line 413\nval_out_(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(val(fm.y,0,0,0) + val(fm.y,0,1,0) + 0.);\n      \n// #line 413\nval_out_(g.z,0,0,0) = (val(gf.z,0,0,0) + val(gf.z,0,0,1))/(val(fm.z,0,0,0) + val(fm.z,0,0,1) + 0.);}"})
+    {
+      {_stencil_val(gf.x,0,0,0); _stencil_val(gf.x,1,0,0);_stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0);_stencil_val_a(g.x,0,0,0);      }
+      
+#line 413
+{_stencil_val(gf.y,0,0,0); _stencil_val(gf.y,0,1,0);_stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0,1,0);_stencil_val_a(g.y,0,0,0);      }
+      
+#line 413
+{_stencil_val(gf.z,0,0,0); _stencil_val(gf.z,0,0,1);_stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0,0,1);_stencil_val_a(g.z,0,0,0);      }}end_foreach_stencil();{
+#line 411
+foreach()
     {
       val(g.x,0,0,0) = (val(gf.x,0,0,0) + val(gf.x,1,0,0))/(val(fm.x,0,0,0) + val(fm.x,1,0,0) + 0.);
       
@@ -16356,7 +17832,18 @@ if(!is_constant(fm.x)){{foreach()
 val(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(val(fm.y,0,0,0) + val(fm.y,0,1,0) + 0.);
       
 #line 413
-val(g.z,0,0,0) = (val(gf.z,0,0,0) + val(gf.z,0,0,1))/(val(fm.z,0,0,0) + val(fm.z,0,0,1) + 0.);}end_foreach();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+val(g.z,0,0,0) = (val(gf.z,0,0,0) + val(gf.z,0,0,1))/(val(fm.z,0,0,0) + val(fm.z,0,0,1) + 0.);}end_foreach();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 411
+foreach_stencil(1,{(NonLocal[]){{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"gf","vector",(void *)&gf,NULL,0},{"g","vector",(void *)&g,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n    \n// #line 412 \"/home/lisergey/basilisk/src/navier-stokes/centered.h\"\n{\n      val_out_(g.x,0,0,0) = (val(gf.x,0,0,0) + val(gf.x,1,0,0))/(_const_fm.x + _const_fm.x + 0.);\n      \n// #line 413\nval_out_(g.y,0,0,0) = (val(gf.y,0,0,0) + val(gf.y,0,1,0))/(_const_fm.y + _const_fm.y + 0.);\n      \n// #line 413\nval_out_(g.z,0,0,0) = (val(gf.z,0,0,0) + val(gf.z,0,0,1))/(_const_fm.z + _const_fm.z + 0.);}"})
+    {
+      {_stencil_val(gf.x,0,0,0); _stencil_val(gf.x,1,0,0);;;_stencil_val_a(g.x,0,0,0);      }
+      
+#line 413
+{_stencil_val(gf.y,0,0,0); _stencil_val(gf.y,0,1,0);;;_stencil_val_a(g.y,0,0,0);      }
+      
+#line 413
+{_stencil_val(gf.z,0,0,0); _stencil_val(gf.z,0,0,1);;;_stencil_val_a(g.z,0,0,0);      }}end_foreach_stencil();
   {
 #line 411
 foreach()
@@ -16539,7 +18026,7 @@ void eigenvalues (double a[3][3],
 
 void lambda2 (const vector u, scalar l2)
 {
-  foreach_stencil() { 
+  foreach_stencil(1,{(NonLocal[]){{"l2","scalar",(void *)&l2,NULL,0},{"ferr","not implemented yet",(void *)ferr,NULL,1},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n@ def not_mpi_compatible()\ndo {\n  if (npe() > 1) {\n    fprintf (ferr, \"%s() is not compatible with MPI (yet)\\n\", __func__);\n    exit (1);\n  }\n} while(0)\n@\n@ define system(command) (pid() == 0 ? system(command) : 0)\n@else\n@ define qstderr() stderr\n@ define qstdout() stdout\n@ define ferr stderr\n@ define fout stdout\n@ define not_mpi_compatible()\n@endif\n\n\n\n\n// #line 93 \"/home/lisergey/basilisk/src/common.h\"\nstatic inline void qassert (const char * file, int line, const char * cond) {\n  fprintf (ferr, \"%s:%d: Assertion `%s' failed.\\n\", file, line, cond);\n  abort();\n}\n// # 10 \"cylinder.c\" 2\n// # 1 \"lambda2.h\" 1\n// # 1 \"/home/lisergey/basilisk/src/lambda2.h\"\nstatic void eigsrt (real d[3],\n      real v[3][3])\n{\n  int k, j, i;\n  real p;\n\n  for (i = 0; i < 3 - 1; i++) {\n    p = d[k = i];\n\n    for (j = i + 1; j < 3; j++)\n      if (d[j] >= p)\n p = d[k = j];\n    if (k != i) {\n      d[k] = d[i];\n      d[i] = p;\n      for (j = 0; j < 3; j++) {\n p = v[j][i];\n v[j][i] = v[j][k];\n v[j][k] = p;\n      }\n    }\n  }\n}\n// # 37 \"/home/lisergey/basilisk/src/lambda2.h\"\nvoid eigenvalues (real a[3][3],\n    real d[3],\n    real v[3][3])\n{\n  int j, iq, ip, i;\n  real tresh, theta, tau, t, sm, s, h, g, c, b[3], z[3];\n\n  for (ip = 0; ip < 3; ip++) {\n    for (iq = 0; iq < 3; iq++)\n      v[ip][iq] = 0.0;\n    v[ip][ip] = 1.0;\n  }\n\n  for (ip = 0; ip < 3; ip++) {\n    b[ip] = d[ip] = a[ip][ip];\n    z[ip] = 0.0;\n  }\n\n  for (i = 1; i <= 50; i++) {\n    sm = 0.0;\n    for (ip = 0; ip < 3 - 1; ip++) {\n      for (iq = ip + 1; iq < 3; iq++)\n sm += fabs (a[ip][iq]);\n    }\n    if (sm == 0.0) {\n      eigsrt (d, v);\n      return;\n    }\n    if (i < 4)\n      tresh = 0.2*sm/(3*3);\n    else\n      tresh = 0.0;\n    for (ip = 0; ip < 3 - 1; ip++) {\n      for (iq = ip + 1; iq < 3; iq++) {\n g = 100.0*fabs (a[ip][iq]);\n if (i > 4 && fabs(d[ip]) + g == fabs(d[ip]) &&\n     fabs(d[iq]) + g == fabs(d[iq]))\n   a[ip][iq] = 0.0;\n else if (fabs (a[ip][iq]) > tresh) {\n   h = d[iq] - d[ip];\n   if (fabs(h) + g == fabs(h))\n     t = a[ip][iq]/h;\n   else {\n     theta = 0.5*h/a[ip][iq];\n     t = 1.0/(fabs (theta) + sqrt (1.0 + theta*theta));\n     if (theta < 0.0) t = -t;\n   }\n   c = 1.0/sqrt (1 + t*t);\n   s = t*c;\n   tau = s/(1.0 + c);\n   h = t*a[ip][iq];\n   z[ip] -= h;\n   z[iq] += h;\n   d[ip] -= h;\n   d[iq] += h;\n   a[ip][iq] = 0.0;\n   for (j = 0; j <= ip - 1; j++)\n     { g=a[j][ip];h=a[j][iq];a[j][ip]=g-s*(h+g*tau);a[j][iq]=h+s*(g-h*tau);};\n   for (j = ip + 1; j <= iq - 1; j++)\n     { g=a[ip][j];h=a[j][iq];a[ip][j]=g-s*(h+g*tau);a[j][iq]=h+s*(g-h*tau);};\n   for (j = iq + 1; j < 3; j++)\n     { g=a[ip][j];h=a[iq][j];a[ip][j]=g-s*(h+g*tau);a[iq][j]=h+s*(g-h*tau);};\n   for (j = 0; j < 3; j++)\n     { g=v[j][ip];h=v[j][iq];v[j][ip]=g-s*(h+g*tau);v[j][iq]=h+s*(g-h*tau);};\n }\n      }\n    }\n    for (ip = 0; ip < 3; ip++) {\n      b[ip] += z[ip];\n      d[ip] = b[ip];\n      z[ip] = 0.0;\n    }\n  }\n\n  for (i = 0; i < 3; i++) {\n    for (j = 0; j < 3; j++)\n      fprintf (ferr, \"%10.3g \", a[i][j]);\n    fprintf (ferr, \"\\n\");\n  }\n  if (!(false)) qassert (\"/home/lisergey/basilisk/src/lambda2.h\", 116, \"false\");\n}"," \n// #line 121 \"/home/lisergey/basilisk/src/lambda2.h\"\n{\n    real JJ[3][3];\n    scalar s = u.x;\n    int i = 0;\n    \n      JJ[0][i++] = ((val(s,1,0,0) - val(s,-1,0,0))/(2.*Delta));\n      \n// #line 126\nJJ[0][i++] = ((val(s,0,1,0) - val(s,0,-1,0))/(2.*Delta));\n      \n// #line 126\nJJ[0][i++] = ((val(s,0,0,1) - val(s,0,0,-1))/(2.*Delta));\n    s = u.y; i = 0;\n    \n      JJ[1][i++] = ((val(s,1,0,0) - val(s,-1,0,0))/(2.*Delta));\n      \n// #line 129\nJJ[1][i++] = ((val(s,0,1,0) - val(s,0,-1,0))/(2.*Delta));\n      \n// #line 129\nJJ[1][i++] = ((val(s,0,0,1) - val(s,0,0,-1))/(2.*Delta));\n    s = u.z; i = 0;\n    \n      JJ[2][i++] = ((val(s,1,0,0) - val(s,-1,0,0))/(2.*Delta));\n      \n// #line 132\nJJ[2][i++] = ((val(s,0,1,0) - val(s,0,-1,0))/(2.*Delta));\n      \n// #line 132\nJJ[2][i++] = ((val(s,0,0,1) - val(s,0,0,-1))/(2.*Delta));\n    real S2O2[3][3];\n    for (int i = 0; i < 3; i++)\n      for (int j = 0; j < 3; j++) {\n S2O2[i][j] = 0.;\n for (int k = 0; k < 3; k++)\n   S2O2[i][j] += JJ[i][k]*JJ[k][j] + JJ[k][i]*JJ[j][k];\n      }\n    real lambda[3], ev[3][3];\n    eigenvalues (S2O2, lambda, ev);\n    val_out_(l2,0,0,0) = lambda[1]/2.;\n  }"}) { 
     
     scalar s = u.x;   
     
@@ -16807,7 +18294,7 @@ static int output_xdmf(double t, scalar *list, vector *vlist,
 }
 #line 12 "cylinder.c"
 #line 79 "cylinder.c"
-static coord Force = {0};
+coord Force = {0};
 scalar  cs={11};
 vector  fs={{12},{13},{14}};
       static void embed_force3(scalar p, vector u, vector mu, coord *Fp,
@@ -16839,25 +18326,34 @@ static int velocity_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;
 #line 96
       static int velocity(const int i,const double t,Event *_ev){tracing("velocity","cylinder.c",96); {
    Force.x = 0; Force.y = 0; Force.z = 0;
-  foreach_stencil () {
-     {
-      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.x,0,0,0); 
+  foreach_stencil (1,{(NonLocal[]){{"Force","coord",(void *)&Force,NULL,0,'+'},{"cs","scalar",(void *)&cs,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 98 \"cylinder.c\"\n{\n     {\n      val_out_(u.x,0,0,0) = val(cs,0,0,0) * val(u.x,0,0,0);\n      Force.x += val(u.x,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;\n    } \n// #line 99\n{\n      val_out_(u.y,0,0,0) = val(cs,0,0,0) * val(u.y,0,0,0);\n      Force.y += val(u.y,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;\n    } \n// #line 99\n{\n      val_out_(u.z,0,0,0) = val(cs,0,0,0) * val(u.z,0,0,0);\n      Force.z += val(u.z,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;\n    }\n  }"}) {
+     { 
+_stencil_val(cs,0,0,0); _stencil_val(u.x,0,0,0);
+      
+#line 100
+_stencil_val_a(u.x,0,0,0); 
 _stencil_val(u.x,0,0,0);_stencil_val(cs,0,0,0);   
                 
     
 #line 102
 } 
 #line 99
-{
-      _stencil_val_a(u.y,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.y,0,0,0); 
+{ 
+_stencil_val(cs,0,0,0); _stencil_val(u.y,0,0,0);
+      
+#line 100
+_stencil_val_a(u.y,0,0,0); 
 _stencil_val(u.y,0,0,0);_stencil_val(cs,0,0,0);   
                 
     
 #line 102
 } 
 #line 99
-{
-      _stencil_val_a(u.z,0,0,0); _stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0); 
+{ 
+_stencil_val(cs,0,0,0); _stencil_val(u.z,0,0,0);
+      
+#line 100
+_stencil_val_a(u.z,0,0,0); 
 _stencil_val(u.z,0,0,0);_stencil_val(cs,0,0,0);   
                 
     
@@ -16884,7 +18380,7 @@ foreach () {
       val(u.z,0,0,0) = val(cs,0,0,0) * val(u.z,0,0,0);
       Force.z += val(u.z,0,0,0) * (val(cs,0,0,0) - 1) * Delta * Delta * Delta;
     }
-  }end_foreach();mpi_all_reduce_array(&Force.x,double,MPI_SUM,3);
+  }end_foreach();mpi_all_reduce_array((double *)&Force,double,MPI_SUM,sizeof(Force)/sizeof(double));
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
@@ -16899,7 +18395,10 @@ static double dot3(const double *a, const double *b) {
 }
 
 static void vorticity_vector(const vector u, vector omega) {
-  foreach_stencil () { 
+  if(!is_constant(cm) && !is_constant(fm.x)){
+  
+#line 113
+foreach_stencil (1,{(NonLocal[]){{"omega","vector",(void *)&omega,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"cm","scalar",(void *)&cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n// #line 108 \"cylinder.c\"\nstatic real dot3(const real *a, const real *b) {\n  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];\n}"," \n// #line 113 \"cylinder.c\"\n{\n    real delta;\n    delta = (2. * val(cm,0,0,0) * Delta + 0.);\n    real fx[3] = {val(fm.x,1,0,0) - val(fm.x,0,0,0), val(fm.x,1,0,0), -val(fm.x,0,0,0)};\n    real fy[3] = {val(fm.y,0, 1,0) - val(fm.y,0,0,0), val(fm.y,0, 1,0), -val(fm.y,0,0,0)};\n    real fz[3] = {val(fm.z,0, 0, 1) - val(fm.z,0,0,0), val(fm.z,0, 0, 1), -val(fm.z,0,0,0)};\n    real xy[3] = {val(u.x,0,0,0), val(u.x,0, 1,0), val(u.x,0, -1,0)};\n    real xz[3] = {val(u.x,0,0,0), val(u.x,0, 0, 1), val(u.x,0, 0, -1)};\n    real yx[3] = {val(u.y,0,0,0), val(u.y,1,0,0), val(u.y,-1,0,0)};\n    real yz[3] = {val(u.y,0,0,0), val(u.y,0, 0, 1), val(u.y,0, 0, -1)};\n    real zx[3] = {val(u.z,0,0,0), val(u.z,1,0,0), val(u.z,-1,0,0)};\n    real zy[3] = {val(u.z,0,0,0), val(u.z,0, 1,0), val(u.z,0, -1,0)};\n    val_out_(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;\n    val_out_(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;\n    val_out_(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;\n  }"}) { 
      
 _stencil_val(cm,0,0,0);      
           
@@ -16917,10 +18416,9 @@ _stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_st
     _stencil_val_a(omega.x,0,0,0);        
     _stencil_val_a(omega.y,0,0,0);        
     _stencil_val_a(omega.z,0,0,0);        
-  }end_foreach_stencil();
-  
+  }end_foreach_stencil();{
 #line 113
-if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
+foreach () {
     double delta;
     delta = (2. * val(cm,0,0,0) * Delta + 0.);
     double fx[3] = {val(fm.x,1,0,0) - val(fm.x,0,0,0), val(fm.x,1,0,0), -val(fm.x,0,0,0)};
@@ -16936,6 +18434,27 @@ if(!is_constant(cm) && !is_constant(fm.x)){{foreach () {
     val(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
   }end_foreach();}}else if(is_constant(cm) && !is_constant(fm.x)){double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);
+  
+#line 113
+foreach_stencil (1,{(NonLocal[]){{"omega","vector",(void *)&omega,NULL,0},{"u","vector",(void *)&u,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n// #line 108 \"cylinder.c\"\nstatic real dot3(const real *a, const real *b) {\n  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];\n}"," \n// #line 113 \"cylinder.c\"\n{\n    real delta;\n    delta = (2. * _const_cm * Delta + 0.);\n    real fx[3] = {val(fm.x,1,0,0) - val(fm.x,0,0,0), val(fm.x,1,0,0), -val(fm.x,0,0,0)};\n    real fy[3] = {val(fm.y,0, 1,0) - val(fm.y,0,0,0), val(fm.y,0, 1,0), -val(fm.y,0,0,0)};\n    real fz[3] = {val(fm.z,0, 0, 1) - val(fm.z,0,0,0), val(fm.z,0, 0, 1), -val(fm.z,0,0,0)};\n    real xy[3] = {val(u.x,0,0,0), val(u.x,0, 1,0), val(u.x,0, -1,0)};\n    real xz[3] = {val(u.x,0,0,0), val(u.x,0, 0, 1), val(u.x,0, 0, -1)};\n    real yx[3] = {val(u.y,0,0,0), val(u.y,1,0,0), val(u.y,-1,0,0)};\n    real yz[3] = {val(u.y,0,0,0), val(u.y,0, 0, 1), val(u.y,0, 0, -1)};\n    real zx[3] = {val(u.z,0,0,0), val(u.z,1,0,0), val(u.z,-1,0,0)};\n    real zy[3] = {val(u.z,0,0,0), val(u.z,0, 1,0), val(u.z,0, -1,0)};\n    val_out_(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;\n    val_out_(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;\n    val_out_(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;\n  }"}) {
+
+;      
+          
+    
+#line 116
+_stencil_val(fm.x,0,0,0); _stencil_val(fm.x,1,0,0); _stencil_val(fm.x,0,0,0);_stencil_val(fm.x,1,0,0);     
+    _stencil_val(fm.y,0,0,0); _stencil_val(fm.y,0, 1,0); _stencil_val(fm.y,0,0,0);_stencil_val(fm.y,0, 1,0);     
+    _stencil_val(fm.z,0,0,0); _stencil_val(fm.z,0, 0, 1); _stencil_val(fm.z,0,0,0);_stencil_val(fm.z,0, 0, 1);   
+     _stencil_val(u.x,0, -1,0); _stencil_val(u.x,0, 1,0);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.x,0, 0, -1); _stencil_val(u.x,0, 0, 1);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.y,-1,0,0); _stencil_val(u.y,1,0,0);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.y,0, 0, -1); _stencil_val(u.y,0, 0, 1);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.z,-1,0,0); _stencil_val(u.z,1,0,0);_stencil_val(u.z,0,0,0);   
+     _stencil_val(u.z,0, -1,0); _stencil_val(u.z,0, 1,0);_stencil_val(u.z,0,0,0);
+    _stencil_val_a(omega.x,0,0,0);        
+    _stencil_val_a(omega.y,0,0,0);        
+    _stencil_val_a(omega.z,0,0,0);        
+  }end_foreach_stencil();
   {
 #line 113
 foreach () {
@@ -16953,7 +18472,25 @@ foreach () {
     val(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;
     val(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
-  }end_foreach();}}else if(!is_constant(cm) && is_constant(fm.x)){struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  }end_foreach();}}else if(!is_constant(cm) && is_constant(fm.x)){_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 113
+foreach_stencil (1,{(NonLocal[]){{"omega","vector",(void *)&omega,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"cm","scalar",(void *)&cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n// #line 108 \"cylinder.c\"\nstatic real dot3(const real *a, const real *b) {\n  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];\n}"," \n// #line 113 \"cylinder.c\"\n{\n    real delta;\n    delta = (2. * val(cm,0,0,0) * Delta + 0.);\n    real fx[3] = {_const_fm.x - _const_fm.x, _const_fm.x, -_const_fm.x};\n    real fy[3] = {_const_fm.y - _const_fm.y, _const_fm.y, -_const_fm.y};\n    real fz[3] = {_const_fm.z - _const_fm.z, _const_fm.z, -_const_fm.z};\n    real xy[3] = {val(u.x,0,0,0), val(u.x,0, 1,0), val(u.x,0, -1,0)};\n    real xz[3] = {val(u.x,0,0,0), val(u.x,0, 0, 1), val(u.x,0, 0, -1)};\n    real yx[3] = {val(u.y,0,0,0), val(u.y,1,0,0), val(u.y,-1,0,0)};\n    real yz[3] = {val(u.y,0,0,0), val(u.y,0, 0, 1), val(u.y,0, 0, -1)};\n    real zx[3] = {val(u.z,0,0,0), val(u.z,1,0,0), val(u.z,-1,0,0)};\n    real zy[3] = {val(u.z,0,0,0), val(u.z,0, 1,0), val(u.z,0, -1,0)};\n    val_out_(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;\n    val_out_(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;\n    val_out_(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;\n  }"}) { 
+     
+_stencil_val(cm,0,0,0);
+;;;;
+;;;;
+;;;;   
+     _stencil_val(u.x,0, -1,0); _stencil_val(u.x,0, 1,0);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.x,0, 0, -1); _stencil_val(u.x,0, 0, 1);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.y,-1,0,0); _stencil_val(u.y,1,0,0);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.y,0, 0, -1); _stencil_val(u.y,0, 0, 1);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.z,-1,0,0); _stencil_val(u.z,1,0,0);_stencil_val(u.z,0,0,0);   
+     _stencil_val(u.z,0, -1,0); _stencil_val(u.z,0, 1,0);_stencil_val(u.z,0,0,0);
+    _stencil_val_a(omega.x,0,0,0);        
+    _stencil_val_a(omega.y,0,0,0);        
+    _stencil_val_a(omega.z,0,0,0);        
+  }end_foreach_stencil();
   {
 #line 113
 foreach () {
@@ -16971,7 +18508,25 @@ foreach () {
     val(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;
     val(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;
     val(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;
-  }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  }end_foreach();}}else {double _const_cm=_constant[cm.i-_NVARMAX];NOT_UNUSED(_const_cm);_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm);
+  
+#line 113
+foreach_stencil (1,{(NonLocal[]){{"omega","vector",(void *)&omega,NULL,0},{"u","vector",(void *)&u,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"_const_cm","double",(void *)&_const_cm,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"\n\n\n\n// #line 108 \"cylinder.c\"\nstatic real dot3(const real *a, const real *b) {\n  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];\n}"," \n// #line 113 \"cylinder.c\"\n{\n    real delta;\n    delta = (2. * _const_cm * Delta + 0.);\n    real fx[3] = {_const_fm.x - _const_fm.x, _const_fm.x, -_const_fm.x};\n    real fy[3] = {_const_fm.y - _const_fm.y, _const_fm.y, -_const_fm.y};\n    real fz[3] = {_const_fm.z - _const_fm.z, _const_fm.z, -_const_fm.z};\n    real xy[3] = {val(u.x,0,0,0), val(u.x,0, 1,0), val(u.x,0, -1,0)};\n    real xz[3] = {val(u.x,0,0,0), val(u.x,0, 0, 1), val(u.x,0, 0, -1)};\n    real yx[3] = {val(u.y,0,0,0), val(u.y,1,0,0), val(u.y,-1,0,0)};\n    real yz[3] = {val(u.y,0,0,0), val(u.y,0, 0, 1), val(u.y,0, 0, -1)};\n    real zx[3] = {val(u.z,0,0,0), val(u.z,1,0,0), val(u.z,-1,0,0)};\n    real zy[3] = {val(u.z,0,0,0), val(u.z,0, 1,0), val(u.z,0, -1,0)};\n    val_out_(omega.x,0,0,0) = (dot3(fy, zy) - dot3(fz, yz)) / delta;\n    val_out_(omega.y,0,0,0) = (dot3(fz, xz) - dot3(fx, zx)) / delta;\n    val_out_(omega.z,0,0,0) = (dot3(fx, yx) - dot3(fy, xy)) / delta;\n  }"}) {
+
+;
+;;;;
+;;;;
+;;;;   
+     _stencil_val(u.x,0, -1,0); _stencil_val(u.x,0, 1,0);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.x,0, 0, -1); _stencil_val(u.x,0, 0, 1);_stencil_val(u.x,0,0,0);   
+     _stencil_val(u.y,-1,0,0); _stencil_val(u.y,1,0,0);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.y,0, 0, -1); _stencil_val(u.y,0, 0, 1);_stencil_val(u.y,0,0,0);   
+     _stencil_val(u.z,-1,0,0); _stencil_val(u.z,1,0,0);_stencil_val(u.z,0,0,0);   
+     _stencil_val(u.z,0, -1,0); _stencil_val(u.z,0, 1,0);_stencil_val(u.z,0,0,0);
+    _stencil_val_a(omega.x,0,0,0);        
+    _stencil_val_a(omega.y,0,0,0);        
+    _stencil_val_a(omega.z,0,0,0);        
+  }end_foreach_stencil();
   {
 #line 113
 foreach () {
@@ -17322,7 +18877,7 @@ static int init_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
   if (dump_path == NULL) {
     do { int refined; do { boundary_internal ((scalar *)all, "cylinder.c", 448); refined = 0; ((Tree *)grid)->refined.n = 0; {foreach_leaf() if (x < X0 + 0.9 * L0 && level < minlevel) { refine_cell (point, all, 0, &((Tree *)grid)->refined); refined++; continue; }end_foreach_leaf();} mpi_all_reduce (refined, MPI_INT, MPI_SUM); if (refined) { mpi_boundary_refine (all); mpi_boundary_update (all); } } while (refined); } while(0);
     for (;;) {
-      do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil() {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions (phi, cs, fs
+      do { scalar  phi=new_vertex_scalar("phi"); foreach_vertex_stencil(1,{(NonLocal[]){{"phi","scalar",(void *)&phi,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 450 \"cylinder.c\"\nval_out_(phi,0,0,0) = shape(x, y, z);"}) {_stencil_val_a(phi,0,0,0);    }end_foreach_vertex_stencil(); {foreach_vertex() val(phi,0,0,0) = shape(x, y, z);end_foreach_vertex();} fractions (phi, cs, fs
 #line 122 "/home/lisergey/basilisk/src/fractions.h"
 , 0.
 #line 450 "cylinder.c"
@@ -17355,7 +18910,7 @@ all
       exit(1);
     }
     restore( 
-#line 1164 "/home/lisergey/basilisk/src/output.h"
+#line 1116 "/home/lisergey/basilisk/src/output.h"
 "dump", 
 NULL
 #line 465 "cylinder.c"
@@ -17380,8 +18935,11 @@ NULL
   if (i == 0) {
     if (Verbose && pid() == 0)
       fprintf(ferr, "cylinder: initialize velocity\n");
-    foreach_stencil () {
-      _stencil_val_a(u.x,0,0,0); _stencil_val(cs,0,0,0); 
+    foreach_stencil (1,{(NonLocal[]){{"cs","scalar",(void *)&cs,NULL,0},{"u","vector",(void *)&u,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},""," \n// #line 482 \"cylinder.c\"\n{\n      val_out_(u.x,0,0,0) = val(cs,0,0,0);\n      val_out_(u.y,0,0,0) = 0;\n      val_out_(u.z,0,0,0) = 0;\n    }"}) { 
+_stencil_val(cs,0,0,0);
+      
+#line 483
+_stencil_val_a(u.x,0,0,0); 
       _stencil_val_a(u.y,0,0,0);  
       _stencil_val_a(u.z,0,0,0);  
     }end_foreach_stencil();
@@ -17401,7 +18959,7 @@ static int properties_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=
 
 
 #line 492
-      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",492); { foreach_face_stencil(){_stencil_is_face_x(){ {_stencil_val_a(muv.x,0,0,0); _stencil_val(fm.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {_stencil_val_a(muv.y,0,0,0); _stencil_val(fm.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {_stencil_val_a(muv.z,0,0,0); _stencil_val(fm.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil(); if(!is_constant(fm.x)){{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {struct{double x,y,z;}_const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",492);return 0;}end_tracing("properties_0","cylinder.c",492);}
+      static int properties_0(const int i,const double t,Event *_ev){tracing("properties_0","cylinder.c",492); { if(!is_constant(fm.x)){ foreach_face_stencil(1,{(NonLocal[]){{"reynolds","double",(void *)&reynolds,NULL,0},{"fm","vector",(void *)&fm,NULL,0},{"muv","vector",(void *)&muv,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 492 \"cylinder.c\"\n{is_face_x(){ val_out_(muv.x,0,0,0) = val(fm.x,0,0,0) / reynolds;}end_is_face_x()is_face_y(){ val_out_(muv.y,0,0,0) = val(fm.y,0,0,0) / reynolds;}end_is_face_y()is_face_z(){ val_out_(muv.z,0,0,0) = val(fm.z,0,0,0) / reynolds;}end_is_face_z()}"}){_stencil_is_face_x(){ { _stencil_val(fm.x,0,0,0);_stencil_val_a(muv.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ { _stencil_val(fm.y,0,0,0);_stencil_val_a(muv.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ { _stencil_val(fm.z,0,0,0);_stencil_val_a(muv.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil();{foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = val(fm.x,0,0,0) / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = val(fm.y,0,0,0) / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = val(fm.z,0,0,0) / reynolds;}end_is_face_z()}end_foreach_face_generic();}}else {_coord _const_fm={_constant[fm.x.i-_NVARMAX],_constant[fm.y.i-_NVARMAX],_constant[fm.z.i-_NVARMAX]};NOT_UNUSED(_const_fm); foreach_face_stencil(1,{(NonLocal[]){{"reynolds","double",(void *)&reynolds,NULL,0},{"_const_fm","_coord",(void *)&_const_fm,NULL,0},{"muv","vector",(void *)&muv,NULL,0},{"N","int",(void *)&N,NULL,0},{"L0","double",(void *)&L0,NULL,0},{"Z0","double",(void *)&Z0,NULL,0},{"Y0","double",(void *)&Y0,NULL,0},{"X0","double",(void *)&X0,NULL,0},{0}},"","\n// #line 492 \"cylinder.c\"\n{is_face_x(){ val_out_(muv.x,0,0,0) = _const_fm.x / reynolds;}end_is_face_x()is_face_y(){ val_out_(muv.y,0,0,0) = _const_fm.y / reynolds;}end_is_face_y()is_face_z(){ val_out_(muv.z,0,0,0) = _const_fm.z / reynolds;}end_is_face_z()}"}){_stencil_is_face_x(){ {;_stencil_val_a(muv.x,0,0,0);   }}end__stencil_is_face_x()_stencil_is_face_y(){ {;_stencil_val_a(muv.y,0,0,0);   }}end__stencil_is_face_y()_stencil_is_face_z(){ {;_stencil_val_a(muv.z,0,0,0);   }}end__stencil_is_face_z()}end_foreach_face_stencil(); {foreach_face_generic(){is_face_x(){ val(muv.x,0,0,0) = _const_fm.x / reynolds;}end_is_face_x()is_face_y(){ val(muv.y,0,0,0) = _const_fm.y / reynolds;}end_is_face_y()is_face_z(){ val(muv.z,0,0,0) = _const_fm.z / reynolds;}end_is_face_z()}end_foreach_face_generic();}} }{end_tracing("properties_0","cylinder.c",492);return 0;}end_tracing("properties_0","cylinder.c",492);}
 
 static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=( t <= tend)!=0;*ip=i;*tp=t;return ret;}static int dump_0_expr1(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;int ret=(i++)!=0;*ip=i;*tp=t;return ret;}
 
@@ -17430,7 +18988,7 @@ static int dump_0_expr0(int *ip,double *tp,Event *_ev){int i=*ip;double t=*tp;in
       if (i % (10 * period) == 0) {
         snprintf(path, sizeof path, "%s.%09d.dump", output_prefix, i);
         dump(path
-#line 1089 "/home/lisergey/basilisk/src/output.h"
+#line 1041 "/home/lisergey/basilisk/src/output.h"
 , 
 all, 
 NULL, 
@@ -17527,7 +19085,7 @@ event_register((Event){0,2,dump_0,{dump_0_expr0,dump_0_expr1},((int *)0),((doubl
       
 #line 22 "ast/init_solver.h"
 }
-#line 1254 "/home/lisergey/basilisk/src/common.h"
+#line 1257 "/home/lisergey/basilisk/src/common.h"
 init_const_vector((vector){{_NVARMAX+0},{_NVARMAX+1},{_NVARMAX+2}},"zerof",(double[]){0.,0.,0.});
 init_const_vector((vector){{_NVARMAX+3},{_NVARMAX+4},{_NVARMAX+5}},"unityf",(double[]){1.,1.,1.});
 init_const_scalar((scalar){_NVARMAX+6},"unity", 1.);

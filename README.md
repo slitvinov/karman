@@ -7,7 +7,7 @@ installation:
 
 <pre>
 $ wget http://basilisk.fr/basilisk/basilisk.tar.gz
-$ tar zxf basilisk.tar.gz
+$ tar zx basilisk.tar.gz
 $ cd basilisk/src
 </pre>
 
@@ -23,7 +23,7 @@ $ cp config.osx config
 
 <pre>
 $ make ast && make qcc
-$ cp qcc $HOME/.local/bin/
+$ cp qcc "$HOME/.local/bin/"
 </pre>
 
 See [deploy/README.md](deploy/README.md).
