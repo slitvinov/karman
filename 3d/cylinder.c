@@ -463,10 +463,11 @@ event init(t = 0) {
       exit(1);
     }
     restore(fp = dump_file);
+    /*
     if (fclose(dump_file) != 0) {
       fprintf(stderr, "cylinder: error: failed to close '%s'\n", dump_path);
       exit(1);
-    }
+      } */
     if (Verbose && pid() == 0)
       fprintf(stderr, "cylinder: starting from '%s': time: %g, step: %d\n",
               dump_path, t, i);
