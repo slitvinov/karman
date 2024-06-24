@@ -1,9 +1,8 @@
 .POSIX:
 .SUFFIXES:
 
-CC = gcc
 MPICC = mpicc
-MPICCFLAGS = -O2
+MPICCFLAGS = -O2 -g
 BASILISK = $(HOME)/basilisk/src
 M = \
 cylinder\
