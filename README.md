@@ -7,7 +7,7 @@ installation:
 
 <pre>
 $ wget http://basilisk.fr/basilisk/basilisk.tar.gz
-$ tar zx basilisk.tar.gz
+$ tar zxf basilisk.tar.gz
 $ cd basilisk/src
 </pre>
 
