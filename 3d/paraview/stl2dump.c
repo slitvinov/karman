@@ -9,6 +9,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _OPENMP
+#include <omp.h>
+static int num_threads(void) {
+  int n;
+  n = 0;
+#pragma omp parallel reduction(+ : n)
+  n++;
+  return n;
+}
+#else
+static int num_threads(void) { return 0; }
+#endif
 
 struct Hash {
   size_t M;
@@ -91,13 +103,24 @@ int main(int argc, char **argv) {
     switch (argv[0][1]) {
     case 'h':
       fprintf(stderr,
-              "Usage: stl2dump [-h] [-v] X0 Y0 Z0 L minlevel maxlevel npe "
-              "file.stl basilisk.dump\n"
+              "Usage: stl2dump [options] X0 Y0 Z0 L minlevel maxlevel npe "
+              "file.stl basilisk.dump\n\n"
               "Options:\n"
-              "  -o  outlevel\n"
-              "  -m          values are size and phi (minimal output)\n"
-              "  -h          print help message and exit\n"
-              "  -v          verbose\n");
+              "  -o          Refine the outlet to a minimum level\n"
+              "  -m          Output size and phi values (minimal output)\n"
+              "  -h          Display this help message and exit\n"
+              "  -v          Enable verbose mode\n\n"
+              "Arguments:\n"
+              "  X0, Y0, Z0    Coordinates of the origin\n"
+              "  L             Length scale\n"
+              "  minlevel      Minimum refinement level\n"
+              "  maxlevel      Maximum refinement level\n"
+              "  npe           Number of MPI ranks\n"
+              "  file.stl      Input STL file\n"
+              "  basilisk.dump Output file\n\n"
+              "Additional Info:\n"
+              "  num_threads: %d\n",
+              num_threads());
       exit(1);
     case 'v':
       config.Verbose = 1;
@@ -116,9 +139,12 @@ int main(int argc, char **argv) {
       exit(1);
     }
 positional:
+  if (config.Verbose) {
+    fprintf(stderr, "stl2dump: num_threads: %d\n", num_threads());
+  }
   for (i = 0; i < sizeof(Table) / sizeof(*Table); i++) {
     if (*argv == NULL) {
-      fprintf(stderr, "stl2dump: missing '%s' option\n", Table[i].name);
+      fprintf(stderr, "stl2dump: error: missing '%s' option\n", Table[i].name);
       exit(1);
     }
     switch (Table[i].type) {
@@ -182,16 +208,20 @@ positional:
   }
   config.hash = malloc((config.maxlevel + 1) * sizeof *config.hash);
   work = malloc((config.maxlevel + 1) * sizeof *work);
+  if (config.hash == NULL || work == NULL) {
+    fprintf(stderr, "stl2dump: error: malloc failed\n");
+    exit(1);
+  }
   nmax = (1ul << 24) * sizeof *(*config.hash)->nodes;
   nfull = sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
     nbytes = nfull < nmax ? nfull : nmax;
     if ((work[i] = malloc(nbytes)) == NULL) {
-      fprintf(stderr, "stl2dump: malloc failed\n");
+      fprintf(stderr, "stl2dump: error: malloc failed\n");
       exit(1);
     }
     if ((config.hash[i] = malloc(sizeof *config.hash[i])) == NULL) {
-      fprintf(stderr, "stl2dump: malloc failed\n");
+      fprintf(stderr, "stl2dump: error: malloc failed\n");
       exit(1);
     }
     hash_ini(nbytes, work[i], config.hash[i]);
@@ -214,12 +244,12 @@ positional:
   config.ngrid = ceil(config.L / config.dgrid);
   config.size_grid = config.ngrid * config.ngrid;
   if ((config.grid = malloc(config.size_grid * sizeof *config.grid)) == NULL) {
-    fprintf(stderr, "stl2dump: malloc failed\n");
+    fprintf(stderr, "stl2dump: error: malloc failed\n");
     exit(1);
   }
   if ((config.max_grid = malloc(config.size_grid * sizeof *config.max_grid)) ==
       NULL) {
-    fprintf(stderr, "stl2dump: malloc failed\n");
+    fprintf(stderr, "stl2dump: error: malloc failed\n");
     exit(1);
   }
   for (i = 0; i < config.size_grid; i++) {
@@ -437,12 +467,11 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   int leaf, i, intersect, iy, iz, index;
   uint32_t leaf_code;
   uint64_t cell_size, u, v, w;
-  long pos, curr, code, code_ch;
+  long pos, curr, code_ch;
   if ((values = malloc(config->header.len * sizeof *values)) == NULL) {
     fprintf(stderr, "stl2dump: error: malloc failed\n");
     exit(1);
   }
-  code = morton(x, y, z);
   delta = config->L / (1ul << level);
   s[0] = config->R[0] + delta * (x + 0.5);
   s[1] = config->R[1] + delta * (y + 0.5);
