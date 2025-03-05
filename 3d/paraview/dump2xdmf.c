@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
   if ((output_path = argv[1]) == NULL) {
-    fprintf(stderr, "dump2xdmf: output is not set\n");
+    fprintf(stderr, "dump2xdmf: error: output is not set\n");
     exit(1);
   }
   if ((input_file = fopen(input_path, "r")) == NULL) {
@@ -153,12 +153,12 @@ int main(int argc, char **argv) {
   if ((context.xyz_file = fopen(context.xyz_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
             context.xyz_path);
-    return 1;
+    exit(1);
   }
   if ((context.attr_file = fopen(context.attr_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
             context.attr_path);
-    return 1;
+    exit(1);
   }
   context.ncell_total = 0;
   traverse(0, &context);
@@ -168,6 +168,12 @@ int main(int argc, char **argv) {
     fprintf(stderr, "dump2xdmf: error: fail to close '%s'\n", context.xyz_path);
     exit(1);
   }
+  if (Verbose) {
+    fprintf(stderr, "dump2xdmf: write: %s\n", context.xyz_path);
+    fprintf(stderr, "dump2xdmf: write: %s\n", context.attr_path);
+    fprintf(stderr, "dump2xdmf: write: %s\n", xdmf_path);
+  }
+
   if (fclose(context.attr_file) != 0) {
     fprintf(stderr, "dump2xdmf: error: fail to close '%s'\n",
             context.attr_path);
@@ -182,7 +188,7 @@ int main(int argc, char **argv) {
   if ((file = fopen(xdmf_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
             xdmf_path);
-    return 1;
+    exit(1);
   }
   fprintf(file,
           "<Xdmf\n"
@@ -238,7 +244,7 @@ int main(int argc, char **argv) {
 
 static void process(int level, void *vcontext) {
   int i, j;
-  double Delta, x, y, z, epsilon;
+  double Delta, x, y, z;
   float xyz[8 * 3];
   struct Context *context;
   context = vcontext;

@@ -19,7 +19,7 @@ static int num_threads(void) {
   return n;
 }
 #else
-static int num_threads(void) { return 0; }
+static int num_threads(void) { return 1; }
 #endif
 
 struct Hash {
@@ -29,14 +29,22 @@ struct Hash {
     void *value;
   } * nodes;
 };
-struct coord {
-  double x, y, z;
-};
+
 struct DumpHeader {
   double t;
   long len;
   int i, depth, npe, version;
-  struct coord n;
+  struct {
+    double x, y, z;
+  } n;
+};
+struct WallData {
+  double z0, z1;
+  int level;
+};
+struct Wall {
+  int (*inside)(struct WallData *, int, const double[3]);
+  double (*dist2)(struct WallData *, const double[3]);
 };
 struct Config {
   double R[3], L, dgrid;
@@ -47,6 +55,8 @@ struct Config {
   int32_t stl_nt, **grid, *max_grid;
   float *stl_ver;
   struct DumpHeader header;
+  struct Wall *wall;
+  struct WallData *wall_data;
 };
 static uint64_t morton(uint64_t, uint64_t, uint64_t);
 static int hash_ini(size_t, void *, struct Hash *);
@@ -58,6 +68,8 @@ static double tri_point_distance2(const double[3], const double[3],
 static double edg2_sq(const float[2], const float[2]);
 static uint64_t create_cell(struct Config *, int64_t, int64_t, int64_t, int,
                             int);
+static double dist2_z(struct WallData *, const double[3]);
+static int inside_z(struct WallData *, int, const double[3]);
 enum { TABLE_DOUBLE, TABLE_INT, TABLE_PCHAR };
 static const struct {
   const char *name;
@@ -84,18 +96,21 @@ static char **fields;
 
 int main(int argc, char **argv) {
   char *end;
-  double lo[3], hi[3], r, d2, d2max;
+  double lo[3], hi[3], s[3], r, d2, d2max, delta;
   FILE *stl_file;
-  float *a, *b, *c, s[3];
+  float *a, *b, *c;
   int OutletFlag;
   int32_t i, ilo[3], ihi[3];
-  int64_t inv_delta, ncells, x, y, z, size;
+  int64_t inv_delta, ncells, ncells_wall, x, y, z, size;
   int index, iy, iz, iv, iw, d, j;
   size_t nbytes, nfull, nmax;
   struct Config config;
   unsigned len;
   void **work;
-
+  struct WallData wall_data;
+  struct Wall wall_z = {inside_z, dist2_z};
+  config.wall_data = NULL;
+  config.wall = NULL;
   config.Verbose = 0;
   OutletFlag = 0;
   fields = fields_full;
@@ -106,22 +121,67 @@ int main(int argc, char **argv) {
               "Usage: stl2dump [options] X0 Y0 Z0 L minlevel maxlevel npe "
               "file.stl basilisk.dump\n\n"
               "Options:\n"
+              "  -w <axis> <start> <end>    Add extra wall (e.g., -w z 0 1)\n"
               "  -o          Refine the outlet to a minimum level\n"
-              "  -m          Output size and phi values (minimal output)\n"
+              "  -m          Minimal output (size and phi values only)\n"
               "  -h          Display this help message and exit\n"
               "  -v          Enable verbose mode\n\n"
               "Arguments:\n"
-              "  X0, Y0, Z0    Coordinates of the origin\n"
+              "  X0, Y0, Z0    Origin coordinates\n"
               "  L             Length scale\n"
               "  minlevel      Minimum refinement level\n"
               "  maxlevel      Maximum refinement level\n"
               "  npe           Number of MPI ranks\n"
               "  file.stl      Input STL file\n"
               "  basilisk.dump Output file\n\n"
+              "Examples:\n"
+              "  stl2dump -o -v -- -5 -6.25 -6.25 12.5  5 6  64 center.stl "
+              "basilisk.dump\n"
+              "  stl2dump -v -w z 8 -2 2 -o -- -5 -6.25 -6.25 12.5  6 9  64 "
+              "center.stl basilisk.dump\n"
               "Additional Info:\n"
               "  num_threads: %d\n",
               num_threads());
       exit(1);
+    case 'w':
+      argv++;
+      if (*argv == NULL) {
+        fprintf(stderr, "stl2dump: error: -w needs more arguments\n");
+        exit(1);
+      }
+      if (strcmp(*argv, "z") != 0) {
+        fprintf(stderr, "stl2dump: error: unsupported wall type '%s'\n", *argv);
+        exit(1);
+      }
+      argv++;
+      if (argv[0] == NULL || argv[1] == NULL || argv[2] == NULL) {
+        fprintf(stderr, "stl2dump: error: -w needs three arguments\n");
+        exit(1);
+      }
+      wall_data.level = strtol(*argv, &end, 10);
+      if (*end != '\0') {
+        fprintf(stderr, "stl2dump: error: '%s' is not an integer\n", *argv);
+        exit(1);
+      }
+      argv++;
+      wall_data.z0 = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
+        exit(1);
+      }
+      argv++;
+      wall_data.z1 = strtod(*argv, &end);
+      if (*end != '\0') {
+        fprintf(stderr, "stl2dump: error: '%s' is not a double\n", *argv);
+        exit(1);
+      }
+      if (wall_data.z1 <= wall_data.z0) {
+        fprintf(stderr, "stl2dump: error: z1 <= z0\n");
+        exit(1);
+      }
+      config.wall_data = &wall_data;
+      config.wall = &wall_z;
+      break;
     case 'v':
       config.Verbose = 1;
       break;
@@ -212,7 +272,7 @@ positional:
     fprintf(stderr, "stl2dump: error: malloc failed\n");
     exit(1);
   }
-  nmax = (1ul << 24) * sizeof *(*config.hash)->nodes;
+  nmax = (1ul << 26) * sizeof *(*config.hash)->nodes;
   nfull = sizeof *(*config.hash)->nodes;
   for (i = 0; i < config.maxlevel + 1; i++) {
     nbytes = nfull < nmax ? nfull : nmax;
@@ -310,16 +370,43 @@ positional:
   }
 
   inv_delta = 1ul << config.minlevel;
+  delta = config.L / inv_delta;
   for (z = 0; z < inv_delta; z++)
     for (y = 0; y < inv_delta; y++)
       if (OutletFlag)
-        for (x = 0; 10 * x < 9 * inv_delta; x++)
-          ncells += create_cell(&config, x, y, z, config.minlevel, 1);
+        for (x = 0; 10 * x < 9 * inv_delta; x++) {
+          s[0] = config.R[0] + delta * (x + 0.5);
+          s[1] = config.R[1] + delta * (y + 0.5);
+          s[2] = config.R[2] + delta * (z + 0.5);
+          if (config.wall->inside(config.wall_data, 1, s))
+            ncells += create_cell(&config, x, y, z, config.minlevel, 1);
+        }
       else
         for (x = 0; x < inv_delta; x++)
           ncells += create_cell(&config, x, y, z, config.minlevel, 1);
-  if (config.Verbose)
+
+  ncells_wall = 0;
+  if (config.wall) {
+    inv_delta = 1ul << config.wall_data->level;
+    delta = config.L / inv_delta;
+    for (z = 0; z < inv_delta; z++)
+      for (y = 0; y < inv_delta; y++)
+        for (x = 0; x < inv_delta; x++) {
+          s[0] = config.R[0] + delta * (x + 0.5);
+          s[1] = config.R[1] + delta * (y + 0.5);
+          s[2] = config.R[2] + delta * (z + 0.5);
+          d2 = config.wall->dist2(config.wall_data, s);
+          if (d2 < delta * delta) {
+            ncells += create_cell(&config, x, y, z, config.wall_data->level, 1);
+            ncells_wall++;
+          }
+        }
+  }
+
+  if (config.Verbose) {
+    fprintf(stderr, "stl2dump: ncells_wall: %ld\n", ncells_wall);
     fprintf(stderr, "stl2dump: ncells: %ld\n", ncells);
+  }
 
   if ((config.dump_file = fopen(config.dump_path, "w")) == NULL) {
     fprintf(stderr, "stl2dump: error: fail to open '%s'\n", config.dump_path);
@@ -345,7 +432,8 @@ positional:
     fprintf(stderr, "stl2dump: error: not `phi' in fields\n");
     exit(1);
   }
-  fprintf(stderr, "config.phi_index: %d\n", config.phi_index);
+  if (config.Verbose)
+    fprintf(stderr, "config.phi_index: %d\n", config.phi_index);
   if (fwrite(&config.header, sizeof(config.header), 1, config.dump_file) != 1) {
     fprintf(stderr, "stl2dump: error: fail to write '%s'\n", config.dump_path);
     exit(1);
@@ -512,8 +600,19 @@ static uint64_t traverse(uint64_t x, uint64_t y, uint64_t z, int level,
   }
   for (i = 0; i < config->header.len; i++)
     values[i] = 0.0;
-  values[config->phi_index] =
-      intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
+
+  if (config->wall == NULL) {
+    values[config->phi_index] =
+        intersect % 2 == 0 ? sqrt(minimum) : -sqrt(minimum);
+  } else {
+    double dist2;
+    int inside;
+    inside = config->wall->inside(config->wall_data, intersect % 2 == 0, s);
+    dist2 = config->wall->dist2(config->wall_data, s);
+    if (dist2 < minimum)
+      minimum = dist2;
+    values[config->phi_index] = inside ? sqrt(minimum) : -sqrt(minimum);
+  }
   code_ch = morton(x << 1, y << 1, z << 1);
   leaf = level + 1 > config->maxlevel ||
          !hash_search(config->hash[level + 1], code_ch, NULL);
@@ -673,4 +772,15 @@ static uint64_t create_cell(struct Config *config, int64_t x, int64_t y,
     ncells += hash_insert(config->hash[level], code, NULL);
   }
   return ncells;
+}
+static double dist2_z(struct WallData *wall_data, const double s[3]) {
+  double d0, d1;
+  d0 = fabs(s[2] - wall_data->z0);
+  d1 = fabs(s[2] - wall_data->z1);
+  if (d1 < d0)
+    d0 = d1;
+  return d0 * d0;
+}
+static int inside_z(struct WallData *wall_data, int inside, const double s[3]) {
+  return inside && (wall_data->z0 < s[2] && s[2] < wall_data->z1);
 }
