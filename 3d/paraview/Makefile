@@ -14,7 +14,6 @@ dump_info \
 dump_select \
 morton \
 stl2dump \
-tree_check\
 
 all: $M
 .c:; $(CC) $< $(CFLAGS) -o $@
